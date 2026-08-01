@@ -895,6 +895,159 @@ body {
   color: rgba(255, 255, 255, 0.85);
 }
 
+/* --- AI panel --------------------------------------------------------------- */
+
+.ai-panel .panel-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ai-title-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--accent);
+}
+
+.ai-usage {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.ai-tabs {
+  margin-bottom: 12px;
+}
+
+.ai-tabs .mode-tab {
+  flex: 1;
+  padding: 4px 8px;
+}
+
+.ai-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ai-prompt-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.ai-textarea {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  font: inherit;
+  resize: vertical;
+  background: var(--panel);
+}
+
+.ai-textarea:focus {
+  outline: 2px solid var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.ai-go {
+  align-self: stretch;
+  margin-bottom: 8px;
+}
+
+.ai-note {
+  margin: 4px 0;
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.ai-link {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--accent);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.ai-notice {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.ai-notice.ok {
+  background: #ecfdf3;
+  color: #15803d;
+}
+
+.ai-notice.error {
+  background: #fef2f2;
+  color: var(--danger);
+}
+
+.ai-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.ai-bubble {
+  padding: 10px 12px;
+  border-radius: 14px 14px 14px 4px;
+  background: var(--accent-soft);
+  line-height: 1.45;
+}
+
+.ai-suggestion {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.ai-suggestion span {
+  flex: 1;
+}
+
+.btn.small-apply {
+  min-height: 30px;
+  padding: 3px 12px;
+  border-color: var(--accent);
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.ai-settings {
+  margin-top: 12px;
+  border-top: 1px dashed var(--border);
+  padding-top: 10px;
+}
+
+.ai-settings-body {
+  margin-top: 10px;
+}
+
+.ai-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 36px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 8px;
+  font: inherit;
+  background: var(--panel);
+}
+
 /* --- Small screens ------------------------------------------------------- */
 
 @media (max-width: 860px) {

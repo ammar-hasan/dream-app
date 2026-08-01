@@ -121,6 +121,10 @@ export function useKeyboardShortcuts(): void {
         store.setTool(designing ? 'select' : 'move');
         return;
       }
+      if (key === 'a') {
+        store.toggleAiPanel();
+        return;
+      }
       const tool = TOOL_KEYS[key];
       if (tool) store.setTool(tool);
     };

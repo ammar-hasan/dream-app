@@ -5,7 +5,7 @@ import { useDreamStore } from '../store/dreamStore';
 import { saveProject } from '../storage/projects';
 import { importImageFiles } from './importImage';
 import { LAST_DOC_KEY } from './usePersistence';
-import { RedoIcon, UndoIcon, ZoomIcon } from './icons';
+import { RedoIcon, SparkleIcon, UndoIcon, ZoomIcon } from './icons';
 
 interface ToolbarProps {
   onNew: () => void;
@@ -22,6 +22,7 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
   const zoom = useDreamStore((s) => s.zoom);
   const mode = useDreamStore((s) => s.mode);
   const animated = useDreamStore((s) => s.doc.frames !== undefined);
+  const aiPanelOpen = useDreamStore((s) => s.aiPanelOpen);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const saveNow = async () => {
@@ -115,6 +116,16 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
           onClick={() => useDreamStore.getState().toggleAnimation()}
         >
           Animate
+        </button>
+        <button
+          type="button"
+          className={`btn icon-btn${aiPanelOpen ? ' primary' : ''}`}
+          aria-pressed={aiPanelOpen}
+          aria-label="AI helper"
+          title="AI helper (A)"
+          onClick={() => useDreamStore.getState().toggleAiPanel()}
+        >
+          <SparkleIcon />
         </button>
       </div>
 

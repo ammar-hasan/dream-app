@@ -10,6 +10,7 @@ import { ToolOptionsPanel } from './ui/ToolOptionsPanel';
 import { DesignPanel } from './ui/DesignPanel';
 import { ComponentsPanel } from './ui/ComponentsPanel';
 import { AdjustPanel } from './ui/AdjustPanel';
+import { AiPanel } from './ui/AiPanel';
 import { LayersPanel } from './ui/LayersPanel';
 import { StatusBar } from './ui/StatusBar';
 import { TimelineBar } from './ui/TimelineBar';
@@ -24,6 +25,7 @@ type Dialog = 'new' | 'open' | 'resize' | 'export' | null;
 export default function App() {
   const [dialog, setDialog] = useState<Dialog>(null);
   const mode = useDreamStore((s) => s.mode);
+  const aiPanelOpen = useDreamStore((s) => s.aiPanelOpen);
 
   useKeyboardShortcuts();
   useAutosave();
@@ -45,6 +47,7 @@ export default function App() {
         <ToolRail />
         <CanvasViewport />
         <aside className="side-panel">
+          {aiPanelOpen && <AiPanel />}
           {mode === 'design' && (
             <>
               <DesignPanel />

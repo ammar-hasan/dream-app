@@ -4,9 +4,11 @@ import {
   adjustContrast,
   adjustSaturation,
   applyAdjustments,
+  blitRegion,
   boxBlur,
   convolve,
   DEFAULT_ADJUSTMENTS,
+  extractRegion,
   FILTER_PRESETS,
   grayscale,
   invert,
@@ -192,5 +194,58 @@ describe('presets', () => {
     const bw = FILTER_PRESETS.find((p) => p.id === 'bw');
     expect(bw).toBeDefined();
     expect([...applyAdjustments(src, bw!.adjustments).data]).toEqual([...grayscale(src, 100).data]);
+  });
+});
+
+describe('regions (extract/blit)', () => {
+  /** 4x2 buffer; pixel (x, y) is (x, y, 0, 255) so position is readable. */
+  function grid(width: number, height: number): PixelBuffer {
+    const data = new Uint8ClampedArray(width * height * 4);
+    for (let y = 0; y < height; y += 1) {
+      for (let x = 0; x < width; x += 1) {
+        const i = (y * width + x) * 4;
+        data[i] = x;
+        data[i + 1] = y;
+        data[i + 3] = 255;
+      }
+    }
+    return { data, width, height };
+  }
+
+  it('extracts a sub-rectangle', () => {
+    const region = extractRegion(grid(4, 2), { x: 1, y: 1, width: 2, height: 1 });
+    expect(region.width).toBe(2);
+    expect(region.height).toBe(1);
+    expect(px(region, 0)).toEqual([1, 1, 0, 255]);
+    expect(px(region, 1)).toEqual([2, 1, 0, 255]);
+  });
+
+  it('clamps extraction to the buffer', () => {
+    const region = extractRegion(grid(4, 2), { x: 3, y: 0, width: 10, height: 10 });
+    expect(region.width).toBe(1);
+    expect(region.height).toBe(2);
+  });
+
+  it('blits a patch back at an offset, clipping at edges', () => {
+    const dst = grid(4, 2);
+    const patch: PixelBuffer = {
+      data: new Uint8ClampedArray([9, 9, 9, 255, 8, 8, 8, 255]),
+      width: 2,
+      height: 1,
+    };
+    blitRegion(dst, patch, 3, 1); // second pixel falls off the right edge
+    expect(px(dst, 1 * 4 + 3)).toEqual([9, 9, 9, 255]);
+    expect(px(dst, 0)).toEqual([0, 0, 0, 255]); // untouched
+  });
+
+  it('blits with negative offsets (clipped)', () => {
+    const dst = grid(4, 2);
+    const patch: PixelBuffer = {
+      data: new Uint8ClampedArray([9, 9, 9, 255, 8, 8, 8, 255]),
+      width: 2,
+      height: 1,
+    };
+    blitRegion(dst, patch, -1, 0); // first patch pixel is off-canvas
+    expect(px(dst, 0)).toEqual([8, 8, 8, 255]);
   });
 });

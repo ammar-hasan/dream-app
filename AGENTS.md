@@ -54,7 +54,13 @@ Conventions for anyone (human or agent) working on Dream.
   animation video/sprite sheet; MediaRecorder isolated behind injectable deps)
 - `src/storage/` — IndexedDB project persistence + cross-project component
   library (shared connection in `db.ts`)
-- `src/ai/` — AIProvider interface, mock provider, registry (BYOK in later slices)
+- `src/ai/` — AIProvider contract (capability flags, PixelBuffer in/out — no
+  DOM, so providers are Node-testable), MockAIProvider (built-in free tier),
+  OpenAICompatibleProvider (BYOK; fetch + image decode are injectable deps),
+  registry with settings persistence (API keys: sessionStorage by default,
+  localStorage only on opt-in — never log keys), daily usage counter,
+  rule-based document feedback (`analyze.ts`), Web Speech dictation
+  (`speech.ts`, feature-detected)
 - `src/test/` — shared test helpers (mock 2D context) + Vitest setup
 
 ## Git

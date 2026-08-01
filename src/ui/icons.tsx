@@ -215,6 +215,22 @@ export const PlayIcon = (p: IconProps) => (
   </svg>
 );
 
+export const SparkleIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9Z" />
+    <path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9Z" />
+    <path d="M5 16l.7 1.8L7.5 18.5l-1.8.7L5 21l-.7-1.8L2.5 18.5l1.8-.7Z" />
+  </svg>
+);
+
+export const MicIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="9" y="2" width="6" height="12" rx="3" />
+    <path d="M5 10a7 7 0 0 0 14 0" />
+    <path d="M12 17v5" />
+  </svg>
+);
+
 export const PauseIcon = (p: IconProps) => (
   <svg {...base(p)}>
     <path d="M8 5v14M16 5v14" />

@@ -87,18 +87,41 @@ slices are roughly ordered by dependency, not by a fixed schedule.
   navigation, fullscreen, slide counter).
 - Remaining: transitions, presenter view with notes, per-slide duration.
 
-## Slice 7 — AI panel with BYOK providers
+## Slice 7 — AI panel with BYOK providers ✅
 
-- UI panel wired to `src/ai` registry: generate image, edit region, get feedback.
-- Bring-your-own-key: OpenAI/Anthropic/Gemini/etc. provider configs stored locally;
-  Mock provider remains for offline/dev.
-- Free-tier hosted quota + unlimited usage with own keys, per the product vision.
-- Acceptance: user enters an API key, generates an image onto a layer, asks for
-  feedback and gets actionable suggestions; provider errors degrade gracefully.
+- ✅ AI panel (sparkle in the toolbar, `A` key): three friendly tabs —
+  Create (prompt → new layer), Edit (prompt → layer edit, optional
+  selected-area-only region from the Design-mode selection box) and
+  Feedback (observations + one-click Apply suggestions). All actions are
+  undoable through the shared History.
+- ✅ Provider architecture in `src/ai`: capability-flagged `AIProvider`
+  (generateImage/editImage/chat, PixelBuffer in/out), the built-in
+  **Dream AI** mock (deterministic procedural scenes seeded by the prompt,
+  keyword→filter edits, rule-engine feedback over the real document), and
+  `OpenAICompatibleProvider` for BYOK (`/chat/completions` +
+  `/images/generations`, graceful degradation when an endpoint can't do
+  images; no shared edits API → edit capability declared false).
+- ✅ BYOK settings persisted locally (base URL, model, active provider);
+  API keys in sessionStorage by default with an opt-in "remember key"
+  (localStorage); keys never logged. Test-connection button with friendly
+  errors.
+- ✅ Free tier: 20 Dream AI tries/day with date rollover, shown subtly in
+  the panel; the counter disappears with BYOK (unlimited).
+- ✅ Voice input for the prompt boxes via the Web Speech API (isolated in
+  `ai/speech.ts` with feature detection; mic button hidden when
+  unsupported).
+- Acceptance: user enters an API key, generates an image onto a layer, asks
+  for feedback and gets actionable suggestions; provider errors degrade
+  gracefully.
+- Deviation: image _editing_ on BYOK providers was skipped (no shared
+  `/images/edits` API across OpenAI-compatible endpoints); Dream AI covers
+  edits, and the Edit tab says so kindly when BYOK can't.
 
 ## Slice 8 — Voice commands
 
-- Hands-free basics: "brush", "undo", "fill red", "new document".
+- Prompt dictation shipped with the AI panel (mic button, Web Speech API).
+- Remaining: hands-free canvas commands: "brush", "undo", "fill red", "new
+  document".
 - Acceptance: core drawing flow is drivable by voice with visible command feedback;
   works with mic permission denied (graceful no-op).
 

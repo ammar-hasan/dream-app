@@ -16,11 +16,10 @@ import {
   FILTER_PRESETS,
   isIdentity,
   type Adjustments,
-  type PixelBuffer,
 } from '../engine/filters';
-import { renderLayer } from '../engine/renderer';
 import type { Layer } from '../engine/types';
 import { useDreamStore } from '../store/dreamStore';
+import { rasterizeLayer } from './rasterize';
 
 interface SliderDef {
   key: keyof Adjustments;
@@ -41,18 +40,6 @@ const SLIDERS: SliderDef[] = [
   { key: 'blur', label: 'Blur', min: 0, max: 20 },
   { key: 'sharpen', label: 'Sharpen', min: 0, max: 100 },
 ];
-
-/** Rasterize a layer at document size, ignoring layer opacity (it is applied at render time). */
-function rasterizeLayer(layer: Layer, width: number, height: number): PixelBuffer | null {
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return null;
-  renderLayer({ ...layer, opacity: 1 }, ctx);
-  const image = ctx.getImageData(0, 0, width, height);
-  return { data: image.data, width: image.width, height: image.height };
-}
 
 function isRasterCapable(layer: Layer): boolean {
   return layer.operations.some((op) => op.kind === 'image' || op.kind === 'fill');

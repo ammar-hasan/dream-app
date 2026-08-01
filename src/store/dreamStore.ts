@@ -186,6 +186,10 @@ export interface DreamStore {
   presentIndex: number;
   /** Workspace to return to when leaving Present mode. */
   lastEditMode: 'draw' | 'design';
+  /** Right-side AI panel visibility (UI state, not persisted per project). */
+  aiPanelOpen: boolean;
+
+  toggleAiPanel(): void;
 
   setTool(tool: ToolId): void;
   /** Switch workspace mode; persisted with the document (not undoable). */
@@ -222,7 +226,7 @@ export interface DreamStore {
   /** Show (or clear) the live filter preview for a layer. */
   setAdjustPreview(preview: AdjustPreview | null): void;
   /** Bake the previewed raster into the layer as an undoable command. */
-  applyLayerRaster(buffer: PixelBuffer): void;
+  applyLayerRaster(buffer: PixelBuffer, label?: string): void;
   flipLayer(direction: FlipDirection): void;
   rotateLayer(direction: RotateDirection): void;
   /** Commit the current cropDraft as a document crop. */
@@ -273,6 +277,8 @@ export interface DreamStore {
   createComponentFromSelection(name: string): Component | null;
   /** Insert a component as a new layer (centered unless `at` is given). */
   insertComponentInstance(component: Component, at?: Point): void;
+  /** Move the selection so its bounding box is centered on the canvas. */
+  centerSelection(): void;
 
   zoomIn(): void;
   zoomOut(): void;
@@ -369,6 +375,9 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
     playbackFrame: null,
     presentIndex: 0,
     lastEditMode: 'draw',
+    aiPanelOpen: false,
+
+    toggleAiPanel: () => set((s) => ({ aiPanelOpen: !s.aiPanelOpen })),
 
     setTool: (tool) =>
       set({
@@ -851,7 +860,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
 
     setAdjustPreview: (preview) => set({ adjustPreview: preview }),
 
-    applyLayerRaster: (buffer) => {
+    applyLayerRaster: (buffer, label = 'Apply filter') => {
       const layer = activeLayer();
       if (!layer || layer.locked) return;
       const op: ImageOp = {
@@ -862,7 +871,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         scale: 1,
         patch: { x: 0, y: 0, width: buffer.width, height: buffer.height, data: buffer.data },
       };
-      execute(replaceLayerContentCommand(get().doc, layer.id, [op], 'Apply filter'));
+      execute(replaceLayerContentCommand(get().doc, layer.id, [op], label));
       set({ adjustPreview: null });
     },
 
@@ -1124,6 +1133,21 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       const layer = createLayer(component.name, ops);
       execute(addLayerCommand(layer));
       set({ activeLayerId: layer.id, selection: ops.map((op) => op.id) });
+    },
+
+    centerSelection: () => {
+      const layer = activeLayer();
+      const { doc, selection } = get();
+      if (!layer || layer.locked || selection.length === 0) return;
+      const bounds = selectionUnionBounds(layer.operations, selection);
+      if (!bounds) return;
+      const dx = Math.round(doc.width / 2 - (bounds.x + bounds.width / 2));
+      const dy = Math.round(doc.height / 2 - (bounds.y + bounds.height / 2));
+      if (dx === 0 && dy === 0) return;
+      mutateSelection('Center selection', (ops, ids) => {
+        const wanted = new Set(ids);
+        return ops.map((op) => (wanted.has(op.id) ? translateOperation(op, dx, dy) : op));
+      });
     },
 
     zoomIn: () => set((s) => ({ zoom: nextZoomIn(s.zoom) })),

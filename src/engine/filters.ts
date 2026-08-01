@@ -269,6 +269,45 @@ export function sharpen(src: PixelBuffer, amount = 100): PixelBuffer {
   return out;
 }
 
+/** Copy a rectangular region out of a buffer; the rect is clamped to the buffer. */
+export function extractRegion(
+  src: PixelBuffer,
+  rect: { x: number; y: number; width: number; height: number },
+): PixelBuffer {
+  const x = Math.max(0, Math.round(rect.x));
+  const y = Math.max(0, Math.round(rect.y));
+  const width = Math.max(0, Math.min(src.width - x, Math.round(rect.width)));
+  const height = Math.max(0, Math.min(src.height - y, Math.round(rect.height)));
+  const data = new Uint8ClampedArray(width * height * 4);
+  for (let row = 0; row < height; row += 1) {
+    const from = ((y + row) * src.width + x) * 4;
+    data.set(src.data.subarray(from, from + width * 4), row * width * 4);
+  }
+  return { data, width, height };
+}
+
+/** Paint `patch` over `dst` at (x, y), clipping at the edges. Returns `dst` (mutated). */
+export function blitRegion(
+  dst: PixelBuffer,
+  patch: PixelBuffer,
+  x: number,
+  y: number,
+): PixelBuffer {
+  const px = Math.round(x);
+  const py = Math.round(y);
+  for (let row = 0; row < patch.height; row += 1) {
+    const dy = py + row;
+    if (dy < 0 || dy >= dst.height) continue;
+    const sx0 = Math.max(0, -px);
+    const count = Math.min(patch.width - sx0, dst.width - px - sx0);
+    if (count <= 0) continue;
+    const from = (row * patch.width + sx0) * 4;
+    const to = (dy * dst.width + px + sx0) * 4;
+    dst.data.set(patch.data.subarray(from, from + count * 4), to);
+  }
+  return dst;
+}
+
 export function isIdentity(adj: Adjustments): boolean {
   return (
     adj.brightness === 0 &&

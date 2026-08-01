@@ -8,8 +8,9 @@ for the full product vision.
 
 This repository currently contains **Slice 1** (foundation + core drawing),
 **Slice 2** (image editing: import, filters, crop & transform), **Slice 3**
-(design mode: selection, components, alignment) and **Slice 4** (animation,
-video export and presentation mode).
+(design mode: selection, components, alignment), **Slice 4** (animation,
+video export and presentation mode) and **Slice 5** (the AI panel with
+BYOK providers and voice input).
 
 ## What works today
 
@@ -68,6 +69,50 @@ frame's stack, so the renderer, tools and persistence never had to learn
 about frames, and old saves load unchanged (animation simply stays off).
 Playback speed and onion-skin preferences are saved with the project but,
 like the workspace mode, live outside undo.
+
+## The AI panel (Dream AI + BYOK)
+
+The sparkle button in the toolbar (or the `A` key) opens the AI panel — a
+friendly assistant you talk to, with three tabs. Everything it does lands
+on the document through the same undoable history as your own strokes.
+
+- **Create**: describe what you want ("a sleepy fox under a starry sky")
+  and it appears as a new layer. The mic button 🎤 fills the prompt by
+  voice (Web Speech API; hidden where unsupported).
+- **Edit**: describe a change ("warmer", "dreamy", "more pop"). With
+  "Selected part only" ticked, the current Design-mode selection box
+  becomes the edit region; the rest of the layer is untouched.
+- **Feedback**: "Look at my design" returns kind, concrete observations
+  plus suggestions — each with an **Apply** button where Dream can do it
+  for you (contrast/brightness/warmth fixes, centering the selection).
+
+**Dream AI** is the built-in provider: free, offline, deterministic. It
+paints procedural scenes (seeded by your words — night, sunset, forest,
+ocean, snow…), edits via the real engine filters, and gives feedback from
+a rule engine that reads the actual document (palette histogram, canvas
+coverage, contrast and warmth heuristics). It comes with **20 free tries
+per day** (persisted, rolling over at midnight); the panel shows the
+countdown subtly.
+
+**BYOK — bring your own key.** In the panel's Settings you can point Dream
+at any OpenAI-compatible endpoint: chat goes through `/chat/completions`,
+image generation through `/images/generations` (tick "This AI can also
+paint images" if the endpoint supports it). With your own provider active
+the daily counter disappears and usage is unlimited. Settings (URL, model,
+active provider) persist in localStorage; **API keys live in sessionStorage
+only** (gone when the tab closes) unless you tick "remember key", and are
+never logged. Examples:
+
+```
+OpenRouter:  base URL https://openrouter.ai/api/v1   model openai/gpt-4o-mini
+Ollama:      base URL http://localhost:11434/v1      model llama3.1  (no key needed)
+LM Studio:   base URL http://localhost:1234/v1       model <loaded model>
+```
+
+The **Test connection** button validates URL/key/model with one cheap
+round-trip and reports success or a friendly, jargon-free error. Endpoints
+that can't generate or edit images simply declare so — the panel degrades
+gracefully and offers to switch back to Dream AI.
 
 ## Design mode
 
@@ -153,7 +198,12 @@ src/
                      (fullscreen slides), dialogs, image/video/sprite export
   storage/           IndexedDB via `idb`: projects + the cross-project
                      component library (one shared connection in db.ts)
-  ai/                AIProvider interface + MockAIProvider + registry (BYOK later)
+  ai/                AIProvider contract (capabilities, PixelBuffer in/out)
+                     + MockAIProvider (free built-in: procedural scenes,
+                     keyword edits, rule-engine feedback in analyze.ts)
+                     + OpenAICompatibleProvider (BYOK) + registry (settings
+                     persistence; keys in sessionStorage unless remembered)
+                     + daily free-tier counter + Web Speech dictation
   styles/            Plain CSS, light theme, 44px+ touch targets
 ```
 
@@ -168,7 +218,7 @@ store → React re-renders → viewport redraws the document with `engine/render
 `C` crop · `H` pan · `Z` zoom ·
 `Ctrl/Cmd+Z` undo · `Ctrl/Cmd+Shift+Z` / `Ctrl+Y` redo · `+`/`-` zoom ·
 `Space` (hold) pan — inside the focused timeline it toggles play instead ·
-`Shift` constrain shapes · `Enter` apply crop ·
+`Shift` constrain shapes · `Enter` apply crop · `A` toggle the AI panel ·
 `Esc` clear selection / cancel text/crop
 
 Design mode, with a selection: `Ctrl/Cmd+D` duplicate · `Ctrl/Cmd+G` group ·
@@ -185,10 +235,17 @@ Present mode: `→` / `Space` / click next slide · `←` previous · `Esc` exit
   components), animation (frame model, CRUD commands + undo, playback timing,
   onion-skin decisions, sprite-sheet layout), renderer (against a recording
   mock 2D context — no canvas package needed)
+- AI tests: provider registry + key/settings persistence, OpenAI-compatible
+  request construction with a mocked fetch, capability degradation, the daily
+  free-tier counter (date rollover via fake timers), the feedback rule engine
+  on synthetic documents, mock-generator determinism (same seed → same
+  pixels), selection-bbox edit regions, and speech feature detection with a
+  mocked SpeechRecognition
 - Store tests: drawing flow, layers, image import/move/adjust/crop/resize,
   design mode (mode switching, select gestures, transform handles, selection
   actions, component insert), animation (frame switching, cross-frame undo,
-  playback state, present mode), undo/redo
+  playback state, present mode), AI panel paths (insert/edit/apply-suggestion),
+  undo/redo
 - Export tests: WebM mime fallback, filenames, progress and error paths with
   mocked recorder/canvas (MediaRecorder can't run in Node — it's isolated
   behind injectable deps in `ui/exportAnimation.ts`)
