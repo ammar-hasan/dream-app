@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { useDreamStore } from '../store/dreamStore';
+import { useT } from './i18n';
 
 const MAX_DIMENSION = 4096;
 
 export function ResizeDialog({ onClose }: { onClose: () => void }) {
+  const t = useT();
   const doc = useDreamStore((s) => s.doc);
   const [width, setWidth] = useState(doc.width);
   const [height, setHeight] = useState(doc.height);
@@ -35,17 +37,15 @@ export function ResizeDialog({ onClose }: { onClose: () => void }) {
         className="dialog"
         role="dialog"
         aria-modal="true"
-        aria-label="Resize document"
+        aria-label={t('resize.title')}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="dialog-title">Resize document</h2>
-        <p className="tool-hint">
-          Current size: {doc.width} × {doc.height}. Content is scaled to fit.
-        </p>
+        <h2 className="dialog-title">{t('resize.title')}</h2>
+        <p className="tool-hint">{t('resize.hint', { width: doc.width, height: doc.height })}</p>
 
         <div className="field-row">
           <label className="field">
-            <span>Width</span>
+            <span>{t('newDoc.width')}</span>
             <input
               type="number"
               min={1}
@@ -56,7 +56,7 @@ export function ResizeDialog({ onClose }: { onClose: () => void }) {
             />
           </label>
           <label className="field">
-            <span>Height</span>
+            <span>{t('newDoc.height')}</span>
             <input
               type="number"
               min={1}
@@ -73,15 +73,15 @@ export function ResizeDialog({ onClose }: { onClose: () => void }) {
             checked={keepAspect}
             onChange={(e) => setKeepAspect(e.target.checked)}
           />
-          <span>Keep aspect ratio</span>
+          <span>{t('resize.keepAspect')}</span>
         </label>
 
         <div className="dialog-actions">
           <button className="btn" onClick={onClose}>
-            Cancel
+            {t('common.cancel')}
           </button>
           <button className="btn primary" onClick={resize}>
-            Resize
+            {t('toolbar.resize')}
           </button>
         </div>
       </div>

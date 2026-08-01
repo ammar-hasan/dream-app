@@ -13,6 +13,7 @@ import { renderDocument } from '../engine/renderer';
 import type { DreamDocument, Frame } from '../engine/types';
 import { useDreamStore } from '../store/dreamStore';
 import { PauseIcon, PlayIcon, PlusIcon } from './icons';
+import { useT } from './i18n';
 
 const THUMB_HEIGHT = 56;
 
@@ -32,6 +33,7 @@ function FrameThumbnail({
   index: number;
   onSelect: () => void;
 }) {
+  const t = useT();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const width = Math.max(24, Math.round((doc.width / doc.height) * THUMB_HEIGHT));
 
@@ -51,8 +53,8 @@ function FrameThumbnail({
     <button
       type="button"
       className={`timeline-frame${active ? ' active' : ''}${playingHere ? ' playing' : ''}`}
-      title={`Frame ${index + 1}`}
-      aria-label={`Frame ${index + 1}`}
+      title={t('timeline.frame', { n: index + 1 })}
+      aria-label={t('timeline.frame', { n: index + 1 })}
       aria-pressed={active}
       onClick={onSelect}
     >
@@ -63,6 +65,7 @@ function FrameThumbnail({
 }
 
 export function TimelineBar() {
+  const t = useT();
   const doc = useDreamStore((s) => s.doc);
   const playing = useDreamStore((s) => s.playing);
   const playbackFrame = useDreamStore((s) => s.playbackFrame);
@@ -88,14 +91,14 @@ export function TimelineBar() {
       className={`timeline-bar${collapsed ? ' collapsed' : ''}`}
       tabIndex={0}
       role="group"
-      aria-label="Frames"
+      aria-label={t('timeline.frames')}
       onKeyDown={onKeyDown}
     >
       <button
         type="button"
         className="btn icon-btn timeline-collapse"
-        aria-label={collapsed ? 'Show frames' : 'Hide frames'}
-        title={collapsed ? 'Show frames' : 'Hide frames'}
+        aria-label={collapsed ? t('timeline.showFrames') : t('timeline.hideFrames')}
+        title={collapsed ? t('timeline.showFrames') : t('timeline.hideFrames')}
         onClick={() => setCollapsed(!collapsed)}
       >
         {collapsed ? '▴' : '▾'}
@@ -106,8 +109,8 @@ export function TimelineBar() {
           <button
             type="button"
             className="btn icon-btn timeline-play"
-            aria-label={playing ? 'Pause' : 'Play'}
-            title={playing ? 'Pause' : 'Play'}
+            aria-label={playing ? t('timeline.pause') : t('timeline.play')}
+            title={playing ? t('timeline.pause') : t('timeline.play')}
             onClick={() => store.togglePlay()}
           >
             {playing ? <PauseIcon /> : <PlayIcon />}
@@ -128,8 +131,8 @@ export function TimelineBar() {
             <button
               type="button"
               className="timeline-frame timeline-add"
-              aria-label="Add frame"
-              title="Add frame"
+              aria-label={t('timeline.addFrame')}
+              title={t('timeline.addFrame')}
               onClick={() => store.addFrame()}
             >
               <PlusIcon />
@@ -140,7 +143,8 @@ export function TimelineBar() {
             <button
               type="button"
               className="btn"
-              title="Duplicate this frame"
+              title={t('timeline.duplicateFrame')}
+              aria-label={t('timeline.duplicateFrame')}
               onClick={() => store.duplicateFrame()}
             >
               ⧉
@@ -148,7 +152,8 @@ export function TimelineBar() {
             <button
               type="button"
               className="btn"
-              title="Move frame left"
+              title={t('timeline.moveLeft')}
+              aria-label={t('timeline.moveLeft')}
               disabled={activeIndex(frames, doc.activeFrameId) === 0}
               onClick={() =>
                 store.moveFrame(doc.activeFrameId ?? '', activeIndex(frames, doc.activeFrameId) - 1)
@@ -159,7 +164,8 @@ export function TimelineBar() {
             <button
               type="button"
               className="btn"
-              title="Move frame right"
+              title={t('timeline.moveRight')}
+              aria-label={t('timeline.moveRight')}
               disabled={activeIndex(frames, doc.activeFrameId) === frames.length - 1}
               onClick={() =>
                 store.moveFrame(doc.activeFrameId ?? '', activeIndex(frames, doc.activeFrameId) + 1)
@@ -170,21 +176,22 @@ export function TimelineBar() {
             <button
               type="button"
               className="btn"
-              title="Delete this frame"
+              title={t('timeline.deleteFrame')}
+              aria-label={t('timeline.deleteFrame')}
               disabled={frames.length <= 1}
               onClick={() => store.deleteFrame(doc.activeFrameId ?? '')}
             >
               ✕
             </button>
 
-            <label className="timeline-fps" title="Frames per second">
+            <label className="timeline-fps" title={t('timeline.fps')}>
               <input
                 type="range"
                 min={MIN_FPS}
                 max={MAX_FPS}
                 value={settings.fps}
                 onChange={(e) => store.setAnimation({ fps: Number(e.target.value) })}
-                aria-label="Frames per second"
+                aria-label={t('timeline.fps')}
               />
               <span>{settings.fps} fps</span>
             </label>
@@ -192,20 +199,20 @@ export function TimelineBar() {
             <button
               type="button"
               className={`btn${settings.loop ? ' primary' : ''}`}
-              title="Loop playback"
+              title={t('timeline.loopTitle')}
               aria-pressed={settings.loop}
               onClick={() => store.setAnimation({ loop: !settings.loop })}
             >
-              Loop
+              {t('timeline.loop')}
             </button>
             <button
               type="button"
               className={`btn${settings.onionSkin ? ' primary' : ''}`}
-              title="Onion skin: ghost the previous frame while you draw"
+              title={t('timeline.onionTitle')}
               aria-pressed={settings.onionSkin}
               onClick={() => store.setAnimation({ onionSkin: !settings.onionSkin })}
             >
-              Onion
+              {t('timeline.onion')}
             </button>
             {settings.onionSkin && (
               <>
@@ -217,17 +224,17 @@ export function TimelineBar() {
                   onChange={(e) =>
                     store.setAnimation({ onionOpacity: Number(e.target.value) / 100 })
                   }
-                  aria-label="Onion skin opacity"
-                  title="Onion skin opacity"
+                  aria-label={t('timeline.onionOpacity')}
+                  title={t('timeline.onionOpacity')}
                 />
                 <button
                   type="button"
                   className={`btn${settings.onionNext ? ' primary' : ''}`}
-                  title="Also ghost the next frame"
+                  title={t('timeline.onionNextTitle')}
                   aria-pressed={settings.onionNext}
                   onClick={() => store.setAnimation({ onionNext: !settings.onionNext })}
                 >
-                  Next
+                  {t('timeline.onionNext')}
                 </button>
               </>
             )}

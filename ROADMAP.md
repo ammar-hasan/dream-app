@@ -1,9 +1,11 @@
 # Roadmap
 
 Dream ships in slices. Slice 1 (core drawing app + harness), slice 2 (image
-editing), slice 3 (design mode) and slice 4 (animation + video export +
-presentation mode) are done. Each slice below lists brief acceptance criteria;
-slices are roughly ordered by dependency, not by a fixed schedule.
+editing), slice 3 (design mode), slice 4 (animation + video export +
+presentation mode), slice 7 (AI panel) and the accessibility trio — slices 8
+(voice commands), 9 (kid mode) and 10 (i18n) — are done. Each slice below
+lists brief acceptance criteria; slices are roughly ordered by dependency,
+not by a fixed schedule.
 
 ## Slice 2 — Image filters & adjustments ✅
 
@@ -117,26 +119,54 @@ slices are roughly ordered by dependency, not by a fixed schedule.
   `/images/edits` API across OpenAI-compatible endpoints); Dream AI covers
   edits, and the Edit tab says so kindly when BYOK can't.
 
-## Slice 8 — Voice commands
+## Slice 8 — Voice commands ✅
 
-- Prompt dictation shipped with the AI panel (mic button, Web Speech API).
-- Remaining: hands-free canvas commands: "brush", "undo", "fill red", "new
-  document".
-- Acceptance: core drawing flow is drivable by voice with visible command feedback;
-  works with mic permission denied (graceful no-op).
+- ✅ Prompt dictation shipped with the AI panel (mic button, Web Speech API).
+- ✅ Hands-free canvas commands via the toolbar mic: "undo", "redo", "clear"
+  (spoken yes/no confirmation before wiping the active layer), "new frame"
+  (enables animation when needed), "play"/"stop", tool names ("brush",
+  "eraser", "fill", shapes…), a friendly color vocabulary ("red", "blue",
+  "fill red"), "bigger"/"smaller" brush sizes, "save" and "help" (speaks the
+  command list). Pure parser in `ai/voiceCommands.ts` (case-insensitive,
+  filler-tolerant) + thin executor in `ui/voiceExecutor.ts` against a minimal
+  store interface; feedback is shown in the toolbar and spoken aloud when
+  voice feedback is on (default in kid mode, toggleable for adults).
+- ✅ Graceful degradation: the mic button hides where SpeechRecognition is
+  unsupported, and mic-permission denial gets a friendly message.
+- Deviation: the command vocabulary is English-only for now — the parser is
+  deliberately a dumb keyword matcher, so localized vocabularies can be
+  added per locale later without touching the executor.
 
-## Slice 9 — Kid mode
+## Slice 9 — Kid mode ✅
 
-- Simplified UI preset: giant buttons, fewer tools, friendly sounds, no dialogs that
-  require reading.
-- Acceptance: a 5-year-old can pick a color and draw with zero literacy; toggle is
-  one tap from the toolbar.
+- ✅ "Little Dreamer" mode (⭐ in the toolbar or the settings gear, per-user
+  in localStorage): giant icon-only tool rail with just the essentials, a
+  12-color bright named palette, three brush sizes as dots, a simplified
+  right panel (big Undo/Redo, "Ask Dream!" Create tab with a giant mic,
+  play button when frames exist). No dialogs that require reading.
+- ✅ Spoken tool names on hover/focus/touch ("Brush!") via speech synthesis
+  (`ai/say.ts`, feature-detected) — on by default in kid mode, toggleable
+  for adults in the settings menu.
+- ✅ Entering kid mode lands in Draw mode with a visible tool; the adult UI
+  is 100% unchanged and one toggle away.
+- Acceptance: a 5-year-old can pick a color and draw with zero literacy;
+  toggle is one tap from the toolbar.
 
-## Slice 10 — i18n & accessibility
+## Slice 10 — i18n & accessibility ✅
 
-- String externalization, RTL support, translations for top languages (per personas).
-- Full keyboard navigation, ARIA roles, focus management, reduced-motion respect.
-- Acceptance: UI switches language at runtime; axe-core audit has no critical issues.
+- ✅ String externalization: every user-visible UI string lives in
+  `ui/i18n/en.ts` and renders through `t(key)` (variable interpolation,
+  English fallback, key fallback). No library.
+- ✅ Complete Arabic (`ar`) locale proving the pipeline, with RTL: the root
+  gets `dir="rtl"`/`lang` and the layout uses CSS logical properties so the
+  shell mirrors. Locale picker in the settings menu, persisted per user.
+  Adding a locale is documented in the README.
+- ✅ Settings menu (gear in the toolbar) consolidating Little Dreamer mode,
+  speak-tool-names, voice feedback and the language picker.
+- ✅ Accessibility pass: aria-labels on every toolbar/rail button (from the
+  string table), `:focus-visible` outlines, keyboard tool switching intact.
+- Remaining: more locales, axe-core audit, reduced-motion respect, localized
+  voice-command vocabularies.
 
 ## Slice 11 — PWA
 

@@ -215,6 +215,8 @@ export interface DreamStore {
   selectLayer(id: string): void;
   addLayer(): void;
   deleteLayer(id: string): void;
+  /** Remove every operation on the active layer (one undoable command). */
+  clearLayer(): void;
   renameLayer(id: string, name: string): void;
   setLayerVisibility(id: string, visible: boolean): void;
   setLayerOpacity(id: string, opacity: number): void;
@@ -809,6 +811,13 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       const trimmed = name.trim();
       if (trimmed === '') return;
       execute(updateLayerCommand(get().doc, id, { name: trimmed }, 'Rename layer'));
+    },
+
+    clearLayer: () => {
+      const layer = activeLayer();
+      if (!layer || layer.locked || layer.operations.length === 0) return;
+      execute(replaceLayerContentCommand(get().doc, layer.id, [], 'Clear layer'));
+      set({ selection: [], selectDraft: null });
     },
 
     setLayerVisibility: (id, visible) =>

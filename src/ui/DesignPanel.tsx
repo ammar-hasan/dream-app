@@ -6,25 +6,27 @@
 
 import { useDreamStore } from '../store/dreamStore';
 import type { AlignMode } from '../engine/selection';
+import { useT } from './i18n';
 
-const ALIGN_BUTTONS: { mode: AlignMode; glyph: string; label: string }[] = [
-  { mode: 'left', glyph: '⇤', label: 'Align left' },
-  { mode: 'center', glyph: '↔', label: 'Align horizontal centers' },
-  { mode: 'right', glyph: '⇥', label: 'Align right' },
-  { mode: 'top', glyph: '⤒', label: 'Align top' },
-  { mode: 'middle', glyph: '↕', label: 'Align vertical centers' },
-  { mode: 'bottom', glyph: '⤓', label: 'Align bottom' },
+const ALIGN_BUTTONS: { mode: AlignMode; glyph: string; key: string }[] = [
+  { mode: 'left', glyph: '⇤', key: 'design.alignLeft' },
+  { mode: 'center', glyph: '↔', key: 'design.alignCenter' },
+  { mode: 'right', glyph: '⇥', key: 'design.alignRight' },
+  { mode: 'top', glyph: '⤒', key: 'design.alignTop' },
+  { mode: 'middle', glyph: '↕', key: 'design.alignMiddle' },
+  { mode: 'bottom', glyph: '⤓', key: 'design.alignBottom' },
 ];
 
 export function DesignPanel() {
+  const t = useT();
   const selection = useDreamStore((s) => s.selection);
   const snapping = useDreamStore((s) => s.snappingEnabled);
   const store = useDreamStore.getState;
   const count = selection.length;
 
   return (
-    <section className="panel design-panel" aria-label="Design">
-      <h2 className="panel-title">Design</h2>
+    <section className="panel design-panel" aria-label={t('design.title')}>
+      <h2 className="panel-title">{t('design.title')}</h2>
 
       <label className="option-row checkbox-field">
         <input
@@ -32,69 +34,68 @@ export function DesignPanel() {
           checked={snapping}
           onChange={(e) => store().setSnapping(e.target.checked)}
         />
-        <span>Snap to canvas &amp; objects</span>
+        <span>{t('design.snap')}</span>
       </label>
 
       {count > 0 && (
         <>
           <p className="tool-hint">
-            {count} {count === 1 ? 'object' : 'objects'} selected — drag to move, corner handles to
-            scale, top handle to rotate.
+            {t(count === 1 ? 'design.selectedOne' : 'design.selectedMany', { count })}
           </p>
           <div className="design-actions">
             <button
               type="button"
               className="btn"
               disabled={count < 2}
-              title="Group (Ctrl/Cmd+G)"
+              title={t('design.groupTitle')}
               onClick={() => store().groupSelection()}
             >
-              Group
+              {t('design.group')}
             </button>
             <button
               type="button"
               className="btn"
               disabled={count < 2}
-              title="Ungroup (Ctrl/Cmd+Shift+G)"
+              title={t('design.ungroupTitle')}
               onClick={() => store().ungroupSelection()}
             >
-              Ungroup
+              {t('design.ungroup')}
             </button>
             <button
               type="button"
               className="btn"
-              title="Duplicate (Ctrl/Cmd+D)"
+              title={t('design.duplicateTitle')}
               onClick={() => store().duplicateSelection()}
             >
-              Duplicate
+              {t('design.duplicate')}
             </button>
             <button
               type="button"
               className="btn danger"
-              title="Delete (Del)"
+              title={t('design.deleteTitle')}
               onClick={() => store().deleteSelection()}
             >
-              Delete
+              {t('design.delete')}
             </button>
             <button type="button" className="btn" onClick={() => store().bringForwardSelection()}>
-              Forward
+              {t('design.forward')}
             </button>
             <button type="button" className="btn" onClick={() => store().sendBackwardSelection()}>
-              Backward
+              {t('design.backward')}
             </button>
           </div>
 
           {count >= 2 && (
             <div className="align-section">
-              <h3 className="panel-title">Align</h3>
+              <h3 className="panel-title">{t('design.align')}</h3>
               <div className="align-grid">
-                {ALIGN_BUTTONS.map(({ mode, glyph, label }) => (
+                {ALIGN_BUTTONS.map(({ mode, glyph, key }) => (
                   <button
                     key={mode}
                     type="button"
                     className="btn icon-btn small"
-                    title={label}
-                    aria-label={label}
+                    title={t(key)}
+                    aria-label={t(key)}
                     onClick={() => store().alignSelection(mode)}
                   >
                     <span aria-hidden="true">{glyph}</span>
@@ -103,8 +104,8 @@ export function DesignPanel() {
                 <button
                   type="button"
                   className="btn icon-btn small"
-                  title="Distribute horizontally"
-                  aria-label="Distribute horizontally"
+                  title={t('design.distributeH')}
+                  aria-label={t('design.distributeH')}
                   disabled={count < 3}
                   onClick={() => store().distributeSelection('horizontal')}
                 >
@@ -113,8 +114,8 @@ export function DesignPanel() {
                 <button
                   type="button"
                   className="btn icon-btn small"
-                  title="Distribute vertically"
-                  aria-label="Distribute vertically"
+                  title={t('design.distributeV')}
+                  aria-label={t('design.distributeV')}
                   disabled={count < 3}
                   onClick={() => store().distributeSelection('vertical')}
                 >

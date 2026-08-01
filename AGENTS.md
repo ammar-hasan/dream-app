@@ -41,6 +41,11 @@ Conventions for anyone (human or agent) working on Dream.
    similar lines beat a premature helper.
 7. No new runtime dependencies without a clear need — current set is intentionally
    tiny (`react`, `react-dom`, `zustand`, `idb`).
+8. **No literal user-visible UI strings outside the string tables.** All UI text
+   goes through `t(key)` from `src/ui/i18n/` with an entry in `en.ts` (and every
+   other locale — tests assert key parity). Voice/speech code is isolated in
+   `src/ai/speech.ts` (recognition) and `src/ai/say.ts` (synthesis), both
+   feature-detected.
 
 ## Structure
 
@@ -49,9 +54,13 @@ Conventions for anyone (human or agent) working on Dream.
   (pure RGBA pixel transforms), transform (flip/rotate/crop/resize),
   selection (Design mode: hit-testing, move/scale/rotate, snapping, align,
   groups, component factories), tools/
-- `src/store/` — Zustand store(s)
+- `src/store/` — Zustand store(s): `dreamStore` (document, via History) and
+  `uiPrefs` (per-user UI prefs in localStorage: kid mode, voice toggles, locale)
 - `src/ui/` — React components, hooks, icons, export helpers (image +
-  animation video/sprite sheet; MediaRecorder isolated behind injectable deps)
+  animation video/sprite sheet; MediaRecorder isolated behind injectable deps),
+  `i18n/` string tables (add a locale: copy `en.ts`, register in `i18n/index.ts`
+  — see README), voice-command executor (`voiceExecutor.ts`, thin layer over
+  the store, driven by a fake in tests)
 - `src/storage/` — IndexedDB project persistence + cross-project component
   library (shared connection in `db.ts`)
 - `src/ai/` — AIProvider contract (capability flags, PixelBuffer in/out — no
@@ -60,7 +69,8 @@ Conventions for anyone (human or agent) working on Dream.
   registry with settings persistence (API keys: sessionStorage by default,
   localStorage only on opt-in — never log keys), daily usage counter,
   rule-based document feedback (`analyze.ts`), Web Speech dictation
-  (`speech.ts`, feature-detected)
+  (`speech.ts`, feature-detected), speech synthesis (`say.ts`,
+  feature-detected), pure voice-command parser (`voiceCommands.ts`)
 - `src/test/` — shared test helpers (mock 2D context) + Vitest setup
 
 ## Git

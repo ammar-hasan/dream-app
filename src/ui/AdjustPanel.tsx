@@ -20,25 +20,26 @@ import {
 import type { Layer } from '../engine/types';
 import { useDreamStore } from '../store/dreamStore';
 import { rasterizeLayer } from './rasterize';
+import { useT } from './i18n';
 
 interface SliderDef {
   key: keyof Adjustments;
-  label: string;
   min: number;
   max: number;
   unit?: string;
 }
 
+/** Slider labels live under `adjust.<key>` in the string table. */
 const SLIDERS: SliderDef[] = [
-  { key: 'brightness', label: 'Brightness', min: -100, max: 100 },
-  { key: 'contrast', label: 'Contrast', min: -100, max: 100 },
-  { key: 'saturation', label: 'Saturation', min: -100, max: 100 },
-  { key: 'hue', label: 'Hue', min: -180, max: 180, unit: '°' },
-  { key: 'grayscale', label: 'Grayscale', min: 0, max: 100 },
-  { key: 'sepia', label: 'Sepia', min: 0, max: 100 },
-  { key: 'invert', label: 'Invert', min: 0, max: 100 },
-  { key: 'blur', label: 'Blur', min: 0, max: 20 },
-  { key: 'sharpen', label: 'Sharpen', min: 0, max: 100 },
+  { key: 'brightness', min: -100, max: 100 },
+  { key: 'contrast', min: -100, max: 100 },
+  { key: 'saturation', min: -100, max: 100 },
+  { key: 'hue', min: -180, max: 180, unit: '°' },
+  { key: 'grayscale', min: 0, max: 100 },
+  { key: 'sepia', min: 0, max: 100 },
+  { key: 'invert', min: 0, max: 100 },
+  { key: 'blur', min: 0, max: 20 },
+  { key: 'sharpen', min: 0, max: 100 },
 ];
 
 function isRasterCapable(layer: Layer): boolean {
@@ -46,6 +47,7 @@ function isRasterCapable(layer: Layer): boolean {
 }
 
 export function AdjustPanel() {
+  const t = useT();
   const doc = useDreamStore((s) => s.doc);
   const activeLayerId = useDreamStore((s) => s.activeLayerId);
   const layer = doc.layers.find((l) => l.id === activeLayerId);
@@ -92,31 +94,31 @@ export function AdjustPanel() {
   };
 
   return (
-    <section className="panel adjust-panel" aria-label="Adjust">
-      <h2 className="panel-title">Adjust</h2>
+    <section className="panel adjust-panel" aria-label={t('adjust.title')}>
+      <h2 className="panel-title">{t('adjust.title')}</h2>
 
       <div className="option-row transform-actions">
         <button
           type="button"
           className="btn"
           onClick={() => store().flipLayer('horizontal')}
-          title="Flip layer horizontally"
+          title={t('adjust.flipHTitle')}
         >
-          Flip H
+          {t('adjust.flipH')}
         </button>
         <button
           type="button"
           className="btn"
           onClick={() => store().flipLayer('vertical')}
-          title="Flip layer vertically"
+          title={t('adjust.flipVTitle')}
         >
-          Flip V
+          {t('adjust.flipV')}
         </button>
         <button
           type="button"
           className="btn"
           onClick={() => store().rotateLayer('ccw')}
-          title="Rotate layer 90° counter-clockwise"
+          title={t('adjust.rotateCcwTitle')}
         >
           ⟲ 90°
         </button>
@@ -124,7 +126,7 @@ export function AdjustPanel() {
           type="button"
           className="btn"
           onClick={() => store().rotateLayer('cw')}
-          title="Rotate layer 90° clockwise"
+          title={t('adjust.rotateCwTitle')}
         >
           ⟳ 90°
         </button>
@@ -140,14 +142,14 @@ export function AdjustPanel() {
                 className="btn"
                 onClick={() => setAdj({ ...preset.adjustments })}
               >
-                {preset.label}
+                {t(`adjust.preset.${preset.id}`)}
               </button>
             ))}
           </div>
 
-          {SLIDERS.map(({ key, label, min, max, unit }) => (
+          {SLIDERS.map(({ key, min, max, unit }) => (
             <label className="option-row" key={key}>
-              <span className="option-label">{label}</span>
+              <span className="option-label">{t(`adjust.${key}`)}</span>
               <input
                 type="range"
                 min={min}
@@ -164,10 +166,10 @@ export function AdjustPanel() {
 
           <div className="option-row adjust-actions">
             <button type="button" className="btn primary" disabled={identity} onClick={apply}>
-              Apply
+              {t('common.apply')}
             </button>
             <button type="button" className="btn" disabled={identity} onClick={cancel}>
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               type="button"
@@ -175,7 +177,7 @@ export function AdjustPanel() {
               disabled={identity}
               onClick={() => setAdj({ ...DEFAULT_ADJUSTMENTS })}
             >
-              Reset
+              {t('common.reset')}
             </button>
           </div>
         </>

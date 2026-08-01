@@ -14,10 +14,12 @@ import {
   videoDurationSeconds,
   videoFileName,
 } from './exportAnimation';
+import { useT } from './i18n';
 
 type Format = 'png' | 'jpeg' | 'webm' | 'sprite';
 
 export function ExportDialog({ onClose }: { onClose: () => void }) {
+  const t = useT();
   const [format, setFormat] = useState<Format>('png');
   const [quality, setQuality] = useState(92);
   const [progress, setProgress] = useState<string | null>(null);
@@ -30,17 +32,17 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
   const doExport = async () => {
     if (format === 'webm') {
       setError(null);
-      setProgress('Starting…');
+      setProgress(t('export.starting'));
       try {
         const blob = await exportAnimationWebM(doc, {
           fps,
-          onProgress: (done, total) => setProgress(`Frame ${done} of ${total}…`),
+          onProgress: (done, total) => setProgress(t('export.progress', { done, total })),
         });
         downloadBlob(blob, videoFileName(doc.name));
         onClose();
       } catch (err) {
         setProgress(null);
-        setError(err instanceof Error ? err.message : 'Export failed.');
+        setError(err instanceof Error ? err.message : t('export.failed'));
       }
       return;
     }
@@ -57,10 +59,10 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
     { id: 'png', label: 'PNG' },
     { id: 'jpeg', label: 'JPEG' },
     ...(animated
-      ? ([
-          { id: 'webm', label: 'WebM video' },
-          { id: 'sprite', label: 'Sprite sheet' },
-        ] as const)
+      ? [
+          { id: 'webm' as const, label: t('export.webmLabel') },
+          { id: 'sprite' as const, label: t('export.spriteLabel') },
+        ]
       : []),
   ];
 
@@ -70,13 +72,13 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
         className="dialog"
         role="dialog"
         aria-modal="true"
-        aria-label="Export"
+        aria-label={t('export.title')}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="dialog-title">Export</h2>
+        <h2 className="dialog-title">{t('export.title')}</h2>
 
         <div className="field">
-          <span>Format</span>
+          <span>{t('export.format')}</span>
           <div className="preset-grid">
             {formats.map(({ id, label }) => (
               <button
@@ -93,7 +95,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
 
         {format === 'jpeg' && (
           <label className="option-row">
-            <span className="option-label">Quality</span>
+            <span className="option-label">{t('export.quality')}</span>
             <input
               type="range"
               min={10}
@@ -107,29 +109,29 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
 
         {format === 'webm' && (
           <p className="dialog-note">
-            Records {doc.frames?.length ?? 0} frames at {fps} fps — about{' '}
-            {videoDurationSeconds(doc, fps).toFixed(1)} seconds of video. Keep this tab in front
-            while it records.
+            {t('export.webmNote', {
+              frames: doc.frames?.length ?? 0,
+              fps,
+              seconds: videoDurationSeconds(doc, fps).toFixed(1),
+            })}
           </p>
         )}
 
-        {format === 'sprite' && (
-          <p className="dialog-note">All frames in one PNG grid — handy for games and sharing.</p>
-        )}
+        {format === 'sprite' && <p className="dialog-note">{t('export.spriteNote')}</p>}
 
-        {progress && <p className="dialog-note">Recording… {progress}</p>}
+        {progress && <p className="dialog-note">{t('export.recording', { progress })}</p>}
         {error && <p className="dialog-note">{error}</p>}
 
         <div className="dialog-actions">
           <button className="btn" onClick={onClose} disabled={progress !== null}>
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             className="btn primary"
             onClick={() => void doExport()}
             disabled={progress !== null}
           >
-            Export
+            {t('export.title')}
           </button>
         </div>
       </div>

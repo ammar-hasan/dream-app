@@ -9,8 +9,55 @@ for the full product vision.
 This repository currently contains **Slice 1** (foundation + core drawing),
 **Slice 2** (image editing: import, filters, crop & transform), **Slice 3**
 (design mode: selection, components, alignment), **Slice 4** (animation,
-video export and presentation mode) and **Slice 5** (the AI panel with
-BYOK providers and voice input).
+video export and presentation mode), **Slice 5** (the AI panel with
+BYOK providers and voice input) and **Slice 6** (accessibility for everyone:
+kid mode, canvas voice commands and i18n with RTL).
+
+## Accessibility for everyone
+
+The heart of Dream: a 5-year-old and a 90-year-old should both be able to
+create — literacy optional. Slice 6 ships three pillars plus a settings menu.
+
+- **Little Dreamer (kid) mode** — tap the ⭐ in the toolbar (or the settings
+  gear). The tool rail becomes giant icon-only buttons for the essentials
+  (brush, pencil, eraser, fill, shapes, eyedropper), a 12-color bright named
+  palette and three brush sizes shown as dots. The right panel simplifies to
+  big Undo/Redo, an "Ask Dream!" button (the AI Create tab with a giant mic)
+  and a play button when frames exist. Turning kid mode on switches to Draw
+  mode and turns both voices on; turning it off restores the full adult UI
+  untouched. It is a per-user preference (localStorage), not per document.
+- **Spoken tool names** — hovering, focusing or touching a tool button says
+  its name aloud ("Brush!") via speech synthesis (`ai/say.ts`, feature
+  detected, silent where unsupported). On by default in kid mode, toggleable
+  in settings for everyone.
+- **Canvas voice commands** — the mic button in the toolbar. Click, speak,
+  done: "undo", "redo", "clear" (asks for a spoken yes first), "new frame",
+  "play"/"stop", "brush", "eraser", "fill", colors ("red", "blue", … a
+  friendly vocabulary including "fill red"), "bigger"/"smaller", "save" and
+  "help" (speaks the command list). The pipeline is a pure parser
+  (`ai/voiceCommands.ts`, case-insensitive, filler-tolerant — "um, can you
+  please undo?") plus a thin executor (`ui/voiceExecutor.ts`) against a
+  minimal store interface. Every command confirms in the status area and,
+  when **voice feedback** is on, out loud. The button hides where
+  SpeechRecognition is unsupported. The vocabulary is English for now.
+- **Languages & RTL** — every UI string lives in a string table
+  (`ui/i18n/en.ts`, `ui/i18n/ar.ts`) and renders through `t(key)`. The
+  settings gear switches language at runtime (persisted); Arabic flips the
+  whole shell to `dir="rtl"` (the layout uses CSS logical properties, so
+  panels and rails mirror).
+
+The **settings gear** in the toolbar consolidates all of it: Little Dreamer
+mode, speak tool names, voice feedback, and the language picker.
+
+### Adding a locale
+
+1. Copy `src/ui/i18n/en.ts` to `src/ui/i18n/<locale>.ts` and translate every
+   value (keys must match exactly — the i18n tests assert parity).
+2. Register it in `src/ui/i18n/index.ts`: add the dictionary to
+   `DICTIONARIES` and an entry `{ id, label, dir }` to `LOCALES`
+   (`dir: 'rtl'` flips the root `dir` attribute automatically).
+3. Done — the settings picker lists it. `t()` falls back to English for any
+   missing key, so partial dictionaries still work.
 
 ## What works today
 
@@ -191,11 +238,14 @@ src/
     tools/           Pure tool state machines: stroke, shapes, fill (flood fill),
                      eyedropper, text, pan/zoom math — begin/update/preview/commit
   store/             Zustand store wrapping the engine (all mutations via History)
+                     + uiPrefs: per-user UI prefs (kid mode, voices, locale)
   ui/                React shell: toolbar (top) with the Draw/Design/Present
                      switch + Animate toggle, tool rail (left), canvas viewport,
                      options + design + components + adjust + layers panels
                      (right), timeline bar + status bar (bottom), PresentView
-                     (fullscreen slides), dialogs, image/video/sprite export
+                     (fullscreen slides), dialogs, image/video/sprite export,
+                     settings menu, kid mode (KidPanel + kid rail), voice
+                     command button + executor, i18n string tables (i18n/)
   storage/           IndexedDB via `idb`: projects + the cross-project
                      component library (one shared connection in db.ts)
   ai/                AIProvider contract (capabilities, PixelBuffer in/out)
@@ -204,6 +254,8 @@ src/
                      + OpenAICompatibleProvider (BYOK) + registry (settings
                      persistence; keys in sessionStorage unless remembered)
                      + daily free-tier counter + Web Speech dictation
+                     (speech.ts) + speech synthesis (say.ts) + the pure
+                     voice-command parser (voiceCommands.ts)
   styles/            Plain CSS, light theme, 44px+ touch targets
 ```
 
@@ -239,8 +291,15 @@ Present mode: `→` / `Space` / click next slide · `←` previous · `Esc` exit
   request construction with a mocked fetch, capability degradation, the daily
   free-tier counter (date rollover via fake timers), the feedback rule engine
   on synthetic documents, mock-generator determinism (same seed → same
-  pixels), selection-bbox edit regions, and speech feature detection with a
-  mocked SpeechRecognition
+  pixels), selection-bbox edit regions, speech feature detection with a
+  mocked SpeechRecognition, speech-synthesis feature detection (`say.ts`),
+  and the voice-command parser (every intent, filler tolerance, the full
+  color vocabulary, unknown input → null)
+- Accessibility tests: the voice executor against a fake store (each command
+  maps to the right actions, clear confirmation flow, size clamping,
+  localized messages), the UI-prefs store (kid-mode voice defaults,
+  independent toggles, localStorage persistence), and the i18n string table
+  (interpolation, English/key fallbacks, en↔ar parity, RTL flag)
 - Store tests: drawing flow, layers, image import/move/adjust/crop/resize,
   design mode (mode switching, select gestures, transform handles, selection
   actions, component insert), animation (frame switching, cross-frame undo,

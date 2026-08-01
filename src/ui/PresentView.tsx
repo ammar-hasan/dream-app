@@ -9,11 +9,13 @@ import { useEffect, useReducer, useRef } from 'react';
 import { presentationFrames } from '../engine/animation';
 import { renderDocument } from '../engine/renderer';
 import { useDreamStore } from '../store/dreamStore';
+import { useT } from './i18n';
 
 const ADVANCE_KEYS = new Set(['ArrowRight', 'ArrowDown', ' ', 'PageDown', 'Enter']);
 const BACK_KEYS = new Set(['ArrowLeft', 'ArrowUp', 'PageUp']);
 
 export function PresentView() {
+  const t = useT();
   const doc = useDreamStore((s) => s.doc);
   const presentIndex = useDreamStore((s) => s.presentIndex);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -90,7 +92,7 @@ export function PresentView() {
           exit();
         }}
       >
-        Exit
+        {t('present.exit')}
       </button>
     </div>
   );

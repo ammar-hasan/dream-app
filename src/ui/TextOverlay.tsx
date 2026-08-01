@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { useDreamStore } from '../store/dreamStore';
+import { useT } from './i18n';
 import type { Point } from '../engine/types';
 
 interface TextOverlayProps {
@@ -10,6 +11,7 @@ interface TextOverlayProps {
 }
 
 export function TextOverlay({ screenPos }: TextOverlayProps) {
+  const t = useT();
   const settings = useDreamStore((s) => s.settings);
   const zoom = useDreamStore((s) => s.zoom);
   const [value, setValue] = useState('');
@@ -40,8 +42,8 @@ export function TextOverlay({ screenPos }: TextOverlayProps) {
       value={value}
       autoFocus
       rows={1}
-      placeholder="Type here…"
-      aria-label="Text input"
+      placeholder={t('text.placeholder')}
+      aria-label={t('text.label')}
       onChange={(e) => setValue(e.target.value)}
       onBlur={commit}
       onKeyDown={(e) => {

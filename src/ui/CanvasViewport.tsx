@@ -22,6 +22,7 @@ import { useDreamStore } from '../store/dreamStore';
 import { getComponent } from '../storage/components';
 import { importImageFiles } from './importImage';
 import { TextOverlay } from './TextOverlay';
+import { useT } from './i18n';
 
 /** Accent used for all selection chrome, matching --accent in app.css. */
 const ACCENT = '#6d7cff';
@@ -36,6 +37,7 @@ function corners(r: Rect): Point[] {
 }
 
 export function CanvasViewport() {
+  const t = useT();
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const panRef = useRef<{ startX: number; startY: number; origin: Point } | null>(null);
@@ -458,7 +460,7 @@ export function CanvasViewport() {
       )}
       {!hintDismissed && (
         <div className="hint-overlay" aria-hidden="true">
-          <div className="hint-card">Pick a brush and start dreaming</div>
+          <div className="hint-card">{t('hint.firstRun')}</div>
         </div>
       )}
     </div>

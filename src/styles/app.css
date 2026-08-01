@@ -71,7 +71,7 @@ body {
 }
 
 .toolbar-zoom {
-  margin-left: auto;
+  margin-inline-start: auto;
 }
 
 .app-title {
@@ -227,7 +227,7 @@ body {
 .component-delete {
   position: absolute;
   top: 2px;
-  right: 2px;
+  inset-inline-end: 2px;
   opacity: 0;
   background: var(--panel);
   transition: opacity 0.12s ease;
@@ -305,7 +305,7 @@ body {
   gap: 4px;
   padding: 10px 8px;
   background: var(--panel);
-  border-right: 1px solid var(--border);
+  border-inline-end: 1px solid var(--border);
   overflow-y: auto;
 }
 
@@ -394,7 +394,7 @@ body {
   display: flex;
   flex-direction: column;
   background: var(--panel);
-  border-left: 1px solid var(--border);
+  border-inline-start: 1px solid var(--border);
   min-height: 0;
   overflow-y: auto;
 }
@@ -448,7 +448,7 @@ body {
 
 .option-value {
   flex: 0 0 44px;
-  text-align: right;
+  text-align: end;
   color: var(--text-dim);
   font-variant-numeric: tabular-nums;
   font-size: 13px;
@@ -614,8 +614,7 @@ body {
 }
 
 .status-tool {
-  margin-left: auto;
-  text-transform: capitalize;
+  margin-inline-start: auto;
 }
 
 /* --- Dialogs ------------------------------------------------------------- */
@@ -736,7 +735,7 @@ body {
   background: var(--panel);
   font: inherit;
   cursor: pointer;
-  text-align: left;
+  text-align: start;
 }
 
 .project-open:hover {
@@ -815,7 +814,7 @@ body {
 
 .timeline-frame-number {
   position: absolute;
-  left: 4px;
+  inset-inline-start: 4px;
   bottom: 4px;
   min-width: 16px;
   padding: 1px 4px;
@@ -889,7 +888,7 @@ body {
 .present-exit {
   position: absolute;
   top: 16px;
-  right: 16px;
+  inset-inline-end: 16px;
   background: rgba(255, 255, 255, 0.12);
   border-color: transparent;
   color: rgba(255, 255, 255, 0.85);
@@ -972,7 +971,7 @@ body {
   color: var(--accent);
   font: inherit;
   cursor: pointer;
-  text-align: left;
+  text-align: start;
 }
 
 .ai-notice {
@@ -1046,6 +1045,268 @@ body {
   padding: 4px 8px;
   font: inherit;
   background: var(--panel);
+}
+
+/* --- Accessibility: visible keyboard focus -------------------------------- */
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* --- Settings menu ---------------------------------------------------------- */
+
+.settings-menu {
+  position: relative;
+}
+
+.settings-popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  inset-inline-end: 0;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 260px;
+  padding: 14px 16px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.settings-item {
+  gap: 10px;
+  cursor: pointer;
+}
+
+.settings-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-item-text small {
+  color: var(--text-dim);
+}
+
+.settings-language {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.settings-language .font-select {
+  flex: 0 1 140px;
+}
+
+/* --- Voice commands ----------------------------------------------------------- */
+
+.voice-commands {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.voice-message {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-dim);
+  font-size: 12px;
+}
+
+.btn.listening {
+  animation: voice-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes voice-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(109, 124, 255, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(109, 124, 255, 0);
+  }
+}
+
+/* --- Little Dreamer (kid) mode -------------------------------------------------- */
+
+.kid-mode {
+  --radius: 18px;
+  font-size: 16px;
+}
+
+.kid-app-title {
+  font-size: 24px;
+}
+
+.kid-toolbar {
+  gap: 16px;
+  padding: 10px 16px;
+}
+
+.kid-toolbar .voice-message {
+  font-size: 15px;
+  max-width: 320px;
+}
+
+.kid-toolbar-btn {
+  min-width: 56px;
+  min-height: 56px;
+  border-radius: 18px;
+}
+
+.kid-toolbar-btn svg {
+  width: 30px;
+  height: 30px;
+}
+
+.kid-rail {
+  gap: 10px;
+  padding: 14px 10px;
+}
+
+.kid-rail .tool-btn {
+  width: 76px;
+  min-height: 68px;
+  border-radius: 20px;
+}
+
+.kid-rail .tool-btn svg {
+  width: 34px;
+  height: 34px;
+}
+
+.kid-colors {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 2px dashed var(--border);
+}
+
+.kid-swatch {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 3px solid rgba(15, 23, 42, 0.12);
+  cursor: pointer;
+  padding: 0;
+}
+
+.kid-swatch.active {
+  outline: 4px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.kid-sizes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 2px dashed var(--border);
+}
+
+.kid-size {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border: 3px solid transparent;
+  border-radius: 50%;
+  background: var(--panel);
+  cursor: pointer;
+}
+
+.kid-size.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.kid-size-dot {
+  border-radius: 50%;
+  background: var(--text);
+}
+
+.kid-panel {
+  padding: 16px;
+  gap: 16px;
+}
+
+.kid-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.kid-big-btn {
+  min-height: 64px;
+  padding: 12px 18px;
+  gap: 12px;
+  border-radius: 22px;
+  border-width: 2px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.kid-big-btn svg {
+  width: 30px;
+  height: 30px;
+}
+
+.kid-ai-btn {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.kid-ai-btn.primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.kid-ai-panel {
+  padding: 0;
+  border-top: 2px dashed var(--border);
+  padding-top: 12px;
+}
+
+.kid-ai-panel .ai-textarea {
+  font-size: 17px;
+  border-radius: 16px;
+}
+
+.kid-ai-panel .ai-go {
+  min-height: 60px;
+  border-radius: 20px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.kid-mic {
+  min-width: 60px;
+  min-height: 60px;
+  border-radius: 50%;
+  border-width: 2px;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.kid-mic svg {
+  width: 30px;
+  height: 30px;
 }
 
 /* --- Small screens ------------------------------------------------------- */

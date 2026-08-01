@@ -16,8 +16,10 @@ import {
   TrashIcon,
   UnlockIcon,
 } from './icons';
+import { useT } from './i18n';
 
 export function LayersPanel() {
+  const t = useT();
   const doc = useDreamStore((s) => s.doc);
   const activeLayerId = useDreamStore((s) => s.activeLayerId);
   const store = useDreamStore.getState;
@@ -34,14 +36,14 @@ export function LayersPanel() {
   };
 
   return (
-    <section className="panel layers-panel" aria-label="Layers">
+    <section className="panel layers-panel" aria-label={t('layers.title')}>
       <div className="panel-header">
-        <h2 className="panel-title">Layers</h2>
+        <h2 className="panel-title">{t('layers.title')}</h2>
         <button
           type="button"
           className="btn icon-btn"
-          title="Add layer"
-          aria-label="Add layer"
+          title={t('layers.add')}
+          aria-label={t('layers.add')}
           onClick={() => store().addLayer()}
         >
           <PlusIcon />
@@ -62,8 +64,12 @@ export function LayersPanel() {
                 <button
                   type="button"
                   className="btn icon-btn small"
-                  title={layer.visible ? 'Hide layer' : 'Show layer'}
-                  aria-label={layer.visible ? `Hide ${layer.name}` : `Show ${layer.name}`}
+                  title={layer.visible ? t('layers.hide') : t('layers.show')}
+                  aria-label={
+                    layer.visible
+                      ? t('layers.hideNamed', { name: layer.name })
+                      : t('layers.showNamed', { name: layer.name })
+                  }
                   onClick={(e) => {
                     e.stopPropagation();
                     store().setLayerVisibility(layer.id, !layer.visible);
@@ -88,7 +94,7 @@ export function LayersPanel() {
                 ) : (
                   <span
                     className={`layer-name${layer.visible ? '' : ' hidden-layer'}`}
-                    title="Double-click to rename"
+                    title={t('layers.renameTitle')}
                     onDoubleClick={() => {
                       setEditingId(layer.id);
                       setEditName(layer.name);
@@ -101,8 +107,12 @@ export function LayersPanel() {
                 <button
                   type="button"
                   className="btn icon-btn small"
-                  title={layer.locked ? 'Unlock layer' : 'Lock layer'}
-                  aria-label={layer.locked ? `Unlock ${layer.name}` : `Lock ${layer.name}`}
+                  title={layer.locked ? t('layers.unlock') : t('layers.lock')}
+                  aria-label={
+                    layer.locked
+                      ? t('layers.unlockNamed', { name: layer.name })
+                      : t('layers.lockNamed', { name: layer.name })
+                  }
                   onClick={(e) => {
                     e.stopPropagation();
                     store().setLayerLocked(layer.id, !layer.locked);
@@ -115,7 +125,7 @@ export function LayersPanel() {
               {isActive && (
                 <div className="layer-row-detail" onClick={(e) => e.stopPropagation()}>
                   <label className="option-row">
-                    <span className="option-label">Opacity</span>
+                    <span className="option-label">{t('layers.opacity')}</span>
                     <input
                       type="range"
                       min={0}
@@ -131,8 +141,8 @@ export function LayersPanel() {
                     <button
                       type="button"
                       className="btn icon-btn small"
-                      title="Move up"
-                      aria-label={`Move ${layer.name} up`}
+                      title={t('layers.moveUp')}
+                      aria-label={t('layers.moveUpNamed', { name: layer.name })}
                       disabled={index === doc.layers.length - 1}
                       onClick={() => store().moveLayer(layer.id, index + 1)}
                     >
@@ -141,8 +151,8 @@ export function LayersPanel() {
                     <button
                       type="button"
                       className="btn icon-btn small"
-                      title="Move down"
-                      aria-label={`Move ${layer.name} down`}
+                      title={t('layers.moveDown')}
+                      aria-label={t('layers.moveDownNamed', { name: layer.name })}
                       disabled={index === 0}
                       onClick={() => store().moveLayer(layer.id, index - 1)}
                     >
@@ -151,8 +161,8 @@ export function LayersPanel() {
                     <button
                       type="button"
                       className="btn icon-btn small danger"
-                      title="Delete layer"
-                      aria-label={`Delete ${layer.name}`}
+                      title={t('layers.delete')}
+                      aria-label={t('layers.deleteNamed', { name: layer.name })}
                       disabled={doc.layers.length <= 1}
                       onClick={() => store().deleteLayer(layer.id)}
                     >

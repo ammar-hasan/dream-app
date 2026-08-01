@@ -5,8 +5,10 @@ import { deleteProject, listProjects, loadProject, type ProjectMeta } from '../s
 import { useDreamStore } from '../store/dreamStore';
 import { LAST_DOC_KEY } from './usePersistence';
 import { TrashIcon } from './icons';
+import { useT } from './i18n';
 
 export function OpenDialog({ onClose }: { onClose: () => void }) {
+  const t = useT();
   const [projects, setProjects] = useState<ProjectMeta[] | null>(null);
 
   const refresh = async () => {
@@ -45,16 +47,14 @@ export function OpenDialog({ onClose }: { onClose: () => void }) {
         className="dialog"
         role="dialog"
         aria-modal="true"
-        aria-label="Open project"
+        aria-label={t('open.title')}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="dialog-title">Open project</h2>
+        <h2 className="dialog-title">{t('open.title')}</h2>
 
-        {projects === null && <p className="dialog-note">Loading…</p>}
+        {projects === null && <p className="dialog-note">{t('open.loading')}</p>}
         {projects !== null && projects.length === 0 && (
-          <p className="dialog-note">
-            No saved projects yet. Draw something — it saves automatically.
-          </p>
+          <p className="dialog-note">{t('open.empty')}</p>
         )}
 
         <ul className="project-list">
@@ -69,8 +69,8 @@ export function OpenDialog({ onClose }: { onClose: () => void }) {
               <button
                 type="button"
                 className="btn icon-btn small danger"
-                title="Delete project"
-                aria-label={`Delete ${p.name}`}
+                title={t('open.delete')}
+                aria-label={t('open.deleteNamed', { name: p.name })}
                 onClick={() => void remove(p.id)}
               >
                 <TrashIcon />
@@ -81,7 +81,7 @@ export function OpenDialog({ onClose }: { onClose: () => void }) {
 
         <div className="dialog-actions">
           <button className="btn" onClick={onClose}>
-            Close
+            {t('common.close')}
           </button>
         </div>
       </div>

@@ -236,3 +236,16 @@ export const PauseIcon = (p: IconProps) => (
     <path d="M8 5v14M16 5v14" />
   </svg>
 );
+
+export const StarIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M12 3.5 14.6 9l6 .6-4.5 4 1.3 5.9L12 16.3l-5.4 3.2L7.9 13.6 3.4 9.6l6-.6Z" />
+  </svg>
+);
+
+export const GearIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="3.2" />
+    <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1" />
+  </svg>
+);

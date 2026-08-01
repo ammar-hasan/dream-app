@@ -115,6 +115,31 @@ describe('layers', () => {
     expect(store().doc.layers).toHaveLength(1);
   });
 
+  it('clearLayer empties the active layer as one undoable command', () => {
+    store().setTool('brush');
+    store().pointerDown({ x: 1, y: 1 });
+    store().pointerUp({ x: 5, y: 5 });
+    expect(store().doc.layers[0].operations).toHaveLength(1);
+
+    store().clearLayer();
+    expect(store().doc.layers[0].operations).toHaveLength(0);
+    store().undo();
+    expect(store().doc.layers[0].operations).toHaveLength(1);
+  });
+
+  it('clearLayer is a no-op on an empty or locked layer', () => {
+    store().clearLayer(); // nothing to clear
+    expect(store().canUndo).toBe(false);
+
+    store().setTool('brush');
+    store().pointerDown({ x: 1, y: 1 });
+    store().pointerUp({ x: 5, y: 5 });
+    store().setLayerLocked(store().activeLayerId, true);
+    const ops = store().doc.layers[0].operations.length;
+    store().clearLayer();
+    expect(store().doc.layers[0].operations).toHaveLength(ops);
+  });
+
   it('deleted layers come back with undo', () => {
     store().addLayer();
     store().deleteLayer(store().activeLayerId);

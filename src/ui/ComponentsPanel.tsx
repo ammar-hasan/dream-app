@@ -16,6 +16,7 @@ import {
   saveComponent,
 } from '../storage/components';
 import { PlusIcon, TrashIcon } from './icons';
+import { useT } from './i18n';
 
 const THUMB_W = 76;
 const THUMB_H = 56;
@@ -43,6 +44,7 @@ function ComponentThumb({ component }: { component: Component }) {
 }
 
 export function ComponentsPanel() {
+  const t = useT();
   const hasSelection = useDreamStore((s) => s.selection.length > 0);
   const [components, setComponents] = useState<Component[]>([]);
   const [creating, setCreating] = useState(false);
@@ -97,14 +99,14 @@ export function ComponentsPanel() {
   };
 
   return (
-    <section className="panel components-panel" aria-label="Components">
+    <section className="panel components-panel" aria-label={t('components.title')}>
       <div className="panel-header">
-        <h2 className="panel-title">Components</h2>
+        <h2 className="panel-title">{t('components.title')}</h2>
         <button
           type="button"
           className="btn icon-btn"
-          title="Create component from selection"
-          aria-label="Create component from selection"
+          title={t('components.create')}
+          aria-label={t('components.create')}
           disabled={!hasSelection}
           onClick={() => setCreating(true)}
         >
@@ -116,7 +118,7 @@ export function ComponentsPanel() {
         <div className="component-create">
           <input
             type="text"
-            placeholder="Component name"
+            placeholder={t('components.namePlaceholder')}
             value={newName}
             autoFocus
             onChange={(e) => setNewName(e.target.value)}
@@ -126,23 +128,19 @@ export function ComponentsPanel() {
             }}
           />
           <button type="button" className="btn primary" onClick={() => void create()}>
-            Save
+            {t('common.save')}
           </button>
         </div>
       )}
 
-      {!creating && components.length === 0 && (
-        <p className="tool-hint">
-          Select objects on the canvas, then save them here to reuse them in any project.
-        </p>
-      )}
+      {!creating && components.length === 0 && <p className="tool-hint">{t('components.hint')}</p>}
 
       <ul className="component-grid">
         {components.map((component) => (
           <li
             key={component.id}
             className="component-card"
-            title="Double-click to insert, or drag onto the canvas"
+            title={t('components.cardTitle')}
             draggable
             onDragStart={(e) => {
               e.dataTransfer.setData('application/x-dream-component', component.id);
@@ -166,7 +164,7 @@ export function ComponentsPanel() {
             ) : (
               <span
                 className="component-name"
-                title="Double-click to rename"
+                title={t('components.renameTitle')}
                 onDoubleClick={(e) => {
                   e.stopPropagation();
                   setEditingId(component.id);
@@ -179,8 +177,8 @@ export function ComponentsPanel() {
             <button
               type="button"
               className="btn icon-btn small danger component-delete"
-              title="Delete component"
-              aria-label={`Delete ${component.name}`}
+              title={t('components.delete')}
+              aria-label={t('components.deleteNamed', { name: component.name })}
               onClick={() => void remove(component.id)}
             >
               <TrashIcon />

@@ -35,6 +35,7 @@ import { isSpeechSupported, startDictation, type DictationHandle } from '../ai/s
 import { decodeImage } from './importImage';
 import { rasterizeLayer } from './rasterize';
 import { useDreamStore } from '../store/dreamStore';
+import { t, useT } from './i18n';
 import { MicIcon, SparkleIcon } from './icons';
 
 type Tab = 'create' | 'edit' | 'feedback';
@@ -47,11 +48,21 @@ interface Notice {
 
 function friendlyError(error: unknown): string {
   if (error instanceof Error && error.message) return error.message;
-  return 'Hmm, that did not work. Try again?';
+  return t('ai.error');
 }
 
 /** Mic button that dictates into the prompt box; hidden when unsupported. */
-function MicButton({ onText, disabled }: { onText: (text: string) => void; disabled: boolean }) {
+function MicButton({
+  onText,
+  disabled,
+  big = false,
+}: {
+  onText: (text: string) => void;
+  disabled: boolean;
+  /** Kid mode: a giant, impossible-to-miss mic. */
+  big?: boolean;
+}) {
+  const t = useT();
   const [listening, setListening] = useState(false);
   const [handle, setHandle] = useState<DictationHandle | null>(null);
   if (!isSpeechSupported()) return null;
@@ -79,10 +90,10 @@ function MicButton({ onText, disabled }: { onText: (text: string) => void; disab
   return (
     <button
       type="button"
-      className={`btn icon-btn${listening ? ' primary' : ''}`}
+      className={`btn icon-btn${big ? ' kid-mic' : ''}${listening ? ' primary' : ''}`}
       aria-pressed={listening}
-      aria-label={listening ? 'Stop listening' : 'Say it'}
-      title={listening ? 'Stop listening' : 'Say it out loud'}
+      aria-label={listening ? t('ai.micStop') : t('ai.mic')}
+      title={listening ? t('ai.micStop') : t('ai.micTitle')}
       disabled={disabled}
       onClick={toggle}
     >
@@ -91,13 +102,16 @@ function MicButton({ onText, disabled }: { onText: (text: string) => void; disab
   );
 }
 
-export function AiPanel() {
+export function AiPanel({ kid = false }: { kid?: boolean }) {
+  const t = useT();
   const doc = useDreamStore((s) => s.doc);
   const activeLayerId = useDreamStore((s) => s.activeLayerId);
   const selection = useDreamStore((s) => s.selection);
   const layer = doc.layers.find((l) => l.id === activeLayerId);
 
   const [tab, setTab] = useState<Tab>('create');
+  // Kid mode is Create-only: no tabs, no BYOK settings — just talk to Dream.
+  const activeTab: Tab = kid ? 'create' : tab;
   const [createPrompt, setCreatePrompt] = useState('');
   const [editPrompt, setEditPrompt] = useState('');
   const [selectedOnly, setSelectedOnly] = useState(true);
@@ -137,7 +151,7 @@ export function AiPanel() {
       setTriesLeft(0);
       setNotice({
         kind: 'error',
-        text: 'That is all the free dreams for today! Add your own AI in Settings below for unlimited magic.',
+        text: t('ai.freeOver'),
       });
       return;
     }
@@ -160,7 +174,7 @@ export function AiPanel() {
       const result = await p.generateImage({ prompt, width: doc.width, height: doc.height });
       useDreamStore.getState().importImage(result.pixels, prompt.slice(0, 40));
       setCreatePrompt('');
-      setNotice({ kind: 'ok', text: 'Ta-da! Your picture is on a brand-new layer.' });
+      setNotice({ kind: 'ok', text: t('ai.created') });
     });
 
   const edit = () =>
@@ -169,7 +183,7 @@ export function AiPanel() {
       const store = useDreamStore.getState();
       if (!prompt || !layer || layer.operations.length === 0) return;
       const base = rasterizeLayer(layer, doc.width, doc.height);
-      if (!base) throw new Error('I could not look at your layer — try again?');
+      if (!base) throw new Error(t('ai.rasterError'));
       const region = selectedOnly ? editRegionForSelection(doc, layer, selection) : null;
       if (region) {
         const part = extractRegion(base, region);
@@ -181,7 +195,7 @@ export function AiPanel() {
         store.applyLayerRaster(result.pixels, 'AI edit');
       }
       setEditPrompt('');
-      setNotice({ kind: 'ok', text: 'Done! Undo is there if you liked it better before.' });
+      setNotice({ kind: 'ok', text: t('ai.edited') });
     });
 
   const look = () =>
@@ -196,13 +210,13 @@ export function AiPanel() {
     const store = useDreamStore.getState();
     if (action.kind === 'center-selection') {
       store.centerSelection();
-      setNotice({ kind: 'ok', text: 'Centered! Looking good.' });
+      setNotice({ kind: 'ok', text: t('ai.centered') });
       return;
     }
     if (!layer || layer.operations.length === 0) {
       setNotice({
         kind: 'error',
-        text: 'This tip works on the active layer — pick a layer with something on it first.',
+        text: t('ai.tipNeedsLayer'),
       });
       return;
     }
@@ -210,7 +224,7 @@ export function AiPanel() {
     if (!base) return;
     const merged = { ...DEFAULT_ADJUSTMENTS, ...action.adjustments };
     store.applyLayerRaster(applyAdjustments(base, merged), 'AI touch-up');
-    setNotice({ kind: 'ok', text: 'Applied! Undo brings back the old look.' });
+    setNotice({ kind: 'ok', text: t('ai.applied') });
   };
 
   const pickProvider = (id: 'mock' | 'openai-compatible') => {
@@ -229,7 +243,7 @@ export function AiPanel() {
     refreshProvider();
     setNotice({
       kind: 'ok',
-      text: 'Saved! Your own AI is connected — unlimited use, no daily counter.',
+      text: t('ai.saved'),
     });
   };
 
@@ -247,7 +261,7 @@ export function AiPanel() {
         { decodeImage },
       );
       await p.testConnection();
-      setTestResult({ kind: 'ok', text: 'It works! Your AI said hello back.' });
+      setTestResult({ kind: 'ok', text: t('ai.testOk') });
     } catch (error) {
       setTestResult({ kind: 'error', text: friendlyError(error) });
     } finally {
@@ -259,65 +273,70 @@ export function AiPanel() {
     if (provider.capabilities[need]) return null;
     return (
       <p className="ai-note">
-        {provider.name} cannot {need === 'generateImage' ? 'paint pictures' : 'edit pictures'}.
-        Dream AI can —{' '}
+        {t(need === 'generateImage' ? 'ai.cannotPaint' : 'ai.cannotEdit', {
+          provider: provider.name,
+        })}{' '}
         <button type="button" className="ai-link" onClick={() => pickProvider('mock')}>
-          switch back
+          {t('ai.switchBack')}
         </button>
-        .
       </p>
     );
   };
 
   return (
-    <section className="panel ai-panel" aria-label="AI helper">
+    <section className={`panel ai-panel${kid ? ' kid-ai-panel' : ''}`} aria-label={t('toolbar.ai')}>
       <div className="panel-header">
         <h2 className="panel-title">
-          <SparkleIcon className="ai-title-icon" /> Dream AI
+          <SparkleIcon className="ai-title-icon" /> {t('ai.title')}
         </h2>
-        <button
-          type="button"
-          className="btn icon-btn small"
-          aria-label="Close AI helper"
-          onClick={() => useDreamStore.getState().toggleAiPanel()}
-        >
-          ✕
-        </button>
+        {!kid && (
+          <button
+            type="button"
+            className="btn icon-btn small"
+            aria-label={t('ai.close')}
+            onClick={() => useDreamStore.getState().toggleAiPanel()}
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       {!byok && (
         <p className="ai-usage">
-          {triesLeft} free {triesLeft === 1 ? 'try' : 'tries'} left today
+          {t(triesLeft === 1 ? 'ai.triesLeftOne' : 'ai.triesLeft', { count: triesLeft })}
         </p>
       )}
 
-      <div className="mode-switch ai-tabs" role="tablist" aria-label="AI tools">
-        {(['create', 'edit', 'feedback'] as const).map((t) => (
-          <button
-            key={t}
-            type="button"
-            role="tab"
-            aria-selected={tab === t}
-            className={`mode-tab${tab === t ? ' active' : ''}`}
-            onClick={() => setTab(t)}
-          >
-            {t === 'create' ? 'Create' : t === 'edit' ? 'Edit' : 'Feedback'}
-          </button>
-        ))}
-      </div>
+      {!kid && (
+        <div className="mode-switch ai-tabs" role="tablist" aria-label={t('ai.tabs')}>
+          {(['create', 'edit', 'feedback'] as const).map((id) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              aria-selected={tab === id}
+              className={`mode-tab${tab === id ? ' active' : ''}`}
+              onClick={() => setTab(id)}
+            >
+              {t(`ai.${id}`)}
+            </button>
+          ))}
+        </div>
+      )}
 
-      {tab === 'create' && (
+      {activeTab === 'create' && (
         <div className="ai-section">
-          <p className="tool-hint">Tell me your dream and I’ll sketch it.</p>
+          <p className="tool-hint">{t('ai.createHint')}</p>
           <div className="ai-prompt-row">
             <textarea
               className="ai-textarea"
               rows={3}
-              placeholder="A sleepy fox under a starry sky…"
+              placeholder={t('ai.createPlaceholder')}
+              aria-label={t('ai.promptLabel')}
               value={createPrompt}
               onChange={(e) => setCreatePrompt(e.target.value)}
             />
-            <MicButton onText={setCreatePrompt} disabled={busy !== null} />
+            <MicButton onText={setCreatePrompt} disabled={busy !== null} big={kid} />
           </div>
           <button
             type="button"
@@ -327,41 +346,35 @@ export function AiPanel() {
             }
             onClick={() => void create()}
           >
-            {busy === 'create' ? 'Dreaming…' : 'Make it!'}
+            {busy === 'create' ? t('ai.dreaming') : t('ai.makeIt')}
           </button>
           {capabilityNote('generateImage')}
         </div>
       )}
 
-      {tab === 'edit' && (
+      {activeTab === 'edit' && (
         <div className="ai-section">
-          <p className="tool-hint">
-            Tell me how to change your picture — “warmer”, “dreamy”, “more pop”.
-          </p>
+          <p className="tool-hint">{t('ai.editHint')}</p>
           <div className="ai-prompt-row">
             <textarea
               className="ai-textarea"
               rows={3}
-              placeholder="Make it warmer and softer…"
+              placeholder={t('ai.editPlaceholder')}
               value={editPrompt}
               onChange={(e) => setEditPrompt(e.target.value)}
             />
             <MicButton onText={setEditPrompt} disabled={busy !== null} />
           </div>
-          <label className="checkbox-field option-row" title="Uses the Design-mode selection box">
+          <label className="checkbox-field option-row" title={t('ai.selectedOnlyTitle')}>
             <input
               type="checkbox"
               checked={selectedOnly && canEditSelection}
               disabled={!canEditSelection}
               onChange={(e) => setSelectedOnly(e.target.checked)}
             />
-            Selected part only
+            {t('ai.selectedOnly')}
           </label>
-          {!canEditSelection && (
-            <p className="ai-note">
-              Tip: pick something with the Select tool in Design mode to edit just that part.
-            </p>
-          )}
+          {!canEditSelection && <p className="ai-note">{t('ai.editTip')}</p>}
           <button
             type="button"
             className="btn primary ai-go"
@@ -374,33 +387,27 @@ export function AiPanel() {
             }
             onClick={() => void edit()}
           >
-            {busy === 'edit' ? 'Working…' : 'Edit it!'}
+            {busy === 'edit' ? t('ai.working') : t('ai.editIt')}
           </button>
           {layer && layer.operations.length === 0 && (
-            <p className="ai-note">
-              The active layer is empty — draw or pick a layer with something on it.
-            </p>
+            <p className="ai-note">{t('ai.emptyLayer')}</p>
           )}
           {capabilityNote('editImage')}
         </div>
       )}
 
-      {tab === 'feedback' && (
+      {activeTab === 'feedback' && (
         <div className="ai-section">
-          <p className="tool-hint">
-            I’ll take a kind look and give you ideas you can use right away.
-          </p>
+          <p className="tool-hint">{t('ai.feedbackHint')}</p>
           <button
             type="button"
             className="btn primary ai-go"
             disabled={busy !== null}
             onClick={() => void look()}
           >
-            {busy === 'feedback' ? 'Taking a good look…' : 'Look at my design'}
+            {busy === 'feedback' ? t('ai.looking') : t('ai.look')}
           </button>
-          {!feedback && busy !== 'feedback' && (
-            <p className="ai-note">Nothing yet — press the button and I’ll share what I see.</p>
-          )}
+          {!feedback && busy !== 'feedback' && <p className="ai-note">{t('ai.noFeedback')}</p>}
           {feedback && (
             <div className="ai-chat">
               <div className="ai-bubble">{feedback.summary}</div>
@@ -413,7 +420,7 @@ export function AiPanel() {
                       className="btn small-apply"
                       onClick={() => applySuggestion(s)}
                     >
-                      Apply
+                      {t('ai.apply')}
                     </button>
                   )}
                 </div>
@@ -429,100 +436,102 @@ export function AiPanel() {
         </p>
       )}
 
-      <div className="ai-settings">
-        <button
-          type="button"
-          className="ai-link"
-          aria-expanded={settingsOpen}
-          onClick={() => setSettingsOpen(!settingsOpen)}
-        >
-          {settingsOpen ? '▾' : '▸'} Settings: {byok ? 'my own AI' : 'Dream AI (built-in)'}
-        </button>
-        {settingsOpen && (
-          <div className="ai-settings-body">
-            <div className="option-row">
-              <span className="option-label">Who helps</span>
-              <select
-                className="font-select"
-                value={byok ? 'openai-compatible' : 'mock'}
-                onChange={(e) => pickProvider(e.target.value as 'mock' | 'openai-compatible')}
-              >
-                <option value="mock">Dream AI (free, built-in)</option>
-                <option value="openai-compatible">My own AI (OpenAI-compatible)</option>
-              </select>
+      {!kid && (
+        <div className="ai-settings">
+          <button
+            type="button"
+            className="ai-link"
+            aria-expanded={settingsOpen}
+            onClick={() => setSettingsOpen(!settingsOpen)}
+          >
+            {settingsOpen ? '▾' : '▸'}{' '}
+            {t('ai.settingsToggle', {
+              provider: t(byok ? 'ai.providerByok' : 'ai.providerMock'),
+            })}
+          </button>
+          {settingsOpen && (
+            <div className="ai-settings-body">
+              <div className="option-row">
+                <span className="option-label">{t('ai.whoHelps')}</span>
+                <select
+                  className="font-select"
+                  value={byok ? 'openai-compatible' : 'mock'}
+                  onChange={(e) => pickProvider(e.target.value as 'mock' | 'openai-compatible')}
+                >
+                  <option value="mock">{t('ai.providerMockFull')}</option>
+                  <option value="openai-compatible">{t('ai.providerByokFull')}</option>
+                </select>
+              </div>
+              <label className="option-row">
+                <span className="option-label">{t('ai.baseUrl')}</span>
+                <input
+                  className="ai-input"
+                  type="text"
+                  placeholder="https://api.openai.com/v1"
+                  value={settings.baseUrl ?? ''}
+                  onChange={(e) => setSettings({ ...settings, baseUrl: e.target.value })}
+                />
+              </label>
+              <label className="option-row">
+                <span className="option-label">{t('ai.model')}</span>
+                <input
+                  className="ai-input"
+                  type="text"
+                  placeholder="gpt-4o-mini"
+                  value={settings.model ?? ''}
+                  onChange={(e) => setSettings({ ...settings, model: e.target.value })}
+                />
+              </label>
+              <label className="option-row">
+                <span className="option-label">{t('ai.apiKey')}</span>
+                <input
+                  className="ai-input"
+                  type="password"
+                  autoComplete="off"
+                  placeholder="sk-…"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                />
+              </label>
+              <label className="checkbox-field option-row">
+                <input
+                  type="checkbox"
+                  checked={!!settings.rememberKey}
+                  onChange={(e) => setSettings({ ...settings, rememberKey: e.target.checked })}
+                />
+                {t('ai.rememberKey')}
+              </label>
+              <label className="checkbox-field option-row">
+                <input
+                  type="checkbox"
+                  checked={!!settings.supportsImages}
+                  onChange={(e) => setSettings({ ...settings, supportsImages: e.target.checked })}
+                />
+                {t('ai.canPaint')}
+              </label>
+              <div className="option-row">
+                <button
+                  type="button"
+                  className="btn"
+                  disabled={busy !== null}
+                  onClick={() => void testConnection()}
+                >
+                  {busy === 'settings' ? t('ai.sayingHi') : t('ai.testConnection')}
+                </button>
+                <button type="button" className="btn primary" onClick={saveSettings}>
+                  {t('common.save')}
+                </button>
+              </div>
+              {testResult && (
+                <p className={`ai-notice ${testResult.kind}`} role="status">
+                  {testResult.text}
+                </p>
+              )}
+              <p className="ai-note">{t('ai.keyNote')}</p>
             </div>
-            <label className="option-row">
-              <span className="option-label">Base URL</span>
-              <input
-                className="ai-input"
-                type="text"
-                placeholder="https://api.openai.com/v1"
-                value={settings.baseUrl ?? ''}
-                onChange={(e) => setSettings({ ...settings, baseUrl: e.target.value })}
-              />
-            </label>
-            <label className="option-row">
-              <span className="option-label">Model</span>
-              <input
-                className="ai-input"
-                type="text"
-                placeholder="gpt-4o-mini"
-                value={settings.model ?? ''}
-                onChange={(e) => setSettings({ ...settings, model: e.target.value })}
-              />
-            </label>
-            <label className="option-row">
-              <span className="option-label">API key</span>
-              <input
-                className="ai-input"
-                type="password"
-                autoComplete="off"
-                placeholder="sk-…"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-              />
-            </label>
-            <label className="checkbox-field option-row">
-              <input
-                type="checkbox"
-                checked={!!settings.rememberKey}
-                onChange={(e) => setSettings({ ...settings, rememberKey: e.target.checked })}
-              />
-              Remember key on this device
-            </label>
-            <label className="checkbox-field option-row">
-              <input
-                type="checkbox"
-                checked={!!settings.supportsImages}
-                onChange={(e) => setSettings({ ...settings, supportsImages: e.target.checked })}
-              />
-              This AI can also paint images
-            </label>
-            <div className="option-row">
-              <button
-                type="button"
-                className="btn"
-                disabled={busy !== null}
-                onClick={() => void testConnection()}
-              >
-                {busy === 'settings' ? 'Saying hi…' : 'Test connection'}
-              </button>
-              <button type="button" className="btn primary" onClick={saveSettings}>
-                Save
-              </button>
-            </div>
-            {testResult && (
-              <p className={`ai-notice ${testResult.kind}`} role="status">
-                {testResult.text}
-              </p>
-            )}
-            <p className="ai-note">
-              Keys live only in this tab’s memory unless “remember key” is ticked. They are never
-              sent anywhere but your AI.
-            </p>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </section>
   );
 }

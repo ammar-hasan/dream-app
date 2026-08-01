@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useDreamStore } from '../store/dreamStore';
+import { useT } from './i18n';
 
 const PRESETS = [
   { label: '1024 × 768', width: 1024, height: 768 },
@@ -14,8 +15,9 @@ const PRESETS = [
 const MAX_DIMENSION = 4096;
 
 export function NewDocumentDialog({ onClose }: { onClose: () => void }) {
+  const t = useT();
   const newDocument = useDreamStore((s) => s.newDocument);
-  const [name, setName] = useState('Untitled');
+  const [name, setName] = useState(() => t('newDoc.untitled'));
   const [width, setWidth] = useState(1024);
   const [height, setHeight] = useState(768);
   const [background, setBackground] = useState('#ffffff');
@@ -24,7 +26,7 @@ export function NewDocumentDialog({ onClose }: { onClose: () => void }) {
 
   const create = () => {
     newDocument({
-      name: name.trim() || 'Untitled',
+      name: name.trim() || t('newDoc.untitled'),
       width: clampDim(width),
       height: clampDim(height),
       background,
@@ -38,18 +40,18 @@ export function NewDocumentDialog({ onClose }: { onClose: () => void }) {
         className="dialog"
         role="dialog"
         aria-modal="true"
-        aria-label="New document"
+        aria-label={t('newDoc.title')}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="dialog-title">New document</h2>
+        <h2 className="dialog-title">{t('newDoc.title')}</h2>
 
         <label className="field">
-          <span>Name</span>
+          <span>{t('newDoc.name')}</span>
           <input value={name} onChange={(e) => setName(e.target.value)} autoFocus />
         </label>
 
         <div className="field">
-          <span>Presets</span>
+          <span>{t('newDoc.presets')}</span>
           <div className="preset-grid">
             {PRESETS.map((p) => (
               <button
@@ -69,7 +71,7 @@ export function NewDocumentDialog({ onClose }: { onClose: () => void }) {
 
         <div className="field-row">
           <label className="field">
-            <span>Width</span>
+            <span>{t('newDoc.width')}</span>
             <input
               type="number"
               min={1}
@@ -79,7 +81,7 @@ export function NewDocumentDialog({ onClose }: { onClose: () => void }) {
             />
           </label>
           <label className="field">
-            <span>Height</span>
+            <span>{t('newDoc.height')}</span>
             <input
               type="number"
               min={1}
@@ -89,22 +91,22 @@ export function NewDocumentDialog({ onClose }: { onClose: () => void }) {
             />
           </label>
           <label className="field">
-            <span>Background</span>
+            <span>{t('newDoc.background')}</span>
             <input
               type="color"
               value={background}
               onChange={(e) => setBackground(e.target.value)}
-              aria-label="Background color"
+              aria-label={t('newDoc.backgroundColor')}
             />
           </label>
         </div>
 
         <div className="dialog-actions">
           <button className="btn" onClick={onClose}>
-            Cancel
+            {t('common.cancel')}
           </button>
           <button className="btn primary" onClick={create}>
-            Create
+            {t('common.create')}
           </button>
         </div>
       </div>
