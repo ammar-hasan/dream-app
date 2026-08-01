@@ -46,6 +46,13 @@ Conventions for anyone (human or agent) working on Dream.
    other locale — tests assert key parity). Voice/speech code is isolated in
    `src/ai/speech.ts` (recognition) and `src/ai/say.ts` (synthesis), both
    feature-detected.
+9. **Styling goes through the design tokens in `src/styles/app.css`.** No
+   hardcoded colors outside the `:root` / `[data-theme='dark']` token blocks —
+   consume `var(--accent)`, `var(--panel)`, etc. Theme is a `data-theme`
+   attribute on `<html>`, set from the uiPrefs store. Tooltips are pure CSS
+   via a `data-tooltip` attribute (never native `title` on buttons; kid mode
+   suppresses them because spoken names do that job). All animation is
+   transform/opacity-only and must respect `prefers-reduced-motion`.
 
 ## Structure
 
@@ -55,7 +62,8 @@ Conventions for anyone (human or agent) working on Dream.
   selection (Design mode: hit-testing, move/scale/rotate, snapping, align,
   groups, component factories), tools/
 - `src/store/` — Zustand store(s): `dreamStore` (document, via History) and
-  `uiPrefs` (per-user UI prefs in localStorage: kid mode, voice toggles, locale)
+  `uiPrefs` (per-user UI prefs in localStorage: kid mode, voice toggles,
+  locale, theme, recent colors)
 - `src/ui/` — React components, hooks, icons, export helpers (image +
   animation video/sprite sheet; MediaRecorder isolated behind injectable deps),
   `i18n/` string tables (add a locale: copy `en.ts`, register in `i18n/index.ts`

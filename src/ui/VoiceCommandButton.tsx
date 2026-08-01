@@ -122,7 +122,7 @@ export function VoiceCommandButton() {
         className={`btn icon-btn${listening ? ' primary listening' : ''}`}
         aria-pressed={listening}
         aria-label={listening ? t('toolbar.stopListening') : t('toolbar.voiceCommands')}
-        title={listening ? t('toolbar.stopListening') : t('toolbar.voiceCommandsTitle')}
+        data-tooltip={listening ? undefined : t('toolbar.voiceCommandsTitle')}
         onClick={toggle}
       >
         <MicIcon />

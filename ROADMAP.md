@@ -168,9 +168,30 @@ not by a fixed schedule.
 - Remaining: more locales, axe-core audit, reduced-motion respect, localized
   voice-command vocabularies.
 
+## Polish pass — design system, theming & micro-delight ✅
+
+- ✅ Design tokens in `app.css`: signature indigo→violet→rose gradient,
+  calm neutral surfaces, dark canvas-surround, radius + elevation scales,
+  consistent focus rings; components consume tokens only.
+- ✅ Dark theme via `[data-theme='dark']`, toggled in the settings menu,
+  persisted in uiPrefs, defaulting to `prefers-color-scheme`.
+- ✅ Micro-delight: sliding mode pill, pure-CSS `data-tooltip` tooltips
+  (name + shortcut; suppressed in kid mode where spoken names rule),
+  dialog/popover fade-scale-in, ambient GPU-cheap drift behind the canvas,
+  splash while the last document restores, welcome card with the logo —
+  all disabled under `prefers-reduced-motion`.
+- ✅ Brand: `DreamMark` (moon + spark) in toolbar/welcome/splash,
+  `public/favicon.svg`, proper title/meta/theme-color, and
+  `public/manifest.webmanifest` (installable; no service worker yet —
+  that's slice 11).
+- ✅ Floating zoom pill (−/%/+, tap % to fit-to-window), recent-colors row
+  in the options panel, refined selection handles, gradient primary buttons.
+
 ## Slice 11 — PWA
 
-- Installable, offline-first (service worker), document library available offline.
+- ✅ Basics shipped in the polish pass: web app manifest, SVG icon
+  (maskable), theme colors.
+- Remaining: offline-first service worker, document library available offline.
 - Acceptance: Lighthouse PWA checks pass; app works fully with network off.
 
 ## Slice 12 — Games & app generation

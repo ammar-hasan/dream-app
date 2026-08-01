@@ -1,7 +1,9 @@
 /** Right panel, top half: options for the active tool. */
 
+import { useEffect } from 'react';
 import { PALETTE } from '../engine/color';
 import { useDreamStore } from '../store/dreamStore';
+import { useUiPrefs } from '../store/uiPrefs';
 import { useT } from './i18n';
 
 const SHOW_COLOR = new Set(['brush', 'pencil', 'line', 'rectangle', 'ellipse', 'fill', 'text']);
@@ -28,6 +30,26 @@ export function ToolOptionsPanel() {
   const setOpacity = useDreamStore((s) => s.setOpacity);
   const setFontSize = useDreamStore((s) => s.setFontSize);
   const setFontFamily = useDreamStore((s) => s.setFontFamily);
+  const recentColors = useUiPrefs((s) => s.recentColors);
+
+  // Remember the color once it settles (debounced so dragging the native
+  // color picker doesn't flood the recents row with in-between values).
+  useEffect(() => {
+    const timer = setTimeout(() => useUiPrefs.getState().rememberColor(settings.color), 600);
+    return () => clearTimeout(timer);
+  }, [settings.color]);
+
+  const swatchButton = (color: string) => (
+    <button
+      key={color}
+      type="button"
+      className={`swatch${settings.color === color ? ' active' : ''}`}
+      style={{ background: color }}
+      title={color}
+      aria-label={t('options.colorSwatch', { color })}
+      onClick={() => setColor(color)}
+    />
+  );
 
   return (
     <section className="panel tool-options" aria-label={t('options.title')}>
@@ -57,30 +79,28 @@ export function ToolOptionsPanel() {
       )}
 
       {SHOW_COLOR.has(tool) && (
-        <div className="option-row">
-          <span className="option-label">{t('options.color')}</span>
-          <div className="swatches">
-            {PALETTE.map((color) => (
-              <button
-                key={color}
-                type="button"
-                className={`swatch${settings.color === color ? ' active' : ''}`}
-                style={{ background: color }}
-                title={color}
-                aria-label={t('options.colorSwatch', { color })}
-                onClick={() => setColor(color)}
-              />
-            ))}
-            <label className="swatch custom-swatch" title={t('options.customColor')}>
-              <input
-                type="color"
-                value={settings.color}
-                onChange={(e) => setColor(e.target.value)}
-                aria-label={t('options.customColor')}
-              />
-            </label>
+        <>
+          <div className="option-row">
+            <span className="option-label">{t('options.color')}</span>
+            <div className="swatches">
+              {PALETTE.map(swatchButton)}
+              <label className="swatch custom-swatch" title={t('options.customColor')}>
+                <input
+                  type="color"
+                  value={settings.color}
+                  onChange={(e) => setColor(e.target.value)}
+                  aria-label={t('options.customColor')}
+                />
+              </label>
+            </div>
           </div>
-        </div>
+          {recentColors.length > 0 && (
+            <div className="option-row">
+              <span className="option-label">{t('options.recent')}</span>
+              <div className="swatches">{recentColors.map(swatchButton)}</div>
+            </div>
+          )}
+        </>
       )}
 
       {SHOW_SIZE.has(tool) && (

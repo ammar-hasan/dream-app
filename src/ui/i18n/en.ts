@@ -27,6 +27,7 @@ export const en: Record<string, string> = {
   'toolbar.redoTitle': 'Redo (Ctrl+Shift+Z)',
   'toolbar.zoomOut': 'Zoom out',
   'toolbar.zoomIn': 'Zoom in',
+  'zoom.fit': 'Fit canvas to window',
   'toolbar.kidMode': 'Little Dreamer mode',
   'toolbar.kidModeTitle': 'Big buttons, bright colors and friendly voices',
   'toolbar.voiceCommands': 'Voice commands',
@@ -89,6 +90,7 @@ export const en: Record<string, string> = {
   'options.hint.text': 'Click on the canvas, type, then press Enter to place the text.',
   'options.applyCrop': 'Apply crop',
   'options.color': 'Color',
+  'options.recent': 'Recent',
   'options.colorSwatch': 'Color {color}',
   'options.customColor': 'Custom color',
   'options.size': 'Size',
@@ -314,6 +316,8 @@ export const en: Record<string, string> = {
   'settings.speakToolsHint': 'Say the tool name out loud on hover',
   'settings.voiceFeedback': 'Voice feedback',
   'settings.voiceFeedbackHint': 'Say what happened after each voice command',
+  'settings.theme': 'Dark mode',
+  'settings.themeHint': 'A midnight studio for late-night dreaming',
   'settings.language': 'Language',
 
   // --- Voice commands ----------------------------------------------------------------------

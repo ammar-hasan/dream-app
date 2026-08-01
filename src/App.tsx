@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useKeyboardShortcuts } from './ui/useKeyboardShortcuts';
 import { useAutosave, useRestoreLastDocument } from './ui/usePersistence';
 import { useImagePaste } from './ui/useImagePaste';
 import { useDreamStore } from './store/dreamStore';
 import { useUiPrefs } from './store/uiPrefs';
 import { isRtl } from './ui/i18n';
+import { DreamMark } from './ui/icons';
 import { Toolbar } from './ui/Toolbar';
 import { ToolRail } from './ui/ToolRail';
 import { CanvasViewport } from './ui/CanvasViewport';
@@ -27,14 +28,17 @@ type Dialog = 'new' | 'open' | 'resize' | 'export' | null;
 
 export default function App() {
   const [dialog, setDialog] = useState<Dialog>(null);
+  // Splash: shown until the last-document restore settles, then fades out.
+  const [splash, setSplash] = useState<'show' | 'fade' | 'gone'>('show');
   const mode = useDreamStore((s) => s.mode);
   const aiPanelOpen = useDreamStore((s) => s.aiPanelOpen);
   const kidMode = useUiPrefs((s) => s.kidMode);
+  const theme = useUiPrefs((s) => s.theme);
   const locale = useUiPrefs((s) => s.locale);
 
   useKeyboardShortcuts();
   useAutosave();
-  useRestoreLastDocument();
+  useRestoreLastDocument(useCallback(() => setSplash('fade'), []));
   useImagePaste();
 
   // Language direction follows the locale (Arabic mirrors the whole shell).
@@ -42,6 +46,21 @@ export default function App() {
     document.documentElement.dir = isRtl(locale) ? 'rtl' : 'ltr';
     document.documentElement.lang = locale;
   }, [locale]);
+
+  // Color theme: a data-attribute remap of the design tokens in app.css.
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    document
+      .querySelector('meta[name="theme-color"]')
+      ?.setAttribute('content', theme === 'dark' ? '#14161f' : '#eef0f6');
+  }, [theme]);
+
+  // Let the fade-out finish before unmounting the splash.
+  useEffect(() => {
+    if (splash !== 'fade') return;
+    const timer = setTimeout(() => setSplash('gone'), 340);
+    return () => clearTimeout(timer);
+  }, [splash]);
 
   // Present mode replaces the whole editor: slides only, no editing.
   if (mode === 'present') return <PresentView />;
@@ -80,6 +99,11 @@ export default function App() {
       {dialog === 'open' && <OpenDialog onClose={() => setDialog(null)} />}
       {dialog === 'resize' && <ResizeDialog onClose={() => setDialog(null)} />}
       {dialog === 'export' && <ExportDialog onClose={() => setDialog(null)} />}
+      {splash !== 'gone' && (
+        <div className={`splash${splash === 'fade' ? ' fade' : ''}`} aria-hidden="true">
+          <DreamMark className="splash-mark" />
+        </div>
+      )}
     </div>
   );
 }

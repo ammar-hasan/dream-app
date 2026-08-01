@@ -249,3 +249,27 @@ export const GearIcon = (p: IconProps) => (
     <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1" />
   </svg>
 );
+
+/**
+ * The Dream brand mark: a crescent moon and a spark on the signature
+ * indigo→violet→rose gradient, in a soft squircle. Used in the toolbar,
+ * the welcome card, the splash screen and (as plain SVG) the favicon.
+ */
+export const DreamMark = (p: IconProps) => (
+  <svg width={28} height={28} viewBox="0 0 32 32" fill="none" aria-hidden={true} {...p}>
+    <defs>
+      <linearGradient id="dream-mark-g" x1="0" y1="0" x2="32" y2="32">
+        <stop offset="0" stopColor="#6d7cff" />
+        <stop offset="0.55" stopColor="#a855f7" />
+        <stop offset="1" stopColor="#f472b6" />
+      </linearGradient>
+    </defs>
+    <rect width="32" height="32" rx="9" fill="url(#dream-mark-g)" />
+    <path d="M14.5 8.5A7.5 7.5 0 1 0 23 20 8.5 8.5 0 0 1 14.5 8.5Z" fill="#ffffff" opacity="0.95" />
+    <path
+      d="M22.5 6.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9Z"
+      fill="#ffffff"
+      opacity="0.9"
+    />
+  </svg>
+);

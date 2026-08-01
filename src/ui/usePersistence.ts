@@ -31,21 +31,25 @@ export function useAutosave(): void {
   }, [doc, isDirty]);
 }
 
-export function useRestoreLastDocument(): void {
+export function useRestoreLastDocument(onDone?: () => void): void {
   useEffect(() => {
     let cancelled = false;
     void (async () => {
       try {
         const id = globalThis.localStorage?.getItem(LAST_DOC_KEY);
-        if (!id) return;
-        const doc = await loadProject(id);
-        if (doc && !cancelled) useDreamStore.getState().loadDocument(doc);
+        if (id) {
+          const doc = await loadProject(id);
+          if (doc && !cancelled) useDreamStore.getState().loadDocument(doc);
+        }
       } catch (error) {
         console.error('Could not restore last document', error);
+      } finally {
+        // Restore settled (or there was nothing to restore): lift the splash.
+        if (!cancelled) onDone?.();
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [onDone]);
 }

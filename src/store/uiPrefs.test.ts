@@ -10,6 +10,8 @@ beforeEach(() => {
     speakToolNames: false,
     voiceFeedback: false,
     locale: 'en',
+    theme: 'light',
+    recentColors: [],
   });
 });
 
@@ -48,5 +50,31 @@ describe('uiPrefs store', () => {
   it('persists the locale choice', () => {
     useUiPrefs.getState().setLocale('ar');
     expect(localStorage.getItem('dream:locale')).toBe('ar');
+  });
+
+  it('defaults to a light theme when nothing is stored and the OS has no preference', () => {
+    expect(useUiPrefs.getState().theme).toBe('light');
+  });
+
+  it('persists the theme choice', () => {
+    useUiPrefs.getState().setTheme('dark');
+    expect(useUiPrefs.getState().theme).toBe('dark');
+    expect(localStorage.getItem('dream:theme')).toBe('dark');
+  });
+
+  it('remembers recent colors, newest first, deduped and capped at 8', () => {
+    const { rememberColor } = useUiPrefs.getState();
+    rememberColor('#111111');
+    rememberColor('#222222');
+    rememberColor('#111111'); // dedupe: moves back to the front
+    expect(useUiPrefs.getState().recentColors).toEqual(['#111111', '#222222']);
+
+    for (let i = 0; i < 10; i++) rememberColor(`#color-${i}`);
+    expect(useUiPrefs.getState().recentColors).toHaveLength(8);
+    expect(useUiPrefs.getState().recentColors[0]).toBe('#color-9');
+
+    expect(JSON.parse(localStorage.getItem('dream:recent-colors') ?? '[]')).toEqual(
+      useUiPrefs.getState().recentColors,
+    );
   });
 });

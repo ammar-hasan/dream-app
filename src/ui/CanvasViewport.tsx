@@ -16,13 +16,15 @@ import { renderDocument, renderLayer, renderOperation } from '../engine/renderer
 import { animationSettingsOf, frameIndexAtTime, onionSkinTargets } from '../engine/animation';
 import { normalizeRect } from '../engine/geometry';
 import { selectedOps, selectionBounds, unionBounds } from '../engine/selection';
-import { nextZoomIn, nextZoomOut, pickColor, zoomAtPoint } from '../engine/tools';
+import { clampZoom, nextZoomIn, nextZoomOut, pickColor, zoomAtPoint } from '../engine/tools';
 import type { Point, Rect } from '../engine/types';
 import { useDreamStore } from '../store/dreamStore';
+import { useUiPrefs } from '../store/uiPrefs';
 import { getComponent } from '../storage/components';
 import { importImageFiles } from './importImage';
 import { TextOverlay } from './TextOverlay';
 import { useT } from './i18n';
+import { DreamMark } from './icons';
 
 /** Accent used for all selection chrome, matching --accent in app.css. */
 const ACCENT = '#6d7cff';
@@ -59,6 +61,7 @@ export function CanvasViewport() {
   const hintDismissed = useDreamStore((s) => s.hintDismissed);
   const playing = useDreamStore((s) => s.playing);
   const playbackFrame = useDreamStore((s) => s.playbackFrame);
+  const kidMode = useUiPrefs((s) => s.kidMode);
   const skinCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // Playback driver: while playing, a rAF loop maps elapsed time to a frame
@@ -102,8 +105,8 @@ export function CanvasViewport() {
     if (!ctx) return; // jsdom and very old browsers: nothing to draw on
 
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.fillStyle = '#e9ebef';
-    ctx.fillRect(0, 0, width, height);
+    // No opaque surround fill: the CSS viewport background (and its dreamy
+    // ambient blobs) shows through, so the theme owns the surround color.
 
     ctx.save();
     ctx.translate(offset.x, offset.y);
@@ -269,13 +272,24 @@ export function CanvasViewport() {
           ctx.lineWidth = 1.5 * px;
           ctx.strokeRect(union.x, union.y, union.width, union.height);
 
-          // Corner resize handles: white squares with an accent ring.
+          // Corner resize handles: soft rounded squares with a gentle lift.
           const hs = 9 * px;
+          const hr = 2.5 * px;
           ctx.lineWidth = px;
           for (const p of corners(union)) {
+            const hx = p.x - hs / 2;
+            const hy = p.y - hs / 2;
+            ctx.save();
+            ctx.shadowColor = 'rgba(15, 23, 42, 0.28)';
+            ctx.shadowBlur = 3 * px;
             ctx.fillStyle = '#ffffff';
-            ctx.fillRect(p.x - hs / 2, p.y - hs / 2, hs, hs);
-            ctx.strokeRect(p.x - hs / 2, p.y - hs / 2, hs, hs);
+            ctx.beginPath();
+            ctx.roundRect(hx, hy, hs, hs, hr);
+            ctx.fill();
+            ctx.restore();
+            ctx.beginPath();
+            ctx.roundRect(hx, hy, hs, hs, hr);
+            ctx.stroke();
           }
 
           // Rotation handle: a circle floating above the top-center.
@@ -347,6 +361,26 @@ export function CanvasViewport() {
     const next = direction === 'in' ? nextZoomIn(state.zoom) : nextZoomOut(state.zoom);
     const focal = { x: clientX - rect.left, y: clientY - rect.top };
     state.setViewport({ zoom: next, offset: zoomAtPoint(state.offset, state.zoom, next, focal) });
+  };
+
+  /** Fit the whole document in the viewport, centered with a small margin. */
+  const fitToWindow = () => {
+    const wrap = wrapRef.current;
+    if (!wrap) return;
+    const state = useDreamStore.getState();
+    const margin = 48;
+    const fit = Math.min(
+      (wrap.clientWidth - margin) / state.doc.width,
+      (wrap.clientHeight - margin) / state.doc.height,
+    );
+    const zoom = clampZoom(fit);
+    state.setViewport({
+      zoom,
+      offset: {
+        x: (wrap.clientWidth - state.doc.width * zoom) / 2,
+        y: (wrap.clientHeight - state.doc.height * zoom) / 2,
+      },
+    });
   };
 
   // --- Pointer routing ----------------------------------------------------
@@ -460,7 +494,41 @@ export function CanvasViewport() {
       )}
       {!hintDismissed && (
         <div className="hint-overlay" aria-hidden="true">
-          <div className="hint-card">{t('hint.firstRun')}</div>
+          <div className="hint-card">
+            <DreamMark className="hint-mark" />
+            <p className="hint-text">{t('hint.firstRun')}</p>
+          </div>
+        </div>
+      )}
+      {!kidMode && (
+        <div className="zoom-pill">
+          <button
+            type="button"
+            className="zoom-pill-btn"
+            aria-label={t('toolbar.zoomOut')}
+            data-tooltip={t('toolbar.zoomOut')}
+            onClick={() => useDreamStore.getState().zoomOut()}
+          >
+            −
+          </button>
+          <button
+            type="button"
+            className="zoom-pill-value"
+            aria-label={t('zoom.fit')}
+            data-tooltip={t('zoom.fit')}
+            onClick={fitToWindow}
+          >
+            {Math.round(zoom * 100)}%
+          </button>
+          <button
+            type="button"
+            className="zoom-pill-btn"
+            aria-label={t('toolbar.zoomIn')}
+            data-tooltip={t('toolbar.zoomIn')}
+            onClick={() => useDreamStore.getState().zoomIn()}
+          >
+            +
+          </button>
         </div>
       )}
     </div>

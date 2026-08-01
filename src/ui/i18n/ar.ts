@@ -26,6 +26,7 @@ export const ar: Record<string, string> = {
   'toolbar.redoTitle': 'إعادة (Ctrl+Shift+Z)',
   'toolbar.zoomOut': 'تصغير',
   'toolbar.zoomIn': 'تكبير',
+  'zoom.fit': 'ملاءمة اللوحة للنافذة',
   'toolbar.kidMode': 'وضع الحالم الصغير',
   'toolbar.kidModeTitle': 'أزرار كبيرة وألوان مبهجة وأصوات ودودة',
   'toolbar.voiceCommands': 'الأوامر الصوتية',
@@ -88,6 +89,7 @@ export const ar: Record<string, string> = {
   'options.hint.text': 'انقر على اللوحة واكتب ثم اضغط Enter لوضع النص.',
   'options.applyCrop': 'تطبيق القص',
   'options.color': 'اللون',
+  'options.recent': 'الأخيرة',
   'options.colorSwatch': 'اللون {color}',
   'options.customColor': 'لون مخصص',
   'options.size': 'الحجم',
@@ -311,6 +313,8 @@ export const ar: Record<string, string> = {
   'settings.speakToolsHint': 'نطق اسم الأداة بصوت عالٍ عند التمرير فوقها',
   'settings.voiceFeedback': 'التغذية الراجعة الصوتية',
   'settings.voiceFeedbackHint': 'نطق ما حدث بعد كل أمر صوتي',
+  'settings.theme': 'الوضع الداكن',
+  'settings.themeHint': 'مرسم منتصف الليل للأحلام المتأخرة',
   'settings.language': 'اللغة',
 
   // --- Voice commands ----------------------------------------------------------------------

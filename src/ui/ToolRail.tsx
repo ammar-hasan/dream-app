@@ -114,7 +114,7 @@ export function ToolRail() {
             key={id}
             type="button"
             className={`tool-btn${activeTool === id ? ' active' : ''}`}
-            title={kidMode ? label : `${label} (${shortcut[mode === 'design' ? 1 : 0]})`}
+            data-tooltip={kidMode ? undefined : `${label} (${shortcut[mode === 'design' ? 1 : 0]})`}
             aria-label={label}
             aria-pressed={activeTool === id}
             onPointerEnter={() => speakName(label)}
@@ -138,7 +138,6 @@ export function ToolRail() {
                   type="button"
                   className={`kid-swatch${settings.color === color ? ' active' : ''}`}
                   style={{ background: color }}
-                  title={name}
                   aria-label={name}
                   aria-pressed={settings.color === color}
                   onPointerEnter={() => speakName(name)}
@@ -157,7 +156,6 @@ export function ToolRail() {
                   key={key}
                   type="button"
                   className={`kid-size${settings.size === size ? ' active' : ''}`}
-                  title={name}
                   aria-label={name}
                   aria-pressed={settings.size === size}
                   onPointerEnter={() => speakName(name)}

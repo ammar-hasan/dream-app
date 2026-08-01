@@ -16,6 +16,7 @@ export function SettingsMenu() {
   const kidMode = useUiPrefs((s) => s.kidMode);
   const speakToolNames = useUiPrefs((s) => s.speakToolNames);
   const voiceFeedback = useUiPrefs((s) => s.voiceFeedback);
+  const theme = useUiPrefs((s) => s.theme);
   const locale = useUiPrefs((s) => s.locale);
 
   useEffect(() => {
@@ -42,7 +43,7 @@ export function SettingsMenu() {
         aria-label={t('toolbar.settings')}
         aria-expanded={open}
         aria-haspopup="menu"
-        title={t('toolbar.settings')}
+        data-tooltip={kidMode ? undefined : t('toolbar.settings')}
         onClick={() => setOpen(!open)}
       >
         <GearIcon />
@@ -83,6 +84,18 @@ export function SettingsMenu() {
             <span className="settings-item-text">
               <strong>{t('settings.voiceFeedback')}</strong>
               <small>{t('settings.voiceFeedbackHint')}</small>
+            </span>
+          </label>
+
+          <label className="settings-item checkbox-field">
+            <input
+              type="checkbox"
+              checked={theme === 'dark'}
+              onChange={(e) => useUiPrefs.getState().setTheme(e.target.checked ? 'dark' : 'light')}
+            />
+            <span className="settings-item-text">
+              <strong>{t('settings.theme')}</strong>
+              <small>{t('settings.themeHint')}</small>
             </span>
           </label>
 

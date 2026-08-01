@@ -1,0 +1,17 @@
+{
+  "name": "Dream",
+  "short_name": "Dream",
+  "description": "An intuitive, elegant design app — draw, design, animate and dream, right in your browser.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#eef0f6",
+  "theme_color": "#6d7cff",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

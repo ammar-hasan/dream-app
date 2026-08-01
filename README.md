@@ -10,8 +10,35 @@ This repository currently contains **Slice 1** (foundation + core drawing),
 **Slice 2** (image editing: import, filters, crop & transform), **Slice 3**
 (design mode: selection, components, alignment), **Slice 4** (animation,
 video export and presentation mode), **Slice 5** (the AI panel with
-BYOK providers and voice input) and **Slice 6** (accessibility for everyone:
-kid mode, canvas voice commands and i18n with RTL).
+BYOK providers and voice input), **Slice 6** (accessibility for everyone:
+kid mode, canvas voice commands and i18n with RTL) and the **polish pass**
+(design system, dark theme, brand, micro-delight).
+
+<!-- Screenshots: drop light/dark theme captures into docs/screenshots/ and
+     link them here once we have a stable marketing look. -->
+
+## Look & feel (theming)
+
+Dream has a small design system defined as CSS custom properties at the top
+of `src/styles/app.css`: a signature indigo→violet→rose gradient, calm
+neutral surfaces, a dark canvas-surround so artwork pops, soft radii and an
+elevation scale. Components consume tokens only — no hardcoded colors
+outside the token blocks.
+
+- **Dark mode** — the settings gear toggles light/dark. The choice persists
+  per user (localStorage); until you choose, Dream follows your OS
+  (`prefers-color-scheme`). Dark theme is the same tokens remapped under
+  `[data-theme='dark']`.
+- **Micro-delight** — sliding workspace-mode pill, styled tooltips
+  (name + shortcut, pure CSS via `data-tooltip`), dialog fade/scale-in,
+  a gentle ambient drift behind the canvas, a pulsing splash while the
+  last document restores, and a welcome card on the empty canvas. All
+  motion is transform/opacity-only and disabled under
+  `prefers-reduced-motion`.
+- **Brand** — the Dream mark (moon + spark on the gradient squircle) lives
+  in `src/ui/icons.tsx` as `DreamMark`; the favicon is
+  `public/favicon.svg`, and `public/manifest.webmanifest` makes the app
+  installable (no service worker yet — see ROADMAP slice 11).
 
 ## Accessibility for everyone
 
@@ -47,7 +74,8 @@ create — literacy optional. Slice 6 ships three pillars plus a settings menu.
   panels and rails mirror).
 
 The **settings gear** in the toolbar consolidates all of it: Little Dreamer
-mode, speak tool names, voice feedback, and the language picker.
+mode, speak tool names, voice feedback, the dark-mode toggle and the
+language picker.
 
 ### Adding a locale
 
@@ -61,7 +89,8 @@ mode, speak tool names, voice feedback, and the language picker.
 
 ## What works today
 
-- Brush, pencil, eraser with adjustable size, color (palette + custom) and opacity
+- Brush, pencil, eraser with adjustable size, color (palette + custom + a
+  recent-colors row) and opacity
 - Line, rectangle and ellipse tools with Shift-to-constrain (45° lines, squares, circles)
 - Flood fill (bucket), eyedropper color picker, and a click-to-type text tool
 - Layers: add, delete, rename, reorder, visibility, opacity, lock — all undoable
@@ -75,11 +104,16 @@ mode, speak tool names, voice feedback, and the language picker.
 - Crop tool (drag a rectangle, Apply or Enter) and a Resize dialog that scales
   the document and its content to fit (nearest-neighbor for raster pixels)
 - Undo/redo across every operation (200-step command history)
-- Zoom (25%–800%) and pan (Space-drag, pan tool, wheel zoom anchored at the cursor)
+- Zoom (25%–800%) and pan (Space-drag, pan tool, wheel zoom anchored at the
+  cursor) — plus a floating zoom pill (bottom-end of the canvas) with −/%/+
+  and one-tap fit-to-window
 - New document dialog (presets + custom size + background color)
 - Autosave to IndexedDB (imported images included), open/delete saved projects,
   export flattened PNG or JPEG (with quality setting)
-- First-run hint overlay that dismisses on your first stroke
+- Elegant splash while the last document restores; a welcome card (logo +
+  "Pick a brush and start dreaming") that dismisses on your first stroke
+- Light & dark themes with a full design-token system; styled tooltips with
+  shortcuts; subtle reduced-motion-aware animation throughout
 - Fully mouse- and touch-driven (Pointer Events), devicePixelRatio-crisp rendering
 
 ## Animation (the flipbook)
@@ -238,9 +272,11 @@ src/
     tools/           Pure tool state machines: stroke, shapes, fill (flood fill),
                      eyedropper, text, pan/zoom math — begin/update/preview/commit
   store/             Zustand store wrapping the engine (all mutations via History)
-                     + uiPrefs: per-user UI prefs (kid mode, voices, locale)
+                     + uiPrefs: per-user UI prefs (kid mode, voices, locale,
+                     theme, recent colors)
   ui/                React shell: toolbar (top) with the Draw/Design/Present
-                     switch + Animate toggle, tool rail (left), canvas viewport,
+                     switch + Animate toggle, tool rail (left), canvas viewport
+                     (ambient background, floating zoom pill, welcome card),
                      options + design + components + adjust + layers panels
                      (right), timeline bar + status bar (bottom), PresentView
                      (fullscreen slides), dialogs, image/video/sprite export,
@@ -256,7 +292,9 @@ src/
                      + daily free-tier counter + Web Speech dictation
                      (speech.ts) + speech synthesis (say.ts) + the pure
                      voice-command parser (voiceCommands.ts)
-  styles/            Plain CSS, light theme, 44px+ touch targets
+  styles/            Plain CSS, token-driven light + dark themes
+                     (`[data-theme='dark']`), 44px+ touch targets
+public/              favicon.svg (the Dream mark) + manifest.webmanifest
 ```
 
 Data flow: pointer events → `ui/CanvasViewport` → tool state machines (`engine/tools`)
@@ -298,8 +336,9 @@ Present mode: `→` / `Space` / click next slide · `←` previous · `Esc` exit
 - Accessibility tests: the voice executor against a fake store (each command
   maps to the right actions, clear confirmation flow, size clamping,
   localized messages), the UI-prefs store (kid-mode voice defaults,
-  independent toggles, localStorage persistence), and the i18n string table
-  (interpolation, English/key fallbacks, en↔ar parity, RTL flag)
+  independent toggles, theme + recent-colors persistence, localStorage), and
+  the i18n string table (interpolation, English/key fallbacks, en↔ar parity,
+  RTL flag)
 - Store tests: drawing flow, layers, image import/move/adjust/crop/resize,
   design mode (mode switching, select gestures, transform handles, selection
   actions, component insert), animation (frame switching, cross-frame undo,

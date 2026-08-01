@@ -1,11 +1,16 @@
 /**
- * Top toolbar: identity, file operations, history, zoom — plus the voice
+ * Top toolbar: identity, file operations, history — plus the voice
  * command mic, the Little Dreamer (kid mode) star and the settings gear.
  * In kid mode the toolbar shrinks to the few big friendly buttons a child
  * needs; everything else stays one toggle away for the grown-ups.
+ *
+ * Buttons carry `data-tooltip` (styled CSS tooltips) instead of native
+ * `title`; kid mode skips tooltips because spoken names do that job.
+ * The Draw/Design/Present switch has a sliding pill, positioned here by
+ * measuring the active tab (locale labels vary in width).
  */
 
-import { useRef } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { useDreamStore } from '../store/dreamStore';
 import { useUiPrefs } from '../store/uiPrefs';
 import { importImageFiles } from './importImage';
@@ -15,7 +20,9 @@ import { useSpeakName } from './useSpeakName';
 import { SettingsMenu } from './SettingsMenu';
 import { VoiceCommandButton } from './VoiceCommandButton';
 import { KID_TOOLS } from './ToolRail';
-import { RedoIcon, SparkleIcon, StarIcon, UndoIcon, ZoomIcon } from './icons';
+import { DreamMark, RedoIcon, SparkleIcon, StarIcon, UndoIcon } from './icons';
+
+const MODES = ['draw', 'design', 'present'] as const;
 
 interface ToolbarProps {
   onNew: () => void;
@@ -31,12 +38,31 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
   const isDirty = useDreamStore((s) => s.isDirty);
   const canUndo = useDreamStore((s) => s.canUndo);
   const canRedo = useDreamStore((s) => s.canRedo);
-  const zoom = useDreamStore((s) => s.zoom);
   const mode = useDreamStore((s) => s.mode);
   const animated = useDreamStore((s) => s.doc.frames !== undefined);
   const aiPanelOpen = useDreamStore((s) => s.aiPanelOpen);
   const kidMode = useUiPrefs((s) => s.kidMode);
+  const locale = useUiPrefs((s) => s.locale);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sliding pill under the active mode tab: measure the tab's box relative
+  // to the switch (direction-aware, so RTL slides the same way).
+  const modeSwitchRef = useRef<HTMLDivElement>(null);
+  const [thumb, setThumb] = useState<{ x: number; w: number } | null>(null);
+  useLayoutEffect(() => {
+    const measure = () => {
+      const el = modeSwitchRef.current;
+      const tab = el?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
+      if (!el || !tab) return;
+      const er = el.getBoundingClientRect();
+      const tr = tab.getBoundingClientRect();
+      const rtl = getComputedStyle(el).direction === 'rtl';
+      setThumb({ x: rtl ? er.right - tr.right : tr.left - er.left, w: tr.width });
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => window.removeEventListener('resize', measure);
+  }, [mode, locale]);
 
   const toggleKidMode = () => {
     const store = useDreamStore.getState();
@@ -54,7 +80,7 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
       <button
         className={`btn icon-btn${big ? ' kid-toolbar-btn' : ''}`}
         aria-label={t('toolbar.undo')}
-        title={t('toolbar.undoTitle')}
+        data-tooltip={big ? undefined : t('toolbar.undoTitle')}
         disabled={!canUndo}
         onPointerEnter={() => speakName(t('toolbar.undo'))}
         onFocus={() => speakName(t('toolbar.undo'))}
@@ -65,7 +91,7 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
       <button
         className={`btn icon-btn${big ? ' kid-toolbar-btn' : ''}`}
         aria-label={t('toolbar.redo')}
-        title={t('toolbar.redoTitle')}
+        data-tooltip={big ? undefined : t('toolbar.redoTitle')}
         disabled={!canRedo}
         onPointerEnter={() => speakName(t('toolbar.redo'))}
         onFocus={() => speakName(t('toolbar.redo'))}
@@ -82,7 +108,7 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
       className={`btn icon-btn${kidMode ? ' primary' : ''}`}
       aria-pressed={kidMode}
       aria-label={t('toolbar.kidMode')}
-      title={t('toolbar.kidModeTitle')}
+      data-tooltip={kidMode ? undefined : t('toolbar.kidModeTitle')}
       onClick={toggleKidMode}
     >
       <StarIcon />
@@ -94,6 +120,7 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
     return (
       <header className="toolbar kid-toolbar">
         <div className="toolbar-group">
+          <DreamMark className="app-mark" />
           <span className="app-title kid-app-title">{t('app.title')}</span>
         </div>
         {historyButtons(true)}
@@ -104,7 +131,6 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
             className={`btn icon-btn kid-toolbar-btn${aiPanelOpen ? ' primary' : ''}`}
             aria-pressed={aiPanelOpen}
             aria-label={t('kid.ai')}
-            title={t('kid.ai')}
             onPointerEnter={() => speakName(t('kid.ai'))}
             onFocus={() => speakName(t('kid.ai'))}
             onClick={() => useDreamStore.getState().toggleAiPanel()}
@@ -112,7 +138,7 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
             <SparkleIcon />
           </button>
         </div>
-        <div className="toolbar-group toolbar-zoom">
+        <div className="toolbar-group toolbar-end">
           {kidToggle}
           <SettingsMenu />
         </div>
@@ -123,6 +149,7 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
   return (
     <header className="toolbar">
       <div className="toolbar-group">
+        <DreamMark className="app-mark" />
         <span className="app-title">{t('app.title')}</span>
         <span className="doc-name" title={docName}>
           {docName}
@@ -163,8 +190,20 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
       </div>
 
       <div className="toolbar-group">
-        <div className="mode-switch" role="tablist" aria-label={t('toolbar.mode')}>
-          {(['draw', 'design', 'present'] as const).map((m) => (
+        <div
+          className="mode-switch"
+          role="tablist"
+          aria-label={t('toolbar.mode')}
+          ref={modeSwitchRef}
+        >
+          {thumb && thumb.w > 0 && (
+            <span
+              className="mode-thumb"
+              style={{ insetInlineStart: thumb.x, width: thumb.w }}
+              aria-hidden="true"
+            />
+          )}
+          {MODES.map((m) => (
             <button
               key={m}
               type="button"
@@ -181,7 +220,7 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
           type="button"
           className={`btn${animated ? ' primary' : ''}`}
           aria-pressed={animated}
-          title={t('toolbar.animateTitle')}
+          data-tooltip={t('toolbar.animateTitle')}
           onClick={() => useDreamStore.getState().toggleAnimation()}
         >
           {t('toolbar.animate')}
@@ -191,7 +230,7 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
           className={`btn icon-btn${aiPanelOpen ? ' primary' : ''}`}
           aria-pressed={aiPanelOpen}
           aria-label={t('toolbar.ai')}
-          title={t('toolbar.aiTitle')}
+          data-tooltip={t('toolbar.aiTitle')}
           onClick={() => useDreamStore.getState().toggleAiPanel()}
         >
           <SparkleIcon />
@@ -201,23 +240,7 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
 
       {historyButtons(false)}
 
-      <div className="toolbar-group toolbar-zoom">
-        <button
-          className="btn"
-          aria-label={t('toolbar.zoomOut')}
-          onClick={() => useDreamStore.getState().zoomOut()}
-        >
-          −
-        </button>
-        <span className="zoom-label">{Math.round(zoom * 100)}%</span>
-        <button
-          className="btn"
-          aria-label={t('toolbar.zoomIn')}
-          onClick={() => useDreamStore.getState().zoomIn()}
-        >
-          +
-        </button>
-        <ZoomIcon className="toolbar-zoom-icon" />
+      <div className="toolbar-group toolbar-end">
         {kidToggle}
         <SettingsMenu />
       </div>
