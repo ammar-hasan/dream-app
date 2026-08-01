@@ -26,20 +26,34 @@ Conventions for anyone (human or agent) working on Dream.
 2. Dependency direction: `ui/` → `store/` → `engine/`. `storage/` and `ai/` are
    leaves consumed by `ui/`/`store/`. Nothing in `engine/` knows the others exist.
 3. **All document mutations go through `History` commands** (invertible `apply`/`revert`,
-   no snapshots). If it changes the document, it must be undoable.
+   no snapshots). If it changes the document, it must be undoable. (Exceptions,
+   all document metadata updated outside history: the workspace `mode` field —
+   undo must not flip the user's workspace — animation settings (`doc.animation`),
+   and switching the active frame — undo must not teleport the user between
+   frames. Frame add/duplicate/delete/reorder ARE undoable commands.)
 4. Document updates are immutable (structural sharing); never mutate an operation
    after it has been committed to a layer.
-5. Keep diffs minimal. Match surrounding style. No speculative abstractions; three
+5. **Frames**: `doc.frames` is optional; when present, `doc.layers` mirrors the
+   ACTIVE frame's layer stack. Never write `doc.layers` directly — use the
+   helpers in `engine/document.ts`, which write through to the owning frame
+   (this is what makes cross-frame undo work).
+6. Keep diffs minimal. Match surrounding style. No speculative abstractions; three
    similar lines beat a premature helper.
-6. No new runtime dependencies without a clear need — current set is intentionally
+7. No new runtime dependencies without a clear need — current set is intentionally
    tiny (`react`, `react-dom`, `zustand`, `idb`).
 
 ## Structure
 
-- `src/engine/` — types, document, history, renderer, geometry, color, tools/
+- `src/engine/` — types, document, history, animation (frame model, playback
+  timing, onion skin, sprite-sheet layout), renderer, geometry, color, filters
+  (pure RGBA pixel transforms), transform (flip/rotate/crop/resize),
+  selection (Design mode: hit-testing, move/scale/rotate, snapping, align,
+  groups, component factories), tools/
 - `src/store/` — Zustand store(s)
-- `src/ui/` — React components, hooks, icons, export helpers
-- `src/storage/` — IndexedDB project persistence
+- `src/ui/` — React components, hooks, icons, export helpers (image +
+  animation video/sprite sheet; MediaRecorder isolated behind injectable deps)
+- `src/storage/` — IndexedDB project persistence + cross-project component
+  library (shared connection in `db.ts`)
 - `src/ai/` — AIProvider interface, mock provider, registry (BYOK in later slices)
 - `src/test/` — shared test helpers (mock 2D context) + Vitest setup
 

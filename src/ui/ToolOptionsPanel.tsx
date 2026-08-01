@@ -8,7 +8,11 @@ const SHOW_SIZE = new Set(['brush', 'pencil', 'eraser', 'line', 'rectangle', 'el
 const SHOW_OPACITY = new Set(['brush', 'line', 'rectangle', 'ellipse', 'fill', 'text']);
 
 const TOOL_HINTS: Record<string, string> = {
+  select:
+    'Click to select, drag to move. Shift-click adds to the selection; drag on empty canvas for a marquee. Handles scale and rotate.',
+  move: 'Drag to move the active layer’s content.',
   eyedropper: 'Click anywhere on the canvas to pick that color.',
+  crop: 'Drag a rectangle, then Apply (or press Enter). Esc cancels.',
   pan: 'Drag to move the canvas. You can also hold Space with any tool.',
   zoom: 'Click to zoom in. Alt+click to zoom out.',
   fill: 'Click a region to fill it with the current color.',
@@ -25,6 +29,7 @@ const FONT_CHOICES = [
 export function ToolOptionsPanel() {
   const tool = useDreamStore((s) => s.tool);
   const settings = useDreamStore((s) => s.settings);
+  const cropDraft = useDreamStore((s) => s.cropDraft);
   const setColor = useDreamStore((s) => s.setColor);
   const setSize = useDreamStore((s) => s.setSize);
   const setOpacity = useDreamStore((s) => s.setOpacity);
@@ -36,6 +41,27 @@ export function ToolOptionsPanel() {
       <h2 className="panel-title">Options</h2>
 
       {TOOL_HINTS[tool] && <p className="tool-hint">{TOOL_HINTS[tool]}</p>}
+
+      {tool === 'crop' && (
+        <div className="option-row crop-actions">
+          <button
+            type="button"
+            className="btn primary"
+            disabled={!cropDraft}
+            onClick={() => useDreamStore.getState().applyCrop()}
+          >
+            Apply crop
+          </button>
+          <button
+            type="button"
+            className="btn"
+            disabled={!cropDraft}
+            onClick={() => useDreamStore.getState().cancelCrop()}
+          >
+            Cancel
+          </button>
+        </div>
+      )}
 
       {SHOW_COLOR.has(tool) && (
         <div className="option-row">

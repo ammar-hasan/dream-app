@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createDocument, createLayer, insertLayer } from './document';
 import { renderDocument, renderLayer, renderOperation } from './renderer';
 import { MockContext2D, makeMockFactories } from '../test/mockContext';
-import type { FillOp, ShapeOp, StrokeOp, TextOp } from './types';
+import type { FillOp, ImageOp, ShapeOp, StrokeOp, TextOp } from './types';
 
 const stroke: StrokeOp = {
   kind: 'stroke',
@@ -156,7 +156,23 @@ describe('fill rendering', () => {
     expect(created[0].width).toBe(1);
     const scratch = created[0].context;
     expect(scratch.calls('putImageData')).toHaveLength(1);
-    expect(ctx.calls('drawImage')).toEqual([['drawImage', created[0], 7, 8]]);
+    expect(ctx.calls('drawImage')).toEqual([['drawImage', created[0], 7, 8, 1, 1]]);
+  });
+
+  it('image ops draw their patch scaled at the patch origin', () => {
+    const image: ImageOp = {
+      kind: 'image',
+      id: 'im1',
+      color: '#000000',
+      opacity: 1,
+      scale: 2,
+      patch: { x: 3, y: 4, width: 5, height: 6, data: new Uint8ClampedArray(5 * 6 * 4) },
+    };
+    const { created, createCanvas, createImageData } = makeMockFactories();
+    const ctx = new MockContext2D();
+    renderOperation(image, ctx, { createCanvas, createImageData });
+    expect(created[0].width).toBe(5);
+    expect(ctx.calls('drawImage')).toEqual([['drawImage', created[0], 3, 4, 10, 12]]);
   });
 
   it('renderLayer paints every operation in order', () => {

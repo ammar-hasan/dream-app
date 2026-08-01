@@ -99,6 +99,48 @@ export const ZoomIcon = (p: IconProps) => (
   </svg>
 );
 
+export const MoveIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M12 2v20M2 12h20" />
+    <path d="m9 5 3-3 3 3M9 19l3 3 3-3M5 9 2 12l3 3M19 9l3 3-3 3" />
+  </svg>
+);
+
+export const SelectIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="m5 3 7 18 2.5-7.5L22 11Z" />
+  </svg>
+);
+
+export const GroupIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="3" y="3" width="8" height="8" rx="1.5" />
+    <rect x="13" y="13" width="8" height="8" rx="1.5" />
+  </svg>
+);
+
+export const ComponentIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="7" y="7" width="10" height="10" rx="2" />
+    <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+  </svg>
+);
+
+export const CropIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M6 2v14a2 2 0 0 0 2 2h14" />
+    <path d="M2 6h14a2 2 0 0 1 2 2v14" />
+  </svg>
+);
+
+export const ImageIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="3" y="4" width="18" height="16" rx="2" />
+    <circle cx="9" cy="10" r="2" />
+    <path d="m21 16-4.5-4.5a1.5 1.5 0 0 0-2 0L7 19" />
+  </svg>
+);
+
 export const EyeIcon = (p: IconProps) => (
   <svg {...base(p)}>
     <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
@@ -164,5 +206,17 @@ export const RedoIcon = (p: IconProps) => (
   <svg {...base(p)}>
     <path d="m15 14 5-5-5-5" />
     <path d="M20 9H10a6 6 0 0 0 0 12h3" />
+  </svg>
+);
+
+export const PlayIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M8 5.5v13l11-6.5Z" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+export const PauseIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M8 5v14M16 5v14" />
   </svg>
 );

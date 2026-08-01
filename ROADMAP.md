@@ -1,46 +1,91 @@
 # Roadmap
 
-Dream ships in slices. Slice 1 (core drawing app + harness) is done. Each slice below
-lists brief acceptance criteria; slices are roughly ordered by dependency, not by a
-fixed schedule.
+Dream ships in slices. Slice 1 (core drawing app + harness), slice 2 (image
+editing), slice 3 (design mode) and slice 4 (animation + video export +
+presentation mode) are done. Each slice below lists brief acceptance criteria;
+slices are roughly ordered by dependency, not by a fixed schedule.
 
-## Slice 2 — Image filters & adjustments
+## Slice 2 — Image filters & adjustments ✅
 
-- Import an image onto a layer (file picker / drag-drop / paste).
-- Per-layer raster filters: brightness, contrast, saturation, hue, blur, sharpen,
-  grayscale, invert — implemented in the engine as pure pixel transforms.
-- Non-destructive: filters are operations in the layer stack, so undo/redo works.
-- Acceptance: user can import a photo, apply + tweak + reorder filters, undo any step,
-  and export the result as PNG; filters have unit tests on synthetic pixel buffers.
+- ✅ Import an image onto a layer (file picker / drag-drop / paste) — centered,
+  scaled down to fit, pixels survive the IndexedDB round-trip.
+- ✅ Per-layer raster filters: brightness, contrast, saturation, hue, grayscale,
+  sepia, invert, blur (box) and sharpen (3x3 kernel) — pure functions in
+  `engine/filters.ts` with unit tests on synthetic pixel buffers.
+- ✅ Live preview on a scratch canvas; Apply bakes one undoable raster command
+  (RasterPatch-style, like flood fill), Cancel discards. Presets: B&W, Vintage,
+  Cool, Warm.
+- ✅ Move tool for layer content; per-layer flip H/V and rotate 90° CW/CCW;
+  crop tool (whole document) and resize dialog (scale-to-fit, nearest sampling).
+- ✅ Export flattened PNG or JPEG (quality setting), including imported images
+  and filter results.
+- Deviation from the original note: applied filters are baked into a single
+  raster op (undoable, like Photoshop's destructive apply) rather than kept as a
+  reorderable filter stack — simpler and consistent with the baked fill model.
 
-## Slice 3 — Design mode: layers, components & selection
+## Slice 3 — Design mode: layers, components & selection ✅
 
-- Select/move/resize/rotate operations and whole layers with a selection tool.
-- Group operations into reusable **components**; instances stay linked to the master.
-- Asset panel with the user's components; drag onto any document.
-- Acceptance: user draws a button, turns it into a component, reuses it in a second
-  document, edits the master, and sees instances update; all undoable.
+- ✅ Draw / Design mode switch in the toolbar, persisted per project; Draw mode
+  is untouched, Design mode reveals the Select tool (V), the Design panel and
+  the Components panel.
+- ✅ Select tool: click / shift-click / rubber-band marquee selection of
+  individual ops on the active layer (engine hit-testing per op kind);
+  bounding box with handles; move, uniform scale (corner handles) and rotate
+  (top handle); Del, Cmd/Ctrl+D duplicate, bring forward / send backward,
+  arrow-key nudge (Shift = 10px) — all undoable.
+- ✅ Snapping while dragging: canvas center/edges and other objects'
+  edges/centers, with accent guide lines; toggleable (default on).
+- ✅ Group/ungroup as `groupId` metadata on ops (no scene graph); align
+  left/center/right/top/middle/bottom and distribute horizontally/vertically.
+- ✅ Component library in IndexedDB (cross-project): create from selection,
+  thumbnail grid, rename/delete, double-click or drag to insert an instance
+  as a new layer.
+- Deviations from the original note: **instances are copies, not linked
+  masters** (editing a component does not update placed instances — the
+  MS-Paint-simple model; linked masters can come later), and arbitrary-angle
+  rotation applies to strokes/lines/text only — selections containing
+  rectangles, ellipses or raster ops rotate in 90° steps. Both decisions are
+  documented in the README and `engine/selection.ts`.
 
-## Slice 4 — Animation timeline
+## Slice 4 — Animation timeline, video export & presentation mode ✅
 
-- Frame-by-frame animation: layers get a timeline; onion skinning; play/pause/loop.
-- FPS control and per-frame duration.
-- Export as animated asset (GIF/APNG or sprite sheet).
-- Acceptance: user creates a 12-frame bouncing-ball loop and exports it; timeline
-  state is covered by engine tests.
+- ✅ Frame-by-frame animation (flipbook model, not a pro timeline): the
+  Animate toolbar toggle wraps the current layers in frame 1; the timeline
+  bar shows big live thumbnails with add/duplicate/delete/reorder, all
+  undoable through the same per-document History. `doc.layers` mirrors the
+  active frame's stack, so renderer/tools/persistence never learned about
+  frames.
+- ✅ Onion skinning (previous frame ghosted, configurable opacity ~30%
+  default, optional next frame), play/pause in the main viewport, FPS 1–24
+  (default 6), loop toggle. Space toggles play only when the timeline has
+  focus; hold-to-pan is untouched everywhere else.
+- ✅ Video export: WebM via `canvas.captureStream()` + `MediaRecorder`
+  (VP9 → VP8 → bare WebM fallback), progress in the dialog, plus a PNG
+  sprite sheet (grid layout math in `engine/animation.ts`). **GIF skipped** —
+  it needs an encoder dependency; sprite sheet is the zero-dep animated asset.
+- ✅ Presentation mode: third workspace mode — frames act as slides,
+  full-viewport rendering, arrows/Space/click to advance, Esc exits to the
+  previous workspace, slide counter. Session-only (reopens in Draw).
+- ✅ Persistence: frames + animation settings survive IndexedDB autosave;
+  old documents load with animation off (schema is purely additive).
+- Acceptance: the 12-frame bouncing-ball loop works — draw, duplicate frames,
+  onion-skin the in-betweens, play at 6 fps, export WebM or sprite sheet.
+- Deviations from the original note: slices 4–6 were merged into one slice
+  (a presentation IS the frame model stepped through manually). Crop/resize
+  apply to EVERY frame. Slice 5's optional audio track and Slice 6's
+  transitions/presenter view remain open (below).
 
-## Slice 5 — Video export
+## Slice 5 — Video export (remainder)
 
-- Render animations to video client-side (WebCodecs/MediaRecorder), with optional
-  audio track.
-- Acceptance: user exports an MP4/WebM of a Slice-4 animation that plays in a
-  standard player.
+- ✅ WebM export shipped in slice 4 (MediaRecorder, VP9/VP8 fallback).
+- Remaining: optional audio track; MP4/WebCodecs path for players that
+  don't support WebM.
 
-## Slice 6 — Presentation mode
+## Slice 6 — Presentation mode (remainder)
 
-- Documents become decks: pages/frames, transitions, presenter view, arrow-key
-  navigation.
-- Acceptance: user builds a 5-page deck from drawings and presents it fullscreen.
+- ✅ Basic deck shipped in slice 4 (frames as slides, keyboard/click
+  navigation, fullscreen, slide counter).
+- Remaining: transitions, presenter view with notes, per-slide duration.
 
 ## Slice 7 — AI panel with BYOK providers
 

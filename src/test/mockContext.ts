@@ -57,8 +57,8 @@ export class MockContext2D implements Renderer2D {
   putImageData(image: unknown, dx: number, dy: number): void {
     this.record('putImageData', image, dx, dy);
   }
-  drawImage(image: unknown, dx: number, dy: number): void {
-    this.record('drawImage', image, dx, dy);
+  drawImage(image: unknown, dx: number, dy: number, dw?: number, dh?: number): void {
+    this.record('drawImage', image, dx, dy, dw, dh);
   }
 }
 

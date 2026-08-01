@@ -4,9 +4,14 @@
  * All helpers return a NEW document object (structural sharing: unchanged
  * layers keep their identity) so history commands stay cheap and Zustand
  * change detection keeps working.
+ *
+ * Frames: when a document has `frames`, `doc.layers` mirrors the active
+ * frame's layer stack. Helpers that edit layers by id first look in the
+ * active stack and then in every other frame, so undo/redo stays correct
+ * even after the user switches frames mid-history (see AGENTS.md).
  */
 
-import type { Color, DreamDocument, Layer, Operation } from './types';
+import type { Color, DreamDocument, Frame, Layer, Operation } from './types';
 
 let idCounter = 0;
 
@@ -18,6 +23,10 @@ export function genId(prefix: string): string {
 
 export function createLayer(name = 'Layer', operations: Operation[] = []): Layer {
   return { id: genId('layer'), name, visible: true, opacity: 1, locked: false, operations };
+}
+
+export function createFrame(layers?: Layer[]): Frame {
+  return { id: genId('frame'), layers: layers ?? [createLayer('Layer 1')] };
 }
 
 export interface CreateDocumentOptions {
@@ -37,26 +46,88 @@ export function createDocument(options: CreateDocumentOptions): DreamDocument {
     height: Math.max(1, Math.round(options.height)),
     background: options.background ?? '#ffffff',
     layers: [createLayer('Layer 1')],
+    mode: 'draw',
     createdAt: now,
     updatedAt: now,
   };
 }
 
 function touch(doc: DreamDocument, layers: Layer[]): DreamDocument {
+  if (doc.frames && doc.activeFrameId) return withFrameLayers(doc, doc.activeFrameId, layers);
   return { ...doc, layers, updatedAt: Date.now() };
 }
 
-/** Replace the layers array. */
+/**
+ * Replace the layer stack of one frame. When that frame is the active one
+ * (or the document has no frames at all) the change is mirrored into
+ * `doc.layers`; otherwise only the frame's own stack is updated.
+ */
+export function withFrameLayers(
+  doc: DreamDocument,
+  frameId: string,
+  layers: Layer[],
+): DreamDocument {
+  if (!doc.frames) return { ...doc, layers, updatedAt: Date.now() };
+  const frames = doc.frames.map((f) => (f.id === frameId ? { ...f, layers } : f));
+  return {
+    ...doc,
+    frames,
+    layers: doc.activeFrameId === frameId ? layers : doc.layers,
+    updatedAt: Date.now(),
+  };
+}
+
+/** The frame whose layers are mirrored into `doc.layers`, if any. */
+export function activeFrameOf(doc: DreamDocument): Frame | undefined {
+  return doc.frames?.find((f) => f.id === doc.activeFrameId);
+}
+
+/** Replace the frames array (and optionally the mirrored active stack). */
+export function withFrames(
+  doc: DreamDocument,
+  frames: Frame[],
+  activeFrameId: string,
+): DreamDocument {
+  const active = frames.find((f) => f.id === activeFrameId) ?? frames[frames.length - 1];
+  return {
+    ...doc,
+    frames,
+    activeFrameId: active?.id,
+    layers: active?.layers ?? doc.layers,
+    updatedAt: Date.now(),
+  };
+}
+
+/** Replace the layers array (of the active frame, when animated). */
 export function withLayers(doc: DreamDocument, layers: Layer[]): DreamDocument {
   return touch(doc, layers);
 }
 
-/** Apply `fn` to the layer with `layerId`; no-op (same doc) if not found. */
+/** Find the frame whose stack contains `layerId` (active stack first). */
+function frameOwningLayer(doc: DreamDocument, layerId: string): Frame | undefined {
+  if (!doc.frames) return undefined;
+  if (doc.layers.some((l) => l.id === layerId)) return activeFrameOf(doc);
+  return doc.frames.find((f) => f.layers.some((l) => l.id === layerId));
+}
+
+/**
+ * Apply `fn` to the layer with `layerId`; no-op (same doc) if not found.
+ * The layer may live in any frame — edits land in the owning frame.
+ */
 export function mapLayer(
   doc: DreamDocument,
   layerId: string,
   fn: (layer: Layer) => Layer,
 ): DreamDocument {
+  const owner = frameOwningLayer(doc, layerId);
+  if (doc.frames && !owner) return doc;
+  if (owner && owner.id !== doc.activeFrameId) {
+    return withFrameLayers(
+      doc,
+      owner.id,
+      owner.layers.map((l) => (l.id === layerId ? fn(l) : l)),
+    );
+  }
   const index = doc.layers.findIndex((l) => l.id === layerId);
   if (index === -1) return doc;
   const layers = doc.layers.slice();
@@ -78,15 +149,37 @@ export function removeOperation(doc: DreamDocument, layerId: string, opId: strin
   }));
 }
 
-/** Insert a layer at `index` (default: top of the stack). Index is clamped. */
-export function insertLayer(doc: DreamDocument, layer: Layer, index?: number): DreamDocument {
-  const at = Math.max(0, Math.min(index ?? doc.layers.length, doc.layers.length));
-  const layers = doc.layers.slice();
+/**
+ * Insert a layer at `index` (default: top of the stack). Index is clamped.
+ * Targets the active frame unless `frameId` names another frame (undo of a
+ * layer deletion can land after the user switched frames).
+ */
+export function insertLayer(
+  doc: DreamDocument,
+  layer: Layer,
+  index?: number,
+  frameId?: string,
+): DreamDocument {
+  const targetId = frameId ?? doc.activeFrameId;
+  const frame = doc.frames?.find((f) => f.id === targetId);
+  if (doc.frames && !frame) return doc;
+  const base = frame ? frame.layers : doc.layers;
+  const at = Math.max(0, Math.min(index ?? base.length, base.length));
+  const layers = base.slice();
   layers.splice(at, 0, layer);
-  return touch(doc, layers);
+  return frame ? withFrameLayers(doc, frame.id, layers) : touch(doc, layers);
 }
 
 export function removeLayerById(doc: DreamDocument, layerId: string): DreamDocument {
+  const owner = frameOwningLayer(doc, layerId);
+  if (doc.frames && !owner) return doc;
+  if (owner && owner.id !== doc.activeFrameId) {
+    return withFrameLayers(
+      doc,
+      owner.id,
+      owner.layers.filter((l) => l.id !== layerId),
+    );
+  }
   if (!doc.layers.some((l) => l.id === layerId)) return doc;
   return touch(
     doc,

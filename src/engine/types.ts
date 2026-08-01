@@ -26,6 +26,7 @@ export interface Rect {
 export type Color = string;
 
 export type ToolId =
+  | 'select'
   | 'brush'
   | 'pencil'
   | 'eraser'
@@ -35,8 +36,20 @@ export type ToolId =
   | 'fill'
   | 'eyedropper'
   | 'text'
+  | 'move'
+  | 'crop'
   | 'pan'
   | 'zoom';
+
+/**
+ * Workspace mode: 'draw' is the default MS-Paint-simple experience; 'design'
+ * reveals pro features (select tool, components, alignment); 'present' turns
+ * the document's frames into a full-viewport slide deck (no editing).
+ * Persisted with the document, except that 'present' is session-only —
+ * loading a document saved mid-presentation starts in 'draw'.
+ * Older saved documents have no `mode` — treat as 'draw'.
+ */
+export type WorkspaceMode = 'draw' | 'design' | 'present';
 
 /** A rectangular RGBA pixel buffer extracted from a larger raster. */
 export interface RasterPatch {
@@ -53,6 +66,11 @@ interface OperationBase {
   color: Color;
   /** 0..1, multiplied with the owning layer's opacity at render time. */
   opacity: number;
+  /**
+   * Design mode: ops sharing a groupId on the same layer select and
+   * transform as one unit. Metadata only — no scene graph.
+   */
+  groupId?: string;
 }
 
 /** Freehand polyline drawn by brush, pencil or eraser. */
@@ -95,7 +113,20 @@ export interface TextOp extends OperationBase {
   fontFamily: string;
 }
 
-export type Operation = StrokeOp | ShapeOp | FillOp | TextOp;
+/**
+ * A raster image placed on the canvas (import, or a baked filter result).
+ * Like flood fill, pixels are baked into a RasterPatch so undo/redo and
+ * IndexedDB serialization stay trivial (structured clone handles the bytes).
+ */
+export interface ImageOp extends OperationBase {
+  kind: 'image';
+  /** Scale factor applied to the patch at render time (1 = native size). */
+  scale: number;
+  /** patch.x/patch.y is the top-left corner in document pixels. */
+  patch: RasterPatch;
+}
+
+export type Operation = StrokeOp | ShapeOp | FillOp | TextOp | ImageOp;
 
 export interface Layer {
   id: string;
@@ -108,14 +139,78 @@ export interface Layer {
   operations: Operation[];
 }
 
+/**
+ * One animation frame (or presentation slide): it owns its own layer stack,
+ * exactly like the top-level document did before animation existed.
+ */
+export interface Frame {
+  id: string;
+  /** Bottom-to-top stacking order: layers[0] is painted first. */
+  layers: Layer[];
+}
+
+/**
+ * Playback / onion-skin preferences, persisted with the document but updated
+ * outside History (like `mode`): undo must never change how fast you watch
+ * your flipbook. Absent on old saves — defaults apply (see animation.ts).
+ */
+export interface AnimationSettings {
+  /** Frames per second during playback, 1..24. */
+  fps: number;
+  /** Loop playback (true) or stop on the last frame (false). */
+  loop: boolean;
+  /** Show the previous frame faintly beneath the current one. */
+  onionSkin: boolean;
+  /** Also ghost the NEXT frame (useful when in-betweening). */
+  onionNext: boolean;
+  /** 0..1 opacity of onion-skinned frames. */
+  onionOpacity: number;
+}
+
 export interface DreamDocument {
   id: string;
   name: string;
   width: number;
   height: number;
   background: Color;
-  /** Bottom-to-top stacking order: layers[0] is painted first. */
+  /**
+   * Bottom-to-top stacking order: layers[0] is painted first.
+   *
+   * When `frames` is present this array ALWAYS mirrors the layer stack of the
+   * frame identified by `activeFrameId` — every existing command, the
+   * renderer and persistence keep working on `layers` unchanged, and the
+   * document helpers in document.ts write edits through to the owning frame.
+   */
   layers: Layer[];
+  /**
+   * Animation frames in play order. `undefined` (old saves and fresh
+   * documents) means animation is off and `layers` is the whole story.
+   */
+  frames?: Frame[];
+  /** Which frame is being edited; `layers` mirrors that frame's stack. */
+  activeFrameId?: string;
+  /** Playback/onion-skin preferences; undefined = defaults. */
+  animation?: AnimationSettings;
+  /** Workspace mode persisted per project; undefined (old saves) = 'draw'. */
+  mode?: WorkspaceMode;
+  createdAt: number;
+  updatedAt: number;
+}
+
+/**
+ * A named, reusable group of operations in the user's component library
+ * (stored in IndexedDB, shared across projects). Coordinates are relative
+ * to the component's top-left corner. Instances are plain copies — editing
+ * a component does NOT update already-inserted instances.
+ */
+export interface Component {
+  id: string;
+  name: string;
+  /** Operations relative to (0, 0) = top-left of the content bounds. */
+  operations: Operation[];
+  /** Native content size in document pixels. */
+  width: number;
+  height: number;
   createdAt: number;
   updatedAt: number;
 }

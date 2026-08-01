@@ -13,10 +13,27 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { renderDocument, renderLayer, renderOperation } from '../engine/renderer';
+import { animationSettingsOf, frameIndexAtTime, onionSkinTargets } from '../engine/animation';
+import { normalizeRect } from '../engine/geometry';
+import { selectedOps, selectionBounds, unionBounds } from '../engine/selection';
 import { nextZoomIn, nextZoomOut, pickColor, zoomAtPoint } from '../engine/tools';
-import type { Point } from '../engine/types';
+import type { Point, Rect } from '../engine/types';
 import { useDreamStore } from '../store/dreamStore';
+import { getComponent } from '../storage/components';
+import { importImageFiles } from './importImage';
 import { TextOverlay } from './TextOverlay';
+
+/** Accent used for all selection chrome, matching --accent in app.css. */
+const ACCENT = '#6d7cff';
+
+function corners(r: Rect): Point[] {
+  return [
+    { x: r.x, y: r.y },
+    { x: r.x + r.width, y: r.y },
+    { x: r.x, y: r.y + r.height },
+    { x: r.x + r.width, y: r.y + r.height },
+  ];
+}
 
 export function CanvasViewport() {
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -25,13 +42,44 @@ export function CanvasViewport() {
 
   const doc = useDreamStore((s) => s.doc);
   const activeLayerId = useDreamStore((s) => s.activeLayerId);
+  const mode = useDreamStore((s) => s.mode);
   const tool = useDreamStore((s) => s.tool);
   const previewOp = useDreamStore((s) => s.previewOp);
   const pendingText = useDreamStore((s) => s.pendingText);
+  const moveDraft = useDreamStore((s) => s.moveDraft);
+  const cropDraft = useDreamStore((s) => s.cropDraft);
+  const adjustPreview = useDreamStore((s) => s.adjustPreview);
+  const selection = useDreamStore((s) => s.selection);
+  const selectDraft = useDreamStore((s) => s.selectDraft);
   const zoom = useDreamStore((s) => s.zoom);
   const offset = useDreamStore((s) => s.offset);
   const spacePanning = useDreamStore((s) => s.spacePanning);
   const hintDismissed = useDreamStore((s) => s.hintDismissed);
+  const playing = useDreamStore((s) => s.playing);
+  const playbackFrame = useDreamStore((s) => s.playbackFrame);
+  const skinCanvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  // Playback driver: while playing, a rAF loop maps elapsed time to a frame
+  // index via the pure engine function; editing is paused in the store.
+  useEffect(() => {
+    if (!playing) return;
+    let raf = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const state = useDreamStore.getState();
+      if (!state.playing || !state.doc.frames) return;
+      const { fps, loop } = animationSettingsOf(state.doc);
+      const { index, done } = frameIndexAtTime(now - start, fps, state.doc.frames.length, loop);
+      if (done) {
+        state.pause();
+        return;
+      }
+      state.setPlaybackFrame(index);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [playing]);
 
   // Redraw whenever the subscribed state changes (effect runs every render).
   useEffect(() => {
@@ -62,14 +110,187 @@ export function CanvasViewport() {
     // Soft shadow + page border make the document read as a sheet of paper.
     ctx.fillStyle = 'rgba(15, 23, 42, 0.10)';
     ctx.fillRect(3, 5, doc.width, doc.height);
-    renderDocument(doc, ctx);
+
+    // Onion skin: ghost neighbouring frames beneath the current one. Each
+    // ghost renders to a scratch canvas first so globalAlpha applies to the
+    // whole frame (renderOperation overwrites alpha per op).
+    if (!playing) {
+      const skins = onionSkinTargets(doc);
+      if (skins.length > 0) {
+        let scratch = skinCanvasRef.current;
+        if (!scratch) {
+          scratch = document.createElement('canvas');
+          skinCanvasRef.current = scratch;
+        }
+        scratch.width = doc.width;
+        scratch.height = doc.height;
+        const skinCtx = scratch.getContext('2d');
+        if (skinCtx) {
+          for (const skin of skins) {
+            skinCtx.clearRect(0, 0, doc.width, doc.height);
+            renderDocument({ ...doc, layers: skin.frame.layers }, skinCtx, { background: false });
+            ctx.save();
+            ctx.globalAlpha = skin.opacity;
+            ctx.drawImage(scratch, 0, 0);
+            ctx.restore();
+          }
+        }
+      }
+    }
+
+    // While moving or adjusting, the affected layer renders separately.
+    const activeLayer = doc.layers.find((l) => l.id === activeLayerId);
+    const detached = new Set<string>();
+    if (moveDraft) detached.add(activeLayerId);
+    if (adjustPreview) detached.add(adjustPreview.layerId);
+
+    // During a select-transform drag, swap the selected ops for their
+    // transformed preview copies (z-order within the layer is preserved).
+    let displayDoc = doc;
+    if (selectDraft?.preview && activeLayer) {
+      const byId = new Map(selectDraft.preview.map((op) => [op.id, op]));
+      displayDoc = {
+        ...doc,
+        layers: doc.layers.map((layer) =>
+          layer.id === activeLayerId
+            ? { ...layer, operations: layer.operations.map((op) => byId.get(op.id) ?? op) }
+            : layer,
+        ),
+      };
+    }
+
+    // Playback swaps the active frame's stack for the frame being shown.
+    if (playing && playbackFrame != null && doc.frames) {
+      const frame = doc.frames[playbackFrame];
+      if (frame) displayDoc = { ...displayDoc, layers: frame.layers };
+    }
+    renderDocument(displayDoc, ctx, { layerFilter: (layer) => !detached.has(layer.id) });
+
+    if (adjustPreview) {
+      const layer = doc.layers.find((l) => l.id === adjustPreview.layerId);
+      if (layer?.visible) {
+        const scratch = document.createElement('canvas');
+        scratch.width = adjustPreview.buffer.width;
+        scratch.height = adjustPreview.buffer.height;
+        const scratchCtx = scratch.getContext('2d');
+        if (scratchCtx) {
+          scratchCtx.putImageData(
+            new ImageData(
+              adjustPreview.buffer.data,
+              adjustPreview.buffer.width,
+              adjustPreview.buffer.height,
+            ),
+            0,
+            0,
+          );
+          ctx.save();
+          ctx.globalAlpha = layer.opacity;
+          ctx.drawImage(scratch, 0, 0);
+          ctx.restore();
+        }
+      }
+    }
+
+    if (moveDraft && activeLayer?.visible) {
+      ctx.save();
+      ctx.translate(moveDraft.delta.x, moveDraft.delta.y);
+      renderLayer(activeLayer, ctx);
+      ctx.restore();
+    }
+
     ctx.strokeStyle = '#c9ced6';
     ctx.lineWidth = 1 / zoom;
     ctx.strokeRect(0, 0, doc.width, doc.height);
 
-    const activeLayer = doc.layers.find((l) => l.id === activeLayerId);
-    if (previewOp) {
+    if (previewOp && !playing) {
       renderOperation(previewOp, ctx, { layerOpacity: activeLayer?.opacity ?? 1 });
+    }
+
+    // Crop selection: dim everything outside the rect, dash the outline.
+    if (cropDraft) {
+      const rect = normalizeRect(cropDraft.from, cropDraft.to);
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.35)';
+      ctx.fillRect(0, 0, doc.width, rect.y);
+      ctx.fillRect(0, rect.y + rect.height, doc.width, doc.height - rect.y - rect.height);
+      ctx.fillRect(0, rect.y, rect.x, rect.height);
+      ctx.fillRect(rect.x + rect.width, rect.y, doc.width - rect.x - rect.width, rect.height);
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 1 / zoom;
+      ctx.setLineDash([4 / zoom, 4 / zoom]);
+      ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+      ctx.setLineDash([]);
+    }
+
+    // --- Design mode: selection chrome -------------------------------------
+    if (!playing && mode === 'design' && tool === 'select' && activeLayer) {
+      const px = 1 / zoom;
+
+      // Snap guides: thin accent lines spanning the dragged bounds.
+      if (selectDraft && selectDraft.guides.length > 0) {
+        ctx.strokeStyle = ACCENT;
+        ctx.lineWidth = px;
+        for (const guide of selectDraft.guides) {
+          ctx.beginPath();
+          if (guide.axis === 'x') {
+            ctx.moveTo(guide.position, guide.from);
+            ctx.lineTo(guide.position, guide.to);
+          } else {
+            ctx.moveTo(guide.from, guide.position);
+            ctx.lineTo(guide.to, guide.position);
+          }
+          ctx.stroke();
+        }
+      }
+
+      if (selectDraft?.kind === 'marquee') {
+        const rect = normalizeRect(selectDraft.from, selectDraft.to);
+        ctx.fillStyle = 'rgba(109, 124, 255, 0.08)';
+        ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+        ctx.strokeStyle = ACCENT;
+        ctx.lineWidth = px;
+        ctx.setLineDash([4 * px, 4 * px]);
+        ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+        ctx.setLineDash([]);
+      }
+
+      if (selection.length > 0) {
+        // Per-op boxes follow the live transform preview while dragging.
+        const displayOps = selectDraft?.preview ?? selectedOps(activeLayer, selection);
+        const boxes = displayOps.map(selectionBounds);
+        ctx.strokeStyle = 'rgba(109, 124, 255, 0.5)';
+        ctx.lineWidth = px;
+        for (const b of boxes) ctx.strokeRect(b.x, b.y, b.width, b.height);
+
+        const union = unionBounds(boxes);
+        if (union) {
+          ctx.strokeStyle = ACCENT;
+          ctx.lineWidth = 1.5 * px;
+          ctx.strokeRect(union.x, union.y, union.width, union.height);
+
+          // Corner resize handles: white squares with an accent ring.
+          const hs = 9 * px;
+          ctx.lineWidth = px;
+          for (const p of corners(union)) {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(p.x - hs / 2, p.y - hs / 2, hs, hs);
+            ctx.strokeRect(p.x - hs / 2, p.y - hs / 2, hs, hs);
+          }
+
+          // Rotation handle: a circle floating above the top-center.
+          const rx = union.x + union.width / 2;
+          const ry = union.y - 22 * px;
+          const rr = 5 * px;
+          ctx.beginPath();
+          ctx.moveTo(rx, union.y);
+          ctx.lineTo(rx, ry + rr);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(rx, ry, rr, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffffff';
+          ctx.fill();
+          ctx.stroke();
+        }
+      }
     }
     ctx.restore();
   });
@@ -136,6 +357,7 @@ export function CanvasViewport() {
       return;
     }
     if (e.button !== 0) return;
+    if (playing) return; // watching, not editing — pause first
     const point = toDocPoint(e.clientX, e.clientY);
     if (tool === 'zoom') {
       zoomAtClientPoint(e.clientX, e.clientY, e.altKey ? 'out' : 'in');
@@ -155,11 +377,9 @@ export function CanvasViewport() {
   const onPointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (panRef.current) {
       const { startX, startY, origin } = panRef.current;
-      useDreamStore
-        .getState()
-        .setViewport({
-          offset: { x: origin.x + e.clientX - startX, y: origin.y + e.clientY - startY },
-        });
+      useDreamStore.getState().setViewport({
+        offset: { x: origin.x + e.clientX - startX, y: origin.y + e.clientY - startY },
+      });
       return;
     }
     const point = toDocPoint(e.clientX, e.clientY);
@@ -187,10 +407,38 @@ export function CanvasViewport() {
     return () => canvas.removeEventListener('wheel', onWheel);
   }, [zoom, offset]);
 
-  const cursor = tool === 'pan' || spacePanning ? 'grab' : tool === 'text' ? 'text' : 'crosshair';
+  const cursor =
+    tool === 'pan' || spacePanning
+      ? 'grab'
+      : tool === 'text'
+        ? 'text'
+        : tool === 'move'
+          ? 'move'
+          : tool === 'select'
+            ? 'default'
+            : 'crosshair';
+
+  const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const componentId = e.dataTransfer.getData('application/x-dream-component');
+    if (componentId) {
+      // Drop a component instance at the drop point (centered on the cursor).
+      void (async () => {
+        const component = await getComponent(componentId);
+        if (!component) return;
+        const point = toDocPoint(e.clientX, e.clientY);
+        useDreamStore.getState().insertComponentInstance(component, {
+          x: point.x - component.width / 2,
+          y: point.y - component.height / 2,
+        });
+      })();
+      return;
+    }
+    void importImageFiles(e.dataTransfer.files);
+  };
 
   return (
-    <div className="viewport" ref={wrapRef}>
+    <div className="viewport" ref={wrapRef} onDragOver={(e) => e.preventDefault()} onDrop={onDrop}>
       <canvas
         ref={canvasRef}
         className="viewport-canvas"

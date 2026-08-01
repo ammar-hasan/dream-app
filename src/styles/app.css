@@ -99,6 +99,144 @@ body {
   color: var(--text-dim);
 }
 
+/* --- Mode switch (Draw / Design) ------------------------------------------ */
+
+.mode-switch {
+  display: flex;
+  padding: 3px;
+  gap: 2px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.mode-tab {
+  min-height: 30px;
+  padding: 4px 18px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-dim);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.mode-tab:hover:not(.active) {
+  color: var(--text);
+}
+
+.mode-tab.active {
+  background: var(--panel);
+  color: var(--accent);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.14);
+}
+
+/* --- Design panel ---------------------------------------------------------- */
+
+.design-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.design-actions .btn {
+  flex: 1;
+  min-width: 72px;
+  padding: 6px 8px;
+  white-space: nowrap;
+}
+
+.align-section {
+  border-top: 1px dashed var(--border);
+  padding-top: 10px;
+}
+
+.align-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.align-grid .btn {
+  font-size: 15px;
+}
+
+/* --- Components panel ------------------------------------------------------ */
+
+.component-create {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.component-create input {
+  flex: 1;
+  min-width: 0;
+  min-height: 36px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 4px 8px;
+  font: inherit;
+}
+
+.component-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 10px;
+}
+
+.component-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  cursor: grab;
+}
+
+.component-card:hover {
+  border-color: var(--accent);
+}
+
+.component-card canvas {
+  max-width: 100%;
+}
+
+.component-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.component-delete {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  opacity: 0;
+  background: var(--panel);
+  transition: opacity 0.12s ease;
+}
+
+.component-card:hover .component-delete {
+  opacity: 1;
+}
+
 /* --- Buttons ------------------------------------------------------------- */
 
 .btn {
@@ -320,6 +458,27 @@ body {
   flex: 1;
   min-height: 32px;
   accent-color: var(--accent);
+}
+
+/* Adjust panel: transform/preset/action button rows */
+
+.transform-actions,
+.preset-row,
+.adjust-actions,
+.crop-actions {
+  flex-wrap: wrap;
+}
+
+.transform-actions .btn,
+.preset-row .btn {
+  flex: 1;
+  white-space: nowrap;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .font-select {
@@ -591,6 +750,149 @@ body {
 .project-meta {
   color: var(--text-dim);
   font-size: 12px;
+}
+
+/* --- Timeline bar (frames) ------------------------------------------------- */
+
+.timeline-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  outline: none;
+}
+
+.timeline-bar.collapsed {
+  padding: 2px 16px;
+}
+
+.timeline-collapse {
+  flex-shrink: 0;
+}
+
+.timeline-play {
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--accent);
+}
+
+.timeline-frames {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.timeline-frame {
+  position: relative;
+  flex-shrink: 0;
+  padding: 0;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  cursor: pointer;
+  line-height: 0;
+}
+
+.timeline-frame:hover {
+  border-color: var(--text-dim);
+}
+
+.timeline-frame.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.timeline-frame.playing {
+  border-color: var(--accent);
+}
+
+.timeline-frame-number {
+  position: absolute;
+  left: 4px;
+  bottom: 4px;
+  min-width: 16px;
+  padding: 1px 4px;
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.55);
+  color: #ffffff;
+  font-size: 11px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.timeline-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  color: var(--accent);
+  border-style: dashed;
+}
+
+.timeline-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.timeline-controls .btn {
+  min-height: 36px;
+  padding: 4px 10px;
+}
+
+.timeline-fps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-dim);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* --- Present mode ----------------------------------------------------------- */
+
+.present-view {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: #10131a;
+  cursor: pointer;
+}
+
+.present-canvas {
+  display: block;
+}
+
+.present-counter {
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.present-exit {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: transparent;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 /* --- Small screens ------------------------------------------------------- */

@@ -8,7 +8,7 @@
 
 import { cssColor } from './color';
 import { normalizeRect } from './geometry';
-import type { DreamDocument, FillOp, Layer, Operation, ShapeOp, StrokeOp } from './types';
+import type { DreamDocument, Layer, Operation, RasterPatch, ShapeOp, StrokeOp } from './types';
 
 /** Structural subset of CanvasRenderingContext2D used by the renderer. */
 export interface Renderer2D {
@@ -40,7 +40,7 @@ export interface Renderer2D {
   fillText(text: string, x: number, y: number): void;
   fillRect(x: number, y: number, w: number, h: number): void;
   putImageData(image: unknown, dx: number, dy: number): void;
-  drawImage(image: unknown, dx: number, dy: number): void;
+  drawImage(image: unknown, dx: number, dy: number, dw?: number, dh?: number): void;
 }
 
 /** Minimal stand-in for an offscreen canvas (used to rasterize fill patches). */
@@ -85,7 +85,7 @@ function resolveFactories(opts: RenderOptions): ResolvedFactories {
       : undefined);
   if (!createCanvas || !createImageData) {
     throw new Error(
-      'renderDocument: fill operations need `createCanvas`/`createImageData` options outside a browser environment',
+      'renderDocument: raster operations need `createCanvas`/`createImageData` options outside a browser environment',
     );
   }
   return { createCanvas, createImageData };
@@ -145,7 +145,10 @@ export function renderOperation(
         ctx.fillText(op.text, op.position.x, op.position.y);
         break;
       case 'fill':
-        renderFill(op, ctx, opts);
+        renderPatch(op.patch, 1, ctx, opts);
+        break;
+      case 'image':
+        renderPatch(op.patch, op.scale, ctx, opts);
         break;
     }
   } finally {
@@ -196,14 +199,19 @@ function renderShape(op: ShapeOp, ctx: Renderer2D): void {
   ctx.stroke();
 }
 
-function renderFill(op: FillOp, ctx: Renderer2D, opts: RenderOptions): void {
+function renderPatch(
+  patch: RasterPatch,
+  scale: number,
+  ctx: Renderer2D,
+  opts: RenderOptions,
+): void {
   // Rasterize the patch on a scratch canvas so layer/op opacity applies
   // through drawImage (putImageData ignores globalAlpha and compositing).
   const { createCanvas, createImageData } = resolveFactories(opts);
-  const scratch = createCanvas(op.patch.width, op.patch.height);
+  const scratch = createCanvas(patch.width, patch.height);
   const scratchCtx = scratch.getContext('2d');
   if (!scratchCtx) return;
-  scratchCtx.putImageData(createImageData(op.patch.data, op.patch.width, op.patch.height), 0, 0);
+  scratchCtx.putImageData(createImageData(patch.data, patch.width, patch.height), 0, 0);
   ctx.globalCompositeOperation = 'source-over';
-  ctx.drawImage(scratch, op.patch.x, op.patch.y);
+  ctx.drawImage(scratch, patch.x, patch.y, patch.width * scale, patch.height * scale);
 }

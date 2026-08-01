@@ -1,5 +1,6 @@
 import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { enableAnimation } from '../engine/animation';
 import { createDocument } from '../engine/document';
 import {
   __resetDbForTests,
@@ -90,5 +91,66 @@ describe('projects storage (IndexedDB)', () => {
     if (op?.kind === 'fill') {
       expect([...op.patch.data]).toEqual(new Array(16).fill(255));
     }
+  });
+
+  it('persists imported image ops (structured clone of the pixel bytes)', async () => {
+    const doc = createDocument({ width: 8, height: 8 });
+    const pixels = new Uint8ClampedArray([1, 2, 3, 255, 5, 6, 7, 128]);
+    const withImage = {
+      ...doc,
+      layers: [
+        {
+          ...doc.layers[0],
+          operations: [
+            {
+              kind: 'image' as const,
+              id: 'im1',
+              color: '#000000',
+              opacity: 1,
+              scale: 2,
+              patch: { x: 1, y: 2, width: 2, height: 1, data: pixels },
+            },
+          ],
+        },
+      ],
+    };
+    await saveProject(withImage);
+    const loaded = await loadProject(doc.id);
+    const op = loaded?.layers[0].operations[0];
+    expect(op?.kind).toBe('image');
+    if (op?.kind === 'image') {
+      expect(op.scale).toBe(2);
+      expect(op.patch).toMatchObject({ x: 1, y: 2, width: 2, height: 1 });
+      expect([...op.patch.data]).toEqual([...pixels]);
+    }
+  });
+
+  it('persists animation frames and settings (structured clone)', async () => {
+    const animated = enableAnimation(createDocument({ width: 8, height: 8, name: 'Flip' }));
+    const doc = {
+      ...animated,
+      frames: [...(animated.frames ?? []), { id: 'frame-2', layers: animated.layers }],
+      animation: { fps: 12, loop: false, onionSkin: true, onionNext: false, onionOpacity: 0.25 },
+    };
+    await saveProject(doc);
+    const loaded = await loadProject(doc.id);
+    expect(loaded?.frames).toHaveLength(2);
+    expect(loaded?.frames?.[1].id).toBe('frame-2');
+    expect(loaded?.activeFrameId).toBe(doc.activeFrameId);
+    expect(loaded?.animation).toMatchObject({ fps: 12, loop: false, onionOpacity: 0.25 });
+  });
+
+  it('old saves (no frames/animation/mode fields) load untouched', async () => {
+    // A slice-1-era document shape: nothing but the pre-animation fields.
+    const doc = createDocument({ width: 8, height: 8 });
+    const legacy = { ...doc };
+    delete legacy.mode;
+    await saveProject(legacy);
+    const loaded = await loadProject(doc.id);
+    expect(loaded?.frames).toBeUndefined();
+    expect(loaded?.activeFrameId).toBeUndefined();
+    expect(loaded?.animation).toBeUndefined();
+    expect(loaded?.mode).toBeUndefined();
+    expect(loaded?.layers).toHaveLength(1);
   });
 });
