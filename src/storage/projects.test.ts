@@ -1,0 +1,94 @@
+import 'fake-indexeddb/auto';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { createDocument } from '../engine/document';
+import {
+  __resetDbForTests,
+  deleteProject,
+  listProjects,
+  loadProject,
+  saveProject,
+} from './projects';
+
+// Fresh database per test: close the cached connection, then delete.
+beforeEach(async () => {
+  await __resetDbForTests();
+  await new Promise<void>((resolve, reject) => {
+    const req = indexedDB.deleteDatabase('dream');
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+    req.onblocked = () => resolve();
+  });
+});
+
+describe('projects storage (IndexedDB)', () => {
+  it('saves and loads a document round-trip', async () => {
+    const doc = createDocument({ width: 320, height: 200, name: 'Roundtrip' });
+    await saveProject(doc);
+    const loaded = await loadProject(doc.id);
+    expect(loaded).toEqual(doc);
+  });
+
+  it('returns undefined for unknown ids', async () => {
+    expect(await loadProject('missing')).toBeUndefined();
+  });
+
+  it('lists projects as metadata sorted by updatedAt desc', async () => {
+    const a = createDocument({ width: 10, height: 10, name: 'A' });
+    const b = createDocument({ width: 20, height: 20, name: 'B' });
+    await saveProject({ ...a, updatedAt: 100 });
+    await saveProject({ ...b, updatedAt: 200 });
+    const list = await listProjects();
+    expect(list.map((p) => p.name)).toEqual(['B', 'A']);
+    expect(list[0]).toMatchObject({ width: 20, height: 20, updatedAt: 200 });
+  });
+
+  it('overwrites a project on re-save', async () => {
+    const doc = createDocument({ width: 10, height: 10, name: 'V1' });
+    await saveProject(doc);
+    await saveProject({ ...doc, name: 'V2' });
+    expect((await loadProject(doc.id))?.name).toBe('V2');
+    expect(await listProjects()).toHaveLength(1);
+  });
+
+  it('deletes projects', async () => {
+    const doc = createDocument({ width: 10, height: 10 });
+    await saveProject(doc);
+    await deleteProject(doc.id);
+    expect(await loadProject(doc.id)).toBeUndefined();
+  });
+
+  it('persists fill patch binary data', async () => {
+    const doc = createDocument({ width: 4, height: 4 });
+    const withFill = {
+      ...doc,
+      layers: [
+        {
+          ...doc.layers[0],
+          operations: [
+            {
+              kind: 'fill' as const,
+              id: 'f1',
+              origin: { x: 1, y: 1 },
+              color: '#ff0000',
+              opacity: 1,
+              patch: {
+                x: 0,
+                y: 0,
+                width: 2,
+                height: 2,
+                data: new Uint8ClampedArray(16).fill(255),
+              },
+            },
+          ],
+        },
+      ],
+    };
+    await saveProject(withFill);
+    const loaded = await loadProject(doc.id);
+    const op = loaded?.layers[0].operations[0];
+    expect(op?.kind).toBe('fill');
+    if (op?.kind === 'fill') {
+      expect([...op.patch.data]).toEqual(new Array(16).fill(255));
+    }
+  });
+});

@@ -1,0 +1,168 @@
+/**
+ * Inline SVG icon set (24×24, stroke-based). No icon library dependency —
+ * these are simple, recognizable glyphs in the spirit of MS Paint.
+ */
+
+import type { SVGProps } from 'react';
+
+type IconProps = SVGProps<SVGSVGElement>;
+
+function base(props: IconProps) {
+  return {
+    width: 22,
+    height: 22,
+    viewBox: '0 0 24 24',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 2,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    'aria-hidden': true,
+    ...props,
+  };
+}
+
+export const BrushIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M9.5 12.5 17 5a2.1 2.1 0 0 1 3 3l-7.5 7.5" />
+    <path d="M11 11c-3.5 0-6.5 3-7 8 4.5-.5 8-3 8-6.5" />
+  </svg>
+);
+
+export const PencilIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+  </svg>
+);
+
+export const EraserIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="m7 21-4.3-4.3a2.4 2.4 0 0 1 0-3.4l9.6-9.6a2.4 2.4 0 0 1 3.4 0l5.6 5.6a2.4 2.4 0 0 1 0 3.4L13 21" />
+    <path d="M22 21H7" />
+    <path d="m5 11 9 9" />
+  </svg>
+);
+
+export const LineIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M5 19 19 5" />
+  </svg>
+);
+
+export const RectangleIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="3" y="5" width="18" height="14" rx="1" />
+  </svg>
+);
+
+export const EllipseIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <ellipse cx="12" cy="12" rx="9" ry="6.5" />
+  </svg>
+);
+
+export const FillIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="m12 2.7 6.5 6.5-8 8a2.8 2.8 0 0 1-4 0l-2.5-2.5a2.8 2.8 0 0 1 0-4Z" />
+    <path d="M5.5 10.5h13" />
+    <path d="M20 15c1.2 1.5 2 2.7 2 3.5a2 2 0 1 1-4 0c0-.8.8-2 2-3.5Z" />
+  </svg>
+);
+
+export const EyedropperIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="m2 22 1-4L13.5 7.5l3 3L6 21l-4 1Z" />
+    <path d="m14 6 3-3a2.1 2.1 0 0 1 3 3l-3 3" />
+  </svg>
+);
+
+export const TextIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M5 6h14" />
+    <path d="M12 6v13" />
+  </svg>
+);
+
+export const PanIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M8 12V6.5a1.5 1.5 0 0 1 3 0V11" />
+    <path d="M11 11V5.5a1.5 1.5 0 0 1 3 0V11" />
+    <path d="M14 11V7a1.5 1.5 0 0 1 3 0v6c0 4-2 7-5.5 7S6.5 17.5 5.7 14l-1.2-3.4c-.4-1.1 1.2-2 2-1.2L8 12" />
+  </svg>
+);
+
+export const ZoomIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m21 21-4.3-4.3" />
+    <path d="M11 8.5v5M8.5 11h5" />
+  </svg>
+);
+
+export const EyeIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+export const EyeOffIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M2 12s3.5-7 10-7c2 0 3.7.6 5.2 1.5M22 12s-3.5 7-10 7c-2 0-3.7-.6-5.2-1.5" />
+    <path d="m3 3 18 18" />
+  </svg>
+);
+
+export const LockIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="5" y="11" width="14" height="9" rx="2" />
+    <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+  </svg>
+);
+
+export const UnlockIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="5" y="11" width="14" height="9" rx="2" />
+    <path d="M8 11V7a4 4 0 0 1 7.5-2" />
+  </svg>
+);
+
+export const TrashIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M3 6h18" />
+    <path d="M8 6V4h8v2" />
+    <path d="M6 6l1 15h10l1-15" />
+  </svg>
+);
+
+export const ChevronUpIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="m6 15 6-6 6 6" />
+  </svg>
+);
+
+export const ChevronDownIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="m6 9 6 6 6-6" />
+  </svg>
+);
+
+export const PlusIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M12 5v14M5 12h14" />
+  </svg>
+);
+
+export const UndoIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M9 14 4 9l5-5" />
+    <path d="M4 9h10a6 6 0 0 1 0 12h-3" />
+  </svg>
+);
+
+export const RedoIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="m15 14 5-5-5-5" />
+    <path d="M20 9H10a6 6 0 0 0 0 12h3" />
+  </svg>
+);
