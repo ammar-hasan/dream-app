@@ -1,8 +1,9 @@
-/** Open dialog: lists projects stored in IndexedDB. */
+/** Open dialog: lists projects stored in IndexedDB, and opens .dream files. */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState, type DragEvent } from 'react';
 import { deleteProject, listProjects, loadProject, type ProjectMeta } from '../storage/projects';
 import { useDreamStore } from '../store/dreamStore';
+import { readDreamFile } from './dreamFile';
 import { LAST_DOC_KEY } from './usePersistence';
 import { TrashIcon } from './icons';
 import { useT } from './i18n';
@@ -10,6 +11,8 @@ import { useT } from './i18n';
 export function OpenDialog({ onClose }: { onClose: () => void }) {
   const t = useT();
   const [projects, setProjects] = useState<ProjectMeta[] | null>(null);
+  const [fileError, setFileError] = useState(false);
+  const fileInput = useRef<HTMLInputElement>(null);
 
   const refresh = async () => {
     try {
@@ -33,6 +36,25 @@ export function OpenDialog({ onClose }: { onClose: () => void }) {
     }
   };
 
+  const openFile = async (file: File) => {
+    setFileError(false);
+    try {
+      const doc = await readDreamFile(file);
+      useDreamStore.getState().loadDocument(doc);
+      globalThis.localStorage?.setItem(LAST_DOC_KEY, doc.id);
+      onClose();
+    } catch (error) {
+      console.error('Could not open .dream file', error);
+      setFileError(true);
+    }
+  };
+
+  const onDrop = (event: DragEvent) => {
+    event.preventDefault();
+    const file = event.dataTransfer.files[0];
+    if (file) void openFile(file);
+  };
+
   const remove = async (id: string) => {
     await deleteProject(id);
     if (globalThis.localStorage?.getItem(LAST_DOC_KEY) === id) {
@@ -49,6 +71,8 @@ export function OpenDialog({ onClose }: { onClose: () => void }) {
         aria-modal="true"
         aria-label={t('open.title')}
         onClick={(e) => e.stopPropagation()}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={onDrop}
       >
         <h2 className="dialog-title">{t('open.title')}</h2>
 
@@ -79,7 +103,23 @@ export function OpenDialog({ onClose }: { onClose: () => void }) {
           ))}
         </ul>
 
+        {fileError && <p className="dialog-note">{t('open.fileError')}</p>}
+
+        <input
+          ref={fileInput}
+          type="file"
+          accept=".dream,application/json"
+          hidden
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) void openFile(file);
+          }}
+        />
+
         <div className="dialog-actions">
+          <button className="btn" onClick={() => fileInput.current?.click()}>
+            {t('open.file')}
+          </button>
           <button className="btn" onClick={onClose}>
             {t('common.close')}
           </button>

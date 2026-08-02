@@ -18,6 +18,8 @@ Conventions for anyone (human or agent) working on Dream.
 - `npm run test:e2e` — e2e alone (builds + previews the production bundle)
 - `npm run test:coverage` — engine coverage report (must stay ≥80% lines/functions/statements)
 - `npm run icons` — regenerate the PWA PNG icons from `public/favicon.svg`
+- `npm run check:mcp` — install, build and test the `mcp-server/` package
+  (separate dependency tree; root `check` never touches it)
 - `npm run release -- patch|minor|major` — clean-tree + green-check gate, bumps the
   version, seeds CHANGELOG.md, prints the git commands (never mutates git itself)
 - `npm run format` — Prettier write; run before committing
@@ -60,13 +62,25 @@ Conventions for anyone (human or agent) working on Dream.
    via a `data-tooltip` attribute (never native `title` on buttons; kid mode
    suppresses them because spoken names do that job). All animation is
    transform/opacity-only and must respect `prefers-reduced-motion`.
+10. **`mcp-server/` is a standalone package.** It has its own package.json,
+    tsconfig, dependency tree and test runner. The webapp never imports it;
+    it imports the ENGINE only (compiled from `src/engine` at its build
+    time), and the engine stays dependency-free — `@napi-rs/canvas` lives in
+    mcp-server alone, plugged into the engine via `RenderOptions` and the
+    `RasterCodec` interface. Root `npm run check` must not build it (eslint,
+    vitest and tsconfig all exclude it); its gate is `npm run check:mcp`.
+    Tool cores stay pure functions over the file system; the MCP protocol
+    wiring stays a thin adapter.
 
 ## Structure
 
 - `src/engine/` — types, document, history, animation (frame model, playback
   timing, onion skin, sprite-sheet layout), hotspots (app-mode links:
   broken-target detection, hit-testing), appExport (standalone interactive
-  HTML prototype generator — pure string builder), renderer, geometry, color, filters
+  HTML prototype generator — pure string builder), projectFile (the `.dream`
+  file format: JSON envelope + raster patches as base64 PNG data URLs, via an
+  injectable `RasterCodec`), index (the public API barrel — semver-intended
+  stable surface), renderer, geometry, color, filters
   (pure RGBA pixel transforms), transform (flip/rotate/crop/resize), symmetry
   (mirror-mode op reflection), spray (seeded dot layout), selection (Design
   mode: hit-testing, lasso/marquee, move/scale/rotate, snapping, align,
@@ -103,12 +117,19 @@ Conventions for anyone (human or agent) working on Dream.
   UI changes.
 - `scripts/` — `gen-icons.mjs` (PWA PNGs via chromium, no image deps) and
   `release.mjs` (release prep; prints git commands, never runs them)
+- `mcp-server/` — standalone Node package: the dream-mcp stdio MCP server
+  over `.dream` files. Thin protocol wiring (`src/index.ts`) over pure tool
+  cores (`src/tools.ts`, tested in tmp dirs) + the Node raster codec/frame
+  renderer (`src/nodeCodec.ts`, `@napi-rs/canvas`). Compiles the engine in
+  from `src/engine`; never imported by the webapp; gated by `check:mcp` and
+  its own CI job.
 
 ## Git
 
 - CI (`.github/workflows/ci.yml`) runs `npm ci && npm run check` on Node 22 — keep it
-  green. A separate `e2e` job runs the Playwright suite and uploads
-  `playwright-report` on failure. `.github/workflows/deploy.yml` publishes
+  green. Separate jobs run the Playwright suite (report uploaded on failure)
+  and the `mcp-server/` package check (`npm ci && npm run check` inside
+  `mcp-server/`). `.github/workflows/deploy.yml` publishes
   `dist/` to GitHub Pages on every push to `main` (base `/dream-app/`).
 - Releases: `npm run release -- patch|minor|major`, fill in the CHANGELOG
   bullets, then run the git commands the script prints (it never commits,

@@ -6,8 +6,8 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
-    // Playwright owns e2e/ — vitest must never pick those specs up.
-    exclude: [...configDefaults.exclude, 'e2e/**'],
+    // Playwright owns e2e/, mcp-server has its own runner — vitest must see neither.
+    exclude: [...configDefaults.exclude, 'e2e/**', 'mcp-server/**'],
     coverage: {
       provider: 'v8',
       include: ['src/engine/**'],

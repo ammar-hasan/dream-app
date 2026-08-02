@@ -1,0 +1,90 @@
+# dream-mcp
+
+An MCP (Model Context Protocol) server that lets agents — Claude Code, Codex,
+any MCP-capable client — work with **Dream** `.dream` project files: read
+them, create them, edit them, render them to PNG, and export interactive HTML
+prototypes.
+
+It runs over stdio against the real Dream engine (compiled straight from the
+root package's `src/engine` — no reimplementation), so a file written here is
+byte-compatible with the browser app, and vice versa.
+
+## Tools
+
+| Tool                   | What it does                                                                                                                     |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `dream.read_project`   | Summary of a `.dream` file: size, background, mode, layer/frame counts, hotspots (incl. broken), op counts per kind, game setup. |
+| `dream.create_project` | Create a new `.dream` file: `path`, `width`, `height`, optional `background`, `name`.                                            |
+| `dream.list_layers`    | Layer stack(s): id, name, visibility, opacity, lock, op count — plus a per-frame breakdown for animated documents.               |
+| `dream.add_text`       | Append a text op: `text`, `x`, `y`, optional `size`, `color`, `fontFamily`, `layer` (id or name; default: top layer).            |
+| `dream.render_png`     | Flatten the document (or one `frame` index) to a PNG file.                                                                       |
+| `dream.export_app`     | Export an animated document as ONE self-contained interactive HTML prototype (frames as screens, hotspots as tappable links).    |
+
+## Setup
+
+```bash
+cd mcp-server
+npm install
+npm run check     # builds to dist/ and runs the test suite
+```
+
+The server entry point after building is
+`mcp-server/dist/mcp-server/src/index.js` (the engine is compiled in from the
+repository root, hence the nested path).
+
+### Claude Code
+
+```bash
+claude mcp add dream -- node /absolute/path/to/dream-app/mcp-server/dist/mcp-server/src/index.js
+```
+
+### Codex (`~/.codex/config.toml`)
+
+```toml
+[mcp_servers.dream]
+command = "node"
+args = ["/absolute/path/to/dream-app/mcp-server/dist/mcp-server/src/index.js"]
+```
+
+### Generic MCP client (JSON)
+
+```json
+{
+  "mcpServers": {
+    "dream": {
+      "command": "node",
+      "args": ["/absolute/path/to/dream-app/mcp-server/dist/mcp-server/src/index.js"]
+    }
+  }
+}
+```
+
+## Try it without an MCP client
+
+```bash
+node examples/demo.mjs
+```
+
+creates a project in a tmp dir, adds text, reads the summary and renders a
+PNG — the exact functions the MCP tools call.
+
+## How it fits the repo
+
+- `src/tools.ts` — the tool cores: plain functions over the file system,
+  fully unit-tested in tmp dirs (`src/tools.test.ts`). `src/index.ts` is a
+  thin MCP stdio adapter over them.
+- `src/nodeCodec.ts` — the Node `RasterCodec` for the `.dream` format and the
+  frame renderer, backed by `@napi-rs/canvas` (native prebuilds, no DOM).
+- The Dream engine itself (`../src/engine`) stays dependency-free; this
+  package is the only place a canvas implementation is plugged into it. The
+  webapp never imports `mcp-server/`.
+
+## Notes & limits
+
+- Canvas codecs premultiply alpha: a PNG round-trip of _semi-transparent_
+  raster pixels is lossy by a rounding step (true of every canvas, browsers
+  included). Opaque pixels round-trip exactly.
+- `dream.export_app` needs an animated document (frames are the screens);
+  documents without frames get a clear error.
+- Rendering uses the headless skia build — text uses the fonts bundled with
+  it, so glyph metrics can differ slightly from a browser's.

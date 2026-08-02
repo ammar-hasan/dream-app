@@ -348,6 +348,8 @@ export const ar: Record<string, string> = {
   'open.empty': 'لا مشاريع محفوظة بعد. ارسم شيئًا — يُحفظ تلقائيًا.',
   'open.delete': 'حذف المشروع',
   'open.deleteNamed': 'حذف {name}',
+  'open.file': 'فتح ملف .dream…',
+  'open.fileError': 'تعذّر فتح هذا الملف كمشروع Dream.',
   'resize.title': 'تغيير حجم المستند',
   'resize.hint': 'الحجم الحالي: {width} × {height}. يُقاس المحتوى ليناسب.',
   'resize.keepAspect': 'الحفاظ على نسبة الأبعاد',
@@ -362,6 +364,9 @@ export const ar: Record<string, string> = {
   'export.appLabel': 'تطبيق تفاعلي (.html)',
   'export.appNote':
     'ملف HTML واحد مستقل: إطاراتك كشاشات وروابطك كنقاط لمس. يفتح في أي مكان ويعمل دون إنترنت.',
+  'export.dreamLabel': 'مشروع Dream (.dream)',
+  'export.dreamNote':
+    'المشروع كاملًا — الطبقات والإطارات والروابط واللعبة — في ملف واحد محمول. أعد فتحه هنا أو شاركه أو مرّره إلى وكيل عبر خادم MCP.',
   'export.recording': 'جارٍ التسجيل… {progress}',
   'export.starting': 'جارٍ البدء…',
   'export.progress': 'إطار {done} من {total}…',

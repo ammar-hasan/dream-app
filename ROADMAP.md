@@ -5,10 +5,11 @@ editing), slice 3 (design mode), slice 4 (animation + video export +
 presentation mode), slice 7 (AI panel), the accessibility trio — slices 8
 (voice commands), 9 (kid mode) and 10 (i18n) — the release harness, the
 drawing power tools (symmetry, pressure, filled shapes, lasso, magic wand,
-spray), game mode v1 (Catch!, the first slice-12 template) and app mode v1
-(interactive prototypes: hotspots, app preview, standalone HTML export) are
-done. Each slice below lists brief acceptance criteria; slices are roughly
-ordered by dependency, not by a fixed schedule.
+spray), game mode v1 (Catch!, the first slice-12 template), app mode v1
+(interactive prototypes: hotspots, app preview, standalone HTML export) and
+the developer surface (.dream project files, the dream-mcp server, the stable
+engine API) are done. Each slice below lists brief acceptance criteria; slices
+are roughly ordered by dependency, not by a fixed schedule.
 
 ## Slice 2 — Image filters & adjustments ✅
 
@@ -272,6 +273,47 @@ ordered by dependency, not by a fixed schedule.
   preview the tap, export the HTML — opening the file feels like a magic
   trick: "I drew this, and now it's an app I can send to anyone."
 
+## Slice 14 — The developer surface ✅
+
+Persona: Maria, professional programmer — connect Dream to her toolchain via
+MCP in her development flow and APIs in her applications.
+
+- ✅ The `.dream` project file format (v1): UTF-8 JSON envelope
+  (`{format: 'dream-project', version: 1, document}`) around a verbatim
+  `DreamDocument`, with raster payloads (fill/image patches) serialized as
+  base64 PNG data URLs. Pure encode/decode in `src/engine/projectFile.ts`
+  with an injectable `RasterCodec` (browser canvas codec in `ui/dreamFile.ts`,
+  Node codec in mcp-server). Round-trip fidelity tests: strokes, shapes,
+  text, images, frames, hotspots, game setup → file → identical document.
+- ✅ App integration: Export → "Dream project (.dream)" downloads the file;
+  the Open dialog opens `.dream` files via a picker button or drag-and-drop,
+  alongside the IndexedDB library.
+- ✅ `mcp-server/` — the **dream-mcp** stdio MCP server, a standalone Node
+  package (own package.json/tsconfig; not part of the webapp build, root
+  `npm run check` never touches it; `npm run check:mcp` and a separate CI job
+  cover it). Tools: `dream.read_project`, `dream.create_project`,
+  `dream.list_layers`, `dream.add_text`, `dream.render_png`,
+  `dream.export_app`. The server compiles the REAL engine in from
+  `src/engine` (no reimplementation); rendering and PNG payloads run on
+  `@napi-rs/canvas`. Tool cores are pure functions over the file system
+  (`src/tools.ts`, tested in tmp dirs); `src/index.ts` is thin stdio wiring
+  (verified over a real MCP initialize + tools/list handshake). Client setup
+  snippets in `mcp-server/README.md`.
+- ✅ Stable engine API: `src/engine/index.ts` barrel is the semver-intended
+  public surface (types, document helpers, history, renderer, filters,
+  color, geometry, animation, hotspots, appExport, projectFile) — documented
+  in the README; everything else under `src/engine/` is internal.
+- Decisions/gaps: the MCP server uses the SDK's low-level `Server` with
+  hand-written JSON Schemas (the high-level `McpServer` helper hits a
+  TypeScript instantiation-depth error with zod 3.25 — transparent and
+  version-proof instead). Canvas codecs premultiply alpha, so
+  semi-transparent raster pixels are lossy by a rounding step on PNG
+  round-trips (true of browser canvases too); opaque pixels round-trip
+  exactly.
+- Future: remote MCP (HTTP transport), websocket collaboration on a shared
+  document, a plugin API (custom tools/panels), more MCP tools (add shape /
+  stroke / image ops, layer management, component library access, AI edits).
+
 ## Post-0.1.0 ideas
 
 - Offline-first service worker (the rest of slice 11) so installed PWAs work
@@ -281,7 +323,7 @@ ordered by dependency, not by a fixed schedule.
 - Slice 5/6 remainders: audio track, MP4/WebCodecs export, slide transitions,
   presenter view with notes, per-slide duration.
 - Slice 12 remainder: more game templates (platformer, maze, flappy),
-  conversational game generation, MCP/API hooks.
+  conversational game generation.
 
 ## Slice 11 — PWA
 
@@ -310,7 +352,7 @@ ordered by dependency, not by a fixed schedule.
 - ✅ Kid mode + voice: gamepad button in the kid toolbar, giant play button
   and big on-screen arrows; "play my game" starts a run, "stop" ends it.
 - Remaining: more templates (platformer, maze, flappy), conversational game
-  generation from a sentence, MCP/API hooks for developer workflows
-  (persona: Maria).
+  generation from a sentence. (The MCP/API hooks for developer workflows —
+  persona: Maria — shipped as slice 14, the developer surface.)
 - Acceptance met: a child draws a blob, casts it as the hero, presses play —
   and their own drawing catches stars.

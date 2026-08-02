@@ -1,0 +1,234 @@
+/**
+ * Tests for the dream-mcp tool cores: real .dream files in tmp directories,
+ * real PNG round-trips through @napi-rs/canvas. The MCP protocol wiring in
+ * index.ts is intentionally untested — it is a thin adapter over these.
+ */
+
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { enableAnimation } from '../../src/engine/animation';
+import {
+  appendOperation,
+  createFrame,
+  createLayer,
+  genId,
+  withFrameHotspots,
+} from '../../src/engine/document';
+import type { FillOp, StrokeOp } from '../../src/engine/types';
+import {
+  addText,
+  createProject,
+  exportApp,
+  listLayers,
+  loadProject,
+  readProject,
+  renderPng,
+  saveProject,
+} from './tools';
+
+let dir: string;
+let projectPath: string;
+
+beforeAll(async () => {
+  dir = await mkdtemp(join(tmpdir(), 'dream-mcp-'));
+  projectPath = join(dir, 'demo.dream');
+});
+
+afterAll(async () => {
+  await rm(dir, { recursive: true, force: true });
+});
+
+const PNG_MAGIC = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
+
+describe('dream-mcp tools', () => {
+  it('create_project writes a valid .dream file', async () => {
+    const summary = await createProject(projectPath, {
+      width: 120,
+      height: 80,
+      background: '#102030',
+      name: 'Agent sketch',
+    });
+    expect(summary).toMatchObject({
+      name: 'Agent sketch',
+      width: 120,
+      height: 80,
+      background: '#102030',
+      layers: 1,
+      frames: null,
+      hotspots: 0,
+    });
+
+    const raw = JSON.parse(await readFile(projectPath, 'utf8'));
+    expect(raw.format).toBe('dream-project');
+    expect(raw.version).toBe(1);
+  });
+
+  it('create_project rejects bad sizes and colors', async () => {
+    await expect(createProject(projectPath, { width: 0, height: 10 })).rejects.toThrow(
+      'positive integers',
+    );
+    await expect(
+      createProject(projectPath, { width: 10, height: 10, background: 'red' }),
+    ).rejects.toThrow('Invalid background color');
+  });
+
+  it('add_text appends a text op to the top layer', async () => {
+    const result = await addText(projectPath, {
+      text: 'Made by an agent',
+      x: 10,
+      y: 20,
+      size: 18,
+      color: '#f0f',
+    });
+    const doc = await loadProject(projectPath);
+    const topLayer = doc.layers[doc.layers.length - 1];
+    expect(result.layerId).toBe(topLayer.id);
+    const op = topLayer.operations.find((o) => o.id === result.opId);
+    expect(op).toMatchObject({
+      kind: 'text',
+      text: 'Made by an agent',
+      color: '#ff00ff',
+      fontSize: 18,
+      position: { x: 10, y: 20 },
+    });
+  });
+
+  it('add_text can target a layer by name and validates input', async () => {
+    await addText(projectPath, { text: 'second', x: 0, y: 0, layer: 'Layer 1' });
+    await expect(addText(projectPath, { text: '  ', x: 0, y: 0 })).rejects.toThrow(
+      'must not be empty',
+    );
+    await expect(addText(projectPath, { text: 'x', x: 0, y: 0, layer: 'nope' })).rejects.toThrow(
+      'No layer with id or name "nope"',
+    );
+  });
+
+  it('read_project summarizes layers, ops and mode', async () => {
+    const summary = await readProject(projectPath);
+    expect(summary.layers).toBe(1);
+    expect(summary.operations).toMatchObject({ total: 2, text: 2 });
+    expect(summary.frames).toBeNull();
+    expect(summary.hasGameSetup).toBe(false);
+  });
+
+  it('list_layers returns the active stack', async () => {
+    const listing = await listLayers(projectPath);
+    expect(listing.frames).toBeNull();
+    expect(listing.layers).toHaveLength(1);
+    expect(listing.layers[0]).toMatchObject({ name: 'Layer 1', operations: 2, visible: true });
+  });
+
+  it('render_png flattens the document to a real PNG', async () => {
+    const outPath = join(dir, 'render.png');
+    const result = await renderPng(projectPath, outPath);
+    expect(result).toMatchObject({ width: 120, height: 80, frame: null });
+    expect(result.bytes).toBeGreaterThan(0);
+    const png = await readFile(outPath);
+    expect(png.subarray(0, 4)).toEqual(PNG_MAGIC);
+  });
+
+  it('render_png can pick a frame and errors without frames', async () => {
+    await expect(renderPng(projectPath, join(dir, 'x.png'), { frame: 0 })).rejects.toThrow(
+      'no frames',
+    );
+  });
+
+  it('round-trips raster ops as real PNG payloads', async () => {
+    const doc = await loadProject(projectPath);
+    // Opaque pixels: canvas codecs premultiply alpha, which is lossy for
+    // semi-transparent pixels (true for the browser codec too — the engine
+    // round-trip test with a fake codec covers byte-exactness).
+    const pixels = new Uint8ClampedArray([
+      255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 9, 8, 7, 255,
+    ]);
+    const fill: FillOp = {
+      kind: 'fill',
+      id: genId('op'),
+      color: '#ff0000',
+      opacity: 1,
+      origin: { x: 1, y: 1 },
+      patch: { x: 2, y: 3, width: 2, height: 2, data: pixels },
+    };
+    const stroke: StrokeOp = {
+      kind: 'stroke',
+      id: genId('op'),
+      tool: 'brush',
+      color: '#00ff00',
+      opacity: 1,
+      size: 5,
+      points: [
+        { x: 0, y: 0 },
+        { x: 50, y: 50 },
+      ],
+    };
+    const withOps = appendOperation(
+      appendOperation(doc, doc.layers[0].id, fill),
+      doc.layers[0].id,
+      stroke,
+    );
+    await saveProject(projectPath, withOps);
+
+    // The payload on disk must be a PNG data URL, not raw bytes.
+    const raw = await readFile(projectPath, 'utf8');
+    expect(raw).toContain('data:image/png;base64,');
+
+    const reloaded = await loadProject(projectPath);
+    expect(reloaded).toEqual(withOps);
+  });
+
+  it('export_app writes a self-contained interactive HTML file', async () => {
+    let doc = await loadProject(projectPath);
+    doc = enableAnimation(doc);
+    // A second frame with its own content, and a hotspot linking frame 1 → 2.
+    const secondLayer = createLayer('Screen 2', [
+      {
+        kind: 'text',
+        id: genId('op'),
+        color: '#000000',
+        opacity: 1,
+        position: { x: 4, y: 4 },
+        text: 'Screen two',
+        fontSize: 16,
+        fontFamily: 'sans-serif',
+      },
+    ]);
+    doc = { ...doc, frames: [...doc.frames!, createFrame([secondLayer])] };
+    doc = withFrameHotspots(doc, doc.frames![0].id, [
+      {
+        id: genId('hot'),
+        rect: { x: 0, y: 0, width: 60, height: 30 },
+        targetFrameId: doc.frames![1].id,
+        transition: 'fade',
+      },
+    ]);
+    await saveProject(projectPath, doc);
+
+    const outPath = join(dir, 'app.html');
+    const result = await exportApp(projectPath, outPath);
+    expect(result).toMatchObject({ screens: 2, hotspots: 1 });
+    const html = await readFile(outPath, 'utf8');
+    expect(html).toContain('data-target="1"');
+    expect(html).toContain('data:image/png;base64,');
+    expect(html).toContain('Made with Dream');
+  });
+
+  it('export_app refuses a document without frames', async () => {
+    const plain = join(dir, 'plain.dream');
+    await createProject(plain, { width: 10, height: 10 });
+    await expect(exportApp(plain, join(dir, 'plain.html'))).rejects.toThrow('needs frames');
+  });
+
+  it('load_project reports unreadable and corrupt files clearly', async () => {
+    await expect(readProject(join(dir, 'missing.dream'))).rejects.toThrow('Cannot read');
+    const bad = join(dir, 'bad.dream');
+    await saveProjectBad(bad);
+    await expect(readProject(bad)).rejects.toThrow('Not a .dream file');
+  });
+});
+
+async function saveProjectBad(path: string) {
+  const { writeFile } = await import('node:fs/promises');
+  await writeFile(path, '{"format":"other"}', 'utf8');
+}

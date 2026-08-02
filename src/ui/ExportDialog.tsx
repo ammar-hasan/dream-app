@@ -1,6 +1,8 @@
 /**
  * Export dialog: flattened PNG/JPEG for still documents; animated documents
- * also get WebM video (recorded client-side) and a PNG sprite sheet.
+ * also get WebM video (recorded client-side), a PNG sprite sheet and the
+ * standalone interactive-app HTML. Every document can be downloaded as a
+ * portable .dream project file.
  */
 
 import { useState } from 'react';
@@ -8,6 +10,7 @@ import { animationSettingsOf } from '../engine/animation';
 import { useDreamStore } from '../store/dreamStore';
 import { exportImage } from './exportImage';
 import { exportAppHtml } from './exportApp';
+import { downloadDreamFile } from './dreamFile';
 import {
   downloadBlob,
   exportAnimationWebM,
@@ -17,7 +20,7 @@ import {
 } from './exportAnimation';
 import { useT } from './i18n';
 
-type Format = 'png' | 'jpeg' | 'webm' | 'sprite' | 'app';
+type Format = 'png' | 'jpeg' | 'webm' | 'sprite' | 'app' | 'dream';
 
 export function ExportDialog({ onClose }: { onClose: () => void }) {
   const t = useT();
@@ -57,6 +60,16 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
       onClose();
       return;
     }
+    if (format === 'dream') {
+      setError(null);
+      try {
+        await downloadDreamFile(doc);
+        onClose();
+      } catch {
+        setError(t('export.failed'));
+      }
+      return;
+    }
     exportImage(doc, { format, quality: quality / 100 });
     onClose();
   };
@@ -71,6 +84,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
           { id: 'app' as const, label: t('export.appLabel') },
         ]
       : []),
+    { id: 'dream', label: t('export.dreamLabel') },
   ];
 
   return (
@@ -127,6 +141,8 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
         {format === 'sprite' && <p className="dialog-note">{t('export.spriteNote')}</p>}
 
         {format === 'app' && <p className="dialog-note">{t('export.appNote')}</p>}
+
+        {format === 'dream' && <p className="dialog-note">{t('export.dreamNote')}</p>}
 
         {progress && <p className="dialog-note">{t('export.recording', { progress })}</p>}
         {error && <p className="dialog-note">{error}</p>}

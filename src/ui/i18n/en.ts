@@ -353,6 +353,8 @@ export const en: Record<string, string> = {
   'open.empty': 'No saved projects yet. Draw something — it saves automatically.',
   'open.delete': 'Delete project',
   'open.deleteNamed': 'Delete {name}',
+  'open.file': 'Open .dream file…',
+  'open.fileError': 'That file could not be opened as a Dream project.',
   'resize.title': 'Resize document',
   'resize.hint': 'Current size: {width} × {height}. Content is scaled to fit.',
   'resize.keepAspect': 'Keep aspect ratio',
@@ -367,6 +369,9 @@ export const en: Record<string, string> = {
   'export.appLabel': 'Interactive app (.html)',
   'export.appNote':
     'One self-contained HTML file: your frames as screens, your links as tappable hotspots. Opens anywhere, works offline.',
+  'export.dreamLabel': 'Dream project (.dream)',
+  'export.dreamNote':
+    'The whole project — layers, frames, links, game — as one portable file. Reopen it here, share it, or hand it to an agent via the MCP server.',
   'export.recording': 'Recording… {progress}',
   'export.starting': 'Starting…',
   'export.progress': 'Frame {done} of {total}…',

@@ -24,7 +24,9 @@ kid mode, canvas voice commands and i18n with RTL), the **polish pass**
 tools** (mirror symmetry, pen pressure, filled shapes, lasso, magic wand
 and the spray brush), **game mode** (turn your drawings into a playable
 Catch! mini-game) and **app mode** (link your frames into an interactive
-prototype and export it as one standalone HTML file).
+prototype and export it as one standalone HTML file), and the **developer
+surface** (a portable `.dream` file format, an MCP server for agents, and a
+stable engine API).
 
 <!-- Screenshots: drop light/dark theme captures into docs/screenshots/ and
      link them here once we have a stable marketing look. -->
@@ -128,7 +130,9 @@ language picker.
   and one-tap fit-to-window
 - New document dialog (presets + custom size + background color)
 - Autosave to IndexedDB (imported images included), open/delete saved projects,
-  export flattened PNG or JPEG (with quality setting)
+  export flattened PNG or JPEG (with quality setting), and portable `.dream`
+  project files (Export dialog downloads one; the Open dialog opens them, with
+  drag-and-drop)
 - Elegant splash while the last document restores; a welcome card (logo +
   "Pick a brush and start dreaming") that dismisses on your first stroke
 - Light & dark themes with a full design-token system; styled tooltips with
@@ -355,6 +359,72 @@ dodge the bad ones (−1 life).
   additive and backward compatible), updated outside undo like the workspace
   mode — undo never re-casts your game.
 
+## For developers: .dream files, MCP and the engine API
+
+Dream's document model is a portable, tool-friendly format, and the engine
+that reads it is dependency-free TypeScript — so you can script Dream from
+your own toolchain, or let an AI agent drive it.
+
+### The `.dream` file format
+
+A `.dream` file is UTF-8 JSON with a tiny envelope around the document:
+
+```json
+{
+  "format": "dream-project",
+  "version": 1,
+  "document": { "id": "…", "width": 320, "height": 240, "layers": [ … ] }
+}
+```
+
+- `document` is the engine's `DreamDocument` verbatim (see
+  `src/engine/types.ts`): layers of operations (strokes, shapes, text, fills,
+  images), optional animation frames with app-mode hotspots, optional
+  Play-mode game setup.
+- The one transformation: raster payloads (`patch.data` on fill/image ops)
+  are base64 **PNG data URLs** (`data:image/png;base64,…`) instead of raw
+  byte arrays — compact, and readable by anything with a PNG decoder.
+- Readers must ignore fields they don't know; writers round-trip them
+  (encode/decode spreads, so unknown fields survive). Version bumps will be
+  additive where possible; breaking changes bump `version`.
+
+In the app: **Export → Dream project (.dream)** downloads one, and the Open
+dialog opens `.dream` files (button or drag-and-drop) next to the IndexedDB
+library. Encode/decode is pure and codec-agnostic in
+`src/engine/projectFile.ts` — the browser plugs in a canvas codec
+(`src/ui/dreamFile.ts`), Node plugs in `@napi-rs/canvas`.
+
+### The MCP server (dream-mcp)
+
+`mcp-server/` is a standalone Node package (not part of the webapp build)
+exposing `.dream` files to agents over stdio MCP: `dream.read_project`,
+`dream.create_project`, `dream.list_layers`, `dream.add_text`,
+`dream.render_png` (real PNGs via `@napi-rs/canvas`) and `dream.export_app`.
+Setup and client config (Claude Code, Codex) are in
+[`mcp-server/README.md`](mcp-server/README.md); `npm run check:mcp` from the
+repo root installs, builds and tests it.
+
+### The stable engine API
+
+`src/engine/index.ts` is the public, semver-intended surface for programmatic
+consumers — import from it, not from deep paths:
+
+- **types** — `DreamDocument`, `Layer`, `Operation`, `Frame`, `Hotspot`, …
+- **document helpers** — `createDocument`, `createLayer`, `appendOperation`,
+  `withLayers`, frame-aware helpers
+- **history** — the invertible `Command`/`History` model
+- **renderer** — `renderDocument` against a structural 2D context (bring your
+  own canvas: browser, `@napi-rs/canvas`, a mock)
+- **filters, color, geometry** — pure pixel transforms and helpers
+- **animation & hotspots** — the frame model and app-mode link queries
+- **appExport** — the standalone interactive-HTML generator
+- **projectFile** — `.dream` encode/decode with an injectable raster codec
+
+Everything else under `src/engine/` (selection, symmetry, spray internals,
+the tool state machines) is internal and may change without notice. The
+engine has zero runtime dependencies and follows the app's semantic version;
+breaking API changes land in CHANGELOG.md.
+
 ## Quickstart
 
 ```bash
@@ -364,22 +434,23 @@ npm run dev        # http://localhost:5173
 
 ## Scripts
 
-| Script                  | What it does                                    |
-| ----------------------- | ----------------------------------------------- |
-| `npm run dev`           | Vite dev server                                 |
-| `npm run build`         | Production build to `dist/`                     |
-| `npm run preview`       | Serve the production build                      |
-| `npm test`              | Run the test suite (Vitest)                     |
-| `npm run test:watch`    | Watch-mode tests                                |
-| `npm run test:coverage` | Tests + engine coverage report                  |
-| `npm run test:e2e`      | Playwright e2e suite (builds + previews first)  |
-| `npm run typecheck`     | `tsc --noEmit` (strict mode)                    |
-| `npm run lint`          | ESLint (typescript-eslint + react-hooks)        |
-| `npm run format`        | Prettier write                                  |
-| `npm run icons`         | Regenerate PWA PNG icons from the SVG mark      |
-| `npm run release`       | Prepare a release (see "Releasing" below)       |
-| `npm run check`         | typecheck + lint + test + build (what CI runs)  |
-| `npm run check:full`    | `check` + e2e — run before a release/PR of note |
+| Script                  | What it does                                      |
+| ----------------------- | ------------------------------------------------- |
+| `npm run dev`           | Vite dev server                                   |
+| `npm run build`         | Production build to `dist/`                       |
+| `npm run preview`       | Serve the production build                        |
+| `npm test`              | Run the test suite (Vitest)                       |
+| `npm run test:watch`    | Watch-mode tests                                  |
+| `npm run test:coverage` | Tests + engine coverage report                    |
+| `npm run test:e2e`      | Playwright e2e suite (builds + previews first)    |
+| `npm run typecheck`     | `tsc --noEmit` (strict mode)                      |
+| `npm run lint`          | ESLint (typescript-eslint + react-hooks)          |
+| `npm run format`        | Prettier write                                    |
+| `npm run icons`         | Regenerate PWA PNG icons from the SVG mark        |
+| `npm run release`       | Prepare a release (see "Releasing" below)         |
+| `npm run check`         | typecheck + lint + test + build (what CI runs)    |
+| `npm run check:full`    | `check` + e2e — run before a release/PR of note   |
+| `npm run check:mcp`     | install, build and test the `mcp-server/` package |
 
 ## Architecture map
 
@@ -398,6 +469,9 @@ src/
                      hit-testing) over the frame model — all pure
     appExport.ts     Standalone prototype export: frames as PNG data URLs +
                      hotspots → ONE self-contained interactive HTML file
+    projectFile.ts   The .dream file format: JSON envelope + raster patches as
+                     base64 PNG data URLs, via an injectable RasterCodec
+    index.ts         Public API barrel (the stable, semver-intended surface)
     renderer.ts      Renders a Document onto any 2D context (structural interface)
     symmetry.ts      Mirror mode: reflect stroke/shape ops across the center axes
     spray.ts         Seeded PRNG + deterministic spray-dot layout
@@ -443,6 +517,12 @@ public/              favicon.svg (the Dream mark) + icons/ (generated PNGs)
                      + manifest.webmanifest
 e2e/                 Playwright suite: smoke.spec.ts, visual.spec.ts (baseline
                      screenshot), helpers.ts — vitest never sees this dir
+mcp-server/          Standalone Node package (own package.json, NOT part of the
+                     webapp build): the dream-mcp stdio MCP server — thin
+                     protocol wiring (src/index.ts) over pure tool cores
+                     (src/tools.ts) + the Node raster codec/frame renderer
+                     (src/nodeCodec.ts, @napi-rs/canvas). Compiles the engine
+                     in from src/engine; the webapp never imports it
 scripts/             gen-icons.mjs (rasterize the SVG mark via chromium),
                      release.mjs (release prep; prints git commands, never
                      mutates git)
