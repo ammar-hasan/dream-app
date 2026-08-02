@@ -13,6 +13,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { renderDocument, renderLayer, renderOperation } from '../engine/renderer';
+import { LayerCache } from '../engine/layerCache';
 import { animationSettingsOf, frameIndexAtTime, onionSkinTargets } from '../engine/animation';
 import { activeHotspots } from '../engine/hotspots';
 import { normalizeRect } from '../engine/geometry';
@@ -90,6 +91,11 @@ export function CanvasViewport() {
   const playbackFrame = useDreamStore((s) => s.playbackFrame);
   const kidMode = useUiPrefs((s) => s.kidMode);
   const skinCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  // Incremental compositor: one bitmap per layer, re-rendered only when the
+  // layer's ops change — stroke previews, pan and zoom cost one drawImage
+  // per layer instead of the whole document.
+  const layerCacheRef = useRef<LayerCache | null>(null);
+  const cachedDocIdRef = useRef<string | null>(null);
 
   // Playback driver: while playing, a rAF loop maps elapsed time to a frame
   // index via the pure engine function; editing is paused in the store.
@@ -197,7 +203,15 @@ export function CanvasViewport() {
       const frame = doc.frames[playbackFrame];
       if (frame) displayDoc = { ...displayDoc, layers: frame.layers };
     }
-    renderDocument(displayDoc, ctx, { layerFilter: (layer) => !detached.has(layer.id) });
+    const cache = (layerCacheRef.current ??= new LayerCache());
+    if (cachedDocIdRef.current !== doc.id) {
+      // Another document was opened: every cached bitmap belongs to the old one.
+      cache.clear();
+      cachedDocIdRef.current = doc.id;
+    }
+    cache.render(displayDoc, ctx, {
+      layerFilter: detached.size > 0 ? (layer) => !detached.has(layer.id) : undefined,
+    });
 
     if (adjustPreview) {
       const layer = doc.layers.find((l) => l.id === adjustPreview.layerId);

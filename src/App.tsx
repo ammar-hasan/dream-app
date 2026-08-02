@@ -27,6 +27,7 @@ import { NewDocumentDialog } from './ui/NewDocumentDialog';
 import { OpenDialog } from './ui/OpenDialog';
 import { ResizeDialog } from './ui/ResizeDialog';
 import { ExportDialog } from './ui/ExportDialog';
+import { UpdateToast } from './ui/UpdateToast';
 
 type Dialog = 'new' | 'open' | 'resize' | 'export' | null;
 
@@ -112,6 +113,7 @@ export default function App() {
       {dialog === 'resize' && <ResizeDialog onClose={() => setDialog(null)} />}
       {dialog === 'export' && <ExportDialog onClose={() => setDialog(null)} />}
       {pendingHotspot && <LinkDialog />}
+      <UpdateToast />
       {splash !== 'gone' && (
         <div className={`splash${splash === 'fade' ? ' fade' : ''}`} aria-hidden="true">
           <DreamMark className="splash-mark" />

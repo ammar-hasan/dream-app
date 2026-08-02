@@ -394,6 +394,15 @@ export const ar: Record<string, string> = {
   'settings.theme': 'الوضع الداكن',
   'settings.themeHint': 'مرسم منتصف الليل للأحلام المتأخرة',
   'settings.language': 'اللغة',
+  'settings.install': 'ثبّت دريم',
+  'settings.installHint': 'احتفظ بدريم على هذا الجهاز — يعمل دون اتصال أيضًا',
+  'settings.installAction': 'تثبيت',
+  'settings.installDismiss': 'لا تظهر هذا مجددًا',
+
+  // --- PWA updates -----------------------------------------------------------------
+  'update.ready': 'إصدار جديد من دريم جاهز',
+  'update.refresh': 'تحديث',
+  'update.dismiss': 'إخفاء',
 
   // --- Voice commands ----------------------------------------------------------------------
   'voice.confirmClear': 'أمسح هذه الطبقة؟ قل نعم لمسحها.',

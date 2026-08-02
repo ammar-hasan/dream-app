@@ -316,8 +316,6 @@ MCP in her development flow and APIs in her applications.
 
 ## Post-0.1.0 ideas
 
-- Offline-first service worker (the rest of slice 11) so installed PWAs work
-  with the network off; document library available offline.
 - More locales; localized voice-command vocabularies; axe-core audit.
 - Per-OS visual baselines if the generous-threshold single baseline flakes.
 - Slice 5/6 remainders: audio track, MP4/WebCodecs export, slide transitions,
@@ -325,12 +323,45 @@ MCP in her development flow and APIs in her applications.
 - Slice 12 remainder: more game templates (platformer, maze, flappy),
   conversational game generation.
 
-## Slice 11 — PWA
+## Slice 11 — PWA ✅
 
 - ✅ Basics shipped in the polish pass: web app manifest, SVG icon
   (maskable), theme colors.
-- Remaining: offline-first service worker, document library available offline.
-- Acceptance: Lighthouse PWA checks pass; app works fully with network off.
+- ✅ Offline-first service worker + install/update flow shipped in slice 15
+  (below); the document library is offline by construction (IndexedDB).
+- Acceptance met: the app installs and boots fully with the network off
+  (e2e-verified against a dead server).
+
+## Slice 15 — Offline PWA & performance ✅
+
+- ✅ Hand-rolled service worker (`public/sw.js`, zero build-time deps):
+  precaches the app shell under a content-hashed cache name injected by a
+  tiny in-house Vite plugin (`dreamServiceWorker` in `vite.config.ts`);
+  navigations network-first with cached-`index.html` fallback, same-origin
+  GET assets cache-first, non-GET and cross-origin requests (AI provider
+  calls) bypass the cache entirely; old caches purged on activate.
+- ✅ Versioned updates: a quiet "A new Dream is ready — Refresh" toast
+  (i18n, both locales); the worker activates only on user action
+  (`DREAM_SKIP_WAITING`), reload follows `controllerchange`.
+- ✅ Install prompt: `beforeinstallprompt` captured into a dismissible
+  "Install Dream" row in the settings menu (dismissal persisted).
+- ✅ Registration is production-only (`import.meta.env.PROD`) and
+  feature-detected; unit-tested with fake containers (gating, first
+  install vs. update, skipWaiting payload, failure swallow).
+- ✅ Offline e2e: boots, then kills a throwaway static server serving
+  `dist/` and asserts the app still boots from the precache. (Real dead
+  server: Chromium fails SW-intercepted subresources under
+  `setOffline`/`route.abort` emulation — documented in the spec.)
+- ✅ Incremental rendering (`engine/layerCache.ts`, DOM-free): per-layer
+  bitmap cache with reference-equality invalidation; unchanged documents
+  composite at ≤ layers+1 draw calls (asserted on a 500-op benchmark doc
+  vs. ≥5 calls/op uncached). Eraser docs fall back to a whole-document
+  snapshot (destination-out punches through layers); >2048² px docs skip
+  caching; LRU cap 16; bitmaps released on delete/document close. Timeline
+  thumbnails memoized per frame.
+- Future: runtime caching of exported media, background sync of autosaves
+  (both unnecessary today — everything is already local), per-OS visual
+  baselines if the single baseline flakes.
 
 ## Slice 12 — Games & app generation (v1: Catch! ✅)
 

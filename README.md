@@ -26,7 +26,9 @@ and the spray brush), **game mode** (turn your drawings into a playable
 Catch! mini-game) and **app mode** (link your frames into an interactive
 prototype and export it as one standalone HTML file), and the **developer
 surface** (a portable `.dream` file format, an MCP server for agents, and a
-stable engine API).
+stable engine API). It is also an **offline PWA** (installable, works with
+the network off) with an **incremental rendering pipeline** (per-layer
+bitmap caching) that keeps big documents smooth.
 
 <!-- Screenshots: drop light/dark theme captures into docs/screenshots/ and
      link them here once we have a stable marketing look. -->
@@ -51,8 +53,50 @@ outside the token blocks.
   `prefers-reduced-motion`.
 - **Brand** — the Dream mark (moon + spark on the gradient squircle) lives
   in `src/ui/icons.tsx` as `DreamMark`; the favicon is
-  `public/favicon.svg`, and `public/manifest.webmanifest` makes the app
-  installable (no service worker yet — see ROADMAP slice 11).
+  `public/favicon.svg`, and `public/manifest.webmanifest` plus the service
+  worker below make the app installable and offline-capable.
+
+## Offline PWA
+
+Dream is a fully offline-capable PWA — install it, and it keeps working with
+the network off (documents live in IndexedDB, which is local by design).
+
+- **Service worker** — a small hand-rolled worker (`public/sw.js`, no
+  build-time dependencies). A tiny in-house Vite plugin
+  (`dreamServiceWorker` in `vite.config.ts`) injects the precache manifest
+  and a content-hashed cache name into `dist/sw.js` on every build, so a
+  new deploy always ships a new cache and old caches are deleted on
+  activate. Registration runs in production only
+  (`import.meta.env.PROD`, via `ui/pwa.ts`).
+- **Caching rules** — precache: `index.html`, the hashed JS/CSS, the icons
+  and the manifest. Navigations are network-first with a fallback to the
+  cached `index.html`; same-origin GET assets are cache-first. Non-GET
+  requests and ALL cross-origin requests bypass the worker entirely —
+  AI-provider API calls are never cached.
+- **Updates** — when a new version has downloaded, a quiet toast offers
+  "A new Dream is ready — Refresh". The worker never activates on its own
+  (`skipWaiting` only when you press Refresh); dismissing the toast simply
+  keeps the current version until the next natural reload.
+- **Install** — the settings menu shows "Install Dream" when the browser
+  offers it (`beforeinstallprompt`); dismissing it is remembered in
+  localStorage.
+
+## Performance
+
+The viewport renders incrementally (`engine/layerCache.ts`, DOM-free like
+the rest of the engine): every layer is cached as an offscreen bitmap and
+only re-rendered when its operations actually change (immutable updates
+give a new `operations` reference, so invalidation is reference equality).
+Each frame then costs one `drawImage` per layer instead of re-issuing every
+operation — stroke previews, pan and zoom composite cached layers plus the
+in-progress stroke only. Eraser strokes punch through lower layers with
+`destination-out`, so documents containing one fall back to a single
+whole-document snapshot (same "unchanged document → one drawImage" win,
+without per-layer incrementality). Memory is bounded: documents larger
+than 2048×2048 pixels skip caching, the cache is LRU-capped at 16 layers,
+bitmaps are released when layers are deleted, and the whole cache is
+dropped when a document closes. Timeline thumbnails are memoized per
+frame — editing one frame never re-renders the others.
 
 ## Accessibility for everyone
 
@@ -471,6 +515,9 @@ src/
                      hotspots → ONE self-contained interactive HTML file
     projectFile.ts   The .dream file format: JSON envelope + raster patches as
                      base64 PNG data URLs, via an injectable RasterCodec
+    layerCache.ts    Incremental compositor: per-layer bitmap cache (reference-
+                     equality invalidation, LRU cap, eraser-aware snapshot
+                     fallback, oversized-document bypass)
     index.ts         Public API barrel (the stable, semver-intended surface)
     renderer.ts      Renders a Document onto any 2D context (structural interface)
     symmetry.ts      Mirror mode: reflect stroke/shape ops across the center axes
@@ -500,7 +547,9 @@ src/
                      (fullscreen slides), PlayView + PlayPanel (the game and
                      its casting couch), dialogs, image/video/sprite export,
                      settings menu, kid mode (KidPanel + kid rail), voice
-                     command button + executor, i18n string tables (i18n/)
+                     command button + executor, i18n string tables (i18n/),
+                     PWA glue (pwa.ts registration + UpdateToast update
+                     prompt, install offer in the settings menu)
   storage/           IndexedDB via `idb`: projects + the cross-project
                      component library (one shared connection in db.ts)
   ai/                AIProvider contract (capabilities, PixelBuffer in/out)
@@ -514,9 +563,13 @@ src/
   styles/            Plain CSS, token-driven light + dark themes
                      (`[data-theme='dark']`), 44px+ touch targets
 public/              favicon.svg (the Dream mark) + icons/ (generated PNGs)
-                     + manifest.webmanifest
+                     + manifest.webmanifest + sw.js (hand-rolled service
+                     worker; the build injects the precache manifest —
+                     see dreamServiceWorker in vite.config.ts)
 e2e/                 Playwright suite: smoke.spec.ts, visual.spec.ts (baseline
-                     screenshot), helpers.ts — vitest never sees this dir
+                     screenshot), offline.spec.ts (SW offline boot against a
+                     throwaway static server), helpers.ts — vitest never sees
+                     this dir
 mcp-server/          Standalone Node package (own package.json, NOT part of the
                      webapp build): the dream-mcp stdio MCP server — thin
                      protocol wiring (src/index.ts) over pure tool cores
@@ -568,7 +621,9 @@ restart button bottom-end)
   playback timing, onion-skin decisions, sprite-sheet layout), app mode
   (hotspot commands + undo, broken-target detection, standalone-HTML
   generation: structure, title escaping, percentage geometry, no external
-  URLs), renderer
+  URLs), layer cache (composite ≤ layers+1 draw calls for an unchanged
+  500-op document vs. re-issuing every op, per-layer invalidation, LRU +
+  memory caps, eraser snapshot fallback), renderer
   (against a recording mock 2D context — no canvas package needed)
 - AI tests: provider registry + key/settings persistence, OpenAI-compatible
   request construction with a mocked fetch, capability degradation, the daily
@@ -601,6 +656,9 @@ restart button bottom-end)
 - Storage tests: real IndexedDB round-trips via `fake-indexeddb` (projects
   including image ops, animation frames, and the component library)
 - React smoke test: `App` renders (jsdom)
+- PWA tests: service-worker registration gating (production-only, unsupported
+  browsers, first-install vs. update) and the update flow (waiting worker →
+  prompt → skipWaiting on user action) against fake containers
 - Engine coverage is enforced at ≥80% (currently ~97% lines)
 
 ## E2E testing (Playwright)
@@ -621,6 +679,11 @@ after `npx playwright install`).
   guard. Thresholds are deliberately generous to absorb cross-platform font
   anti-aliasing; regenerate after intentional UI changes with
   `npx playwright test --update-snapshots`.
+- `e2e/offline.spec.ts` — the offline PWA check: boot, wait for the service
+  worker to claim the page, then kill the test's own throwaway static
+  server (dist/ over a random port) and assert the app still boots from the
+  precache. A real dead server is used because Chromium fails SW-intercepted
+  subresource requests under `context.setOffline`/`route.abort` emulation.
 
 CI runs e2e in its own job (`playwright install --with-deps chromium`, 1
 retry, report uploaded on failure), keeping the main `check` job fast.

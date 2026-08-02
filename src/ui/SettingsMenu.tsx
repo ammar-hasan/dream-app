@@ -1,13 +1,30 @@
 /**
  * Settings menu (the gear in the toolbar): Little Dreamer mode, the two
  * voice toggles and the language picker — all per-user preferences in one
- * place. Closes on outside click or Escape.
+ * place. Also hosts the "Install Dream" affordance when the browser offers
+ * it (beforeinstallprompt); dismissing it is remembered. Closes on outside
+ * click or Escape.
  */
 
 import { useEffect, useRef, useState } from 'react';
 import { useUiPrefs } from '../store/uiPrefs';
 import { LOCALES, useT } from './i18n';
 import { GearIcon } from './icons';
+
+const INSTALL_DISMISSED_KEY = 'dream:install-dismissed';
+
+/** Non-standard event Chrome/Edge fire when the app is installable. */
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+}
+
+function readInstallDismissed(): boolean {
+  try {
+    return globalThis.localStorage?.getItem(INSTALL_DISMISSED_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
 
 export function SettingsMenu() {
   const t = useT();
@@ -18,6 +35,27 @@ export function SettingsMenu() {
   const voiceFeedback = useUiPrefs((s) => s.voiceFeedback);
   const theme = useUiPrefs((s) => s.theme);
   const locale = useUiPrefs((s) => s.locale);
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [installDismissed, setInstallDismissed] = useState(readInstallDismissed);
+
+  useEffect(() => {
+    const onBeforeInstall = (e: Event) => {
+      // Keep the browser's mini-infobar quiet; the menu offers install instead.
+      e.preventDefault();
+      setInstallPrompt(e as BeforeInstallPromptEvent);
+    };
+    window.addEventListener('beforeinstallprompt', onBeforeInstall);
+    return () => window.removeEventListener('beforeinstallprompt', onBeforeInstall);
+  }, []);
+
+  const dismissInstall = () => {
+    setInstallDismissed(true);
+    try {
+      globalThis.localStorage?.setItem(INSTALL_DISMISSED_KEY, '1');
+    } catch {
+      // storage unavailable — the offer simply reappears next session
+    }
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -115,6 +153,33 @@ export function SettingsMenu() {
               ))}
             </select>
           </label>
+
+          {installPrompt && !installDismissed && (
+            <div className="settings-item settings-install">
+              <span className="settings-item-text">
+                <strong>{t('settings.install')}</strong>
+                <small>{t('settings.installHint')}</small>
+              </span>
+              <button
+                type="button"
+                className="btn small-apply"
+                onClick={() => {
+                  void installPrompt.prompt();
+                  setInstallPrompt(null);
+                }}
+              >
+                {t('settings.installAction')}
+              </button>
+              <button
+                type="button"
+                className="btn icon-btn small"
+                aria-label={t('settings.installDismiss')}
+                onClick={dismissInstall}
+              >
+                ✕
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -71,6 +71,18 @@ Conventions for anyone (human or agent) working on Dream.
     vitest and tsconfig all exclude it); its gate is `npm run check:mcp`.
     Tool cores stay pure functions over the file system; the MCP protocol
     wiring stays a thin adapter.
+11. **The service worker (`public/sw.js`) is hand-rolled and build-injected.**
+    No vite-plugin-pwa; the `dreamServiceWorker` plugin in `vite.config.ts`
+    writes the precache manifest + hashed cache name into `dist/sw.js`.
+    Caching rules: precache the shell only; cache-first ONLY for same-origin
+    GET requests; navigations network-first with cached-index fallback;
+    non-GET and cross-origin requests (AI provider APIs) must never touch
+    the cache. `skipWaiting` only on user action (the update toast posts
+    `DREAM_SKIP_WAITING`). Engine code and unit tests never touch the
+    worker — registration lives in `src/ui/pwa.ts` behind injectable
+    fakes, runs only under `import.meta.env.PROD`, and offline behavior is
+    verified by `e2e/offline.spec.ts` (a real killed server, not network
+    emulation).
 
 ## Structure
 
@@ -79,7 +91,9 @@ Conventions for anyone (human or agent) working on Dream.
   broken-target detection, hit-testing), appExport (standalone interactive
   HTML prototype generator — pure string builder), projectFile (the `.dream`
   file format: JSON envelope + raster patches as base64 PNG data URLs, via an
-  injectable `RasterCodec`), index (the public API barrel — semver-intended
+  injectable `RasterCodec`), layerCache (incremental compositor: per-layer
+  bitmap cache, reference-equality invalidation, eraser-aware snapshot
+  fallback, LRU + pixel caps), index (the public API barrel — semver-intended
   stable surface), renderer, geometry, color, filters
   (pure RGBA pixel transforms), transform (flip/rotate/crop/resize), symmetry
   (mirror-mode op reflection), spray (seeded dot layout), selection (Design
@@ -99,7 +113,9 @@ Conventions for anyone (human or agent) working on Dream.
   PresentView's Slideshow/App toggle),
   `i18n/` string tables (add a locale: copy `en.ts`, register in `i18n/index.ts`
   — see README), voice-command executor (`voiceExecutor.ts`, thin layer over
-  the store, driven by a fake in tests)
+  the store, driven by a fake in tests), PWA glue (`pwa.ts` — production-only
+  SW registration behind injectable fakes, `UpdateToast.tsx` — the
+  version-update prompt)
 - `src/storage/` — IndexedDB project persistence + cross-project component
   library (shared connection in `db.ts`)
 - `src/ai/` — AIProvider contract (capability flags, PixelBuffer in/out — no
@@ -111,10 +127,12 @@ Conventions for anyone (human or agent) working on Dream.
   (`speech.ts`, feature-detected), speech synthesis (`say.ts`,
   feature-detected), pure voice-command parser (`voiceCommands.ts`)
 - `src/test/` — shared test helpers (mock 2D context) + Vitest setup
-- `e2e/` — Playwright suite (smoke + one visual baseline). Vitest excludes it;
-  Playwright's `testDir` points only here. Screenshots are asserted with
-  generous thresholds — regenerate with `--update-snapshots` after intended
-  UI changes.
+- `e2e/` — Playwright suite (smoke + one visual baseline + the offline PWA
+  boot test, which serves `dist/` from its own throwaway server and kills
+  it — network emulation breaks SW-intercepted subresources in Chromium).
+  Vitest excludes it; Playwright's `testDir` points only here. Screenshots
+  are asserted with generous thresholds — regenerate with
+  `--update-snapshots` after intended UI changes.
 - `scripts/` — `gen-icons.mjs` (PWA PNGs via chromium, no image deps) and
   `release.mjs` (release prep; prints git commands, never runs them)
 - `mcp-server/` — standalone Node package: the dream-mcp stdio MCP server

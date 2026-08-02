@@ -7,7 +7,7 @@
  * (everywhere else Space stays hold-to-pan — see useKeyboardShortcuts).
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { animationSettingsOf, MAX_FPS, MIN_FPS } from '../engine/animation';
 import { hasHotspots } from '../engine/hotspots';
 import { renderDocument } from '../engine/renderer';
@@ -20,51 +20,64 @@ import { useT } from './i18n';
 const THUMB_HEIGHT = 56;
 
 /** One frame in the strip: a live-rendered thumbnail. */
-function FrameThumbnail({
-  doc,
-  frame,
-  active,
-  playingHere,
-  index,
-  onSelect,
-}: {
-  doc: DreamDocument;
-  frame: Frame;
-  active: boolean;
-  playingHere: boolean;
-  index: number;
-  onSelect: () => void;
-}) {
-  const t = useT();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const width = Math.max(24, Math.round((doc.width / doc.height) * THUMB_HEIGHT));
+const FrameThumbnail = memo(
+  function FrameThumbnail({
+    doc,
+    frame,
+    active,
+    playingHere,
+    index,
+    onSelect,
+  }: {
+    doc: DreamDocument;
+    frame: Frame;
+    active: boolean;
+    playingHere: boolean;
+    index: number;
+    onSelect: () => void;
+  }) {
+    const t = useT();
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const width = Math.max(24, Math.round((doc.width / doc.height) * THUMB_HEIGHT));
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.round(width * dpr);
-    canvas.height = Math.round(THUMB_HEIGHT * dpr);
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.setTransform((width * dpr) / doc.width, 0, 0, (THUMB_HEIGHT * dpr) / doc.height, 0, 0);
-    renderDocument({ ...doc, layers: frame.layers }, ctx);
-  }, [doc, frame, width]);
+    useEffect(() => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(THUMB_HEIGHT * dpr);
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      ctx.setTransform((width * dpr) / doc.width, 0, 0, (THUMB_HEIGHT * dpr) / doc.height, 0, 0);
+      renderDocument({ ...doc, layers: frame.layers }, ctx);
+    }, [doc, frame, width]);
 
-  return (
-    <button
-      type="button"
-      className={`timeline-frame${active ? ' active' : ''}${playingHere ? ' playing' : ''}`}
-      title={t('timeline.frame', { n: index + 1 })}
-      aria-label={t('timeline.frame', { n: index + 1 })}
-      aria-pressed={active}
-      onClick={onSelect}
-    >
-      <canvas ref={canvasRef} style={{ width, height: THUMB_HEIGHT }} />
-      <span className="timeline-frame-number">{index + 1}</span>
-    </button>
-  );
-}
+    return (
+      <button
+        type="button"
+        className={`timeline-frame${active ? ' active' : ''}${playingHere ? ' playing' : ''}`}
+        title={t('timeline.frame', { n: index + 1 })}
+        aria-label={t('timeline.frame', { n: index + 1 })}
+        aria-pressed={active}
+        onClick={onSelect}
+      >
+        <canvas ref={canvasRef} style={{ width, height: THUMB_HEIGHT }} />
+        <span className="timeline-frame-number">{index + 1}</span>
+      </button>
+    );
+  },
+  // Memoized on frame content: edits to one frame never re-render the other
+  // thumbnails. onSelect is keyed by frame.id (stable per component), so it
+  // is deliberately excluded from the comparison.
+  (prev, next) =>
+    prev.frame.layers === next.frame.layers &&
+    prev.active === next.active &&
+    prev.playingHere === next.playingHere &&
+    prev.index === next.index &&
+    prev.doc.width === next.doc.width &&
+    prev.doc.height === next.doc.height &&
+    prev.doc.background === next.doc.background,
+);
 
 export function TimelineBar() {
   const t = useT();

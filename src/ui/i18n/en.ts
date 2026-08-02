@@ -399,6 +399,15 @@ export const en: Record<string, string> = {
   'settings.theme': 'Dark mode',
   'settings.themeHint': 'A midnight studio for late-night dreaming',
   'settings.language': 'Language',
+  'settings.install': 'Install Dream',
+  'settings.installHint': 'Keep Dream on this device — it works offline too',
+  'settings.installAction': 'Install',
+  'settings.installDismiss': 'Don’t show again',
+
+  // --- PWA updates -----------------------------------------------------------------
+  'update.ready': 'A new Dream is ready',
+  'update.refresh': 'Refresh',
+  'update.dismiss': 'Dismiss',
 
   // --- Voice commands ----------------------------------------------------------------------
   'voice.confirmClear': 'Clear this layer? Say yes to clear it.',
