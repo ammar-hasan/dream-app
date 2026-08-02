@@ -474,7 +474,9 @@ exposing `.dream` files to agents over stdio MCP: `dream.read_project`,
 `dream.render_png` (real PNGs via `@napi-rs/canvas`) and `dream.export_app`.
 Setup and client config (Claude Code, Codex) are in
 [`mcp-server/README.md`](mcp-server/README.md); `npm run check:mcp` from the
-repo root installs, builds and tests it.
+repo root installs, builds and tests it. The repo also ships a root
+`.mcp.json`, so MCP-capable agents working in this repo get dream-mcp
+automatically once `npm run check:mcp` has produced `mcp-server/dist/`.
 
 ### The stable engine API
 
@@ -523,6 +525,7 @@ npm run dev        # http://localhost:5173
 | `npm run check`         | typecheck + lint + test + build (what CI runs)    |
 | `npm run check:full`    | `check` + e2e — run before a release/PR of note   |
 | `npm run check:mcp`     | install, build and test the `mcp-server/` package |
+| `npm run evals`         | smoke-test the agent-eval harness (`evals/`)      |
 
 ## Architecture map
 
@@ -753,3 +756,16 @@ project-page path `/dream-app/` (Vite `base` is set via `vite build --base`).
 - Run `npm run check` before opening a PR; CI runs the same on Node 22.
 - Keep diffs minimal and match the surrounding code style (`npm run format`).
 - See `ROADMAP.md` for the upcoming slices.
+
+## The agent harness
+
+Dream is developed by AI agents as much as by humans, and the infrastructure
+for that lives in the repo: `CLAUDE.md` (bootstrap for Claude Code),
+`.claude/agents/` (specialized subagents: dream-engine, dream-ui,
+dream-verify, dream-release), `.agents/skills/` (implement-slice,
+verify-release, dogfood-mcp), `.mcp.json` (auto-wires the dream-mcp server
+for MCP-capable agents — build it with `npm run check:mcp`), `evals/`
+(deterministic agent-task graders; `npm run evals` smoke-tests them) and
+`LOOPS.md` + `loops/` (bounded continuous-work loops). The map of how it
+all fits together — including how agents dogfood Dream's own MCP server to
+build Dream — is [`docs/HARNESS.md`](docs/HARNESS.md).

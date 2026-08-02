@@ -20,6 +20,9 @@ Conventions for anyone (human or agent) working on Dream.
 - `npm run icons` — regenerate the PWA PNG icons from `public/favicon.svg`
 - `npm run check:mcp` — install, build and test the `mcp-server/` package
   (separate dependency tree; root `check` never touches it)
+- `npm run evals` — smoke-test the agent-eval harness in `evals/` (graders
+  must fail the untouched tree); grade a case with
+  `node evals/run.mjs --case NN`
 - `npm run release -- patch|minor|major` — clean-tree + green-check gate, bumps the
   version, seeds CHANGELOG.md, prints the git commands (never mutates git itself)
 - `npm run format` — Prettier write; run before committing
@@ -146,6 +149,32 @@ Conventions for anyone (human or agent) working on Dream.
   renderer (`src/nodeCodec.ts`, `@napi-rs/canvas`). Compiles the engine in
   from `src/engine`; never imported by the webapp; gated by `check:mcp` and
   its own CI job.
+- Harness (agent infrastructure, no app code): `CLAUDE.md` (bootstrap
+  pointer), `.claude/agents/` (subagent definitions), `.agents/skills/`
+  (project skills), `.mcp.json` (auto-wires dream-mcp for repo agents),
+  `evals/` (agent-task cases + deterministic graders), `LOOPS.md` +
+  `loops/` (bounded loops), `docs/HARNESS.md` (the map).
+
+## Harness (subagents, skills, evals, loops)
+
+Conventions for the agent infrastructure — full map in `docs/HARNESS.md`:
+
+- **Subagents** (`.claude/agents/*.md`): Markdown with YAML frontmatter
+  (`name`, `description`, `tools`). dream-engine and dream-ui implement;
+  dream-verify is read-only (the writer never approves its own work);
+  dream-release prepares releases but never mutates git without approval.
+  Keep them short pointers into this file, not copies of it.
+- **Skills** (`.agents/skills/<name>/SKILL.md`): frontmatter `name` +
+  `description`, concrete command sequences, no fluff.
+- **Evals** (`evals/`): each case is a self-contained agent task
+  (`cases/NN-name.md` with `## Task` + `## Grader`) plus a deterministic
+  grader (`cases/NN-name.grader.mjs` exporting `async grade(ctx)`). No
+  network, no clocks, no LLM judging; a grader must fail the untouched
+  tree — `npm run evals` enforces it.
+- **Loops** (`loops/*.md`, indexed by `LOOPS.md`): loopy format — `## name`,
+  one-sentence explanation, `Prompt:` blockquote under 80 words with a
+  bounded action, a gate as feedback check, an explicit stop rule and an
+  approval boundary.
 
 ## Git
 

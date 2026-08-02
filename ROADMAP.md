@@ -347,7 +347,46 @@ vocabularies, #7 senior comfort toggle).
 - Acceptance met: a kid stamps a rocket and colors a garden; Victor gets a
   bigger, calmer UI in one tap; Zainab says "تراجع" and Dream undoes.
 
-## Post-0.1.0 ideas
+## Harness engineering — the agentic dev harness ✅
+
+Infrastructure so AI agents (the orchestrator, Claude Code/Codex/Kimi
+sessions) can continuously and safely develop Dream. No app-code changes;
+every piece points at the existing gates (`check`, `check:full`,
+`check:mcp`).
+
+- ✅ `CLAUDE.md` — thin bootstrap for Claude Code: "read AGENTS.md first"
+  plus the ten most important facts/commands.
+- ✅ `.claude/agents/` — four subagents: `dream-engine` (framework-free
+  pure-TS rules), `dream-ui` (string-table/token/RTL/reduced-motion rules),
+  `dream-verify` (read-only reviewer: gates + diff review against the
+  AGENTS.md rules; the writer never approves its own work) and
+  `dream-release` (gate sequence + `scripts/release.mjs`, never mutates git
+  without approval).
+- ✅ `.agents/skills/` — three project skills: `implement-slice` (the
+  proven slice workflow), `verify-release` (full gate sequence incl. the
+  macOS-only visual baseline rules — CI skips it via `--grep-invert`) and
+  `dogfood-mcp` (build + demo + live tool round-trip against a real
+  `.dream` file).
+- ✅ `.mcp.json` — repo-root MCP wiring: MCP-capable agents working in this
+  repo get dream-mcp automatically once `npm run check:mcp` has built
+  `mcp-server/dist/`.
+- ✅ `evals/` — a real agent-eval harness: four self-contained cases of
+  increasing difficulty (filter preset → voice intent in both locales →
+  game setting → MCP tool), each with a deterministic grader
+  (`grade(ctx) → {pass, reasons}`: static evidence + targeted vitest +
+  behavioral runs, no LLM judging). `node evals/run.mjs --case NN [--agent
+"<cmd>"]` grades a tree; `npm run evals` smoke-tests the harness by
+  asserting every grader FAILS the untouched tree (ungameable by trivial
+  edits).
+- ✅ `LOOPS.md` + `loops/` — two bounded loops in the loopy format
+  (observe/choose/act/verify/record/stop): `dream-improve` (one backlog
+  slice per cycle, push, stop at release time or empty backlog; asks before
+  anything public-facing beyond the push) and `dream-release-watch`
+  (red CI/deploy → diagnose → minimal fix → verify green; stops green or
+  reports credential blockers).
+- ✅ `docs/HARNESS.md` — the harness map: how humans and agents use the
+  pieces together, the loop diagram, and the dogfooding story (agents build
+  Dream with Dream's own MCP server).
 
 - More locales (voice vocabularies are now per-locale tables — adding one is
   data only); axe-core audit.

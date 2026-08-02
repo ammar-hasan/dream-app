@@ -21,7 +21,7 @@ export default tseslint.config(
     rules: reactHooks.configs.recommended.rules,
   },
   {
-    files: ['scripts/**/*.mjs'],
+    files: ['scripts/**/*.mjs', 'evals/**/*.mjs'],
     languageOptions: {
       globals: {
         console: 'readonly',

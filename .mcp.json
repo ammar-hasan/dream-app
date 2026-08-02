@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "dream": {
+      "command": "node",
+      "args": ["mcp-server/dist/mcp-server/src/index.js"]
+    }
+  }
+}

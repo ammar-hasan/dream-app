@@ -7,6 +7,14 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- The agent harness: in-repo infrastructure for AI agents developing Dream —
+  `CLAUDE.md` bootstrap, four Claude Code subagents (`.claude/agents/`:
+  dream-engine, dream-ui, dream-verify, dream-release), three project skills
+  (`.agents/skills/`: implement-slice, verify-release, dogfood-mcp), a root
+  `.mcp.json` that auto-wires the dream-mcp server for MCP-capable agents, a
+  deterministic agent-eval harness (`evals/`, four graded cases,
+  `npm run evals`), two bounded continuous-work loops (`LOOPS.md` + `loops/`),
+  and the harness map (`docs/HARNESS.md`).
 - Stamps: twelve built-in doodle stamps (star, heart, smiley, flower, sun,
   moon, cloud, tree, fish, butterfly, cat, rocket) drawn procedurally by the
   engine — click-to-place at S/M/L sizes, one undo per stamp, ops grouped so
