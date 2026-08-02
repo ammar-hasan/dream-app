@@ -15,6 +15,7 @@ export const ar: Record<string, string> = {
   'toolbar.mode': 'وضع العمل',
   'toolbar.draw': 'رسم',
   'toolbar.design': 'تصميم',
+  'toolbar.play': 'العب',
   'toolbar.present': 'عرض',
   'toolbar.animate': 'تحريك',
   'toolbar.animateTitle': 'حوّل هذا الرسم إلى رسوم متحركة',
@@ -78,6 +79,7 @@ export const ar: Record<string, string> = {
   'kid.play': 'شغّل!',
   'kid.stop': 'أوقف!',
   'kid.ai': 'اسأل حُلم!',
+  'kid.playGame': 'شغّل لعبتي!',
 
   // --- Tool options panel ---------------------------------------------------
   'options.title': 'الخيارات',
@@ -220,6 +222,36 @@ export const ar: Record<string, string> = {
   // --- Present mode --------------------------------------------------------------
   'present.exit': 'خروج',
 
+  // --- Play mode (Catch!) ----------------------------------------------------------
+  'play.cast': 'اختَر أبطال لعبتك',
+  'play.castHint': 'رسومك تصير قطع اللعبة! اختر طبقة لكل دور، أو اتركه تلقائيًا ليرسمه حُلم لك.',
+  'play.hero': 'البطل (الملتقط)',
+  'play.good': 'الشيء الجيد (+1 نقطة)',
+  'play.bad': 'الشيء السيئ (−1 حياة)',
+  'play.roleHero': 'البطل',
+  'play.roleGood': 'الشيء الجيد',
+  'play.roleBad': 'الشيء السيئ',
+  'play.background': 'الخلفية',
+  'play.auto': 'تلقائي (يرسمه حُلم)',
+  'play.docBackground': 'بقية الرسمة',
+  'play.drawIt': 'ارسمه الآن',
+  'play.settings': 'إعدادات اللعبة',
+  'play.fallSpeed': 'سرعة السقوط',
+  'play.spawnRate': 'كم مرة تسقط الأشياء',
+  'play.lives': 'المحاولات',
+  'play.best': 'أفضل نتيجة: {score}',
+  'play.start': 'العب!',
+  'play.again': 'العب مجددًا!',
+  'play.exit': 'عودة إلى الرسم',
+  'play.gameOver': 'انتهت اللعبة!',
+  'play.score': 'النقاط: {score}',
+  'play.newBest': 'رقم قياسي جديد!',
+  'play.hint': 'التقط الأشياء الجيدة وتجنّب السيئة! حرّك بالأسهم أو بالسحب.',
+  'play.soundOn': 'تشغيل الصوت',
+  'play.soundOff': 'كتم الصوت',
+  'play.moveLeft': 'تحرك يسارًا',
+  'play.moveRight': 'تحرك يمينًا',
+
   // --- AI panel --------------------------------------------------------------------
   'ai.title': 'حُلم الذكي',
   'ai.close': 'إغلاق مساعد الذكاء الاصطناعي',
@@ -344,6 +376,7 @@ export const ar: Record<string, string> = {
   'voice.layerEmpty': 'هذه الطبقة فارغة أصلًا.',
   'voice.newFrame': 'إطار جديد!',
   'voice.playing': 'يعمل الآن!',
+  'voice.playGame': 'هيّا نلعب لعبتك!',
   'voice.stopped': 'توقف.',
   'voice.nothingToPlay': 'لا شيء للتشغيل بعد — أضف بعض الإطارات أولًا.',
   'voice.tool': '{tool}!',
@@ -354,6 +387,6 @@ export const ar: Record<string, string> = {
   'voice.mirrorOff': 'التناظر متوقّف.',
   'voice.saved': 'تم الحفظ!',
   'voice.help':
-    'يمكنك أن تقول: فرشاة، قلم، رش، ممحاة، تعبئة، عصا سحرية، لون مثل أحمر أو أزرق، أكبر، أصغر، فعّل التناظر، أوقف التناظر، تراجع، إعادة، امسح، إطار جديد، شغّل، أوقف، احفظ، مساعدة.',
+    'يمكنك أن تقول: فرشاة، قلم، رش، ممحاة، تعبئة، عصا سحرية، لون مثل أحمر أو أزرق، أكبر، أصغر، فعّل التناظر، أوقف التناظر، تراجع، إعادة، امسح، إطار جديد، شغّل، العب لعبتي، أوقف، احفظ، مساعدة.',
   'voice.unknown': 'عذرًا، لم أفهم. قل «مساعدة» لتسمع ما أستطيع فعله.',
 };

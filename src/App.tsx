@@ -19,6 +19,8 @@ import { LayersPanel } from './ui/LayersPanel';
 import { StatusBar } from './ui/StatusBar';
 import { TimelineBar } from './ui/TimelineBar';
 import { PresentView } from './ui/PresentView';
+import { PlayView } from './ui/PlayView';
+import { PlayPanel } from './ui/PlayPanel';
 import { NewDocumentDialog } from './ui/NewDocumentDialog';
 import { OpenDialog } from './ui/OpenDialog';
 import { ResizeDialog } from './ui/ResizeDialog';
@@ -74,10 +76,10 @@ export default function App() {
         onExport={() => setDialog('export')}
       />
       <div className="app-body">
-        <ToolRail />
-        <CanvasViewport />
+        {mode !== 'play' && <ToolRail />}
+        {mode === 'play' ? <PlayView /> : <CanvasViewport />}
         {kidMode ? (
-          <KidPanel />
+          mode !== 'play' && <KidPanel />
         ) : (
           <aside className="side-panel">
             {aiPanelOpen && <AiPanel />}
@@ -87,9 +89,15 @@ export default function App() {
                 <ComponentsPanel />
               </>
             )}
-            <ToolOptionsPanel />
-            <AdjustPanel />
-            <LayersPanel />
+            {mode === 'play' ? (
+              <PlayPanel />
+            ) : (
+              <>
+                <ToolOptionsPanel />
+                <AdjustPanel />
+                <LayersPanel />
+              </>
+            )}
           </aside>
         )}
       </div>

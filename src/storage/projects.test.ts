@@ -140,6 +140,23 @@ describe('projects storage (IndexedDB)', () => {
     expect(loaded?.animation).toMatchObject({ fps: 12, loop: false, onionOpacity: 0.25 });
   });
 
+  it('persists the Play-mode cast and settings (additive, backward compatible)', async () => {
+    const doc = {
+      ...createDocument({ width: 8, height: 8, name: 'Game' }),
+      game: {
+        cast: { hero: 'layer-1', good: 'layer-2', bad: 'layer-3' },
+        settings: { fallSpeed: 240, spawnInterval: 0.8, lives: 5 },
+      },
+    };
+    await saveProject(doc);
+    const loaded = await loadProject(doc.id);
+    expect(loaded?.game).toEqual(doc.game);
+    // A document without the field (old saves) loads with it undefined.
+    const plain = createDocument({ width: 8, height: 8 });
+    await saveProject(plain);
+    expect((await loadProject(plain.id))?.game).toBeUndefined();
+  });
+
   it('old saves (no frames/animation/mode fields) load untouched', async () => {
     // A slice-1-era document shape: nothing but the pre-animation fields.
     const doc = createDocument({ width: 8, height: 8 });

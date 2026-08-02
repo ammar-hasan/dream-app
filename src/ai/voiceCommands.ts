@@ -20,6 +20,8 @@ export type VoiceCommand =
   | { kind: 'cancel' }
   | { kind: 'new-frame' }
   | { kind: 'play' }
+  /** "play my game": switch to Play mode and start a Catch! run. */
+  | { kind: 'play-game' }
   | { kind: 'stop' }
   | { kind: 'tool'; tool: ToolId }
   /** "mirror on" / "mirror off": toggle vertical mirror symmetry. */
@@ -217,6 +219,8 @@ export function parseVoiceCommand(transcript: string): VoiceCommand | null {
   }
 
   if (has(tokens, STOP_WORDS)) return { kind: 'stop' };
+  // "play my game" beats a bare "play" (which is animation playback).
+  if (has(tokens, new Set(['game', 'games']))) return { kind: 'play-game' };
   if (has(tokens, PLAY_WORDS)) return { kind: 'play' };
   if (has(tokens, new Set(['save']))) return { kind: 'save' };
   if (has(tokens, BIGGER_WORDS)) return { kind: 'bigger' };

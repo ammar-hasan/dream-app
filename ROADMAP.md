@@ -3,11 +3,11 @@
 Dream ships in slices. Slice 1 (core drawing app + harness), slice 2 (image
 editing), slice 3 (design mode), slice 4 (animation + video export +
 presentation mode), slice 7 (AI panel), the accessibility trio — slices 8
-(voice commands), 9 (kid mode) and 10 (i18n) — the release harness and the
+(voice commands), 9 (kid mode) and 10 (i18n) — the release harness, the
 drawing power tools (symmetry, pressure, filled shapes, lasso, magic wand,
-spray) are done. Each slice below
-lists brief acceptance criteria; slices are roughly ordered by dependency,
-not by a fixed schedule.
+spray) and game mode v1 (Catch!, the first slice-12 template) are done. Each
+slice below lists brief acceptance criteria; slices are roughly ordered by
+dependency, not by a fixed schedule.
 
 ## Slice 2 — Image filters & adjustments ✅
 
@@ -245,7 +245,8 @@ not by a fixed schedule.
 - Per-OS visual baselines if the generous-threshold single baseline flakes.
 - Slice 5/6 remainders: audio track, MP4/WebCodecs export, slide transitions,
   presenter view with notes, per-slide duration.
-- Slice 12: games & app generation from drawings (MCP/API hooks).
+- Slice 12 remainder: more game templates (platformer, maze, flappy),
+  conversational game generation, MCP/API hooks.
 
 ## Slice 11 — PWA
 
@@ -254,9 +255,27 @@ not by a fixed schedule.
 - Remaining: offline-first service worker, document library available offline.
 - Acceptance: Lighthouse PWA checks pass; app works fully with network off.
 
-## Slice 12 — Games & app generation
+## Slice 12 — Games & app generation (v1: Catch! ✅)
 
-- Conversational flow that turns drawings/animations into playable mini-games and
-  simple apps; MCP/API hooks for developer workflows (persona: Maria).
-- Acceptance: user sketches a character, describes a game in one sentence, and plays
-  the result in-app.
+- ✅ Play mode: a fourth workspace mode (Draw / Design / Play / Present) that
+  turns the drawing into a playable mini-game right on the canvas. First
+  template, **Catch!**: catch the good things, dodge the bad ones — score,
+  lives, "3… 2… 1…" countdown, score pops, bad-catch shake, game-over card
+  with best score (persisted per project in localStorage).
+- ✅ Casting: any layer can be cast as the Hero / Good Thing / Bad Thing /
+  Background from the cast panel, or "Draw it now" creates and casts a named
+  layer in one tap; uncast roles get procedural stand-ins (smiley, star,
+  spiky rock — `game/defaults.ts`, no AI). Cast + settings live on the
+  document (`doc.game`, additive, IndexedDB-safe), outside undo like `mode`.
+- ✅ Pure game core in `src/game` (framework-free like the engine):
+  `tick(state, input, dtMs, rng)` with seeded RNG, spawn/collision/score,
+  difficulty ramp — fully unit-tested. Settings (fall speed, spawn rate,
+  lives) with gentler kid defaults; procedural WebAudio bleeps
+  (`game/sounds.ts`, feature-detected; on in kid mode, off for adults).
+- ✅ Kid mode + voice: gamepad button in the kid toolbar, giant play button
+  and big on-screen arrows; "play my game" starts a run, "stop" ends it.
+- Remaining: more templates (platformer, maze, flappy), conversational game
+  generation from a sentence, MCP/API hooks for developer workflows
+  (persona: Maria).
+- Acceptance met: a child draws a blob, casts it as the hero, presses play —
+  and their own drawing catches stars.

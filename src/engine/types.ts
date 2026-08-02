@@ -46,13 +46,14 @@ export type ToolId =
 
 /**
  * Workspace mode: 'draw' is the default MS-Paint-simple experience; 'design'
- * reveals pro features (select tool, components, alignment); 'present' turns
- * the document's frames into a full-viewport slide deck (no editing).
- * Persisted with the document, except that 'present' is session-only —
- * loading a document saved mid-presentation starts in 'draw'.
+ * reveals pro features (select tool, components, alignment); 'play' turns the
+ * drawing into a mini-game; 'present' turns the document's frames into a
+ * full-viewport slide deck (no editing). Persisted with the document, except
+ * that 'present' and 'play' are session-only — loading a document saved
+ * mid-game or mid-presentation starts in 'draw'.
  * Older saved documents have no `mode` — treat as 'draw'.
  */
-export type WorkspaceMode = 'draw' | 'design' | 'present';
+export type WorkspaceMode = 'draw' | 'design' | 'play' | 'present';
 
 /** A rectangular RGBA pixel buffer extracted from a larger raster. */
 export interface RasterPatch {
@@ -185,6 +186,42 @@ export interface AnimationSettings {
   onionOpacity: number;
 }
 
+/**
+ * Play mode: which layer plays which role in the mini-game. Any role left
+ * undefined gets a friendly procedurally-drawn default (see game/defaults.ts).
+ */
+export interface GameCast {
+  /** Layer id of the catcher the player moves. */
+  hero?: string;
+  /** Layer id of the good falling thing (+1 point). */
+  good?: string;
+  /** Layer id of the bad falling thing (-1 life). */
+  bad?: string;
+  /** Layer id painted as the backdrop; undefined = the rest of the document. */
+  background?: string;
+}
+
+/** Play-mode difficulty knobs. */
+export interface GameSettings {
+  /** Base fall speed in document pixels per second. */
+  fallSpeed: number;
+  /** Average seconds between falling things (smaller = busier sky). */
+  spawnInterval: number;
+  /** Lives per run. */
+  lives: number;
+}
+
+/**
+ * Play-mode setup, persisted with the document but updated outside History
+ * (like `mode` and `animation`): undo must never re-cast your game. Absent on
+ * old saves — defaults apply (see game/core.ts). `settings` stays undefined
+ * until the user touches a knob, so kid mode can apply its gentler defaults.
+ */
+export interface GameSetup {
+  cast: GameCast;
+  settings?: GameSettings;
+}
+
 export interface DreamDocument {
   id: string;
   name: string;
@@ -211,6 +248,8 @@ export interface DreamDocument {
   animation?: AnimationSettings;
   /** Workspace mode persisted per project; undefined (old saves) = 'draw'. */
   mode?: WorkspaceMode;
+  /** Play-mode casting + settings; undefined = friendly defaults. */
+  game?: GameSetup;
   createdAt: number;
   updatedAt: number;
 }

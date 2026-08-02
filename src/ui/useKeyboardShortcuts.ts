@@ -96,10 +96,10 @@ export function useKeyboardShortcuts(): void {
       }
       if (e.key === ' ') {
         // Space is hold-to-pan, EXCEPT when focus is inside the timeline bar
-        // (where it toggles play — see TimelineBar) or while presenting
-        // (where it advances the slide — see PresentView).
+        // (where it toggles play — see TimelineBar), while presenting (where
+        // it advances the slide — see PresentView) or while playing a game.
         const inTimeline = e.target instanceof HTMLElement && !!e.target.closest('.timeline-bar');
-        if (!inTimeline && store.mode !== 'present') {
+        if (!inTimeline && store.mode !== 'present' && store.mode !== 'play') {
           e.preventDefault();
           store.setSpacePanning(true);
         }

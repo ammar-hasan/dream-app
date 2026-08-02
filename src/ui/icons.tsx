@@ -269,6 +269,29 @@ export const PauseIcon = (p: IconProps) => (
   </svg>
 );
 
+export const GamepadIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M6.5 7h11a4.5 4.5 0 0 1 4.4 5.4l-.8 3.6a3 3 0 0 1-5.4 1.2L14.4 15h-4.8l-1.3 2.2a3 3 0 0 1-5.4-1.2l-.8-3.6A4.5 4.5 0 0 1 6.5 7Z" />
+    <path d="M8 10.5v3M6.5 12h3" />
+    <circle cx="16" cy="11.5" r="0.4" fill="currentColor" />
+    <circle cx="18" cy="13" r="0.4" fill="currentColor" />
+  </svg>
+);
+
+export const SoundIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M11 5 6.5 9H3v6h3.5L11 19Z" fill="currentColor" stroke="none" />
+    <path d="M15 9a4.5 4.5 0 0 1 0 6M17.5 6.5a8 8 0 0 1 0 11" />
+  </svg>
+);
+
+export const MuteIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M11 5 6.5 9H3v6h3.5L11 19Z" fill="currentColor" stroke="none" />
+    <path d="m16 9.5 5 5M21 9.5l-5 5" />
+  </svg>
+);
+
 export const StarIcon = (p: IconProps) => (
   <svg {...base(p)}>
     <path d="M12 3.5 14.6 9l6 .6-4.5 4 1.3 5.9L12 16.3l-5.4 3.2L7.9 13.6 3.4 9.6l6-.6Z" />

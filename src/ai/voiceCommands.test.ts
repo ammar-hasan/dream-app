@@ -70,6 +70,13 @@ describe('parseVoiceCommand — animation', () => {
     expect(parseVoiceCommand('stop')).toEqual({ kind: 'stop' });
     expect(parseVoiceCommand('pause it')).toEqual({ kind: 'stop' });
   });
+
+  it('"play my game" routes to the game; "stop the game" still stops', () => {
+    expect(parseVoiceCommand('play my game')).toEqual({ kind: 'play-game' });
+    expect(parseVoiceCommand('can you please play the game')).toEqual({ kind: 'play-game' });
+    expect(parseVoiceCommand('game')).toEqual({ kind: 'play-game' });
+    expect(parseVoiceCommand('stop the game')).toEqual({ kind: 'stop' });
+  });
 });
 
 describe('parseVoiceCommand — tools, colors, sizes', () => {

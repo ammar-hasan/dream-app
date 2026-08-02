@@ -28,12 +28,14 @@ Conventions for anyone (human or agent) working on Dream.
    no imports from `store/`, `ui/`, or `storage/`. The renderer takes a 2D context
    (structural `Renderer2D` interface) so tests use a recording mock — never add a
    real-canvas dependency to engine tests.
-2. Dependency direction: `ui/` → `store/` → `engine/`. `storage/` and `ai/` are
-   leaves consumed by `ui/`/`store/`. Nothing in `engine/` knows the others exist.
+2. Dependency direction: `ui/` → `store/` → `engine/`. `storage/`, `ai/` and
+   `game/` are leaves consumed by `ui/`/`store/`. Nothing in `engine/` knows
+   the others exist; `game/` may use `engine/` but stays DOM-free too.
 3. **All document mutations go through `History` commands** (invertible `apply`/`revert`,
    no snapshots). If it changes the document, it must be undoable. (Exceptions,
    all document metadata updated outside history: the workspace `mode` field —
    undo must not flip the user's workspace — animation settings (`doc.animation`),
+   Play-mode casting + settings (`doc.game`) — undo must not re-cast your game —
    and switching the active frame — undo must not teleport the user between
    frames. Frame add/duplicate/delete/reorder ARE undoable commands.)
 4. Document updates are immutable (structural sharing); never mutate an operation
@@ -70,6 +72,11 @@ Conventions for anyone (human or agent) working on Dream.
 - `src/store/` — Zustand store(s): `dreamStore` (document, via History) and
   `uiPrefs` (per-user UI prefs in localStorage: kid mode, voice toggles,
   locale, theme, recent colors)
+- `src/game/` — Play mode ("Catch!"), framework-free like the engine: the
+  pure game core (`core.ts`: entities, spawn/collision/score, difficulty
+  ramp, seeded `tick`), sprite content-cropping (`sprites.ts`), procedural
+  default cast drawings (`defaults.ts`), tiny WebAudio bleeps (`sounds.ts`,
+  feature-detected). No DOM, no React, no store imports.
 - `src/ui/` — React components, hooks, icons, export helpers (image +
   animation video/sprite sheet; MediaRecorder isolated behind injectable deps),
   `i18n/` string tables (add a locale: copy `en.ts`, register in `i18n/index.ts`

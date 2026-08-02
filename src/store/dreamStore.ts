@@ -68,6 +68,7 @@ import {
 } from '../engine/selection';
 import { translateOperation, type FlipDirection, type RotateDirection } from '../engine/transform';
 import { mirrorOperations, type SymmetryMode } from '../engine/symmetry';
+import { clampGameSettings, gameSetupOf } from '../game/core';
 import {
   createFillOperation,
   createTextOperation,
@@ -90,6 +91,8 @@ import type {
   Color,
   Component,
   DreamDocument,
+  GameCast,
+  GameSettings,
   ImageOp,
   Operation,
   Point,
@@ -102,9 +105,21 @@ import type {
 
 const HISTORY_LIMIT = 200;
 const HINT_STORAGE_KEY = 'dream:hint-dismissed';
+const HIGH_SCORE_PREFIX = 'dream:high-score:';
 /** Selection handle size / rotate-handle offset, in screen pixels. */
 const HANDLE_PX = 10;
 const ROTATE_GAP_PX = 22;
+
+/** The project's best Catch! score, persisted per project in localStorage. */
+export function readHighScore(docId: string): number {
+  try {
+    const raw = globalThis.localStorage?.getItem(HIGH_SCORE_PREFIX + docId);
+    const score = raw ? Number(raw) : 0;
+    return Number.isFinite(score) && score > 0 ? Math.floor(score) : 0;
+  } catch {
+    return 0;
+  }
+}
 
 export interface DraftState {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -217,6 +232,8 @@ export interface DreamStore {
   playbackFrame: number | null;
   /** Slide index while in Present mode. */
   presentIndex: number;
+  /** Play mode: true while a Catch! run is live (drives the Play view). */
+  gameRunning: boolean;
   /** Workspace to return to when leaving Present mode. */
   lastEditMode: 'draw' | 'design';
   /** Right-side AI panel visibility (UI state, not persisted per project). */
@@ -310,6 +327,18 @@ export interface DreamStore {
   // --- Present mode ----------------------------------------------------------
   presentNext(): void;
   presentPrev(): void;
+
+  // --- Play mode (Catch!) ----------------------------------------------------
+  /** Cast a layer into a game role (null = back to the default sprite). */
+  setGameCast(role: keyof GameCast, layerId: string | null): void;
+  /** Difficulty knobs (fall speed, spawn interval, lives); not undoable. */
+  setGameSettings(patch: Partial<GameSettings>): void;
+  /** Add a named layer for a game role and make it active; returns its id. */
+  createCastLayer(name: string): string;
+  startGame(): void;
+  stopGame(): void;
+  /** Persist the score when it beats the project's best; true on a record. */
+  recordHighScore(score: number): boolean;
 
   // --- Design mode: selection ---------------------------------------------
   setSelection(ids: string[]): void;
@@ -432,6 +461,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
     playing: false,
     playbackFrame: null,
     presentIndex: 0,
+    gameRunning: false,
     lastEditMode: 'draw',
     aiPanelOpen: false,
 
@@ -469,12 +499,13 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
             : s.tool === 'select' || s.tool === 'lasso'
               ? 'brush'
               : s.tool,
-        // Remember where to return when a presentation ends; start the deck
-        // on the active frame and stop any playback.
-        lastEditMode: mode === 'present' ? s.lastEditMode : mode,
+        // Remember where to return when a presentation or game ends; start
+        // the deck on the active frame and stop any playback.
+        lastEditMode: mode === 'draw' || mode === 'design' ? mode : s.lastEditMode,
         presentIndex: mode === 'present' ? Math.max(0, activeFrameIndex(s.doc)) : s.presentIndex,
         playing: false,
         playbackFrame: null,
+        gameRunning: false,
         selection: [],
         selectDraft: null,
         draft: null,
@@ -630,15 +661,17 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         playing: false,
         playbackFrame: null,
         presentIndex: 0,
+        gameRunning: false,
         lastEditMode: 'draw',
       });
     },
 
     loadDocument: (doc) => {
       history.clear();
-      // Saves from before slice 3 have no mode; 'present' is session-only,
-      // so a project saved mid-presentation reopens in Draw.
-      const mode = doc.mode === 'present' ? 'draw' : (doc.mode ?? 'draw');
+      // Saves from before slice 3 have no mode; 'present' and 'play' are
+      // session-only, so a project saved mid-game/mid-presentation reopens
+      // in Draw.
+      const mode = doc.mode === 'present' || doc.mode === 'play' ? 'draw' : (doc.mode ?? 'draw');
       set((s) => ({
         doc: { ...doc, mode },
         activeLayerId: doc.layers[doc.layers.length - 1]?.id ?? '',
@@ -663,6 +696,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         playing: false,
         playbackFrame: null,
         presentIndex: 0,
+        gameRunning: false,
         lastEditMode: 'draw',
       }));
     },
@@ -1331,6 +1365,50 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       })),
 
     presentPrev: () => set((s) => ({ presentIndex: Math.max(0, s.presentIndex - 1) })),
+
+    // --- Play mode (Catch!) ----------------------------------------------------
+
+    setGameCast: (role, layerId) =>
+      set((s) => {
+        const cast = { ...s.doc.game?.cast };
+        if (layerId) cast[role] = layerId;
+        else delete cast[role];
+        // Metadata like `mode`: persisted, but undo must never re-cast.
+        // `settings` is carried through untouched — casting is not a knob.
+        return {
+          doc: { ...s.doc, game: { cast, settings: s.doc.game?.settings } },
+          isDirty: true,
+        };
+      }),
+
+    setGameSettings: (patch) =>
+      set((s) => {
+        const setup = gameSetupOf(s.doc);
+        const settings = clampGameSettings({ ...setup.settings, ...patch });
+        return { doc: { ...s.doc, game: { ...setup, settings } }, isDirty: true };
+      }),
+
+    createCastLayer: (name) => {
+      const layer = createLayer(name);
+      execute(addLayerCommand(layer));
+      set({ activeLayerId: layer.id });
+      return layer.id;
+    },
+
+    startGame: () => set({ gameRunning: true }),
+    stopGame: () => set({ gameRunning: false }),
+
+    recordHighScore: (score) => {
+      const best = readHighScore(get().doc.id);
+      const rounded = Math.max(0, Math.floor(score));
+      if (rounded <= best) return false;
+      try {
+        globalThis.localStorage?.setItem(HIGH_SCORE_PREFIX + get().doc.id, String(rounded));
+      } catch {
+        // storage unavailable — the record simply doesn't persist
+      }
+      return true;
+    },
 
     // --- Design mode: selection ---------------------------------------------
 

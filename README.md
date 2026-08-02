@@ -20,9 +20,10 @@ This repository currently contains **Slice 1** (foundation + core drawing),
 video export and presentation mode), **Slice 5** (the AI panel with
 BYOK providers and voice input), **Slice 6** (accessibility for everyone:
 kid mode, canvas voice commands and i18n with RTL), the **polish pass**
-(design system, dark theme, brand, micro-delight) and the **drawing power
+(design system, dark theme, brand, micro-delight), the **drawing power
 tools** (mirror symmetry, pen pressure, filled shapes, lasso, magic wand
-and the spray brush).
+and the spray brush) and **game mode** (turn your drawings into a playable
+Catch! mini-game).
 
 <!-- Screenshots: drop light/dark theme captures into docs/screenshots/ and
      link them here once we have a stable marketing look. -->
@@ -69,7 +70,8 @@ create — literacy optional. Slice 6 ships three pillars plus a settings menu.
   in settings for everyone.
 - **Canvas voice commands** — the mic button in the toolbar. Click, speak,
   done: "undo", "redo", "clear" (asks for a spoken yes first), "new frame",
-  "play"/"stop", "brush", "spray", "wand", "eraser", "fill", colors ("red",
+  "play"/"stop", "play my game", "brush", "spray", "wand", "eraser", "fill",
+  colors ("red",
   "blue", … a friendly vocabulary including "fill red"), "mirror on"/
   "mirror off", "bigger"/"smaller", "save" and "help" (speaks the command
   list). The pipeline is a pure parser
@@ -153,7 +155,7 @@ play button, everything called "frames".
   fallback, progress shown while recording) and **Sprite sheet** (all frames
   in one PNG grid, zero dependencies). GIF was skipped — it needs an encoder
   dependency; the sprite sheet covers the animated-asset use case.
-- **Present mode**: the mode pill is now Draw / Design / Present. Present
+- **Present mode**: the mode pill is now Draw / Design / Play / Present. Present
   turns frames into slides: full-viewport rendering, arrow keys / Space /
   click to advance, ← to go back, Esc to exit, slide counter at the bottom.
   No editing while presenting. A document without frames is a one-slide deck.
@@ -281,6 +283,43 @@ pro workspace — the mode is persisted per project.
   MS-Paint model; linked masters are a possible future slice).
 - Everything above is undoable through the same command history.
 
+## Play mode (Catch!)
+
+The **Play** tab in the mode pill turns the drawing into a mini-game you play
+right on the canvas. The first template is **Catch!**: things fall from the
+top, and the hero slides left/right to catch the good ones (+1 point) and
+dodge the bad ones (−1 life).
+
+- **Casting is the magic** — your own drawings become the game pieces. The
+  cast panel assigns a layer to each role: the Hero (the catcher), the Good
+  Thing, the Bad Thing and the Background. Every role offers a layer dropdown
+  or "Draw it now" (creates a named layer, casts it and lands you in Draw
+  mode with the brush ready). Roles left on Auto get a friendly stand-in
+  drawn by the engine: a smiley hero, a gold star, a grumpy spiky rock
+  (`game/defaults.ts` — no AI, no assets).
+- **Controls**: arrow keys, touch/mouse drag (a finger is a joystick) and —
+  in kid mode — two big on-screen arrows. A run starts with a "3… 2… 1…"
+  countdown; catches pop "+1" floats, a bad catch shakes the stage, and the
+  game-over card shows score, best and a big "Play again!".
+- **Difficulty**: fall speed, spawn rate and lives are sliders in the cast
+  panel (kid mode defaults to slower, sparser, 5 lives); the game also ramps
+  up on its own the longer a run lasts. The best score persists per project
+  (localStorage).
+- **Sounds**: tiny procedural WebAudio bleeps (`game/sounds.ts`,
+  feature-detected, no assets) — on by default in kid mode, off for adults,
+  with a mute toggle in the corner.
+- **Kid mode + voice**: the kid toolbar has a gamepad button that jumps
+  straight into Play mode with a giant play button; saying "play my game"
+  switches over and starts a run, and "stop" ends it.
+- The **game core is pure TypeScript** (`game/core.ts`): one
+  `tick(state, input, dtMs, rng) → state` function with an injectable seeded
+  RNG, fully unit-tested (spawning, collisions, scoring, lives, game over,
+  the difficulty ramp, determinism). Cast layers are rasterized once per run
+  and cropped to their content; the backdrop is the document minus the game
+  pieces. Casting choices and settings live on the document (`doc.game`,
+  additive and backward compatible), updated outside undo like the workspace
+  mode — undo never re-casts your game.
+
 ## Quickstart
 
 ```bash
@@ -336,12 +375,17 @@ src/
   store/             Zustand store wrapping the engine (all mutations via History)
                      + uiPrefs: per-user UI prefs (kid mode, voices, locale,
                      theme, recent colors)
-  ui/                React shell: toolbar (top) with the Draw/Design/Present
+  game/              Play mode ("Catch!"): the pure game core (entities,
+                     spawn/collision/score, difficulty ramp, seeded tick),
+                     sprite cropping helpers, procedural default cast drawings,
+                     WebAudio bleeps — framework-free like the engine
+  ui/                React shell: toolbar (top) with the Draw/Design/Play/Present
                      switch + Animate toggle, tool rail (left), canvas viewport
                      (ambient background, floating zoom pill, welcome card),
                      options + design + components + adjust + layers panels
                      (right), timeline bar + status bar (bottom), PresentView
-                     (fullscreen slides), dialogs, image/video/sprite export,
+                     (fullscreen slides), PlayView + PlayPanel (the game and
+                     its casting couch), dialogs, image/video/sprite export,
                      settings menu, kid mode (KidPanel + kid rail), voice
                      command button + executor, i18n string tables (i18n/)
   storage/           IndexedDB via `idb`: projects + the cross-project
@@ -419,7 +463,13 @@ Present mode: `→` / `Space` / click next slide · `←` previous · `Esc` exit
   design mode (mode switching, select gestures, transform handles, selection
   actions, component insert), animation (frame switching, cross-frame undo,
   playback state, present mode), AI panel paths (insert/edit/apply-suggestion),
-  undo/redo
+  play mode (cast roles, clamped settings, run state, per-project high
+  scores, Play reopening in Draw), undo/redo
+- Game tests (`game/`): the Catch! tick core (spawning, hero movement and
+  clamping, good/bad collisions, scoring, lives, game over, pop aging, the
+  difficulty ramp, seeded determinism), sprite content-bbox cropping, default
+  cast drawings against the recording mock, and sound feature detection with
+  a fake AudioContext
 - Export tests: WebM mime fallback, filenames, progress and error paths with
   mocked recorder/canvas (MediaRecorder can't run in Node — it's isolated
   behind injectable deps in `ui/exportAnimation.ts`)

@@ -24,6 +24,9 @@ function makeStore(overrides: Partial<VoiceExecutorStore> = {}) {
     addFrame: vi.fn(),
     play: vi.fn(),
     pause: vi.fn(),
+    setMode: vi.fn(),
+    startGame: vi.fn(),
+    stopGame: vi.fn(),
     setTool: vi.fn(),
     setColor: vi.fn(),
     setSize: vi.fn(),
@@ -114,6 +117,16 @@ describe('executeVoiceCommand', () => {
 
     executeVoiceCommand({ kind: 'stop' }, animated, () => {});
     expect(animated.pause).toHaveBeenCalledOnce();
+    expect(animated.stopGame).toHaveBeenCalledOnce();
+  });
+
+  it('"play my game" switches to Play mode and starts a run', () => {
+    const store = makeStore();
+    expect(executeVoiceCommand({ kind: 'play-game' }, store, () => {})?.message).toBe(
+      'Let’s play your game!',
+    );
+    expect(store.setMode).toHaveBeenCalledWith('play');
+    expect(store.startGame).toHaveBeenCalledOnce();
   });
 
   it('tool and color commands set tool settings', () => {

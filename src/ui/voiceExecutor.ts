@@ -6,7 +6,7 @@
  */
 
 import type { VoiceCommand } from '../ai/voiceCommands';
-import type { Color, DreamDocument, ToolId } from '../engine/types';
+import type { Color, DreamDocument, ToolId, WorkspaceMode } from '../engine/types';
 import type { SymmetryMode } from '../engine/symmetry';
 import { t } from './i18n';
 
@@ -25,6 +25,9 @@ export interface VoiceExecutorStore {
   addFrame(): void;
   play(): void;
   pause(): void;
+  setMode(mode: WorkspaceMode): void;
+  startGame(): void;
+  stopGame(): void;
   setTool(tool: ToolId): void;
   setColor(color: Color): void;
   setSize(size: number): void;
@@ -94,8 +97,14 @@ export function executeVoiceCommand(
       store.play();
       return { message: t('voice.playing') };
 
+    case 'play-game':
+      store.setMode('play');
+      store.startGame();
+      return { message: t('voice.playGame') };
+
     case 'stop':
       store.pause();
+      store.stopGame();
       return { message: t('voice.stopped') };
 
     case 'tool':

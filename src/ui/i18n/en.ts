@@ -16,6 +16,7 @@ export const en: Record<string, string> = {
   'toolbar.mode': 'Workspace mode',
   'toolbar.draw': 'Draw',
   'toolbar.design': 'Design',
+  'toolbar.play': 'Play',
   'toolbar.present': 'Present',
   'toolbar.animate': 'Animate',
   'toolbar.animateTitle': 'Turn this drawing into a flipbook animation',
@@ -79,6 +80,7 @@ export const en: Record<string, string> = {
   'kid.play': 'Play!',
   'kid.stop': 'Stop!',
   'kid.ai': 'Ask Dream!',
+  'kid.playGame': 'Play my game!',
 
   // --- Tool options panel ---------------------------------------------------
   'options.title': 'Options',
@@ -222,6 +224,37 @@ export const en: Record<string, string> = {
   // --- Present mode --------------------------------------------------------------
   'present.exit': 'Exit',
 
+  // --- Play mode (Catch!) ----------------------------------------------------------
+  'play.cast': 'Cast your game',
+  'play.castHint':
+    'Your drawings become the game pieces! Pick a layer for each role, or leave it on Auto for a friendly stand-in.',
+  'play.hero': 'Hero (the catcher)',
+  'play.good': 'Good thing (+1 point)',
+  'play.bad': 'Bad thing (−1 life)',
+  'play.roleHero': 'Hero',
+  'play.roleGood': 'Good thing',
+  'play.roleBad': 'Bad thing',
+  'play.background': 'Background',
+  'play.auto': 'Auto (Dream draws it)',
+  'play.docBackground': 'The rest of the drawing',
+  'play.drawIt': 'Draw it now',
+  'play.settings': 'Game settings',
+  'play.fallSpeed': 'Fall speed',
+  'play.spawnRate': 'How often things fall',
+  'play.lives': 'Lives',
+  'play.best': 'Best score: {score}',
+  'play.start': 'Play!',
+  'play.again': 'Play again!',
+  'play.exit': 'Back to drawing',
+  'play.gameOver': 'Game over!',
+  'play.score': 'Score: {score}',
+  'play.newBest': 'New best!',
+  'play.hint': 'Catch the good things, dodge the bad ones! Move with the arrows or drag.',
+  'play.soundOn': 'Sound on',
+  'play.soundOff': 'Sound off',
+  'play.moveLeft': 'Move left',
+  'play.moveRight': 'Move right',
+
   // --- AI panel --------------------------------------------------------------------
   'ai.title': 'Dream AI',
   'ai.close': 'Close AI helper',
@@ -347,6 +380,7 @@ export const en: Record<string, string> = {
   'voice.layerEmpty': 'This layer is already empty.',
   'voice.newFrame': 'New frame!',
   'voice.playing': 'Playing!',
+  'voice.playGame': 'Let’s play your game!',
   'voice.stopped': 'Stopped.',
   'voice.nothingToPlay': 'Nothing to play yet — add some frames first.',
   'voice.tool': '{tool}!',
@@ -357,6 +391,6 @@ export const en: Record<string, string> = {
   'voice.mirrorOff': 'Mirror off.',
   'voice.saved': 'Saved!',
   'voice.help':
-    'You can say: brush, pencil, spray, eraser, fill, wand, a color like red or blue, bigger, smaller, mirror on, mirror off, undo, redo, clear, new frame, play, stop, save, and help.',
+    'You can say: brush, pencil, spray, eraser, fill, wand, a color like red or blue, bigger, smaller, mirror on, mirror off, undo, redo, clear, new frame, play, play my game, stop, save, and help.',
   'voice.unknown': 'Sorry, I didn’t understand. Say “help” to hear what I can do.',
 };

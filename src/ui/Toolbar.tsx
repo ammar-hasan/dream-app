@@ -20,9 +20,9 @@ import { useSpeakName } from './useSpeakName';
 import { SettingsMenu } from './SettingsMenu';
 import { VoiceCommandButton } from './VoiceCommandButton';
 import { KID_TOOLS } from './ToolRail';
-import { DreamMark, RedoIcon, SparkleIcon, StarIcon, UndoIcon } from './icons';
+import { DreamMark, GamepadIcon, RedoIcon, SparkleIcon, StarIcon, UndoIcon } from './icons';
 
-const MODES = ['draw', 'design', 'present'] as const;
+const MODES = ['draw', 'design', 'play', 'present'] as const;
 
 interface ToolbarProps {
   onNew: () => void;
@@ -126,6 +126,17 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
         {historyButtons(true)}
         <div className="toolbar-group">
           <VoiceCommandButton />
+          <button
+            type="button"
+            className={`btn icon-btn kid-toolbar-btn${mode === 'play' ? ' primary' : ''}`}
+            aria-pressed={mode === 'play'}
+            aria-label={t('kid.playGame')}
+            onPointerEnter={() => speakName(t('kid.playGame'))}
+            onFocus={() => speakName(t('kid.playGame'))}
+            onClick={() => useDreamStore.getState().setMode(mode === 'play' ? 'draw' : 'play')}
+          >
+            <GamepadIcon />
+          </button>
           <button
             type="button"
             className={`btn icon-btn kid-toolbar-btn${aiPanelOpen ? ' primary' : ''}`}
