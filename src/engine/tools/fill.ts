@@ -17,20 +17,29 @@ export interface Rgb {
 
 export const DEFAULT_FILL_TOLERANCE = 0;
 
+export interface FloodRegion {
+  /** Pixel indices (y * width + x) of the contiguous matching region. */
+  pixels: number[];
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+}
+
 /**
- * Fill the contiguous region around (startX, startY) whose pixels match the
- * start pixel within `tolerance` (per-channel, alpha included).
- * Returns null when the start is out of bounds or already the fill color.
+ * Shared scanline flood traversal: the contiguous region around
+ * (startX, startY) whose pixels match the start pixel within `tolerance`
+ * (per-channel, alpha included). Returns null when the start is out of
+ * bounds. Used by the fill bucket and the magic wand.
  */
-export function floodFill(
+export function floodPixels(
   data: Uint8ClampedArray,
   width: number,
   height: number,
   startX: number,
   startY: number,
-  color: Rgb,
-  tolerance: number = DEFAULT_FILL_TOLERANCE,
-): RasterPatch | null {
+  tolerance: number,
+): FloodRegion | null {
   const x0 = Math.floor(startX);
   const y0 = Math.floor(startY);
   if (x0 < 0 || y0 < 0 || x0 >= width || y0 >= height) return null;
@@ -47,16 +56,6 @@ export function floodFill(
     Math.abs(data[i + 1] - tg) <= tolerance &&
     Math.abs(data[i + 2] - tb) <= tolerance &&
     Math.abs(data[i + 3] - ta) <= tolerance;
-
-  // Nothing to do when the region already is the fill color.
-  if (
-    Math.abs(tr - color.r) <= tolerance &&
-    Math.abs(tg - color.g) <= tolerance &&
-    Math.abs(tb - color.b) <= tolerance &&
-    ta === 255
-  ) {
-    return null;
-  }
 
   const visited = new Uint8Array(width * height);
   const filled: number[] = []; // pixel indices (not byte offsets)
@@ -104,11 +103,46 @@ export function floodFill(
   }
 
   if (filled.length === 0) return null;
+  return { pixels: filled, minX, minY, maxX, maxY };
+}
+
+/**
+ * Fill the contiguous region around (startX, startY) whose pixels match the
+ * start pixel within `tolerance` (per-channel, alpha included).
+ * Returns null when the start is out of bounds or already the fill color.
+ */
+export function floodFill(
+  data: Uint8ClampedArray,
+  width: number,
+  height: number,
+  startX: number,
+  startY: number,
+  color: Rgb,
+  tolerance: number = DEFAULT_FILL_TOLERANCE,
+): RasterPatch | null {
+  const x0 = Math.floor(startX);
+  const y0 = Math.floor(startY);
+  if (x0 < 0 || y0 < 0 || x0 >= width || y0 >= height) return null;
+
+  // Nothing to do when the region already is the fill color.
+  const si = (y0 * width + x0) * 4;
+  if (
+    Math.abs(data[si] - color.r) <= tolerance &&
+    Math.abs(data[si + 1] - color.g) <= tolerance &&
+    Math.abs(data[si + 2] - color.b) <= tolerance &&
+    data[si + 3] === 255
+  ) {
+    return null;
+  }
+
+  const region = floodPixels(data, width, height, startX, startY, tolerance);
+  if (!region) return null;
+  const { pixels, minX, minY, maxX, maxY } = region;
 
   const patchWidth = maxX - minX + 1;
   const patchHeight = maxY - minY + 1;
   const patch = new Uint8ClampedArray(patchWidth * patchHeight * 4);
-  for (const pixel of filled) {
+  for (const pixel of pixels) {
     const px = pixel % width;
     const py = Math.floor(pixel / width);
     const o = ((py - minY) * patchWidth + (px - minX)) * 4;

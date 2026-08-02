@@ -13,6 +13,8 @@ import type { Color, Operation, Point, ToolId, ToolSettings } from '../types';
 export interface PointerSample {
   point: Point;
   shiftKey: boolean;
+  /** Stylus pressure 0..1 (pen only); undefined for mouse/touch. */
+  pressure?: number;
 }
 
 export interface DrawingTool<TState> {
@@ -35,6 +37,8 @@ export const DEFAULT_SETTINGS: ToolSettings = {
   opacity: 1,
   fontSize: 24,
   fontFamily: 'system-ui, sans-serif',
+  fillShapes: false,
+  density: 40,
 };
 
 export const DEFAULT_TEXT_FONT = DEFAULT_SETTINGS.fontFamily;

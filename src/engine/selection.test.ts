@@ -14,6 +14,7 @@ import {
   hitTestOperation,
   hitTestOperations,
   instantiateComponent,
+  lassoSelect,
   marqueeSelect,
   rotateOperation,
   rotateOperation90,
@@ -468,5 +469,56 @@ describe('components', () => {
   it('single-op instances get no group', () => {
     const component = createComponentFromOps('One', [stroke({ id: 'a' })]);
     expect(instantiateComponent(component, { x: 0, y: 0 })[0].groupId).toBeUndefined();
+  });
+});
+
+describe('lassoSelect', () => {
+  // Loop around the left half of the canvas.
+  const loop = [
+    { x: 0, y: 0 },
+    { x: 35, y: 0 },
+    { x: 35, y: 60 },
+    { x: 0, y: 60 },
+  ];
+
+  it('selects ops whose bounds center is inside the polygon', () => {
+    // stroke spans x 10..50 → center x=30 inside; shape spans x 20..60 →
+    // center x=40 outside.
+    const ops: Operation[] = [stroke(), shape()];
+    const picked = lassoSelect(ops, loop);
+    expect(picked.map((op) => op.id)).toEqual(['s1']);
+  });
+
+  it('returns nothing for a loop around empty space or a degenerate polygon', () => {
+    const farLoop = loop.map((p) => ({ x: p.x + 200, y: p.y + 200 }));
+    expect(lassoSelect([stroke()], farLoop)).toEqual([]);
+    expect(
+      lassoSelect(
+        [stroke()],
+        [
+          { x: 0, y: 0 },
+          { x: 5, y: 5 },
+        ],
+      ),
+    ).toEqual([]);
+  });
+});
+
+describe('filled-shape hit-testing', () => {
+  it('the interior of a filled rectangle hits', () => {
+    const filled = shape({ fill: true });
+    expect(hitTestOperation(filled, { x: 40, y: 30 })).toBe(true); // dead center
+    expect(hitTestOperation(filled, { x: 80, y: 30 })).toBe(false);
+  });
+
+  it('the interior of a filled ellipse hits, its corners do not', () => {
+    const ellipse = shape({
+      shape: 'ellipse',
+      from: { x: 0, y: 0 },
+      to: { x: 100, y: 50 },
+      fill: true,
+    });
+    expect(hitTestOperation(ellipse, { x: 50, y: 25 })).toBe(true); // center
+    expect(hitTestOperation(ellipse, { x: 5, y: 5 })).toBe(false); // bbox corner, outside the ellipse
   });
 });

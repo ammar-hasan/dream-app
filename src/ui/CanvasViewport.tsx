@@ -16,7 +16,9 @@ import { renderDocument, renderLayer, renderOperation } from '../engine/renderer
 import { animationSettingsOf, frameIndexAtTime, onionSkinTargets } from '../engine/animation';
 import { normalizeRect } from '../engine/geometry';
 import { selectedOps, selectionBounds, unionBounds } from '../engine/selection';
+import { mirrorOperations, SYMMETRY_TOOLS } from '../engine/symmetry';
 import { clampZoom, nextZoomIn, nextZoomOut, pickColor, zoomAtPoint } from '../engine/tools';
+import type { RasterSource } from '../engine/tools';
 import type { Point, Rect } from '../engine/types';
 import { useDreamStore } from '../store/dreamStore';
 import { useUiPrefs } from '../store/uiPrefs';
@@ -28,6 +30,26 @@ import { DreamMark } from './icons';
 
 /** Accent used for all selection chrome, matching --accent in app.css. */
 const ACCENT = '#6d7cff';
+
+/** Paint a raw RGBA buffer onto the canvas at (x, y), honoring opacity. */
+function blitBuffer(
+  ctx: CanvasRenderingContext2D,
+  buffer: RasterSource,
+  x: number,
+  y: number,
+  alpha: number,
+): void {
+  const scratch = document.createElement('canvas');
+  scratch.width = buffer.width;
+  scratch.height = buffer.height;
+  const scratchCtx = scratch.getContext('2d');
+  if (!scratchCtx) return;
+  scratchCtx.putImageData(new ImageData(buffer.data, buffer.width, buffer.height), 0, 0);
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.drawImage(scratch, x, y);
+  ctx.restore();
+}
 
 function corners(r: Rect): Point[] {
   return [
@@ -53,6 +75,9 @@ export function CanvasViewport() {
   const moveDraft = useDreamStore((s) => s.moveDraft);
   const cropDraft = useDreamStore((s) => s.cropDraft);
   const adjustPreview = useDreamStore((s) => s.adjustPreview);
+  const symmetry = useDreamStore((s) => s.symmetry);
+  const wandDraft = useDreamStore((s) => s.wandDraft);
+  const lassoDraft = useDreamStore((s) => s.lassoDraft);
   const selection = useDreamStore((s) => s.selection);
   const selectDraft = useDreamStore((s) => s.selectDraft);
   const zoom = useDreamStore((s) => s.zoom);
@@ -148,6 +173,7 @@ export function CanvasViewport() {
     const detached = new Set<string>();
     if (moveDraft) detached.add(activeLayerId);
     if (adjustPreview) detached.add(adjustPreview.layerId);
+    if (wandDraft) detached.add(wandDraft.layerId);
 
     // During a select-transform drag, swap the selected ops for their
     // transformed preview copies (z-order within the layer is preserved).
@@ -203,12 +229,71 @@ export function CanvasViewport() {
       ctx.restore();
     }
 
+    // Wand floating region: the layer's raster with the region erased, then
+    // the lifted patch at its drag offset, boxed in accent dashes.
+    if (wandDraft) {
+      const wandLayer = doc.layers.find((l) => l.id === wandDraft.layerId);
+      if (wandLayer?.visible) {
+        blitBuffer(ctx, wandDraft.base, 0, 0, wandLayer.opacity);
+        const px = wandDraft.patch.x + wandDraft.offset.x;
+        const py = wandDraft.patch.y + wandDraft.offset.y;
+        blitBuffer(ctx, wandDraft.patch, px, py, wandLayer.opacity);
+        ctx.strokeStyle = ACCENT;
+        ctx.lineWidth = 1 / zoom;
+        ctx.setLineDash([5 / zoom, 4 / zoom]);
+        ctx.strokeRect(px, py, wandDraft.patch.width, wandDraft.patch.height);
+        ctx.setLineDash([]);
+      }
+    }
+
     ctx.strokeStyle = '#c9ced6';
     ctx.lineWidth = 1 / zoom;
     ctx.strokeRect(0, 0, doc.width, doc.height);
 
     if (previewOp && !playing) {
-      renderOperation(previewOp, ctx, { layerOpacity: activeLayer?.opacity ?? 1 });
+      // Mirror mode: the in-progress gesture blooms live across the axes.
+      const previewOps =
+        symmetry === 'off'
+          ? [previewOp]
+          : mirrorOperations(previewOp, symmetry, { width: doc.width, height: doc.height });
+      for (const op of previewOps) {
+        renderOperation(op, ctx, { layerOpacity: activeLayer?.opacity ?? 1 });
+      }
+    }
+
+    // Mirror axes: soft dashed center lines that fade toward the edges.
+    if (!playing && !kidMode && symmetry !== 'off' && SYMMETRY_TOOLS.includes(tool)) {
+      const px = 1 / zoom;
+      const fade = (from: number, to: number, horizontal: boolean) => {
+        const g = horizontal
+          ? ctx.createLinearGradient(from, 0, to, 0)
+          : ctx.createLinearGradient(0, from, 0, to);
+        g.addColorStop(0, 'rgba(109, 124, 255, 0)');
+        g.addColorStop(0.2, 'rgba(109, 124, 255, 0.85)');
+        g.addColorStop(0.8, 'rgba(109, 124, 255, 0.85)');
+        g.addColorStop(1, 'rgba(109, 124, 255, 0)');
+        return g;
+      };
+      ctx.save();
+      ctx.lineWidth = 1.5 * px;
+      ctx.setLineDash([10 * px, 7 * px]);
+      ctx.shadowColor = 'rgba(109, 124, 255, 0.5)';
+      ctx.shadowBlur = 8 * px;
+      if (symmetry === 'vertical' || symmetry === 'quad') {
+        ctx.strokeStyle = fade(0, doc.height, false);
+        ctx.beginPath();
+        ctx.moveTo(doc.width / 2, 0);
+        ctx.lineTo(doc.width / 2, doc.height);
+        ctx.stroke();
+      }
+      if (symmetry === 'horizontal' || symmetry === 'quad') {
+        ctx.strokeStyle = fade(0, doc.width, true);
+        ctx.beginPath();
+        ctx.moveTo(0, doc.height / 2);
+        ctx.lineTo(doc.width, doc.height / 2);
+        ctx.stroke();
+      }
+      ctx.restore();
     }
 
     // Crop selection: dim everything outside the rect, dash the outline.
@@ -308,6 +393,22 @@ export function CanvasViewport() {
         }
       }
     }
+
+    // Lasso: the in-progress freehand loop (Design mode).
+    if (lassoDraft && lassoDraft.length > 1) {
+      const px = 1 / zoom;
+      ctx.beginPath();
+      ctx.moveTo(lassoDraft[0].x, lassoDraft[0].y);
+      for (const p of lassoDraft.slice(1)) ctx.lineTo(p.x, p.y);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(109, 124, 255, 0.08)';
+      ctx.fill();
+      ctx.strokeStyle = ACCENT;
+      ctx.lineWidth = px;
+      ctx.setLineDash([4 * px, 4 * px]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
     ctx.restore();
   });
 
@@ -352,6 +453,22 @@ export function CanvasViewport() {
     const image = offCtx.getImageData(0, 0, off.width, off.height);
     const color = pickColor({ data: image.data, width: off.width, height: off.height }, point);
     if (color) state.setColor(color);
+  };
+
+  const doWand = (point: Point) => {
+    const state = useDreamStore.getState();
+    const layer = state.doc.layers.find((l) => l.id === state.activeLayerId);
+    if (!layer || layer.locked) return;
+    // Clicking the floating region grabs it instead of re-selecting.
+    if (state.beginWandDrag(point)) return;
+    const off = document.createElement('canvas');
+    off.width = state.doc.width;
+    off.height = state.doc.height;
+    const offCtx = off.getContext('2d');
+    if (!offCtx) return;
+    renderLayer(layer, offCtx);
+    const image = offCtx.getImageData(0, 0, off.width, off.height);
+    state.applyWandAt(point, { data: image.data, width: off.width, height: off.height });
   };
 
   const zoomAtClientPoint = (clientX: number, clientY: number, direction: 'in' | 'out') => {
@@ -403,11 +520,17 @@ export function CanvasViewport() {
       doFill(point);
       return;
     }
+    if (tool === 'wand') {
+      doWand(point);
+      return;
+    }
     if (tool === 'eyedropper') {
       doEyedropper(point);
       return;
     }
-    useDreamStore.getState().pointerDown(point, { shiftKey: e.shiftKey });
+    // Stylus pressure flows to the stroke tools; mouse/touch stay uniform.
+    const pressure = e.pointerType === 'pen' ? e.pressure : undefined;
+    useDreamStore.getState().pointerDown(point, { shiftKey: e.shiftKey, pressure });
   };
 
   const onPointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -419,7 +542,8 @@ export function CanvasViewport() {
       return;
     }
     const point = toDocPoint(e.clientX, e.clientY);
-    useDreamStore.getState().pointerMove(point, { shiftKey: e.shiftKey });
+    const pressure = e.pointerType === 'pen' ? e.pressure : undefined;
+    useDreamStore.getState().pointerMove(point, { shiftKey: e.shiftKey, pressure });
   };
 
   const onPointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {

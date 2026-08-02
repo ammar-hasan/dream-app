@@ -7,6 +7,7 @@
 
 import type { VoiceCommand } from '../ai/voiceCommands';
 import type { Color, DreamDocument, ToolId } from '../engine/types';
+import type { SymmetryMode } from '../engine/symmetry';
 import { t } from './i18n';
 
 /** The slice of the dream store voice commands are allowed to touch. */
@@ -27,6 +28,7 @@ export interface VoiceExecutorStore {
   setTool(tool: ToolId): void;
   setColor(color: Color): void;
   setSize(size: number): void;
+  setSymmetry(mode: SymmetryMode): void;
 }
 
 export interface VoiceResult {
@@ -99,6 +101,11 @@ export function executeVoiceCommand(
     case 'tool':
       store.setTool(command.tool);
       return { message: t('voice.tool', { tool: t(`tools.${command.tool}`) }) };
+
+    case 'mirror':
+      // "Mirror on" means the vertical axis — quad is a canvas-select away.
+      store.setSymmetry(command.on ? 'vertical' : 'off');
+      return { message: t(command.on ? 'voice.mirrorOn' : 'voice.mirrorOff') };
 
     case 'color':
       store.setColor(command.color);

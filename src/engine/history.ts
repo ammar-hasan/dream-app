@@ -97,6 +97,18 @@ export function addOperationCommand(layerId: string, op: Operation): Command {
   };
 }
 
+/**
+ * Append several ops as ONE undoable step — e.g. a mirrored gesture, where a
+ * single undo must remove the whole symmetric bloom.
+ */
+export function addOperationsCommand(layerId: string, ops: Operation[]): Command {
+  return {
+    label: 'Draw',
+    apply: (doc) => ops.reduce((d, op) => appendOperation(d, layerId, op), doc),
+    revert: (doc) => ops.reduce((d, op) => removeOperation(d, layerId, op.id), doc),
+  };
+}
+
 export function addLayerCommand(layer: Layer, index?: number): Command {
   return {
     label: 'Add layer',

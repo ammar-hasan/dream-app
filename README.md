@@ -19,8 +19,10 @@ This repository currently contains **Slice 1** (foundation + core drawing),
 (design mode: selection, components, alignment), **Slice 4** (animation,
 video export and presentation mode), **Slice 5** (the AI panel with
 BYOK providers and voice input), **Slice 6** (accessibility for everyone:
-kid mode, canvas voice commands and i18n with RTL) and the **polish pass**
-(design system, dark theme, brand, micro-delight).
+kid mode, canvas voice commands and i18n with RTL), the **polish pass**
+(design system, dark theme, brand, micro-delight) and the **drawing power
+tools** (mirror symmetry, pen pressure, filled shapes, lasso, magic wand
+and the spray brush).
 
 <!-- Screenshots: drop light/dark theme captures into docs/screenshots/ and
      link them here once we have a stable marketing look. -->
@@ -67,9 +69,10 @@ create — literacy optional. Slice 6 ships three pillars plus a settings menu.
   in settings for everyone.
 - **Canvas voice commands** — the mic button in the toolbar. Click, speak,
   done: "undo", "redo", "clear" (asks for a spoken yes first), "new frame",
-  "play"/"stop", "brush", "eraser", "fill", colors ("red", "blue", … a
-  friendly vocabulary including "fill red"), "bigger"/"smaller", "save" and
-  "help" (speaks the command list). The pipeline is a pure parser
+  "play"/"stop", "brush", "spray", "wand", "eraser", "fill", colors ("red",
+  "blue", … a friendly vocabulary including "fill red"), "mirror on"/
+  "mirror off", "bigger"/"smaller", "save" and "help" (speaks the command
+  list). The pipeline is a pure parser
   (`ai/voiceCommands.ts`, case-insensitive, filler-tolerant — "um, can you
   please undo?") plus a thin executor (`ui/voiceExecutor.ts`) against a
   minimal store interface. Every command confirms in the status area and,
@@ -98,9 +101,13 @@ language picker.
 ## What works today
 
 - Brush, pencil, eraser with adjustable size, color (palette + custom + a
-  recent-colors row) and opacity
+  recent-colors row) and opacity — with per-point pen pressure on a stylus
+- Spray (airbrush) with a density slider; deterministic per-stroke seeds
 - Line, rectangle and ellipse tools with Shift-to-constrain (45° lines, squares, circles)
-- Flood fill (bucket), eyedropper color picker, and a click-to-type text tool
+  and an optional fill-shapes mode (filled with the current color)
+- Mirror symmetry (vertical / horizontal / quad) with live mirrored preview
+- Flood fill (bucket), magic wand (move / delete / copy-to-layer a region),
+  eyedropper color picker, and a click-to-type text tool
 - Layers: add, delete, rename, reorder, visibility, opacity, lock — all undoable
 - Image import: file picker, drag-and-drop onto the canvas, or paste from the
   clipboard — each image lands centered on its own layer (scaled down to fit)
@@ -203,6 +210,44 @@ round-trip and reports success or a friendly, jargon-free error. Endpoints
 that can't generate or edit images simply declare so — the panel degrades
 gracefully and offers to switch back to Dream AI.
 
+## Drawing power tools
+
+The pro drawing upgrades live alongside the classic tools — in the adult
+tool rail and the options panel (Little Dreamer mode stays untouched).
+
+- **Mirror / symmetry** — the Mirror select in the options panel (off /
+  vertical / horizontal / quad) reflects every brush, pencil, eraser, spray,
+  line and shape gesture live across the canvas center axes, with a soft
+  dashed accent line showing the active axes. Mirrored strokes are real
+  operations committed together with the original in ONE undoable command —
+  a single undo removes the whole symmetric bloom (`engine/symmetry.ts`).
+  Session-only, like the zoom level.
+- **Pen pressure** — with a stylus, brush/pencil/eraser strokes modulate
+  their width per pointer sample (`PointerEvent.pressure`, pen only). The
+  multipliers ride on the stroke op (`widths`) and the renderer interpolates
+  between points. Mouse and touch strokes carry no `widths` and render
+  exactly as before.
+- **Filled shapes** — the "Fill shapes" toggle fills rectangles and
+  ellipses with the current color (no outline — the simpler, prettier
+  option; the outline tools behave as always when it's off).
+- **Lasso (Design mode, K)** — draw a freehand loop; ops whose selection
+  bounds CENTER falls inside the polygon become the selection (center-based
+  keeps big background ops from being swallowed by a small loop). Shift
+  adds to the selection, like the marquee.
+- **Magic wand (W)** — click a pixel to lift the contiguous region of
+  similar color (tolerance slider) out of the active layer into a floating
+  patch. Drag it to move it, Delete to remove it, or "Copy to new layer"
+  to duplicate it; Esc puts it back. Moving and deleting bake the layer to
+  a raster — the same destructive-bake model as filters — each as one
+  undoable command (`engine/tools/wand.ts`, sharing the flood-fill scanline
+  traversal).
+- **Spray (S)** — an airbrush: seeded stochastic dots scattered along the
+  stroke with a density slider. The seed travels on the stroke op, so every
+  redraw (viewport, export, thumbnails) paints the identical mist
+  (`engine/spray.ts`).
+- Voice commands learned **"spray"**, **"wand"**, **"lasso"** and
+  **"mirror on" / "mirror off"**.
+
 ## Design mode
 
 The Draw / Design switch in the top toolbar moves between two workspaces. Draw
@@ -211,8 +256,9 @@ pro workspace — the mode is persisted per project.
 
 - **Select tool (V)**: click any object on the active layer to select it
   (strokes, shapes, text, images, fills — topmost wins). Shift-click toggles,
-  drag on empty canvas rubber-band-selects. The selection shows per-object
-  boxes plus a shared bounding box with handles.
+  drag on empty canvas rubber-band-selects. The **lasso (K)** selects with a
+  freehand loop instead (bounds-center inside the polygon). The selection
+  shows per-object boxes plus a shared bounding box with handles.
 - **Move / scale / rotate**: drag the selection to move it; corner handles
   scale uniformly; the handle above the box rotates. Rotation is free-form for
   strokes, lines and text anchors; selections containing rectangles, ellipses
@@ -275,14 +321,18 @@ src/
     animation.ts     Frame model (enable/disable/clone), playback timing,
                      onion-skin decisions, sprite-sheet layout — all pure
     renderer.ts      Renders a Document onto any 2D context (structural interface)
+    symmetry.ts      Mirror mode: reflect stroke/shape ops across the center axes
+    spray.ts         Seeded PRNG + deterministic spray-dot layout
     filters.ts       Pure pixel filters/adjustments over RGBA buffers (+ convolution)
     transform.ts     Flip/rotate/translate/crop/resize for buffers, layers, documents
-    selection.ts     Design mode: hit-testing, marquee, move/scale/rotate math,
+    selection.ts     Design mode: hit-testing, marquee, lasso, move/scale/rotate math,
                      snapping, align/distribute, groups, component factories
-    geometry.ts      clamp, normalizeRect, constrainEnd (Shift), boundingRect…
+    geometry.ts      clamp, normalizeRect, constrainEnd (Shift), boundingRect,
+                     pointInPolygon…
     color.ts         hex <-> rgba, cssColor, built-in palette
-    tools/           Pure tool state machines: stroke, shapes, fill (flood fill),
-                     eyedropper, text, pan/zoom math — begin/update/preview/commit
+    tools/           Pure tool state machines: stroke (pressure widths, spray
+                     seed), shapes (fill toggle), fill (flood fill), wand
+                     (region mask/extract/stamp), eyedropper, text, pan/zoom math
   store/             Zustand store wrapping the engine (all mutations via History)
                      + uiPrefs: per-user UI prefs (kid mode, voices, locale,
                      theme, recent colors)
@@ -321,13 +371,17 @@ store → React re-renders → viewport redraws the document with `engine/render
 
 ## Keyboard shortcuts
 
-`V` select (Design) / move (Draw) · `M` move · `B` brush · `P` pencil · `E` eraser ·
-`L` line · `R` rectangle · `O` ellipse · `G` fill · `I` eyedropper · `T` text ·
+`V` select (Design) / move (Draw) · `K` lasso (Design) · `M` move · `B` brush ·
+`P` pencil · `S` spray · `E` eraser ·
+`L` line · `R` rectangle · `O` ellipse · `G` fill · `W` magic wand · `I` eyedropper · `T` text ·
 `C` crop · `H` pan · `Z` zoom ·
 `Ctrl/Cmd+Z` undo · `Ctrl/Cmd+Shift+Z` / `Ctrl+Y` redo · `+`/`-` zoom ·
 `Space` (hold) pan — inside the focused timeline it toggles play instead ·
 `Shift` constrain shapes · `Enter` apply crop · `A` toggle the AI panel ·
-`Esc` clear selection / cancel text/crop
+`Esc` clear selection / cancel text/crop/wand
+
+With a floating wand region: drag to move · `Del`/`Backspace` delete the region ·
+`Esc` put it back
 
 Design mode, with a selection: `Ctrl/Cmd+D` duplicate · `Ctrl/Cmd+G` group ·
 `Ctrl/Cmd+Shift+G` ungroup · `Del`/`Backspace` delete · arrow keys nudge
@@ -339,10 +393,14 @@ Present mode: `→` / `Space` / click next slide · `←` previous · `Esc` exit
 
 - Engine unit tests: history edge cases, flood fill, geometry, color, filters,
   transforms (crop/resize/flip/rotate), every tool, selection (hit-testing per
-  op kind, marquee, scale/rotate math, snapping, align/distribute, groups,
-  components), animation (frame model, CRUD commands + undo, playback timing,
-  onion-skin decisions, sprite-sheet layout), renderer (against a recording
-  mock 2D context — no canvas package needed)
+  op kind, marquee, lasso polygon, scale/rotate math, snapping,
+  align/distribute, groups, components), symmetry/mirror math for strokes,
+  shapes and erasers, spray determinism (same seed → same dots, density
+  bounds), pen-pressure width interpolation, filled-shape rendering and
+  hit-testing, magic-wand region extraction on synthetic buffers
+  (mask/extract/erase/stamp), animation (frame model, CRUD commands + undo,
+  playback timing, onion-skin decisions, sprite-sheet layout), renderer
+  (against a recording mock 2D context — no canvas package needed)
 - AI tests: provider registry + key/settings persistence, OpenAI-compatible
   request construction with a mocked fetch, capability degradation, the daily
   free-tier counter (date rollover via fake timers), the feedback rule engine

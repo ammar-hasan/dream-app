@@ -21,6 +21,8 @@ export function createShapeTool(shape: ShapeKind): DrawingTool<ShapeState> {
       color: settings.color,
       size: settings.size,
       opacity: settings.opacity,
+      // "Fill shapes" fills the interior with the current color (no outline).
+      ...(settings.fillShapes && shape !== 'line' ? { fill: true } : {}),
     };
   };
 

@@ -61,3 +61,51 @@ describe('shape tools', () => {
     expect(preview.to).toEqual({ x: 6, y: 6 });
   });
 });
+
+describe('filled shapes', () => {
+  const fillSettings = { ...DEFAULT_SETTINGS, fillShapes: true };
+
+  it('rectangle and ellipse carry the fill flag when the toggle is on', () => {
+    const rect = rectangleTool.commit(
+      (() => {
+        const s = rectangleTool.begin({ point: { x: 0, y: 0 }, shiftKey: false }, fillSettings);
+        rectangleTool.update(s, { point: { x: 10, y: 10 }, shiftKey: false }, fillSettings);
+        return s;
+      })(),
+      fillSettings,
+    ) as ShapeOp;
+    expect(rect.fill).toBe(true);
+
+    const ellipse = ellipseTool.commit(
+      (() => {
+        const s = ellipseTool.begin({ point: { x: 0, y: 0 }, shiftKey: false }, fillSettings);
+        ellipseTool.update(s, { point: { x: 10, y: 10 }, shiftKey: false }, fillSettings);
+        return s;
+      })(),
+      fillSettings,
+    ) as ShapeOp;
+    expect(ellipse.fill).toBe(true);
+  });
+
+  it('lines never fill, and the toggle off keeps the flag absent', () => {
+    const line = lineTool.commit(
+      (() => {
+        const s = lineTool.begin({ point: { x: 0, y: 0 }, shiftKey: false }, fillSettings);
+        lineTool.update(s, { point: { x: 10, y: 10 }, shiftKey: false }, fillSettings);
+        return s;
+      })(),
+      fillSettings,
+    ) as ShapeOp;
+    expect(line.fill).toBeUndefined();
+
+    const rect = rectangleTool.commit(
+      (() => {
+        const s = rectangleTool.begin({ point: { x: 0, y: 0 }, shiftKey: false }, DEFAULT_SETTINGS);
+        rectangleTool.update(s, { point: { x: 10, y: 10 }, shiftKey: false }, DEFAULT_SETTINGS);
+        return s;
+      })(),
+      DEFAULT_SETTINGS,
+    ) as ShapeOp;
+    expect(rect.fill).toBeUndefined();
+  });
+});

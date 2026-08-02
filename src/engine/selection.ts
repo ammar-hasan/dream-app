@@ -13,7 +13,7 @@
  */
 
 import { genId } from './document';
-import { distance, normalizeRect, pointInRect } from './geometry';
+import { distance, normalizeRect, pointInPolygon, pointInRect } from './geometry';
 import { resizeBufferNearest, transformOperation, translateOperation } from './transform';
 import type {
   Component,
@@ -170,6 +170,19 @@ export function hitTestOperations(ops: Operation[], point: Point, tolerance = 0)
 /** Ops whose selection bounds intersect the marquee rect (paint order). */
 export function marqueeSelect(ops: Operation[], rect: Rect): Operation[] {
   return ops.filter((op) => rectsIntersect(selectionBounds(op), rect));
+}
+
+/**
+ * Lasso (freehand) selection: ops whose selection-bounds CENTER falls inside
+ * the polygon. Center-based keeps big background ops from being swallowed by
+ * a loop drawn around something small inside them.
+ */
+export function lassoSelect(ops: Operation[], polygon: Point[]): Operation[] {
+  if (polygon.length < 3) return [];
+  return ops.filter((op) => {
+    const b = selectionBounds(op);
+    return pointInPolygon({ x: b.x + b.width / 2, y: b.y + b.height / 2 }, polygon);
+  });
 }
 
 // ---------------------------------------------------------------------------

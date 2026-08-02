@@ -6,6 +6,7 @@ import {
   distance,
   lerp,
   normalizeRect,
+  pointInPolygon,
   pointInRect,
 } from './geometry';
 
@@ -82,5 +83,57 @@ describe('boundingRect', () => {
         { x: 10, y: 1 },
       ]),
     ).toEqual({ x: -2, y: 1, width: 12, height: 7 });
+  });
+});
+
+describe('pointInPolygon', () => {
+  const square = [
+    { x: 0, y: 0 },
+    { x: 10, y: 0 },
+    { x: 10, y: 10 },
+    { x: 0, y: 10 },
+  ];
+
+  it('finds points inside a square and rejects points outside', () => {
+    expect(pointInPolygon({ x: 5, y: 5 }, square)).toBe(true);
+    expect(pointInPolygon({ x: 15, y: 5 }, square)).toBe(false);
+    expect(pointInPolygon({ x: 5, y: -1 }, square)).toBe(false);
+  });
+
+  it('handles a concave polygon', () => {
+    // U-shape opening upward: (5, 2) is inside the bowl's wall area,
+    // (5, 5) sits in the hollow and must read as outside.
+    const u = [
+      { x: 0, y: 0 },
+      { x: 10, y: 0 },
+      { x: 10, y: 10 },
+      { x: 7, y: 10 },
+      { x: 7, y: 3 },
+      { x: 3, y: 3 },
+      { x: 3, y: 10 },
+      { x: 0, y: 10 },
+    ];
+    expect(pointInPolygon({ x: 1, y: 5 }, u)).toBe(true);
+    expect(pointInPolygon({ x: 5, y: 5 }, u)).toBe(false);
+  });
+
+  it('needs at least three vertices', () => {
+    expect(
+      pointInPolygon({ x: 1, y: 1 }, [
+        { x: 0, y: 0 },
+        { x: 10, y: 10 },
+      ]),
+    ).toBe(false);
+    expect(pointInPolygon({ x: 1, y: 1 }, [])).toBe(false);
+  });
+
+  it('works with an unclosed loop (implicit closing edge)', () => {
+    const triangle = [
+      { x: 0, y: 0 },
+      { x: 10, y: 0 },
+      { x: 5, y: 10 },
+    ];
+    expect(pointInPolygon({ x: 5, y: 3 }, triangle)).toBe(true);
+    expect(pointInPolygon({ x: 0, y: 9 }, triangle)).toBe(false);
   });
 });

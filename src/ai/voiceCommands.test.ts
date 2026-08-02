@@ -107,6 +107,22 @@ describe('parseVoiceCommand — tools, colors, sizes', () => {
     expect(parseVoiceCommand('smaller')).toEqual({ kind: 'smaller' });
     expect(parseVoiceCommand('a tiny brush please')).toEqual({ kind: 'smaller' });
   });
+
+  it('parses the new slice-9 tools', () => {
+    expect(parseVoiceCommand('spray')).toEqual({ kind: 'tool', tool: 'spray' });
+    expect(parseVoiceCommand('airbrush')).toEqual({ kind: 'tool', tool: 'spray' });
+    expect(parseVoiceCommand('wand')).toEqual({ kind: 'tool', tool: 'wand' });
+    expect(parseVoiceCommand('magic wand')).toEqual({ kind: 'tool', tool: 'wand' });
+    expect(parseVoiceCommand('lasso')).toEqual({ kind: 'tool', tool: 'lasso' });
+  });
+
+  it('parses mirror on / mirror off', () => {
+    expect(parseVoiceCommand('mirror on')).toEqual({ kind: 'mirror', on: true });
+    expect(parseVoiceCommand('turn the mirror on')).toEqual({ kind: 'mirror', on: true });
+    expect(parseVoiceCommand('mirror off')).toEqual({ kind: 'mirror', on: false });
+    expect(parseVoiceCommand('symmetry off')).toEqual({ kind: 'mirror', on: false });
+    expect(parseVoiceCommand('mirror')).toEqual({ kind: 'mirror', on: true });
+  });
 });
 
 describe('parseVoiceCommand — unknown input', () => {

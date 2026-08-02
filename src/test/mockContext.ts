@@ -42,6 +42,9 @@ export class MockContext2D implements Renderer2D {
   stroke(): void {
     this.record('stroke');
   }
+  fill(): void {
+    this.record('fill');
+  }
   rect(x: number, y: number, w: number, h: number): void {
     this.record('rect', x, y, w, h);
   }

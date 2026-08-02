@@ -63,8 +63,9 @@ Conventions for anyone (human or agent) working on Dream.
 
 - `src/engine/` — types, document, history, animation (frame model, playback
   timing, onion skin, sprite-sheet layout), renderer, geometry, color, filters
-  (pure RGBA pixel transforms), transform (flip/rotate/crop/resize),
-  selection (Design mode: hit-testing, move/scale/rotate, snapping, align,
+  (pure RGBA pixel transforms), transform (flip/rotate/crop/resize), symmetry
+  (mirror-mode op reflection), spray (seeded dot layout), selection (Design
+  mode: hit-testing, lasso/marquee, move/scale/rotate, snapping, align,
   groups, component factories), tools/
 - `src/store/` — Zustand store(s): `dreamStore` (document, via History) and
   `uiPrefs` (per-user UI prefs in localStorage: kid mode, voice toggles,

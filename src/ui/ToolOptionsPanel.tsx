@@ -2,16 +2,44 @@
 
 import { useEffect } from 'react';
 import { PALETTE } from '../engine/color';
+import { SYMMETRY_TOOLS, type SymmetryMode } from '../engine/symmetry';
 import { useDreamStore } from '../store/dreamStore';
 import { useUiPrefs } from '../store/uiPrefs';
 import { useT } from './i18n';
 
-const SHOW_COLOR = new Set(['brush', 'pencil', 'line', 'rectangle', 'ellipse', 'fill', 'text']);
-const SHOW_SIZE = new Set(['brush', 'pencil', 'eraser', 'line', 'rectangle', 'ellipse']);
-const SHOW_OPACITY = new Set(['brush', 'line', 'rectangle', 'ellipse', 'fill', 'text']);
+const SHOW_COLOR = new Set([
+  'brush',
+  'pencil',
+  'spray',
+  'line',
+  'rectangle',
+  'ellipse',
+  'fill',
+  'text',
+]);
+const SHOW_SIZE = new Set(['brush', 'pencil', 'spray', 'eraser', 'line', 'rectangle', 'ellipse']);
+const SHOW_OPACITY = new Set(['brush', 'spray', 'line', 'rectangle', 'ellipse', 'fill', 'text']);
 
 /** Tools with a usage hint; the text lives under `options.hint.<tool>`. */
-const HINT_TOOLS = new Set(['select', 'move', 'eyedropper', 'crop', 'pan', 'zoom', 'fill', 'text']);
+const HINT_TOOLS = new Set([
+  'select',
+  'move',
+  'eyedropper',
+  'crop',
+  'pan',
+  'zoom',
+  'fill',
+  'text',
+  'wand',
+  'lasso',
+]);
+
+const SYMMETRY_MODES: { value: SymmetryMode; key: string }[] = [
+  { value: 'off', key: 'options.symmetryOff' },
+  { value: 'vertical', key: 'options.symmetryVertical' },
+  { value: 'horizontal', key: 'options.symmetryHorizontal' },
+  { value: 'quad', key: 'options.symmetryQuad' },
+];
 
 const FONT_CHOICES = [
   { key: 'font.sans', value: 'system-ui, sans-serif' },
@@ -30,6 +58,9 @@ export function ToolOptionsPanel() {
   const setOpacity = useDreamStore((s) => s.setOpacity);
   const setFontSize = useDreamStore((s) => s.setFontSize);
   const setFontFamily = useDreamStore((s) => s.setFontFamily);
+  const symmetry = useDreamStore((s) => s.symmetry);
+  const wandDraft = useDreamStore((s) => s.wandDraft);
+  const wandTolerance = useDreamStore((s) => s.wandTolerance);
   const recentColors = useUiPrefs((s) => s.recentColors);
 
   // Remember the color once it settles (debounced so dragging the native
@@ -129,6 +160,83 @@ export function ToolOptionsPanel() {
           />
           <span className="option-value">{Math.round(settings.opacity * 100)}%</span>
         </label>
+      )}
+
+      {SYMMETRY_TOOLS.includes(tool) && (
+        <label className="option-row">
+          <span className="option-label">{t('options.symmetry')}</span>
+          <select
+            value={symmetry}
+            onChange={(e) => useDreamStore.getState().setSymmetry(e.target.value as SymmetryMode)}
+            className="font-select"
+            aria-label={t('options.symmetry')}
+          >
+            {SYMMETRY_MODES.map((m) => (
+              <option key={m.value} value={m.value}>
+                {t(m.key)}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+
+      {(tool === 'rectangle' || tool === 'ellipse') && (
+        <label className="option-row checkbox-field">
+          <input
+            type="checkbox"
+            checked={settings.fillShapes}
+            onChange={(e) => useDreamStore.getState().setFillShapes(e.target.checked)}
+          />
+          <span>{t('options.fillShapes')}</span>
+        </label>
+      )}
+
+      {tool === 'spray' && (
+        <label className="option-row">
+          <span className="option-label">{t('options.density')}</span>
+          <input
+            type="range"
+            min={10}
+            max={100}
+            value={settings.density}
+            onChange={(e) => useDreamStore.getState().setDensity(Number(e.target.value))}
+          />
+          <span className="option-value">{settings.density}</span>
+        </label>
+      )}
+
+      {tool === 'wand' && (
+        <>
+          <label className="option-row">
+            <span className="option-label">{t('options.tolerance')}</span>
+            <input
+              type="range"
+              min={0}
+              max={128}
+              value={wandTolerance}
+              onChange={(e) => useDreamStore.getState().setWandTolerance(Number(e.target.value))}
+            />
+            <span className="option-value">{wandTolerance}</span>
+          </label>
+          <div className="option-row crop-actions">
+            <button
+              type="button"
+              className="btn"
+              disabled={!wandDraft}
+              onClick={() => useDreamStore.getState().copyWandToLayer()}
+            >
+              {t('options.wandCopy')}
+            </button>
+            <button
+              type="button"
+              className="btn"
+              disabled={!wandDraft}
+              onClick={() => useDreamStore.getState().deleteWandRegion()}
+            >
+              {t('options.wandDelete')}
+            </button>
+          </div>
+        </>
       )}
 
       {tool === 'text' && (

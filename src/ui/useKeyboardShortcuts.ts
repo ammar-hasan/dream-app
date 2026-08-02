@@ -7,16 +7,19 @@ import type { ToolId } from '../engine/types';
 const TOOL_KEYS: Record<string, ToolId> = {
   b: 'brush',
   p: 'pencil',
+  s: 'spray',
   e: 'eraser',
   l: 'line',
   r: 'rectangle',
   o: 'ellipse',
   g: 'fill',
+  w: 'wand',
   i: 'eyedropper',
   t: 'text',
   c: 'crop',
   h: 'pan',
   m: 'move',
+  k: 'lasso',
   z: 'zoom',
 };
 
@@ -55,6 +58,12 @@ export function useKeyboardShortcuts(): void {
       if (mod && key === 'y') {
         e.preventDefault();
         store.redo();
+        return;
+      }
+      // Wand floating region: Delete removes it (both workspace modes).
+      if ((e.key === 'Delete' || e.key === 'Backspace') && store.wandDraft) {
+        e.preventDefault();
+        store.deleteWandRegion();
         return;
       }
       // Design-mode selection shortcuts.
@@ -99,7 +108,8 @@ export function useKeyboardShortcuts(): void {
       if (mod || e.altKey) return;
 
       if (e.key === 'Escape') {
-        if (designing && store.selection.length > 0) store.clearSelection();
+        if (store.wandDraft) store.cancelWand();
+        else if (designing && store.selection.length > 0) store.clearSelection();
         else if (store.cropDraft) store.cancelCrop();
         else store.cancelText();
         return;
@@ -126,7 +136,8 @@ export function useKeyboardShortcuts(): void {
         return;
       }
       const tool = TOOL_KEYS[key];
-      if (tool) store.setTool(tool);
+      // Lasso lives in Design mode only (it is hidden from the Draw rail).
+      if (tool && (tool !== 'lasso' || designing)) store.setTool(tool);
     };
 
     const onKeyUp = (e: KeyboardEvent) => {

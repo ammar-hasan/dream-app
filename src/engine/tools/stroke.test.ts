@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { brushTool, eraserTool, pencilTool } from './stroke';
+import { brushTool, createStrokeTool, eraserTool, pencilTool, sprayTool } from './stroke';
 import { DEFAULT_SETTINGS } from './types';
 import type { StrokeOp } from '../types';
 
@@ -71,5 +71,63 @@ describe('stroke tools', () => {
       settings,
     );
     expect(a?.id).not.toBe(b?.id);
+  });
+});
+
+describe('pressure sensitivity', () => {
+  it('records per-point width multipliers for pen samples', () => {
+    const state = brushTool.begin(
+      { point: { x: 0, y: 0 }, shiftKey: false, pressure: 0.2 },
+      settings,
+    );
+    brushTool.update(state, { point: { x: 5, y: 0 }, shiftKey: false, pressure: 0.8 }, settings);
+    brushTool.update(state, { point: { x: 9, y: 0 }, shiftKey: false, pressure: 1 }, settings);
+    const op = brushTool.commit(state, settings) as StrokeOp;
+    expect(op.widths).toEqual([0.2, 0.8, 1]);
+  });
+
+  it('mouse strokes (no pressure) carry no widths — uniform rendering', () => {
+    const state = brushTool.begin({ point: { x: 0, y: 0 }, shiftKey: false }, settings);
+    brushTool.update(state, { point: { x: 5, y: 5 }, shiftKey: false }, settings);
+    const op = brushTool.commit(state, settings) as StrokeOp;
+    expect(op.widths).toBeUndefined();
+  });
+
+  it('clamps feather-light pressure to a visible minimum', () => {
+    const state = brushTool.begin(
+      { point: { x: 0, y: 0 }, shiftKey: false, pressure: 0.01 },
+      settings,
+    );
+    const op = brushTool.commit(state, settings) as StrokeOp;
+    expect(op.widths).toEqual([0.1, 0.1]); // single tap duplicates the sample
+  });
+
+  it('a pressure gap mid-stroke falls back to the previous width', () => {
+    const state = brushTool.begin(
+      { point: { x: 0, y: 0 }, shiftKey: false, pressure: 0.5 },
+      settings,
+    );
+    brushTool.update(state, { point: { x: 5, y: 0 }, shiftKey: false }, settings);
+    const op = brushTool.commit(state, settings) as StrokeOp;
+    expect(op.widths).toEqual([0.5, 0.5]);
+  });
+});
+
+describe('spray tool', () => {
+  it('commits a stroke with a seed and the density setting', () => {
+    const state = sprayTool.begin({ point: { x: 2, y: 2 }, shiftKey: false }, settings);
+    sprayTool.update(state, { point: { x: 8, y: 8 }, shiftKey: false }, settings);
+    const op = sprayTool.commit(state, settings) as StrokeOp;
+    expect(op.tool).toBe('spray');
+    expect(typeof op.seed).toBe('number');
+    expect(op.density).toBe(settings.density);
+    expect(op.opacity).toBe(0.5); // honors opacity like the brush
+  });
+
+  it('an injected random source makes the seed deterministic', () => {
+    const seeded = createStrokeTool('spray', () => 0.5);
+    const state = seeded.begin({ point: { x: 0, y: 0 }, shiftKey: false }, settings);
+    const op = seeded.commit(state, settings) as StrokeOp;
+    expect(op.seed).toBe(Math.floor(0.5 * 0xffffffff));
   });
 });

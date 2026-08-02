@@ -22,6 +22,8 @@ export type VoiceCommand =
   | { kind: 'play' }
   | { kind: 'stop' }
   | { kind: 'tool'; tool: ToolId }
+  /** "mirror on" / "mirror off": toggle vertical mirror symmetry. */
+  | { kind: 'mirror'; on: boolean }
   | { kind: 'color'; color: Color; name: string }
   /** "fill red": pick the color AND the fill bucket in one breath. */
   | { kind: 'fill-color'; color: Color; name: string }
@@ -64,6 +66,8 @@ const TOOL_WORDS: Record<string, ToolId> = {
   eraser: 'eraser',
   erase: 'eraser',
   rubber: 'eraser',
+  spray: 'spray',
+  airbrush: 'spray',
   line: 'line',
   rectangle: 'rectangle',
   square: 'rectangle',
@@ -73,6 +77,8 @@ const TOOL_WORDS: Record<string, ToolId> = {
   oval: 'ellipse',
   fill: 'fill',
   bucket: 'fill',
+  wand: 'wand',
+  lasso: 'lasso',
   eyedropper: 'eyedropper',
   dropper: 'eyedropper',
   text: 'text',
@@ -215,6 +221,18 @@ export function parseVoiceCommand(transcript: string): VoiceCommand | null {
   if (has(tokens, new Set(['save']))) return { kind: 'save' };
   if (has(tokens, BIGGER_WORDS)) return { kind: 'bigger' };
   if (has(tokens, SMALLER_WORDS)) return { kind: 'smaller' };
+
+  // Mirror / symmetry: "mirror on", "turn the symmetry off", or a bare
+  // "mirror" toggles it on. Phrases win over the bare-word fallback.
+  if (hasPhrase(normalized, 'mirror off', 'symmetry off', 'mirroring off')) {
+    return { kind: 'mirror', on: false };
+  }
+  if (
+    hasPhrase(normalized, 'mirror on', 'symmetry on', 'mirroring on') ||
+    has(tokens, new Set(['mirror', 'symmetry', 'mirroring']))
+  ) {
+    return { kind: 'mirror', on: true };
+  }
 
   const color = colorIn(tokens);
   const tool = toolIn(tokens);

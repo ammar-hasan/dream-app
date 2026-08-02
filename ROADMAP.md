@@ -2,8 +2,10 @@
 
 Dream ships in slices. Slice 1 (core drawing app + harness), slice 2 (image
 editing), slice 3 (design mode), slice 4 (animation + video export +
-presentation mode), slice 7 (AI panel) and the accessibility trio — slices 8
-(voice commands), 9 (kid mode) and 10 (i18n) — are done. Each slice below
+presentation mode), slice 7 (AI panel), the accessibility trio — slices 8
+(voice commands), 9 (kid mode) and 10 (i18n) — the release harness and the
+drawing power tools (symmetry, pressure, filled shapes, lasso, magic wand,
+spray) are done. Each slice below
 lists brief acceptance criteria; slices are roughly ordered by dependency,
 not by a fixed schedule.
 
@@ -187,6 +189,34 @@ not by a fixed schedule.
 - ✅ Floating zoom pill (−/%/+, tap % to fit-to-window), recent-colors row
   in the options panel, refined selection handles, gradient primary buttons.
 
+## Drawing power tools — symmetry, pressure, wand, lasso, spray ✅
+
+- ✅ Mirror/symmetry mode (options panel: off / vertical / horizontal / quad):
+  strokes, shapes and the eraser mirror live across the canvas center axes,
+  with a soft dashed accent axis overlay. Mirrored ops are real ops committed
+  with the original in ONE undoable command (`engine/symmetry.ts`; document
+  model unchanged, session-only toggle, kid rail untouched).
+- ✅ Pen pressure: stylus `PointerEvent.pressure` (pen only) modulates
+  brush/pencil/eraser width per point (`widths` on the stroke op, renderer
+  interpolates). Mouse/touch carry no widths and render exactly as before.
+- ✅ Filled shapes: a "Fill shapes" toggle fills rectangles/ellipses with the
+  current color (no outline — the simpler, prettier option; outline stays
+  the default). Renderer + hit-testing updated.
+- ✅ Lasso select (Design mode, `K`): freehand loop; ops whose selection
+  bounds CENTER falls inside the polygon are selected (center-based,
+  documented in `engine/selection.ts`; point-in-polygon in `geometry.ts`).
+- ✅ Magic wand (both modes, `W`): click lifts the contiguous similar-color
+  region (tolerance slider) out of the active layer into a floating patch —
+  drag to move, Del to delete, "Copy to new layer" to duplicate, Esc to put
+  back. Move/delete bake the layer to a raster (the filter model), each as
+  one undoable command. Reuses the flood-fill scanline traversal.
+- ✅ Spray brush (`S`): airbrush with a density slider; deterministic seeded
+  dot scatter — the seed rides on the stroke op so every redraw is identical.
+- ✅ Voice commands: "spray", "wand", "lasso", "mirror on"/"mirror off".
+- Deviation: symmetry is session-only store state (like zoom), not persisted
+  per project; the wand's floating region lives outside the document until
+  it is committed, deleted or copied.
+
 ## Release harness — e2e, tooling & deployment ✅
 
 - ✅ Playwright e2e (`e2e/`, excluded from Vitest; `testDir` keeps Playwright
@@ -204,8 +234,8 @@ not by a fixed schedule.
 - ✅ Deployment: `.github/workflows/deploy.yml` builds with
   `--base=/dream-app/` and publishes `dist/` to GitHub Pages on push to main.
 - ✅ PWA icons: `scripts/gen-icons.mjs` rasterizes the SVG mark to 192/512 PNG
-  + a maskable tile via chromium (no image dependencies); wired into the
-  manifest with relative paths so the project-page base works.
+  - a maskable tile via chromium (no image dependencies); wired into the
+    manifest with relative paths so the project-page base works.
 
 ## Post-0.1.0 ideas
 

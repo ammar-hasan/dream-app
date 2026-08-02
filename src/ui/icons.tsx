@@ -61,6 +61,38 @@ export const EllipseIcon = (p: IconProps) => (
   </svg>
 );
 
+export const SprayIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M10 3h4v3h-4z" />
+    <path d="M10 6h4l1.2 3H8.8L10 6Z" />
+    <path d="M12 9v2" />
+    <circle cx="9" cy="15" r="1" fill="currentColor" stroke="none" />
+    <circle cx="15" cy="14" r="1" fill="currentColor" stroke="none" />
+    <circle cx="12" cy="18" r="1" fill="currentColor" stroke="none" />
+    <circle cx="7" cy="19" r="1" fill="currentColor" stroke="none" />
+    <circle cx="17" cy="19" r="1" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+export const WandIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="m4 20 9-9" />
+    <path d="M16 3l.9 2.1 2.1.9-2.1.9L16 9l-.9-2.1L13 6l2.1-.9Z" />
+    <path d="M20 12l.6 1.4L22 14l-1.4.6L20 16l-.6-1.4L18 14l1.4-.6Z" />
+    <path d="M9 4l.5 1.2L10.7 5.7 9.5 6.2 9 7.4 8.5 6.2 7.3 5.7 8.5 5.2Z" />
+  </svg>
+);
+
+export const LassoIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path
+      d="M12 4c5 0 9 2.7 9 6.2S17 16.5 12 16.5 3 13.9 3 10.2 7 4 12 4Z"
+      strokeDasharray="3.5 2.5"
+    />
+    <path d="M12 16.5V19l-2.5 2" />
+  </svg>
+);
+
 export const FillIcon = (p: IconProps) => (
   <svg {...base(p)}>
     <path d="m12 2.7 6.5 6.5-8 8a2.8 2.8 0 0 1-4 0l-2.5-2.5a2.8 2.8 0 0 1 0-4Z" />

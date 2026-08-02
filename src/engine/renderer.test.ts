@@ -194,3 +194,108 @@ describe('fill rendering', () => {
     expect(ctx.calls('drawImage')).toHaveLength(1);
   });
 });
+
+describe('pressure-width stroke rendering', () => {
+  const pressured: StrokeOp = {
+    ...stroke,
+    points: [
+      { x: 0, y: 0 },
+      { x: 10, y: 0 },
+      { x: 20, y: 0 },
+    ],
+    widths: [0.2, 0.6, 1],
+  };
+
+  /** Mock that also captures the lineWidth in effect at each stroke call. */
+  class WidthRecorder extends MockContext2D {
+    widths: number[] = [];
+    stroke(): void {
+      this.widths.push(this.lineWidth);
+      super.stroke();
+    }
+  }
+
+  it('strokes segment by segment with interpolated widths', () => {
+    const ctx = new WidthRecorder();
+    renderOperation(pressured, ctx);
+    // Average of adjacent multipliers × size: (0.2+0.6)/2*6 = 2.4, (0.6+1)/2*6 = 4.8.
+    expect(ctx.widths[0]).toBeCloseTo(2.4);
+    expect(ctx.widths[1]).toBeCloseTo(4.8);
+    expect(ctx.calls('beginPath')).toHaveLength(2);
+    expect(ctx.calls('moveTo')).toEqual([
+      ['moveTo', 0, 0],
+      ['moveTo', 10, 0],
+    ]);
+  });
+
+  it('uniform strokes (no widths) keep the single-path rendering', () => {
+    const ctx = new MockContext2D();
+    renderOperation(stroke, ctx);
+    expect(ctx.calls('beginPath')).toHaveLength(1);
+    expect(ctx.calls('stroke')).toHaveLength(1);
+  });
+
+  it('mismatched widths arrays fall back to uniform rendering', () => {
+    const ctx = new MockContext2D();
+    renderOperation({ ...pressured, widths: [1] }, ctx);
+    expect(ctx.calls('stroke')).toHaveLength(1);
+  });
+});
+
+describe('spray rendering', () => {
+  const spray: StrokeOp = {
+    kind: 'stroke',
+    id: 'sp1',
+    tool: 'spray',
+    points: [
+      { x: 0, y: 0 },
+      { x: 30, y: 0 },
+    ],
+    color: '#00ff00',
+    size: 16,
+    opacity: 1,
+    seed: 42,
+    density: 40,
+  };
+
+  it('paints deterministic fillRect dots from the seed', () => {
+    const a = new MockContext2D();
+    const b = new MockContext2D();
+    renderOperation(spray, a);
+    renderOperation(spray, b);
+    const dots = a.calls('fillRect');
+    expect(dots.length).toBeGreaterThan(0);
+    expect(b.calls('fillRect')).toEqual(dots);
+    expect(a.calls('stroke')).toHaveLength(0);
+  });
+});
+
+describe('filled shape rendering', () => {
+  const filledRect: ShapeOp = {
+    kind: 'shape',
+    id: 'fr1',
+    shape: 'rectangle',
+    from: { x: 5, y: 5 },
+    to: { x: 25, y: 20 },
+    color: '#0000ff',
+    size: 4,
+    opacity: 1,
+    fill: true,
+  };
+
+  it('fills instead of stroking when fill is set', () => {
+    const ctx = new MockContext2D();
+    renderOperation(filledRect, ctx);
+    expect(ctx.calls('fill')).toHaveLength(1);
+    expect(ctx.calls('stroke')).toHaveLength(0);
+    expect(ctx.calls('rect')).toEqual([['rect', 5, 5, 20, 15]]);
+    expect(ctx.fillStyle).toBe('rgba(0, 0, 255, 1)');
+  });
+
+  it('outline shapes still stroke, never fill', () => {
+    const ctx = new MockContext2D();
+    renderOperation({ ...filledRect, fill: undefined }, ctx);
+    expect(ctx.calls('fill')).toHaveLength(0);
+    expect(ctx.calls('stroke')).toHaveLength(1);
+  });
+});

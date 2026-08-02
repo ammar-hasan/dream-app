@@ -22,6 +22,7 @@ import {
   addFrameCommand,
   addLayerCommand,
   addOperationCommand,
+  addOperationsCommand,
   cropDocumentCommand,
   duplicateFrameCommand,
   History,
@@ -37,7 +38,7 @@ import {
   updateLayerCommand,
 } from '../engine/history';
 import type { PixelBuffer } from '../engine/filters';
-import { distance, normalizeRect } from '../engine/geometry';
+import { distance, normalizeRect, pointInRect } from '../engine/geometry';
 import {
   alignOps,
   angleBetween,
@@ -51,6 +52,7 @@ import {
   groupOps,
   hitTestOperations,
   instantiateComponent,
+  lassoSelect,
   marqueeSelect,
   rotateOperation,
   rotateOperation90,
@@ -65,14 +67,20 @@ import {
   type SnapGuide,
 } from '../engine/selection';
 import { translateOperation, type FlipDirection, type RotateDirection } from '../engine/transform';
+import { mirrorOperations, type SymmetryMode } from '../engine/symmetry';
 import {
   createFillOperation,
   createTextOperation,
+  DEFAULT_WAND_TOLERANCE,
   DRAWING_TOOLS,
+  eraseMask,
+  extractPatch,
   nextZoomIn,
   nextZoomOut,
   panBy as panOffset,
   clampZoom,
+  stampPatch,
+  wandMask,
   type DrawingTool,
   type RasterSource,
 } from '../engine/tools';
@@ -85,6 +93,7 @@ import type {
   ImageOp,
   Operation,
   Point,
+  RasterPatch,
   Rect,
   ToolId,
   ToolSettings,
@@ -115,6 +124,20 @@ export interface CropDraft {
   to: Point;
   /** True while the pointer is still down; a placed selection keeps `to` fixed. */
   dragging: boolean;
+}
+
+/**
+ * Magic-wand floating selection: the clicked region lifted out of the active
+ * layer as a patch. `base` is the layer's raster with the region erased; the
+ * document itself is untouched until the region is moved (bake on commit),
+ * deleted, or copied to a new layer — each one undoable command.
+ */
+export interface WandDraft {
+  layerId: string;
+  base: RasterSource;
+  patch: RasterPatch;
+  /** Drag offset applied to the patch (document pixels). */
+  offset: Point;
 }
 
 /** Live filter preview that replaces a layer's rendering while adjusting. */
@@ -164,6 +187,16 @@ export interface DreamStore {
   moveDraft: MoveDraft | null;
   cropDraft: CropDraft | null;
   adjustPreview: AdjustPreview | null;
+  /** Mirror mode: strokes/shapes commit with reflected copies (one undo). */
+  symmetry: SymmetryMode;
+  /** Magic-wand floating region, if any. */
+  wandDraft: WandDraft | null;
+  /** In-progress wand drag (pointer is down on the floating region). */
+  wandDrag: { origin: Point; start: Point } | null;
+  /** Wand color-match tolerance (per-channel 0..255). */
+  wandTolerance: number;
+  /** In-progress lasso polygon (Design mode), doc-space points. */
+  lassoDraft: Point[] | null;
   /** Design mode: ids of the selected ops on the active layer. */
   selection: string[];
   selectDraft: SelectDraft | null;
@@ -199,12 +232,30 @@ export interface DreamStore {
   setOpacity(opacity: number): void;
   setFontSize(fontSize: number): void;
   setFontFamily(fontFamily: string): void;
+  setFillShapes(fillShapes: boolean): void;
+  setDensity(density: number): void;
+  setSymmetry(symmetry: SymmetryMode): void;
+
+  // --- Magic wand -------------------------------------------------------------
+  setWandTolerance(tolerance: number): void;
+  /** Start a wand selection; the viewport supplies the active layer's raster. */
+  applyWandAt(point: Point, raster: RasterSource): void;
+  /** Begin dragging the floating region; false when the point is outside it. */
+  beginWandDrag(point: Point): boolean;
+  /** Bake the floating region back (moved) — one undoable command. */
+  commitWand(): void;
+  /** Discard the floating region, restoring the layer as it was. */
+  cancelWand(): void;
+  /** Remove the region from the layer (one undoable command). */
+  deleteWandRegion(): void;
+  /** Copy the region onto a new layer at its current offset. */
+  copyWandToLayer(): void;
 
   newDocument(options: NewDocumentOptions): void;
   loadDocument(doc: DreamDocument): void;
 
-  pointerDown(point: Point, event?: { shiftKey?: boolean }): void;
-  pointerMove(point: Point, event?: { shiftKey?: boolean }): void;
+  pointerDown(point: Point, event?: { shiftKey?: boolean; pressure?: number }): void;
+  pointerMove(point: Point, event?: { shiftKey?: boolean; pressure?: number }): void;
   pointerUp(point: Point, event?: { shiftKey?: boolean }): void;
   /** Commit a flood fill; the viewport supplies the active layer's raster. */
   applyFillAt(point: Point, raster: RasterSource): void;
@@ -362,6 +413,11 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
     moveDraft: null,
     cropDraft: null,
     adjustPreview: null,
+    symmetry: 'off',
+    wandDraft: null,
+    wandDrag: null,
+    wandTolerance: DEFAULT_WAND_TOLERANCE,
+    lassoDraft: null,
     selection: [],
     selectDraft: null,
     snappingEnabled: true,
@@ -381,7 +437,8 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
 
     toggleAiPanel: () => set((s) => ({ aiPanelOpen: !s.aiPanelOpen })),
 
-    setTool: (tool) =>
+    setTool: (tool) => {
+      get().commitWand(); // a floating wand region settles before switching
       set({
         tool,
         draft: null,
@@ -390,9 +447,12 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         moveDraft: null,
         cropDraft: null,
         adjustPreview: null,
+        wandDrag: null,
+        lassoDraft: null,
         selection: [],
         selectDraft: null,
-      }),
+      });
+    },
 
     setMode: (mode) =>
       set((s) => ({
@@ -401,9 +461,14 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         // flipping your workspace on an undo would be jarring.
         doc: { ...s.doc, mode },
         isDirty: true,
-        // Enter the mode with its natural tool; never leave the select
+        // Enter the mode with its natural tool; never leave a design-only
         // tool active in Draw mode, where it is hidden.
-        tool: mode === 'design' ? 'select' : s.tool === 'select' ? 'brush' : s.tool,
+        tool:
+          mode === 'design'
+            ? 'select'
+            : s.tool === 'select' || s.tool === 'lasso'
+              ? 'brush'
+              : s.tool,
         // Remember where to return when a presentation ends; start the deck
         // on the active frame and stop any playback.
         lastEditMode: mode === 'present' ? s.lastEditMode : mode,
@@ -418,6 +483,9 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         moveDraft: null,
         cropDraft: null,
         adjustPreview: null,
+        wandDraft: null,
+        wandDrag: null,
+        lassoDraft: null,
       })),
     setColor: (color) => set((s) => ({ settings: { ...s.settings, color } })),
     setSize: (size) => set((s) => ({ settings: { ...s.settings, size } })),
@@ -425,6 +493,115 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       set((s) => ({ settings: { ...s.settings, opacity: Math.min(1, Math.max(0, opacity)) } })),
     setFontSize: (fontSize) => set((s) => ({ settings: { ...s.settings, fontSize } })),
     setFontFamily: (fontFamily) => set((s) => ({ settings: { ...s.settings, fontFamily } })),
+    setFillShapes: (fillShapes) => set((s) => ({ settings: { ...s.settings, fillShapes } })),
+    setDensity: (density) =>
+      set((s) => ({ settings: { ...s.settings, density: Math.min(100, Math.max(1, density)) } })),
+    setSymmetry: (symmetry) => set({ symmetry }),
+
+    setWandTolerance: (tolerance) =>
+      set({ wandTolerance: Math.min(255, Math.max(0, Math.round(tolerance))) }),
+
+    applyWandAt: (point, raster) => {
+      get().commitWand(); // settle a previous floating region first
+      const layer = activeLayer();
+      if (!layer || layer.locked) return;
+      const mask = wandMask(raster, point, get().wandTolerance);
+      const patch = mask ? extractPatch(raster, mask) : null;
+      if (!mask || !patch) {
+        set({ wandDraft: null, wandDrag: null });
+        return;
+      }
+      set({
+        wandDraft: {
+          layerId: layer.id,
+          base: eraseMask(raster, mask),
+          patch,
+          offset: { x: 0, y: 0 },
+        },
+        wandDrag: null,
+      });
+      get().dismissHint();
+    },
+
+    beginWandDrag: (point) => {
+      const { wandDraft } = get();
+      if (!wandDraft) return false;
+      const rect = {
+        x: wandDraft.patch.x + wandDraft.offset.x,
+        y: wandDraft.patch.y + wandDraft.offset.y,
+        width: wandDraft.patch.width,
+        height: wandDraft.patch.height,
+      };
+      if (!pointInRect(point, rect)) return false;
+      set({ wandDrag: { origin: point, start: { ...wandDraft.offset } } });
+      return true;
+    },
+
+    commitWand: () => {
+      const { doc, wandDraft } = get();
+      if (!wandDraft) return;
+      set({ wandDraft: null, wandDrag: null });
+      const dx = Math.round(wandDraft.offset.x);
+      const dy = Math.round(wandDraft.offset.y);
+      if (dx === 0 && dy === 0) return; // never moved — the layer is untouched
+      const layer = doc.layers.find((l) => l.id === wandDraft.layerId);
+      if (!layer || layer.locked) return;
+      const stamped = stampPatch(wandDraft.base, wandDraft.patch, dx, dy);
+      const op: ImageOp = {
+        kind: 'image',
+        id: genId('op'),
+        color: '#000000',
+        opacity: 1,
+        scale: 1,
+        patch: { x: 0, y: 0, width: stamped.width, height: stamped.height, data: stamped.data },
+      };
+      execute(replaceLayerContentCommand(doc, layer.id, [op], 'Move region'));
+    },
+
+    cancelWand: () => set({ wandDraft: null, wandDrag: null }),
+
+    deleteWandRegion: () => {
+      const { doc, wandDraft } = get();
+      if (!wandDraft) return;
+      set({ wandDraft: null, wandDrag: null });
+      const layer = doc.layers.find((l) => l.id === wandDraft.layerId);
+      if (!layer || layer.locked) return;
+      const op: ImageOp = {
+        kind: 'image',
+        id: genId('op'),
+        color: '#000000',
+        opacity: 1,
+        scale: 1,
+        patch: {
+          x: 0,
+          y: 0,
+          width: wandDraft.base.width,
+          height: wandDraft.base.height,
+          data: wandDraft.base.data,
+        },
+      };
+      execute(replaceLayerContentCommand(doc, layer.id, [op], 'Delete region'));
+    },
+
+    copyWandToLayer: () => {
+      const { wandDraft } = get();
+      if (!wandDraft) return;
+      const op: ImageOp = {
+        kind: 'image',
+        id: genId('op'),
+        color: '#000000',
+        opacity: 1,
+        scale: 1,
+        patch: {
+          ...wandDraft.patch,
+          x: Math.round(wandDraft.patch.x + wandDraft.offset.x),
+          y: Math.round(wandDraft.patch.y + wandDraft.offset.y),
+        },
+      };
+      const layer = createLayer(`Region ${get().doc.layers.length + 1}`, [op]);
+      execute(addLayerCommand(layer));
+      set({ wandDraft: null, wandDrag: null, activeLayerId: layer.id });
+    },
 
     newDocument: (options) => {
       const doc = createDocument(options);
@@ -440,6 +617,9 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         moveDraft: null,
         cropDraft: null,
         adjustPreview: null,
+        wandDraft: null,
+        wandDrag: null,
+        lassoDraft: null,
         selection: [],
         selectDraft: null,
         zoom: 1,
@@ -470,6 +650,9 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         moveDraft: null,
         cropDraft: null,
         adjustPreview: null,
+        wandDraft: null,
+        wandDrag: null,
+        lassoDraft: null,
         selection: [],
         selectDraft: null,
         zoom: 1,
@@ -581,6 +764,16 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         });
         return;
       }
+      if (tool === 'lasso') {
+        const layer = activeLayer();
+        if (!layer || layer.locked) {
+          set({ selection: [] });
+          return;
+        }
+        if (!event.shiftKey) set({ selection: [] });
+        set({ lassoDraft: [point] });
+        return;
+      }
       if (tool === 'text') {
         set({ pendingText: point });
         return;
@@ -599,13 +792,41 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       if (!machine) return;
       const layer = activeLayer();
       if (!layer || layer.locked) return;
-      const state = machine.begin({ point, shiftKey: !!event.shiftKey }, settings);
+      const state = machine.begin(
+        { point, shiftKey: !!event.shiftKey, pressure: event.pressure },
+        settings,
+      );
       set({ draft: { tool: machine, state }, previewOp: machine.preview(state, settings) });
     },
 
     pointerMove: (point, event = {}) => {
       set({ pointerPos: point });
-      const { draft, settings, moveDraft, cropDraft, selectDraft } = get();
+      const {
+        draft,
+        settings,
+        moveDraft,
+        cropDraft,
+        selectDraft,
+        lassoDraft,
+        wandDrag,
+        wandDraft,
+      } = get();
+      if (lassoDraft) {
+        set({ lassoDraft: [...lassoDraft, point] });
+        return;
+      }
+      if (wandDrag && wandDraft) {
+        set({
+          wandDraft: {
+            ...wandDraft,
+            offset: {
+              x: wandDrag.start.x + point.x - wandDrag.origin.x,
+              y: wandDrag.start.y + point.y - wandDrag.origin.y,
+            },
+          },
+        });
+        return;
+      }
       if (selectDraft) {
         const layer = activeLayer();
         if (!layer) return;
@@ -687,12 +908,36 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         return;
       }
       if (!draft) return;
-      draft.tool.update(draft.state, { point, shiftKey: !!event.shiftKey }, settings);
+      draft.tool.update(
+        draft.state,
+        { point, shiftKey: !!event.shiftKey, pressure: event.pressure },
+        settings,
+      );
       set({ previewOp: draft.tool.preview(draft.state, settings) });
     },
 
     pointerUp: (point, event = {}) => {
-      const { draft, settings, moveDraft, cropDraft, selectDraft } = get();
+      const { draft, settings, moveDraft, cropDraft, selectDraft, lassoDraft, wandDrag } = get();
+      if (lassoDraft) {
+        set({ lassoDraft: null });
+        const layer = activeLayer();
+        if (!layer || lassoDraft.length < 3) return;
+        const ids = expandSelectionWithGroups(
+          layer.operations,
+          lassoSelect(layer.operations, lassoDraft).map((op) => op.id),
+        );
+        set((s) => ({
+          selection: event.shiftKey
+            ? [...s.selection, ...ids.filter((id) => !s.selection.includes(id))]
+            : ids,
+        }));
+        return;
+      }
+      // The wand region stays floating after the drag so Delete / copy still apply.
+      if (wandDrag) {
+        set({ wandDrag: null });
+        return;
+      }
       if (selectDraft) {
         const layer = activeLayer();
         set({ selectDraft: null });
@@ -752,7 +997,11 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       const op = draft.tool.commit(draft.state, settings);
       set({ draft: null, previewOp: null });
       if (op) {
-        execute(addOperationCommand(get().activeLayerId, op));
+        // Mirror mode: the op and its reflected copies land as ONE command,
+        // so a single undo removes the whole symmetric gesture.
+        const { doc, symmetry } = get();
+        const ops = mirrorOperations(op, symmetry, { width: doc.width, height: doc.height });
+        execute(addOperationsCommand(get().activeLayerId, ops));
         get().dismissHint();
       }
     },
@@ -784,7 +1033,13 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
 
     selectLayer: (id) => {
       if (get().doc.layers.some((l) => l.id === id))
-        set({ activeLayerId: id, selection: [], selectDraft: null });
+        set({
+          activeLayerId: id,
+          selection: [],
+          selectDraft: null,
+          wandDraft: null,
+          wandDrag: null,
+        });
     },
 
     addLayer: () => {
@@ -940,6 +1195,9 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
           moveDraft: null,
           cropDraft: null,
           adjustPreview: null,
+          wandDraft: null,
+          wandDrag: null,
+          lassoDraft: null,
           canUndo: history.canUndo,
           canRedo: history.canRedo,
           isDirty: true,
@@ -963,6 +1221,9 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
           moveDraft: null,
           cropDraft: null,
           adjustPreview: null,
+          wandDraft: null,
+          wandDrag: null,
+          lassoDraft: null,
           canUndo: history.canUndo,
           canRedo: history.canRedo,
           isDirty: true,

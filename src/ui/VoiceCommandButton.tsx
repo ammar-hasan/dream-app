@@ -42,6 +42,7 @@ function executorStore(): VoiceExecutorStore {
     setTool: s.setTool,
     setColor: s.setColor,
     setSize: s.setSize,
+    setSymmetry: s.setSymmetry,
   };
 }
 

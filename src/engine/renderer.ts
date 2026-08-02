@@ -8,6 +8,7 @@
 
 import { cssColor } from './color';
 import { normalizeRect } from './geometry';
+import { sprayDots } from './spray';
 import type { DreamDocument, Layer, Operation, RasterPatch, ShapeOp, StrokeOp } from './types';
 
 /** Structural subset of CanvasRenderingContext2D used by the renderer. */
@@ -27,6 +28,7 @@ export interface Renderer2D {
   moveTo(x: number, y: number): void;
   lineTo(x: number, y: number): void;
   stroke(): void;
+  fill(): void;
   rect(x: number, y: number, w: number, h: number): void;
   ellipse(
     x: number,
@@ -158,22 +160,44 @@ export function renderOperation(
 
 function renderStroke(op: StrokeOp, ctx: Renderer2D): void {
   if (op.points.length === 0) return;
+  if (op.tool === 'spray') {
+    renderSpray(op, ctx);
+    return;
+  }
   const erasing = op.tool === 'eraser';
   ctx.globalCompositeOperation = erasing ? 'destination-out' : 'source-over';
   ctx.strokeStyle = erasing ? 'rgba(0, 0, 0, 1)' : cssColor(op.color);
-  ctx.lineWidth = op.size;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
+  if (op.widths && op.widths.length === op.points.length) {
+    // Pen pressure: stroke segment by segment, interpolating the width
+    // between the two endpoints' multipliers.
+    for (let i = 1; i < op.points.length; i += 1) {
+      ctx.lineWidth = Math.max(0.5, ((op.widths[i - 1] + op.widths[i]) / 2) * op.size);
+      ctx.beginPath();
+      ctx.moveTo(op.points[i - 1].x, op.points[i - 1].y);
+      ctx.lineTo(op.points[i].x, op.points[i].y);
+      ctx.stroke();
+    }
+    return;
+  }
+  ctx.lineWidth = op.size;
   ctx.beginPath();
   ctx.moveTo(op.points[0].x, op.points[0].y);
   for (const p of op.points.slice(1)) ctx.lineTo(p.x, p.y);
   ctx.stroke();
 }
 
+function renderSpray(op: StrokeOp, ctx: Renderer2D): void {
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.fillStyle = cssColor(op.color);
+  for (const dot of sprayDots(op)) {
+    ctx.fillRect(dot.x - dot.size / 2, dot.y - dot.size / 2, dot.size, dot.size);
+  }
+}
+
 function renderShape(op: ShapeOp, ctx: Renderer2D): void {
   ctx.globalCompositeOperation = 'source-over';
-  ctx.strokeStyle = cssColor(op.color);
-  ctx.lineWidth = op.size;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   ctx.beginPath();
@@ -196,6 +220,14 @@ function renderShape(op: ShapeOp, ctx: Renderer2D): void {
       Math.PI * 2,
     );
   }
+  if (op.fill && op.shape !== 'line') {
+    // Filled variant: interior in the op color, no outline.
+    ctx.fillStyle = cssColor(op.color);
+    ctx.fill();
+    return;
+  }
+  ctx.strokeStyle = cssColor(op.color);
+  ctx.lineWidth = op.size;
   ctx.stroke();
 }
 

@@ -27,13 +27,16 @@ export type Color = string;
 
 export type ToolId =
   | 'select'
+  | 'lasso'
   | 'brush'
   | 'pencil'
   | 'eraser'
+  | 'spray'
   | 'line'
   | 'rectangle'
   | 'ellipse'
   | 'fill'
+  | 'wand'
   | 'eyedropper'
   | 'text'
   | 'move'
@@ -73,13 +76,23 @@ interface OperationBase {
   groupId?: string;
 }
 
-/** Freehand polyline drawn by brush, pencil or eraser. */
+/** Freehand polyline drawn by brush, pencil, eraser or spray. */
 export interface StrokeOp extends OperationBase {
   kind: 'stroke';
-  tool: 'brush' | 'pencil' | 'eraser';
+  tool: 'brush' | 'pencil' | 'eraser' | 'spray';
   points: Point[];
   /** Stroke width in document pixels. */
   size: number;
+  /**
+   * Optional per-point width multiplier from pen pressure (same length as
+   * `points`). Absent = uniform width — mouse/touch strokes render exactly
+   * as before.
+   */
+  widths?: number[];
+  /** Spray only: PRNG seed so the dot scatter is identical on every redraw. */
+  seed?: number;
+  /** Spray only: dot density (1..100). */
+  density?: number;
 }
 
 export type ShapeKind = 'line' | 'rectangle' | 'ellipse';
@@ -92,6 +105,11 @@ export interface ShapeOp extends OperationBase {
   to: Point;
   /** Outline width in document pixels. */
   size: number;
+  /**
+   * Rectangle/ellipse only: paint the interior with `color` instead of
+   * stroking the outline. Absent/false = outline (the classic behavior).
+   */
+  fill?: boolean;
 }
 
 /**
@@ -223,4 +241,8 @@ export interface ToolSettings {
   opacity: number;
   fontSize: number;
   fontFamily: string;
+  /** Rectangle/ellipse: fill with the current color instead of an outline. */
+  fillShapes: boolean;
+  /** Spray density, 1..100. */
+  density: number;
 }

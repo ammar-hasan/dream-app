@@ -27,6 +27,7 @@ function makeStore(overrides: Partial<VoiceExecutorStore> = {}) {
     setTool: vi.fn(),
     setColor: vi.fn(),
     setSize: vi.fn(),
+    setSymmetry: vi.fn(),
     ...overrides,
   };
   return store;
@@ -141,6 +142,19 @@ describe('executeVoiceCommand', () => {
     expect(store.setColor).toHaveBeenCalledWith('#3b82f6');
     expect(store.setTool).toHaveBeenCalledWith('fill');
     expect(result?.message).toBe('Blue! Fill bucket!');
+  });
+
+  it('mirror toggles vertical symmetry on and off', () => {
+    const store = makeStore();
+    expect(executeVoiceCommand({ kind: 'mirror', on: true }, store, () => {})?.message).toBe(
+      'Mirror on!',
+    );
+    expect(store.setSymmetry).toHaveBeenCalledWith('vertical');
+
+    expect(executeVoiceCommand({ kind: 'mirror', on: false }, store, () => {})?.message).toBe(
+      'Mirror off.',
+    );
+    expect(store.setSymmetry).toHaveBeenCalledWith('off');
   });
 
   it('bigger/smaller step the brush size and clamp to 1..64', () => {

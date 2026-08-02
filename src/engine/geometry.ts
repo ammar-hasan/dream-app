@@ -62,3 +62,20 @@ export function boundingRect(points: Point[]): Rect | null {
   }
   return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
 }
+
+/**
+ * Ray-casting point-in-polygon test (even-odd rule). Needs at least 3
+ * vertices; points exactly on a horizontal edge count as outside.
+ */
+export function pointInPolygon(p: Point, polygon: Point[]): boolean {
+  if (polygon.length < 3) return false;
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i, i += 1) {
+    const a = polygon[i];
+    const b = polygon[j];
+    if (a.y > p.y !== b.y > p.y && p.x < ((b.x - a.x) * (p.y - a.y)) / (b.y - a.y) + a.x) {
+      inside = !inside;
+    }
+  }
+  return inside;
+}

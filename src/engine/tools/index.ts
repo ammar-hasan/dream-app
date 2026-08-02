@@ -1,7 +1,7 @@
 /** Registry of the drag-based drawing tools keyed by tool id. */
 
 import type { ToolId } from '../types';
-import { eraserTool, brushTool, pencilTool } from './stroke';
+import { eraserTool, brushTool, pencilTool, sprayTool } from './stroke';
 import { ellipseTool, lineTool, rectangleTool } from './shapes';
 import type { DrawingTool } from './types';
 
@@ -10,15 +10,17 @@ export const DRAWING_TOOLS: Partial<Record<ToolId, DrawingTool<any>>> = {
   brush: brushTool,
   pencil: pencilTool,
   eraser: eraserTool,
+  spray: sprayTool,
   line: lineTool,
   rectangle: rectangleTool,
   ellipse: ellipseTool,
 };
 
 export * from './types';
-export { brushTool, pencilTool, eraserTool, createStrokeTool } from './stroke';
+export { brushTool, pencilTool, eraserTool, sprayTool, createStrokeTool } from './stroke';
 export { lineTool, rectangleTool, ellipseTool, createShapeTool } from './shapes';
-export { floodFill, createFillOperation, DEFAULT_FILL_TOLERANCE } from './fill';
+export { floodFill, floodPixels, createFillOperation, DEFAULT_FILL_TOLERANCE } from './fill';
+export { wandMask, extractPatch, eraseMask, stampPatch, DEFAULT_WAND_TOLERANCE } from './wand';
 export { pickColor } from './eyedropper';
 export { createTextOperation } from './text';
 export {
