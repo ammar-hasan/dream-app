@@ -14,7 +14,12 @@ Conventions for anyone (human or agent) working on Dream.
 
 - `npm run dev` — dev server
 - `npm run check` — typecheck + lint + test + build (must be green before committing)
+- `npm run check:full` — `check` + Playwright e2e; run before releases and big PRs
+- `npm run test:e2e` — e2e alone (builds + previews the production bundle)
 - `npm run test:coverage` — engine coverage report (must stay ≥80% lines/functions/statements)
+- `npm run icons` — regenerate the PWA PNG icons from `public/favicon.svg`
+- `npm run release -- patch|minor|major` — clean-tree + green-check gate, bumps the
+  version, seeds CHANGELOG.md, prints the git commands (never mutates git itself)
 - `npm run format` — Prettier write; run before committing
 
 ## Architecture rules
@@ -80,8 +85,20 @@ Conventions for anyone (human or agent) working on Dream.
   (`speech.ts`, feature-detected), speech synthesis (`say.ts`,
   feature-detected), pure voice-command parser (`voiceCommands.ts`)
 - `src/test/` — shared test helpers (mock 2D context) + Vitest setup
+- `e2e/` — Playwright suite (smoke + one visual baseline). Vitest excludes it;
+  Playwright's `testDir` points only here. Screenshots are asserted with
+  generous thresholds — regenerate with `--update-snapshots` after intended
+  UI changes.
+- `scripts/` — `gen-icons.mjs` (PWA PNGs via chromium, no image deps) and
+  `release.mjs` (release prep; prints git commands, never runs them)
 
 ## Git
 
-- CI (`.github/workflows/ci.yml`) runs `npm ci && npm run check` on Node 22 — keep it green.
+- CI (`.github/workflows/ci.yml`) runs `npm ci && npm run check` on Node 22 — keep it
+  green. A separate `e2e` job runs the Playwright suite and uploads
+  `playwright-report` on failure. `.github/workflows/deploy.yml` publishes
+  `dist/` to GitHub Pages on every push to `main` (base `/dream-app/`).
+- Releases: `npm run release -- patch|minor|major`, fill in the CHANGELOG
+  bullets, then run the git commands the script prints (it never commits,
+  tags or pushes itself).
 - Commit messages: short imperative summary, e.g. "Dream: slice 2 — image filters".

@@ -1,10 +1,18 @@
 # Dream
 
+[![CI](https://github.com/ammarhasanrizvi/dream-app/actions/workflows/ci.yml/badge.svg)](https://github.com/ammarhasanrizvi/dream-app/actions/workflows/ci.yml)
+
 Dream is an intuitive, simple, elegant design app — as simple as MS Paint, as deep as
 Photoshop, AI-assisted, and usable by anyone from a 5-year-old to a 90-year-old. It is
 free, runs entirely in the browser, and will grow to support image editing, design mode
 (layers/components), animation, presentations, videos, and even games. See `IDEA.md`
 for the full product vision.
+
+## Try it
+
+**https://ammarhasanrizvi.github.io/dream-app/** _(placeholder — live once GitHub Pages
+is enabled: repo Settings → Pages → Source: "GitHub Actions", then the Deploy workflow
+publishes `dist/` on every push to `main`)_
 
 This repository currently contains **Slice 1** (foundation + core drawing),
 **Slice 2** (image editing: import, filters, crop & transform), **Slice 3**
@@ -236,18 +244,22 @@ npm run dev        # http://localhost:5173
 
 ## Scripts
 
-| Script                  | What it does                                   |
-| ----------------------- | ---------------------------------------------- |
-| `npm run dev`           | Vite dev server                                |
-| `npm run build`         | Production build to `dist/`                    |
-| `npm run preview`       | Serve the production build                     |
-| `npm test`              | Run the test suite (Vitest)                    |
-| `npm run test:watch`    | Watch-mode tests                               |
-| `npm run test:coverage` | Tests + engine coverage report                 |
-| `npm run typecheck`     | `tsc --noEmit` (strict mode)                   |
-| `npm run lint`          | ESLint (typescript-eslint + react-hooks)       |
-| `npm run format`        | Prettier write                                 |
-| `npm run check`         | typecheck + lint + test + build (what CI runs) |
+| Script                  | What it does                                    |
+| ----------------------- | ----------------------------------------------- |
+| `npm run dev`           | Vite dev server                                 |
+| `npm run build`         | Production build to `dist/`                     |
+| `npm run preview`       | Serve the production build                      |
+| `npm test`              | Run the test suite (Vitest)                     |
+| `npm run test:watch`    | Watch-mode tests                                |
+| `npm run test:coverage` | Tests + engine coverage report                  |
+| `npm run test:e2e`      | Playwright e2e suite (builds + previews first)  |
+| `npm run typecheck`     | `tsc --noEmit` (strict mode)                    |
+| `npm run lint`          | ESLint (typescript-eslint + react-hooks)        |
+| `npm run format`        | Prettier write                                  |
+| `npm run icons`         | Regenerate PWA PNG icons from the SVG mark      |
+| `npm run release`       | Prepare a release (see "Releasing" below)       |
+| `npm run check`         | typecheck + lint + test + build (what CI runs)  |
+| `npm run check:full`    | `check` + e2e — run before a release/PR of note |
 
 ## Architecture map
 
@@ -294,7 +306,13 @@ src/
                      voice-command parser (voiceCommands.ts)
   styles/            Plain CSS, token-driven light + dark themes
                      (`[data-theme='dark']`), 44px+ touch targets
-public/              favicon.svg (the Dream mark) + manifest.webmanifest
+public/              favicon.svg (the Dream mark) + icons/ (generated PNGs)
+                     + manifest.webmanifest
+e2e/                 Playwright suite: smoke.spec.ts, visual.spec.ts (baseline
+                     screenshot), helpers.ts — vitest never sees this dir
+scripts/             gen-icons.mjs (rasterize the SVG mark via chromium),
+                     release.mjs (release prep; prints git commands, never
+                     mutates git)
 ```
 
 Data flow: pointer events → `ui/CanvasViewport` → tool state machines (`engine/tools`)
@@ -351,6 +369,43 @@ Present mode: `→` / `Space` / click next slide · `←` previous · `Esc` exit
   including image ops, animation frames, and the component library)
 - React smoke test: `App` renders (jsdom)
 - Engine coverage is enforced at ≥80% (currently ~97% lines)
+
+## E2E testing (Playwright)
+
+`e2e/` holds the Playwright suite — kept out of Vitest (`exclude` in
+`vite.config.ts`; Playwright's `testDir` is `e2e/`, so neither runner sees
+the other's files). `npm run test:e2e` builds the app and serves the
+production bundle via `vite preview`, then runs Chromium against it
+(WebKit/Firefox are opt-in: `DREAM_E2E_ALL_BROWSERS=1 npx playwright test`,
+after `npx playwright install`).
+
+- `e2e/smoke.spec.ts` — boot/welcome, brush stroke verified by reading real
+  canvas pixels, undo, Design-mode panels, Dream AI generation onto a new
+  layer, kid mode, Arabic RTL, dark theme. Every test is independent (fresh
+  browser context → empty localStorage/IndexedDB).
+- `e2e/visual.spec.ts` — one full-page screenshot baseline of the welcome
+  state (`e2e/visual.spec.ts-snapshots/`), committed as the CSS-regression
+  guard. Thresholds are deliberately generous to absorb cross-platform font
+  anti-aliasing; regenerate after intentional UI changes with
+  `npx playwright test --update-snapshots`.
+
+CI runs e2e in its own job (`playwright install --with-deps chromium`, 1
+retry, report uploaded on failure), keeping the main `check` job fast.
+
+## Releasing
+
+Versioning is semver; notable changes live in `CHANGELOG.md` (Keep a
+Changelog). The release script never touches git itself:
+
+```bash
+npm run release -- patch   # or minor / major
+```
+
+It verifies a clean tree, runs `npm run check`, bumps `package.json` (and the
+lockfile copies) and seeds a CHANGELOG skeleton — then prints the exact
+`git add / commit / tag / push` commands to run by hand. Pushing `main`
+triggers the Deploy workflow, which publishes `dist/` to GitHub Pages at the
+project-page path `/dream-app/` (Vite `base` is set via `vite build --base`).
 
 ## Contributing
 

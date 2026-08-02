@@ -187,6 +187,36 @@ not by a fixed schedule.
 - ✅ Floating zoom pill (−/%/+, tap % to fit-to-window), recent-colors row
   in the options panel, refined selection handles, gradient primary buttons.
 
+## Release harness — e2e, tooling & deployment ✅
+
+- ✅ Playwright e2e (`e2e/`, excluded from Vitest; `testDir` keeps Playwright
+  out of `src/`): an 8-test smoke suite — boot/welcome, brush stroke verified
+  by real canvas pixels, undo, Design-mode panels, Dream AI generation onto a
+  new layer, kid mode round-trip, Arabic RTL, dark theme — plus one committed
+  full-page visual baseline of the welcome state (generous thresholds, the
+  CSS-regression guard). Runs against `vite preview` of the production build;
+  Chromium by default, WebKit/Firefox opt-in via `DREAM_E2E_ALL_BROWSERS=1`.
+- ✅ `npm run check` stays fast; `npm run check:full` adds e2e. CI runs e2e as
+  its own job (report artifact on failure).
+- ✅ Release tooling: version 0.1.0, `CHANGELOG.md` (Keep a Changelog),
+  `npm run release -- patch|minor|major` (clean-tree + green-check gate,
+  bumps version, seeds the changelog, prints — never runs — the git commands).
+- ✅ Deployment: `.github/workflows/deploy.yml` builds with
+  `--base=/dream-app/` and publishes `dist/` to GitHub Pages on push to main.
+- ✅ PWA icons: `scripts/gen-icons.mjs` rasterizes the SVG mark to 192/512 PNG
+  + a maskable tile via chromium (no image dependencies); wired into the
+  manifest with relative paths so the project-page base works.
+
+## Post-0.1.0 ideas
+
+- Offline-first service worker (the rest of slice 11) so installed PWAs work
+  with the network off; document library available offline.
+- More locales; localized voice-command vocabularies; axe-core audit.
+- Per-OS visual baselines if the generous-threshold single baseline flakes.
+- Slice 5/6 remainders: audio track, MP4/WebCodecs export, slide transitions,
+  presenter view with notes, per-slide duration.
+- Slice 12: games & app generation from drawings (MCP/API hooks).
+
 ## Slice 11 — PWA
 
 - ✅ Basics shipped in the polish pass: web app manifest, SVG icon
