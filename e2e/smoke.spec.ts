@@ -26,10 +26,13 @@ test('undo removes the stroke', async ({ page }) => {
   const drawn = await nonWhitePixels(page);
   expect(drawn).toBeGreaterThan(before + 100);
   await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  // Re-render happens on requestAnimationFrame — poll instead of reading
+  // pixels in the same tick (headless CI may lag a frame).
   // Rasterization isn't bit-exact across draws/platforms — after undo the
   // count must land far closer to the blank canvas than to the drawn one.
-  const undone = await nonWhitePixels(page);
-  expect(undone).toBeLessThan(before + (drawn - before) * 0.25);
+  await expect
+    .poll(() => nonWhitePixels(page), { timeout: 3000 })
+    .toBeLessThan(before + (drawn - before) * 0.25);
 });
 
 test('switching to Design mode reveals the design panels', async ({ page }) => {
