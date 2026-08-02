@@ -16,6 +16,7 @@ const SPEAK_TOOLS_KEY = 'dream:speak-tool-names';
 const VOICE_FEEDBACK_KEY = 'dream:voice-feedback';
 const LOCALE_KEY = 'dream:locale';
 const THEME_KEY = 'dream:theme';
+const COMFORT_KEY = 'dream:comfort-mode';
 const RECENT_COLORS_KEY = 'dream:recent-colors';
 const MAX_RECENT_COLORS = 8;
 
@@ -31,6 +32,8 @@ export interface UiPrefs {
   locale: string;
   /** Color theme — defaults to the OS preference until the user picks one. */
   theme: Theme;
+  /** Senior-friendly mode: larger UI text/targets and stronger contrast. */
+  comfortMode: boolean;
   /** Most-recently-used colors, newest first (for the options panel row). */
   recentColors: string[];
 
@@ -39,6 +42,7 @@ export interface UiPrefs {
   setVoiceFeedback(on: boolean): void;
   setLocale(locale: string): void;
   setTheme(theme: Theme): void;
+  setComfortMode(on: boolean): void;
   rememberColor(color: string): void;
 }
 
@@ -98,6 +102,7 @@ export const useUiPrefs = create<UiPrefs>()((set) => {
     voiceFeedback: readFlag(VOICE_FEEDBACK_KEY) || kidMode,
     locale: readLocale(),
     theme: readTheme(),
+    comfortMode: readFlag(COMFORT_KEY),
     recentColors: readRecentColors(),
 
     setKidMode: (on) => {
@@ -125,6 +130,11 @@ export const useUiPrefs = create<UiPrefs>()((set) => {
     setTheme: (theme) => {
       set({ theme });
       write(THEME_KEY, theme);
+    },
+
+    setComfortMode: (on) => {
+      set({ comfortMode: on });
+      write(COMFORT_KEY, on ? '1' : '0');
     },
 
     rememberColor: (color) => {

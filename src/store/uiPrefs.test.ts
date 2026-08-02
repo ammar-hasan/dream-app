@@ -11,6 +11,7 @@ beforeEach(() => {
     voiceFeedback: false,
     locale: 'en',
     theme: 'light',
+    comfortMode: false,
     recentColors: [],
   });
 });
@@ -60,6 +61,18 @@ describe('uiPrefs store', () => {
     useUiPrefs.getState().setTheme('dark');
     expect(useUiPrefs.getState().theme).toBe('dark');
     expect(localStorage.getItem('dream:theme')).toBe('dark');
+  });
+
+  it('persists the comfort-mode toggle independently of everything else', () => {
+    useUiPrefs.getState().setComfortMode(true);
+    expect(useUiPrefs.getState().comfortMode).toBe(true);
+    expect(localStorage.getItem('dream:comfort-mode')).toBe('1');
+    // Comfort never flips the other preferences.
+    expect(useUiPrefs.getState().kidMode).toBe(false);
+    expect(useUiPrefs.getState().theme).toBe('light');
+
+    useUiPrefs.getState().setComfortMode(false);
+    expect(localStorage.getItem('dream:comfort-mode')).toBe('0');
   });
 
   it('remembers recent colors, newest first, deduped and capped at 8', () => {

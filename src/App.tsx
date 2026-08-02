@@ -40,6 +40,7 @@ export default function App() {
   const aiPanelOpen = useDreamStore((s) => s.aiPanelOpen);
   const kidMode = useUiPrefs((s) => s.kidMode);
   const theme = useUiPrefs((s) => s.theme);
+  const comfortMode = useUiPrefs((s) => s.comfortMode);
   const locale = useUiPrefs((s) => s.locale);
 
   useKeyboardShortcuts();
@@ -60,6 +61,11 @@ export default function App() {
       .querySelector('meta[name="theme-color"]')
       ?.setAttribute('content', theme === 'dark' ? '#14161f' : '#eef0f6');
   }, [theme]);
+
+  // Comfort mode: bigger text/targets + higher contrast via `html[data-comfort]`.
+  useEffect(() => {
+    document.documentElement.toggleAttribute('data-comfort', comfortMode);
+  }, [comfortMode]);
 
   // Let the fade-out finish before unmounting the splash.
   useEffect(() => {

@@ -46,6 +46,9 @@
   --blob-1: rgba(109, 124, 255, 0.14);
   --blob-2: rgba(244, 114, 182, 0.1);
 
+  /* Coloring-book thumbnails: paper stays white in both themes */
+  --paper: #ffffff;
+
   /* Radii, elevation, focus */
   --radius-sm: 8px;
   --radius: 12px;
@@ -86,6 +89,88 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 4px 16px rgba(0, 0, 0, 0.35);
   --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.45), 0 16px 48px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Comfort mode ----------------------------------------------------------
+ * Senior-friendly mode (the settings gear): larger text, roomier targets and
+ * a higher-contrast variant of the CURRENT theme — it only strengthens the
+ * text/border tokens and scales the chrome, so it composes with dark theme,
+ * kid mode and RTL (everything below is token/logical-property based). */
+html[data-comfort] {
+  --text: #0f141f;
+  --text-dim: #454d61;
+  --border: #bfc7d8;
+}
+
+html[data-comfort][data-theme='dark'] {
+  --text: #ffffff;
+  --text-dim: #ccd4e8;
+  --border: #525b78;
+}
+
+html[data-comfort] body {
+  font-size: 16px;
+}
+
+html[data-comfort] .toolbar {
+  padding: 12px 20px;
+  gap: 24px;
+}
+
+html[data-comfort] .btn {
+  min-height: 44px;
+  padding: 8px 18px;
+}
+
+html[data-comfort] .btn.icon-btn {
+  min-width: 44px;
+}
+
+html[data-comfort] .tool-rail {
+  gap: 6px;
+  padding: 12px 10px;
+}
+
+html[data-comfort] .tool-btn {
+  width: 76px;
+  min-height: 62px;
+}
+
+html[data-comfort] .tool-btn-label {
+  font-size: 12px;
+}
+
+html[data-comfort] .panel {
+  padding: 18px 20px;
+}
+
+html[data-comfort] .panel-title {
+  font-size: 14px;
+}
+
+html[data-comfort] .tool-hint,
+html[data-comfort] .option-label,
+html[data-comfort] .option-value {
+  font-size: 15px;
+}
+
+html[data-comfort] .mode-tab {
+  min-height: 38px;
+  padding: 6px 22px;
+}
+
+html[data-comfort] .zoom-pill-btn,
+html[data-comfort] .zoom-pill-value {
+  min-height: 40px;
+  min-width: 40px;
+}
+
+html[data-comfort] .settings-popover {
+  min-width: 320px;
+}
+
+html[data-comfort] .settings-item-text small {
+  font-size: 13px;
 }
 
 * {
@@ -381,6 +466,143 @@ body {
 
 .component-card:hover .component-delete {
   opacity: 1;
+}
+
+/* --- Stamp picker (tool options + kid panel) ------------------------------- */
+
+.stamp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.stamp-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease,
+    transform 0.08s ease;
+}
+
+.stamp-btn:hover {
+  background: var(--panel-hover);
+}
+
+.stamp-btn:active {
+  transform: scale(0.95);
+}
+
+.stamp-btn.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.stamp-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+}
+
+.stamp-sizes {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.stamp-sizes .btn {
+  flex: 1;
+  min-height: 32px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.stamp-scenes-title {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+}
+
+.stamp-scenes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 8px;
+}
+
+.stamp-scene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease,
+    transform 0.08s ease;
+}
+
+.stamp-scene:hover {
+  background: var(--panel-hover);
+  border-color: var(--accent);
+}
+
+.stamp-scene:active {
+  transform: scale(0.97);
+}
+
+.stamp-scene canvas {
+  max-width: 100%;
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+}
+
+/* Kid mode: giant stamps, no labels needed — the names are spoken. */
+.kid-stamps .stamp-grid {
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 10px;
+}
+
+.kid-stamps .stamp-btn {
+  padding: 8px;
+  border-width: 2px;
+}
+
+.kid-stamps .stamp-sizes .btn {
+  min-height: 44px;
+  font-size: 15px;
+}
+
+.kid-stamps .stamp-scenes {
+  grid-template-columns: 1fr;
+}
+
+.kid-stamps .stamp-scene {
+  padding: 10px;
+  border-width: 2px;
+}
+
+.kid-stamps .stamp-name {
+  font-size: 15px;
+  font-weight: 600;
 }
 
 /* --- Buttons ------------------------------------------------------------- */

@@ -70,7 +70,7 @@ export function VoiceCommandButton() {
   };
 
   const runTranscript = (text: string) => {
-    const command = parseVoiceCommand(text);
+    const command = parseVoiceCommand(text, useUiPrefs.getState().locale);
 
     // A pending "clear this layer?" confirmation intercepts yes/no first.
     if (pendingClearRef.current) {
@@ -102,19 +102,22 @@ export function VoiceCommandButton() {
       return; // onend runs the transcript
     }
     transcriptRef.current = '';
-    const handle = startDictation({
-      onText: (text) => {
-        transcriptRef.current = text;
+    const handle = startDictation(
+      {
+        onText: (text) => {
+          transcriptRef.current = text;
+        },
+        onError: (friendly) => announce(friendly),
+        onEnd: () => {
+          handleRef.current = null;
+          setListening(false);
+          const text = transcriptRef.current.trim();
+          transcriptRef.current = '';
+          if (text) runTranscript(text);
+        },
       },
-      onError: (friendly) => announce(friendly),
-      onEnd: () => {
-        handleRef.current = null;
-        setListening(false);
-        const text = transcriptRef.current.trim();
-        transcriptRef.current = '';
-        if (text) runTranscript(text);
-      },
-    });
+      { lang: useUiPrefs.getState().locale },
+    );
     if (handle) {
       handleRef.current = handle;
       setListening(true);

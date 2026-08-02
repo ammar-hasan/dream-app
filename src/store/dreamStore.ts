@@ -72,6 +72,8 @@ import {
 } from '../engine/selection';
 import { translateOperation, type FlipDirection, type RotateDirection } from '../engine/transform';
 import { mirrorOperations, type SymmetryMode } from '../engine/symmetry';
+import { createStamp, STAMP_SIZES, type StampId, type StampSize } from '../engine/stamps';
+import { createStarterScene, type SceneId } from '../engine/starterScenes';
 import { clampGameSettings, gameSetupOf } from '../game/core';
 import {
   createFillOperation,
@@ -258,6 +260,16 @@ export interface DreamStore {
   setTool(tool: ToolId): void;
   /** Switch workspace mode; persisted with the document (not undoable). */
   setMode(mode: WorkspaceMode): void;
+  /** The stamp the stamp tool will place (picker selection). */
+  stamp: StampId;
+  /** Stamp placement size (S/M/L). */
+  stampSize: StampSize;
+  setStamp(stamp: StampId): void;
+  setStampSize(size: StampSize): void;
+  /** Place the current stamp at a document point — ONE undoable command. */
+  placeStamp(point: Point): void;
+  /** Insert a coloring-book starter scene as a new layer (undoable). */
+  insertStarterScene(scene: SceneId, name: string): void;
   setColor(color: Color): void;
   setSize(size: number): void;
   setOpacity(opacity: number): void;
@@ -467,6 +479,8 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
     activeLayerId: initialDoc.layers[0].id,
     mode: initialDoc.mode ?? 'draw',
     tool: 'brush',
+    stamp: 'star',
+    stampSize: 'medium',
     settings: { ...DEFAULT_SETTINGS },
     draft: null,
     previewOp: null,
@@ -572,6 +586,27 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
     setDensity: (density) =>
       set((s) => ({ settings: { ...s.settings, density: Math.min(100, Math.max(1, density)) } })),
     setSymmetry: (symmetry) => set({ symmetry }),
+
+    setStamp: (stamp) => set({ stamp }),
+    setStampSize: (stampSize) => set({ stampSize }),
+
+    placeStamp: (point) => {
+      const layer = activeLayer();
+      if (!layer || layer.locked) return;
+      const ops = createStamp(get().stamp, point, STAMP_SIZES[get().stampSize]);
+      execute(addOperationsCommand(layer.id, ops));
+      get().dismissHint();
+    },
+
+    insertStarterScene: (scene, name) => {
+      const { doc } = get();
+      const ops = createStarterScene(scene, doc.width, doc.height);
+      if (ops.length === 0) return;
+      const layer = createLayer(name, ops);
+      execute(addLayerCommand(layer));
+      set({ activeLayerId: layer.id });
+      get().dismissHint();
+    },
 
     setWandTolerance: (tolerance) =>
       set({ wandTolerance: Math.min(255, Math.max(0, Math.round(tolerance))) }),
@@ -869,6 +904,11 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       }
       if (tool === 'text') {
         set({ pendingText: point });
+        return;
+      }
+      if (tool === 'stamp') {
+        // Click-to-place: no drag gesture, one undo per stamp.
+        get().placeStamp(point);
         return;
       }
       if (tool === 'move') {

@@ -4,9 +4,11 @@
  * undo?"), so kids and grandparents alike can just talk. Anything it doesn't
  * understand parses to null and the caller says so kindly.
  *
- * The vocabulary is English for now; recognition in other languages still
- * produces transcripts, they just may not match — the executor reports
- * "didn't understand" and suggests "help".
+ * The parser is a dumb keyword matcher over per-locale vocabulary tables:
+ * English is the base and other locales (Arabic so far) merge their words in
+ * alongside it — English commands keep working no matter the UI language.
+ * Arabic transcripts are normalized first (diacritics/tatweel stripped, alef
+ * forms unified) so "شغّل" and "شغل" match the same word.
  */
 
 import type { Color, ToolId } from '../engine/types';
@@ -85,6 +87,8 @@ const TOOL_WORDS: Record<string, ToolId> = {
   bucket: 'fill',
   wand: 'wand',
   lasso: 'lasso',
+  stamp: 'stamp',
+  sticker: 'stamp',
   eyedropper: 'eyedropper',
   dropper: 'eyedropper',
   text: 'text',
@@ -142,21 +146,205 @@ const FILLER_WORDS = new Set([
   'there',
 ]);
 
-const YES_WORDS = new Set(['yes', 'yeah', 'yep', 'sure', 'confirm', 'definitely', 'absolutely']);
-const NO_WORDS = new Set(['no', 'nope', 'cancel', 'nevermind', "don't", 'dont']);
-const BIGGER_WORDS = new Set(['bigger', 'larger', 'thicker', 'grow', 'huge', 'giant']);
-const SMALLER_WORDS = new Set(['smaller', 'thinner', 'shrink', 'tiny', 'small']);
-const CLEAR_WORDS = new Set(['clear', 'wipe', 'clean']);
-const PLAY_WORDS = new Set(['play', 'animate', 'roll']);
-const STOP_WORDS = new Set(['stop', 'pause', 'halt', 'freeze']);
+/** Everything the matcher needs, in one data table per locale. */
+export interface VoiceVocabulary {
+  filler: Set<string>;
+  colors: Record<string, Color>;
+  tools: Record<string, ToolId>;
+  yes: Set<string>;
+  no: Set<string>;
+  bigger: Set<string>;
+  smaller: Set<string>;
+  clear: Set<string>;
+  play: Set<string>;
+  stop: Set<string>;
+  undo: Set<string>;
+  redo: Set<string>;
+  help: Set<string>;
+  save: Set<string>;
+  game: Set<string>;
+  app: Set<string>;
+  appPreview: Set<string>;
+  appExport: Set<string>;
+  mirror: Set<string>;
+  clearPhrases: string[];
+  newFramePhrases: string[];
+  mirrorOnPhrases: string[];
+  mirrorOffPhrases: string[];
+}
 
-/** Tokenize: lowercase, drop punctuation, remove filler words. */
-export function tokenize(transcript: string): string[] {
-  return transcript
-    .toLowerCase()
+const EN_VOCAB: VoiceVocabulary = {
+  filler: FILLER_WORDS,
+  colors: COLOR_WORDS,
+  tools: TOOL_WORDS,
+  yes: new Set(['yes', 'yeah', 'yep', 'sure', 'confirm', 'definitely', 'absolutely']),
+  no: new Set(['no', 'nope', 'cancel', 'nevermind', "don't", 'dont']),
+  bigger: new Set(['bigger', 'larger', 'thicker', 'grow', 'huge', 'giant']),
+  smaller: new Set(['smaller', 'thinner', 'shrink', 'tiny', 'small']),
+  clear: new Set(['clear', 'wipe', 'clean']),
+  play: new Set(['play', 'animate', 'roll']),
+  stop: new Set(['stop', 'pause', 'halt', 'freeze']),
+  undo: new Set(['undo', 'oops']),
+  redo: new Set(['redo']),
+  help: new Set(['help', 'commands', 'options']),
+  save: new Set(['save']),
+  game: new Set(['game', 'games']),
+  app: new Set(['app', 'prototype']),
+  appPreview: new Set(['preview', 'try', 'test', 'open', 'show']),
+  appExport: new Set(['export', 'download', 'share', 'send']),
+  mirror: new Set(['mirror', 'symmetry', 'mirroring']),
+  clearPhrases: ['erase everything', 'delete everything', 'start over', 'wipe it'],
+  newFramePhrases: ['new frame', 'add frame', 'another frame', 'next frame'],
+  mirrorOnPhrases: ['mirror on', 'symmetry on', 'mirroring on'],
+  mirrorOffPhrases: ['mirror off', 'symmetry off', 'mirroring off'],
+};
+
+/**
+ * Arabic additions (العربية), written in normalized form: no diacritics, bare
+ * alef. Both teh-marbuta and plain-h spellings are listed where transcripts
+ * might differ. Merged INTO English, so mixed sentences keep working.
+ */
+const AR_VOCAB: VoiceVocabulary = {
+  filler: new Set([
+    'من',
+    'فضلك',
+    'لو',
+    'سمحت',
+    'يا',
+    'ارجوك',
+    'ارجو',
+    'هل',
+    'يمكنك',
+    'تستطيع',
+    'الان',
+    'اريد',
+    'ان',
+    'لي',
+    'مع',
+  ]),
+  colors: {
+    احمر: COLOR_WORDS.red,
+    برتقالي: COLOR_WORDS.orange,
+    اصفر: COLOR_WORDS.yellow,
+    اخضر: COLOR_WORDS.green,
+    فيروزي: COLOR_WORDS.teal,
+    سماوي: COLOR_WORDS.sky,
+    ازرق: COLOR_WORDS.blue,
+    بنفسجي: COLOR_WORDS.purple,
+    وردي: COLOR_WORDS.pink,
+    زهري: COLOR_WORDS.pink,
+    بني: COLOR_WORDS.brown,
+    اسود: COLOR_WORDS.black,
+    ابيض: COLOR_WORDS.white,
+    رمادي: COLOR_WORDS.gray,
+    ذهبي: COLOR_WORDS.gold,
+  },
+  tools: {
+    فرشاة: 'brush',
+    قلم: 'pencil',
+    رصاص: 'pencil',
+    ممحاة: 'eraser',
+    رش: 'spray',
+    بخاخ: 'spray',
+    خط: 'line',
+    مستطيل: 'rectangle',
+    مربع: 'rectangle',
+    بيضاوي: 'ellipse',
+    دائرة: 'ellipse',
+    دلو: 'fill',
+    تعبئة: 'fill',
+    املا: 'fill',
+    عصا: 'wand',
+    سحرية: 'wand',
+    لاسو: 'lasso',
+    طابع: 'stamp',
+    ملصق: 'stamp',
+    قطارة: 'eyedropper',
+    نص: 'text',
+    كتابة: 'text',
+  },
+  yes: new Set(['نعم', 'ايه', 'ايوه', 'اكيد', 'موافق', 'تمام', 'اوكي']),
+  no: new Set(['لا', 'كلا', 'الغي', 'الغاء']),
+  bigger: new Set(['اكبر', 'كبر', 'ضخم', 'عملاق']),
+  smaller: new Set(['اصغر', 'صغر', 'صغير']),
+  clear: new Set(['امسح', 'نظف']),
+  play: new Set(['شغل', 'شغلي', 'العب']),
+  stop: new Set(['اوقف', 'اوقفي', 'توقف', 'قف', 'ايقاف']),
+  undo: new Set(['تراجع', 'رجوع', 'ارجع']),
+  redo: new Set(['اعادة', 'اعاده', 'اعد']),
+  help: new Set(['مساعدة', 'مساعده', 'اوامر']),
+  save: new Set(['احفظ', 'حفظ', 'خزن']),
+  game: new Set(['لعبة', 'لعبه', 'لعبتي', 'العاب']),
+  app: new Set(['تطبيق', 'تطبيقي', 'برنامج']),
+  appPreview: new Set(['عاين', 'معاينة', 'معاينه', 'جرب', 'افتح', 'اعرض']),
+  appExport: new Set(['صدر', 'صدري', 'تصدير', 'حمل', 'نزل', 'شارك']),
+  mirror: new Set(['مراية', 'مرايه', 'تناظر', 'تطابق']),
+  clearPhrases: ['امسح كل شيء', 'احذف كل شيء', 'ابدا من جديد', 'نظف اللوحة'],
+  newFramePhrases: ['اطار جديد', 'فريم جديد', 'اضف اطار', 'اطار اخر'],
+  mirrorOnPhrases: ['شغل التناظر', 'فعل التناظر', 'شغل المراية', 'تناظر شغال'],
+  mirrorOffPhrases: ['اطف التناظر', 'اطفي التناظر', 'اطفي المراية', 'بدون تناظر'],
+};
+
+function union<T>(a: Set<T>, b: Set<T>): Set<T> {
+  return new Set([...a, ...b]);
+}
+
+/** Merge a locale's vocabulary into the English base (English always works). */
+function mergeVocabulary(base: VoiceVocabulary, extra: VoiceVocabulary): VoiceVocabulary {
+  return {
+    filler: union(base.filler, extra.filler),
+    colors: { ...base.colors, ...extra.colors },
+    tools: { ...base.tools, ...extra.tools },
+    yes: union(base.yes, extra.yes),
+    no: union(base.no, extra.no),
+    bigger: union(base.bigger, extra.bigger),
+    smaller: union(base.smaller, extra.smaller),
+    clear: union(base.clear, extra.clear),
+    play: union(base.play, extra.play),
+    stop: union(base.stop, extra.stop),
+    undo: union(base.undo, extra.undo),
+    redo: union(base.redo, extra.redo),
+    help: union(base.help, extra.help),
+    save: union(base.save, extra.save),
+    game: union(base.game, extra.game),
+    app: union(base.app, extra.app),
+    appPreview: union(base.appPreview, extra.appPreview),
+    appExport: union(base.appExport, extra.appExport),
+    mirror: union(base.mirror, extra.mirror),
+    clearPhrases: [...base.clearPhrases, ...extra.clearPhrases],
+    newFramePhrases: [...base.newFramePhrases, ...extra.newFramePhrases],
+    mirrorOnPhrases: [...base.mirrorOnPhrases, ...extra.mirrorOnPhrases],
+    mirrorOffPhrases: [...base.mirrorOffPhrases, ...extra.mirrorOffPhrases],
+  };
+}
+
+const LOCALE_VOCABULARIES: Record<string, VoiceVocabulary> = {
+  ar: mergeVocabulary(EN_VOCAB, AR_VOCAB),
+};
+
+/** The vocabulary for a UI locale; unknown locales get plain English. */
+export function vocabularyFor(locale: string): VoiceVocabulary {
+  return LOCALE_VOCABULARIES[locale] ?? EN_VOCAB;
+}
+
+/**
+ * Normalize Arabic orthography so transcripts match the vocabulary tables:
+ * strip harakat/tanwin/shadda/dagger-alef and tatweel, unify alef forms and
+ * alef-maqsura. A no-op for English text.
+ */
+export function normalizeArabic(text: string): string {
+  return text
+    .replace(/[ً-ْٰـ]/g, '')
+    .replace(/[أإآٱ]/g, 'ا')
+    .replace(/ى/g, 'ي');
+}
+
+/** Tokenize: lowercase, normalize Arabic, drop punctuation, remove filler. */
+export function tokenize(transcript: string, filler: Set<string> = FILLER_WORDS): string[] {
+  return normalizeArabic(transcript.toLowerCase())
     .replace(/[^\p{L}\p{N}' ]+/gu, ' ')
     .split(/\s+/)
-    .filter((word) => word !== '' && !FILLER_WORDS.has(word));
+    .filter((word) => word !== '' && !filler.has(word));
 }
 
 function has(tokens: Set<string>, words: Set<string>): boolean {
@@ -166,17 +354,20 @@ function has(tokens: Set<string>, words: Set<string>): boolean {
   return false;
 }
 
-function colorIn(tokens: Set<string>): { color: Color; name: string } | null {
+function colorIn(
+  tokens: Set<string>,
+  colors: Record<string, Color>,
+): { color: Color; name: string } | null {
   for (const token of tokens) {
-    const color = COLOR_WORDS[token];
+    const color = colors[token];
     if (color) return { color, name: token };
   }
   return null;
 }
 
-function toolIn(tokens: Set<string>): ToolId | null {
+function toolIn(tokens: Set<string>, tools: Record<string, ToolId>): ToolId | null {
   for (const token of tokens) {
-    const tool = TOOL_WORDS[token];
+    const tool = tools[token];
     if (tool) return tool;
   }
   return null;
@@ -189,15 +380,18 @@ function hasPhrase(normalized: string, ...phrases: string[]): boolean {
 
 /**
  * Parse a transcript into a command intent, or null when nothing matches.
+ * `locale` picks the vocabulary ('ar' adds Arabic words to the English base).
  * Order matters: confirmations and destructive requests win over tools, and
  * "fill red" is recognized before a bare color so both intents survive.
  */
-export function parseVoiceCommand(transcript: string): VoiceCommand | null {
-  const normalized = transcript
-    .toLowerCase()
+export function parseVoiceCommand(transcript: string, locale = 'en'): VoiceCommand | null {
+  const vocab = vocabularyFor(locale);
+  // Arabic marks are stripped BEFORE punctuation removal — a shadda is a
+  // Unicode mark and would otherwise turn into a word-breaking space.
+  const normalized = normalizeArabic(transcript.toLowerCase())
     .replace(/[^\p{L}\p{N}' ]+/gu, ' ')
     .trim();
-  const tokens = new Set(tokenize(transcript));
+  const tokens = new Set(tokenize(transcript, vocab.filler));
   if (tokens.size === 0) return null;
 
   // Confirmations are tiny sentences ("yes", "no thanks") — match them first,
@@ -205,56 +399,56 @@ export function parseVoiceCommand(transcript: string): VoiceCommand | null {
   // still falls through to the color command.
   const rawWordCount = normalized.split(/\s+/).filter((w) => w !== '').length;
   if (rawWordCount <= 2) {
-    if (has(tokens, YES_WORDS)) return { kind: 'confirm' };
-    if (has(tokens, NO_WORDS)) return { kind: 'cancel' };
+    if (has(tokens, vocab.yes)) return { kind: 'confirm' };
+    if (has(tokens, vocab.no)) return { kind: 'cancel' };
   }
 
-  if (has(tokens, new Set(['help', 'commands', 'options']))) return { kind: 'help' };
-  if (has(tokens, new Set(['undo', 'oops']))) return { kind: 'undo' };
-  if (has(tokens, new Set(['redo']))) return { kind: 'redo' };
+  if (has(tokens, vocab.help)) return { kind: 'help' };
+  if (has(tokens, vocab.undo)) return { kind: 'undo' };
+  if (has(tokens, vocab.redo)) return { kind: 'redo' };
 
-  const isClearAll =
-    has(tokens, CLEAR_WORDS) ||
-    hasPhrase(normalized, 'erase everything', 'delete everything', 'start over', 'wipe it');
+  const isClearAll = has(tokens, vocab.clear) || hasPhrase(normalized, ...vocab.clearPhrases);
   if (isClearAll) return { kind: 'clear' };
 
-  if (hasPhrase(normalized, 'new frame', 'add frame', 'another frame', 'next frame')) {
+  if (hasPhrase(normalized, ...vocab.newFramePhrases)) {
     return { kind: 'new-frame' };
+  }
+
+  // Mirror PHRASES win over play/stop: Arabic "شغّل التناظر" (mirror on)
+  // contains a play word, and we must not start playback for it.
+  if (hasPhrase(normalized, ...vocab.mirrorOffPhrases)) {
+    return { kind: 'mirror', on: false };
+  }
+  if (hasPhrase(normalized, ...vocab.mirrorOnPhrases)) {
+    return { kind: 'mirror', on: true };
   }
 
   // App mode: "preview my app" / "export my app" — checked before a bare
   // "play"/"stop" so app phrases never fall through to playback.
-  if (has(tokens, new Set(['app', 'prototype']))) {
-    if (has(tokens, new Set(['preview', 'try', 'test', 'open', 'show']))) {
+  if (has(tokens, vocab.app)) {
+    if (has(tokens, vocab.appPreview)) {
       return { kind: 'preview-app' };
     }
-    if (has(tokens, new Set(['export', 'download', 'share', 'send']))) {
+    if (has(tokens, vocab.appExport)) {
       return { kind: 'export-app' };
     }
   }
 
-  if (has(tokens, STOP_WORDS)) return { kind: 'stop' };
+  if (has(tokens, vocab.stop)) return { kind: 'stop' };
   // "play my game" beats a bare "play" (which is animation playback).
-  if (has(tokens, new Set(['game', 'games']))) return { kind: 'play-game' };
-  if (has(tokens, PLAY_WORDS)) return { kind: 'play' };
-  if (has(tokens, new Set(['save']))) return { kind: 'save' };
-  if (has(tokens, BIGGER_WORDS)) return { kind: 'bigger' };
-  if (has(tokens, SMALLER_WORDS)) return { kind: 'smaller' };
+  if (has(tokens, vocab.game)) return { kind: 'play-game' };
+  if (has(tokens, vocab.play)) return { kind: 'play' };
+  if (has(tokens, vocab.save)) return { kind: 'save' };
+  if (has(tokens, vocab.bigger)) return { kind: 'bigger' };
+  if (has(tokens, vocab.smaller)) return { kind: 'smaller' };
 
-  // Mirror / symmetry: "mirror on", "turn the symmetry off", or a bare
-  // "mirror" toggles it on. Phrases win over the bare-word fallback.
-  if (hasPhrase(normalized, 'mirror off', 'symmetry off', 'mirroring off')) {
-    return { kind: 'mirror', on: false };
-  }
-  if (
-    hasPhrase(normalized, 'mirror on', 'symmetry on', 'mirroring on') ||
-    has(tokens, new Set(['mirror', 'symmetry', 'mirroring']))
-  ) {
+  // A bare mirror word ("mirror", "مراية") toggles symmetry on.
+  if (has(tokens, vocab.mirror)) {
     return { kind: 'mirror', on: true };
   }
 
-  const color = colorIn(tokens);
-  const tool = toolIn(tokens);
+  const color = colorIn(tokens, vocab.colors);
+  const tool = toolIn(tokens, vocab.tools);
   if (tool === 'fill' && color) return { kind: 'fill-color', ...color };
   if (tool) return { kind: 'tool', tool };
   if (color) return { kind: 'color', ...color };

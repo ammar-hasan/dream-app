@@ -105,12 +105,30 @@ create — literacy optional. Slice 6 ships three pillars plus a settings menu.
 
 - **Little Dreamer (kid) mode** — tap the ⭐ in the toolbar (or the settings
   gear). The tool rail becomes giant icon-only buttons for the essentials
-  (brush, pencil, eraser, fill, shapes, eyedropper), a 12-color bright named
-  palette and three brush sizes shown as dots. The right panel simplifies to
-  big Undo/Redo, an "Ask Dream!" button (the AI Create tab with a giant mic)
-  and a play button when frames exist. Turning kid mode on switches to Draw
-  mode and turns both voices on; turning it off restores the full adult UI
-  untouched. It is a per-user preference (localStorage), not per document.
+  (brush, pencil, eraser, fill, stamps, shapes, eyedropper), a 12-color
+  bright named palette and three brush sizes shown as dots. The right panel
+  simplifies to big Undo/Redo, an "Ask Dream!" button (the AI Create tab with
+  a giant mic) and a play button when frames exist. Turning kid mode on
+  switches to Draw mode and turns both voices on; turning it off restores the
+  full adult UI untouched. It is a per-user preference (localStorage), not
+  per document.
+- **Stamps & starter scenes** — the stamp tool (N) places one of twelve
+  built-in doodles (star, heart, smiley, flower, sun, moon, cloud, tree,
+  fish, butterfly, cat, rocket) at Small/Medium/Big: chunky, multi-color
+  vector art drawn procedurally by the engine (`engine/stamps.ts`, no
+  assets). A stamp is click-to-place — regular ops on the active layer, one
+  undo per stamp, and its ops share a groupId so Design mode moves the whole
+  doodle as one. In kid mode the rail's big stamp button opens a friendly
+  picker grid with spoken names. The picker also offers "Start with a
+  picture": three coloring-book starter scenes (Sunny garden, Night sky,
+  Under the sea) — black outline art generated procedurally
+  (`engine/starterScenes.ts`) and inserted as a new layer, ready to color in
+  with the brush or fill bucket.
+- **Comfort mode** — the settings gear's senior-friendly toggle: bigger text
+  and targets and a higher-contrast variant of the current theme, applied as
+  a `data-comfort` attribute on the root that restyles the design tokens
+  (light and dark both strengthen text/border contrast). Per-user
+  (localStorage), and it composes with kid mode and RTL.
 - **Spoken tool names** — hovering, focusing or touching a tool button says
   its name aloud ("Brush!") via speech synthesis (`ai/say.ts`, feature
   detected, silent where unsupported). On by default in kid mode, toggleable
@@ -118,7 +136,7 @@ create — literacy optional. Slice 6 ships three pillars plus a settings menu.
 - **Canvas voice commands** — the mic button in the toolbar. Click, speak,
   done: "undo", "redo", "clear" (asks for a spoken yes first), "new frame",
   "play"/"stop", "play my game", "preview my app", "export my app", "brush",
-  "spray", "wand", "eraser", "fill",
+  "spray", "wand", "stamp", "eraser", "fill",
   colors ("red",
   "blue", … a friendly vocabulary including "fill red"), "mirror on"/
   "mirror off", "bigger"/"smaller", "save" and "help" (speaks the command
@@ -127,7 +145,13 @@ create — literacy optional. Slice 6 ships three pillars plus a settings menu.
   please undo?") plus a thin executor (`ui/voiceExecutor.ts`) against a
   minimal store interface. Every command confirms in the status area and,
   when **voice feedback** is on, out loud. The button hides where
-  SpeechRecognition is unsupported. The vocabulary is English for now.
+  SpeechRecognition is unsupported. The vocabulary is **per-locale**: with
+  the UI in Arabic the parser also understands Arabic commands (تراجع،
+  إعادة، امسح، إطار جديد، شغّل، أوقف، فرشاة، ممحاة، طابع، العب لعبتي،
+  أحمر/أزرق/أخضر/أصفر/أسود/أبيض، أكبر/أصغر…) — the Arabic words merge into
+  the English table (which always keeps working), transcripts are
+  normalized for diacritics and alef forms, and recognition switches to
+  Arabic too.
 - **Languages & RTL** — every UI string lives in a string table
   (`ui/i18n/en.ts`, `ui/i18n/ar.ts`) and renders through `t(key)`. The
   settings gear switches language at runtime (persisted); Arabic flips the
@@ -135,8 +159,8 @@ create — literacy optional. Slice 6 ships three pillars plus a settings menu.
   panels and rails mirror).
 
 The **settings gear** in the toolbar consolidates all of it: Little Dreamer
-mode, speak tool names, voice feedback, the dark-mode toggle and the
-language picker.
+mode, speak tool names, voice feedback, the dark-mode toggle, comfort mode
+and the language picker.
 
 ### Adding a locale
 
@@ -158,6 +182,10 @@ language picker.
 - Mirror symmetry (vertical / horizontal / quad) with live mirrored preview
 - Flood fill (bucket), magic wand (move / delete / copy-to-layer a region),
   eyedropper color picker, and a click-to-type text tool
+- Stamp tool: twelve built-in cute stamps at S/M/L plus three coloring-book
+  starter scenes, all procedurally generated (no assets), one undo per stamp
+- Comfort mode: a senior-friendly settings toggle — larger text/targets and
+  higher-contrast tokens, composing with dark theme, kid mode and RTL
 - Layers: add, delete, rename, reorder, visibility, opacity, lock — all undoable
 - Image import: file picker, drag-and-drop onto the canvas, or paste from the
   clipboard — each image lands centered on its own layer (scaled down to fit)
@@ -518,6 +546,10 @@ src/
     layerCache.ts    Incremental compositor: per-layer bitmap cache (reference-
                      equality invalidation, LRU cap, eraser-aware snapshot
                      fallback, oversized-document bypass)
+    stamps.ts        The 12 built-in stamps: cute multi-color doodles as engine
+                     ops (deterministic, grouped per stamp)
+    starterScenes.ts Coloring-book starter scenes (garden/night/sea): black
+                     outline ops sized to the document — pure, deterministic
     index.ts         Public API barrel (the stable, semver-intended surface)
     renderer.ts      Renders a Document onto any 2D context (structural interface)
     symmetry.ts      Mirror mode: reflect stroke/shape ops across the center axes
@@ -548,6 +580,8 @@ src/
                      its casting couch), dialogs, image/video/sprite export,
                      settings menu, kid mode (KidPanel + kid rail), voice
                      command button + executor, i18n string tables (i18n/),
+                     stamp picker (StampPicker — shared by the adult options
+                     panel and the kid panel),
                      PWA glue (pwa.ts registration + UpdateToast update
                      prompt, install offer in the settings menu)
   storage/           IndexedDB via `idb`: projects + the cross-project
@@ -590,7 +624,7 @@ store → React re-renders → viewport redraws the document with `engine/render
 `V` select (Design) / move (Draw) · `K` lasso (Design) · `U` link (Design) ·
 `M` move · `B` brush ·
 `P` pencil · `S` spray · `E` eraser ·
-`L` line · `R` rectangle · `O` ellipse · `G` fill · `W` magic wand · `I` eyedropper · `T` text ·
+`L` line · `R` rectangle · `O` ellipse · `G` fill · `W` magic wand · `N` stamp · `I` eyedropper · `T` text ·
 `C` crop · `H` pan · `Z` zoom ·
 `Ctrl/Cmd+Z` undo · `Ctrl/Cmd+Shift+Z` / `Ctrl+Y` redo · `+`/`-` zoom ·
 `Space` (hold) pan — inside the focused timeline it toggles play instead ·
@@ -632,13 +666,21 @@ restart button bottom-end)
   pixels), selection-bbox edit regions, speech feature detection with a
   mocked SpeechRecognition, speech-synthesis feature detection (`say.ts`),
   and the voice-command parser (every intent, filler tolerance, the full
-  color vocabulary, unknown input → null)
+  color vocabulary, the Arabic vocabulary under locale "ar" — diacritic
+  normalization, mirror-phrase precedence, English unaffected — unknown
+  input → null)
 - Accessibility tests: the voice executor against a fake store (each command
   maps to the right actions, clear confirmation flow, size clamping,
   localized messages), the UI-prefs store (kid-mode voice defaults,
-  independent toggles, theme + recent-colors persistence, localStorage), and
-  the i18n string table (interpolation, English/key fallbacks, en↔ar parity,
-  RTL flag)
+  independent toggles, theme + comfort + recent-colors persistence,
+  localStorage), the comfort-mode data-attribute effect on the root element,
+  and the i18n string table (interpolation, English/key fallbacks, en↔ar
+  parity, RTL flag)
+- Stamp & starter-scene tests: engine op counts, determinism (same inputs →
+  same drawing), stamp bounds within the size box, scene bounds within the
+  canvas, outline-only scenes; store integration (click-to-place as ONE
+  undoable command, S/M/L sizing, locked layers, scene insertion as a new
+  active layer)
 - Store tests: drawing flow, layers, image import/move/adjust/crop/resize,
   design mode (mode switching, select gestures, transform handles, selection
   actions, component insert), animation (frame switching, cross-frame undo,

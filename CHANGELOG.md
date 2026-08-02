@@ -5,6 +5,28 @@ All notable changes to Dream are documented here. The format is based on
 
 ## [Unreleased]
 
+### Added
+
+- Stamps: twelve built-in doodle stamps (star, heart, smiley, flower, sun,
+  moon, cloud, tree, fish, butterfly, cat, rocket) drawn procedurally by the
+  engine — click-to-place at S/M/L sizes, one undo per stamp, ops grouped so
+  Design mode moves a stamp as one object. Adult stamp tool (N) with a
+  picker in the options panel; kid mode gets a big stamp button in the rail
+  with a friendly picker grid and spoken names.
+- Starter scenes: three coloring-book outlines ("Sunny garden", "Night sky",
+  "Under the sea") generated as engine ops and inserted as a new layer from
+  the stamp picker's "Start with a picture" section.
+- Comfort mode: a senior-friendly settings toggle (persisted per user) —
+  larger text and targets plus a higher-contrast variant of the current
+  theme via a `data-comfort` root attribute; composes with dark theme, kid
+  mode and RTL.
+- Arabic voice commands: the parser now matches per-locale vocabulary
+  tables — Arabic commands (تراجع، امسح، إطار جديد، العب لعبتي، colors,
+  sizes…) work when the UI is in Arabic, English keeps working everywhere,
+  transcripts are normalized for diacritics and alef forms, and speech
+  recognition follows the UI locale.
+- English "stamp"/"sticker" voice intent.
+
 ## [0.1.0] - 2026-08-01
 
 First public release: a complete, free, browser-only design app — as simple

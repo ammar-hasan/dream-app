@@ -8,6 +8,7 @@ import { useDreamStore } from '../store/dreamStore';
 import { useT } from './i18n';
 import { useSpeakName } from './useSpeakName';
 import { AiPanel } from './AiPanel';
+import { StampPicker } from './StampPicker';
 import { PauseIcon, PlayIcon, RedoIcon, SparkleIcon, UndoIcon } from './icons';
 
 export function KidPanel() {
@@ -18,6 +19,7 @@ export function KidPanel() {
   const hasFrames = useDreamStore((s) => !!s.doc.frames && s.doc.frames.length > 0);
   const playing = useDreamStore((s) => s.playing);
   const aiPanelOpen = useDreamStore((s) => s.aiPanelOpen);
+  const tool = useDreamStore((s) => s.tool);
 
   const speak = (key: string) => () => speakName(t(key));
 
@@ -77,6 +79,8 @@ export function KidPanel() {
           <span>{t('kid.ai')}</span>
         </button>
       </div>
+
+      {tool === 'stamp' && <StampPicker kid />}
 
       {aiPanelOpen && <AiPanel kid />}
     </aside>

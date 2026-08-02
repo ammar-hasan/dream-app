@@ -38,6 +38,7 @@ export type ToolId =
   | 'ellipse'
   | 'fill'
   | 'wand'
+  | 'stamp'
   | 'eyedropper'
   | 'text'
   | 'move'

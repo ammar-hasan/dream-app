@@ -151,3 +151,97 @@ describe('parseVoiceCommand — unknown input', () => {
     expect(parseVoiceCommand('flibberty gibbet')).toBeNull();
   });
 });
+
+describe('parseVoiceCommand — Arabic vocabulary (locale "ar")', () => {
+  it('parses undo/redo/clear with polite filler', () => {
+    expect(parseVoiceCommand('تراجع', 'ar')).toEqual({ kind: 'undo' });
+    expect(parseVoiceCommand('يا حلم من فضلك تراجع', 'ar')).toEqual({ kind: 'undo' });
+    expect(parseVoiceCommand('إعادة', 'ar')).toEqual({ kind: 'redo' });
+    expect(parseVoiceCommand('امسح', 'ar')).toEqual({ kind: 'clear' });
+    expect(parseVoiceCommand('امسح كل شيء', 'ar')).toEqual({ kind: 'clear' });
+  });
+
+  it('parses confirmations and cancellations', () => {
+    expect(parseVoiceCommand('نعم', 'ar')).toEqual({ kind: 'confirm' });
+    expect(parseVoiceCommand('لا', 'ar')).toEqual({ kind: 'cancel' });
+  });
+
+  it('parses frames and playback, diacritics optional', () => {
+    expect(parseVoiceCommand('إطار جديد', 'ar')).toEqual({ kind: 'new-frame' });
+    expect(parseVoiceCommand('شَغِّل', 'ar')).toEqual({ kind: 'play' });
+    expect(parseVoiceCommand('أوقف', 'ar')).toEqual({ kind: 'stop' });
+  });
+
+  it('"العب لعبتي" routes to the game; "أوقف اللعبة" still stops', () => {
+    expect(parseVoiceCommand('العب لعبتي', 'ar')).toEqual({ kind: 'play-game' });
+    expect(parseVoiceCommand('أوقف اللعبة', 'ar')).toEqual({ kind: 'stop' });
+  });
+
+  it('parses tools', () => {
+    expect(parseVoiceCommand('فرشاة', 'ar')).toEqual({ kind: 'tool', tool: 'brush' });
+    expect(parseVoiceCommand('ممحاة', 'ar')).toEqual({ kind: 'tool', tool: 'eraser' });
+    expect(parseVoiceCommand('طابع', 'ar')).toEqual({ kind: 'tool', tool: 'stamp' });
+    expect(parseVoiceCommand('دائرة', 'ar')).toEqual({ kind: 'tool', tool: 'ellipse' });
+  });
+
+  it('parses colors, including "fill red" in one breath', () => {
+    expect(parseVoiceCommand('أحمر', 'ar')).toEqual({
+      kind: 'color',
+      color: COLOR_WORDS.red,
+      name: 'احمر',
+    });
+    expect(parseVoiceCommand('أزرق', 'ar')).toEqual({
+      kind: 'color',
+      color: COLOR_WORDS.blue,
+      name: 'ازرق',
+    });
+    expect(parseVoiceCommand('أخضر', 'ar')).toEqual({
+      kind: 'color',
+      color: COLOR_WORDS.green,
+      name: 'اخضر',
+    });
+    expect(parseVoiceCommand('أصفر', 'ar')).toEqual({
+      kind: 'color',
+      color: COLOR_WORDS.yellow,
+      name: 'اصفر',
+    });
+    expect(parseVoiceCommand('أسود', 'ar')).toEqual({
+      kind: 'color',
+      color: COLOR_WORDS.black,
+      name: 'اسود',
+    });
+    expect(parseVoiceCommand('أبيض', 'ar')).toEqual({
+      kind: 'color',
+      color: COLOR_WORDS.white,
+      name: 'ابيض',
+    });
+    expect(parseVoiceCommand('املأ أحمر', 'ar')).toEqual({
+      kind: 'fill-color',
+      color: COLOR_WORDS.red,
+      name: 'احمر',
+    });
+  });
+
+  it('parses brush size, save and help', () => {
+    expect(parseVoiceCommand('أكبر', 'ar')).toEqual({ kind: 'bigger' });
+    expect(parseVoiceCommand('أصغر', 'ar')).toEqual({ kind: 'smaller' });
+    expect(parseVoiceCommand('احفظ', 'ar')).toEqual({ kind: 'save' });
+    expect(parseVoiceCommand('مساعدة', 'ar')).toEqual({ kind: 'help' });
+  });
+
+  it('mirror phrases beat the play word inside them', () => {
+    expect(parseVoiceCommand('شغّل التناظر', 'ar')).toEqual({ kind: 'mirror', on: true });
+    expect(parseVoiceCommand('اطفي التناظر', 'ar')).toEqual({ kind: 'mirror', on: false });
+    expect(parseVoiceCommand('مراية', 'ar')).toEqual({ kind: 'mirror', on: true });
+  });
+
+  it('English keeps working under the Arabic locale (mixed sentences too)', () => {
+    expect(parseVoiceCommand('undo', 'ar')).toEqual({ kind: 'undo' });
+    expect(parseVoiceCommand('brush', 'ar')).toEqual({ kind: 'tool', tool: 'brush' });
+    expect(parseVoiceCommand('please تراجع', 'ar')).toEqual({ kind: 'undo' });
+  });
+
+  it('unknown Arabic still parses to null', () => {
+    expect(parseVoiceCommand('ما حالة الطقس اليوم', 'ar')).toBeNull();
+  });
+});

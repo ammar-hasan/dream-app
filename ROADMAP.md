@@ -314,9 +314,43 @@ MCP in her development flow and APIs in her applications.
   document, a plugin API (custom tools/panels), more MCP tools (add shape /
   stroke / image ops, layer management, component library access, AI edits).
 
+## Slice 16 — Research quick wins: stamps, comfort mode, Arabic voice ✅
+
+Three small, high-persona-impact items from the research backlog
+(RESEARCH.md §4: #3 stamps & coloring starters, #6 localized voice
+vocabularies, #7 senior comfort toggle).
+
+- ✅ Stamps (backlog #3): twelve built-in stamps (star, heart, smiley,
+  flower, sun, moon, cloud, tree, fish, butterfly, cat, rocket) — chunky,
+  multi-color vector art built from engine ops in `engine/stamps.ts` (no
+  assets, deterministic, all ops sharing a groupId so Design mode moves a
+  stamp as one object). Click-to-place on the active layer at S/M/L sizes,
+  ONE undoable command per stamp. Adult rail gets a stamp tool (N) with a
+  picker in the options panel; the kid rail gets a big stamp button opening
+  a giant picker grid in the kid panel with spoken names (`ui/StampPicker.tsx`
+  shared by both). Voice learned "stamp"/"sticker".
+- ✅ Starter scenes (backlog #3): three coloring-book scenes ("Sunny
+  garden", "Night sky", "Under the sea") — black outline art sized to the
+  document, pure functions in `engine/starterScenes.ts`, inserted as a new
+  layer from the picker's "Start with a picture" section (undoable).
+- ✅ Senior comfort toggle (backlog #7): "Comfort mode" in the settings
+  menu, persisted in uiPrefs. Sets `data-comfort` on the root: bigger body
+  text, 44px+ targets, roomier toolbar/rail/panels, and strengthened
+  text/border tokens for BOTH light and dark themes. Composes with kid mode
+  and RTL (token- and logical-property-based).
+- ✅ Arabic voice commands (backlog #6): `ai/voiceCommands.ts` is now a
+  dumb matcher over per-locale `VoiceVocabulary` tables — English is the
+  base, Arabic merges in (so English keeps working under the Arabic UI).
+  Arabic normalization (diacritics/tatweel stripped, alef forms unified)
+  before matching; mirror phrases take precedence over the play word they
+  contain (شغّل التناظر ≠ play). Recognition language follows the UI locale.
+- Acceptance met: a kid stamps a rocket and colors a garden; Victor gets a
+  bigger, calmer UI in one tap; Zainab says "تراجع" and Dream undoes.
+
 ## Post-0.1.0 ideas
 
-- More locales; localized voice-command vocabularies; axe-core audit.
+- More locales (voice vocabularies are now per-locale tables — adding one is
+  data only); axe-core audit.
 - Per-OS visual baselines if the generous-threshold single baseline flakes.
 - Slice 5/6 remainders: audio track, MP4/WebCodecs export, slide transitions,
   presenter view with notes, per-slide duration.

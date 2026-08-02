@@ -6,6 +6,7 @@ import { SYMMETRY_TOOLS, type SymmetryMode } from '../engine/symmetry';
 import { useDreamStore } from '../store/dreamStore';
 import { useUiPrefs } from '../store/uiPrefs';
 import { useT } from './i18n';
+import { StampPicker } from './StampPicker';
 
 const SHOW_COLOR = new Set([
   'brush',
@@ -33,6 +34,7 @@ const HINT_TOOLS = new Set([
   'wand',
   'lasso',
   'link',
+  'stamp',
 ]);
 
 const SYMMETRY_MODES: { value: SymmetryMode; key: string }[] = [
@@ -88,6 +90,8 @@ export function ToolOptionsPanel() {
       <h2 className="panel-title">{t('options.title')}</h2>
 
       {HINT_TOOLS.has(tool) && <p className="tool-hint">{t(`options.hint.${tool}`)}</p>}
+
+      {tool === 'stamp' && <StampPicker />}
 
       {tool === 'crop' && (
         <div className="option-row crop-actions">

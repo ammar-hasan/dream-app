@@ -19,6 +19,7 @@ const TOOL_KEYS: Record<string, ToolId> = {
   c: 'crop',
   h: 'pan',
   m: 'move',
+  n: 'stamp',
   k: 'lasso',
   u: 'link',
   z: 'zoom',

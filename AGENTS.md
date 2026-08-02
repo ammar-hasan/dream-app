@@ -56,9 +56,11 @@ Conventions for anyone (human or agent) working on Dream.
    `src/ai/speech.ts` (recognition) and `src/ai/say.ts` (synthesis), both
    feature-detected.
 9. **Styling goes through the design tokens in `src/styles/app.css`.** No
-   hardcoded colors outside the `:root` / `[data-theme='dark']` token blocks —
-   consume `var(--accent)`, `var(--panel)`, etc. Theme is a `data-theme`
-   attribute on `<html>`, set from the uiPrefs store. Tooltips are pure CSS
+   hardcoded colors outside the `:root` / `[data-theme='dark']` /
+   `html[data-comfort]` token blocks — consume `var(--accent)`,
+   `var(--panel)`, etc. Theme is a `data-theme` attribute on `<html>`,
+   comfort mode a `data-comfort` attribute (both set from the uiPrefs
+   store). Tooltips are pure CSS
    via a `data-tooltip` attribute (never native `title` on buttons; kid mode
    suppresses them because spoken names do that job). All animation is
    transform/opacity-only and must respect `prefers-reduced-motion`.
@@ -96,12 +98,14 @@ Conventions for anyone (human or agent) working on Dream.
   fallback, LRU + pixel caps), index (the public API barrel — semver-intended
   stable surface), renderer, geometry, color, filters
   (pure RGBA pixel transforms), transform (flip/rotate/crop/resize), symmetry
-  (mirror-mode op reflection), spray (seeded dot layout), selection (Design
+  (mirror-mode op reflection), spray (seeded dot layout), stamps (the 12
+  built-in stamp doodles as op lists), starterScenes (coloring-book outline
+  scenes as op lists), selection (Design
   mode: hit-testing, lasso/marquee, move/scale/rotate, snapping, align,
   groups, component factories), tools/
 - `src/store/` — Zustand store(s): `dreamStore` (document, via History) and
   `uiPrefs` (per-user UI prefs in localStorage: kid mode, voice toggles,
-  locale, theme, recent colors)
+  comfort mode, locale, theme, recent colors)
 - `src/game/` — Play mode ("Catch!"), framework-free like the engine: the
   pure game core (`core.ts`: entities, spawn/collision/score, difficulty
   ramp, seeded `tick`), sprite content-cropping (`sprites.ts`), procedural
@@ -125,7 +129,8 @@ Conventions for anyone (human or agent) working on Dream.
   localStorage only on opt-in — never log keys), daily usage counter,
   rule-based document feedback (`analyze.ts`), Web Speech dictation
   (`speech.ts`, feature-detected), speech synthesis (`say.ts`,
-  feature-detected), pure voice-command parser (`voiceCommands.ts`)
+  feature-detected), pure voice-command parser (`voiceCommands.ts` —
+  per-locale vocabulary tables; Arabic merges into the English base)
 - `src/test/` — shared test helpers (mock 2D context) + Vitest setup
 - `e2e/` — Playwright suite (smoke + one visual baseline + the offline PWA
   boot test, which serves `dist/` from its own throwaway server and kills

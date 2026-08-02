@@ -54,8 +54,13 @@ export interface DictationHandle {
 /**
  * Start listening; returns null when speech recognition is unsupported.
  * The transcript is streamed to onText until stop() or the session ends.
+ * `options.lang` sets the recognition language (e.g. the UI locale, so Arabic
+ * commands are recognized as Arabic); defaults to the browser language.
  */
-export function startDictation(callbacks: DictationCallbacks): DictationHandle | null {
+export function startDictation(
+  callbacks: DictationCallbacks,
+  options?: { lang?: string },
+): DictationHandle | null {
   const Ctor = resolveCtor();
   if (!Ctor) return null;
   let recognition: SpeechRecognitionLike;
@@ -64,7 +69,7 @@ export function startDictation(callbacks: DictationCallbacks): DictationHandle |
   } catch {
     return null;
   }
-  recognition.lang = globalThis.navigator?.language || 'en-US';
+  recognition.lang = options?.lang || globalThis.navigator?.language || 'en-US';
   recognition.interimResults = true;
   recognition.continuous = false;
 

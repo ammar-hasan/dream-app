@@ -305,6 +305,14 @@ export const StarIcon = (p: IconProps) => (
   </svg>
 );
 
+export const StampIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M12 2.5c2 0 3.3 1.4 3.3 3.3 0 2.6-1.2 3.9-1.2 5.7h-4.2c0-1.8-1.2-3.1-1.2-5.7C8.7 3.9 10 2.5 12 2.5Z" />
+    <path d="M7 15.5c0-1.7 1.3-3 3-3h4c1.7 0 3 1.3 3 3v1.5H7Z" />
+    <path d="M4.5 19.5h15" />
+  </svg>
+);
+
 export const GearIcon = (p: IconProps) => (
   <svg {...base(p)}>
     <circle cx="12" cy="12" r="3.2" />
