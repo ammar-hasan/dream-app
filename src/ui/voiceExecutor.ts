@@ -28,6 +28,10 @@ export interface VoiceExecutorStore {
   setMode(mode: WorkspaceMode): void;
   startGame(): void;
   stopGame(): void;
+  /** Open Present mode as an interactive app preview. */
+  previewApp(): void;
+  /** Download the standalone HTML prototype. */
+  exportApp(): void;
   setTool(tool: ToolId): void;
   setColor(color: Color): void;
   setSize(size: number): void;
@@ -101,6 +105,20 @@ export function executeVoiceCommand(
       store.setMode('play');
       store.startGame();
       return { message: t('voice.playGame') };
+
+    case 'preview-app':
+      if (!store.doc.frames || store.doc.frames.length === 0) {
+        return { message: t('voice.noApp') };
+      }
+      store.previewApp();
+      return { message: t('voice.previewApp') };
+
+    case 'export-app':
+      if (!store.doc.frames || store.doc.frames.length === 0) {
+        return { message: t('voice.noApp') };
+      }
+      store.exportApp();
+      return { message: t('voice.exportApp') };
 
     case 'stop':
       store.pause();

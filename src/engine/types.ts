@@ -28,6 +28,7 @@ export type Color = string;
 export type ToolId =
   | 'select'
   | 'lasso'
+  | 'link'
   | 'brush'
   | 'pencil'
   | 'eraser'
@@ -158,14 +159,34 @@ export interface Layer {
   operations: Operation[];
 }
 
+/** How an app-mode hotspot animates the move to its target frame. */
+export type HotspotTransition = 'none' | 'fade' | 'slide';
+
 /**
- * One animation frame (or presentation slide): it owns its own layer stack,
- * exactly like the top-level document did before animation existed.
+ * App mode: a tappable rectangle on a frame ("screen") that jumps to another
+ * frame when tapped in the app preview or the exported standalone HTML.
+ * Pure document data — additive and backward compatible.
+ */
+export interface Hotspot {
+  id: string;
+  /** Tap area in document pixels. */
+  rect: Rect;
+  targetFrameId: string;
+  transition: HotspotTransition;
+}
+
+/**
+ * One animation frame (or presentation slide, or app screen): it owns its
+ * own layer stack, exactly like the top-level document did before animation
+ * existed. `hotspots` link frames into an interactive prototype (app mode);
+ * absent on old saves.
  */
 export interface Frame {
   id: string;
   /** Bottom-to-top stacking order: layers[0] is painted first. */
   layers: Layer[];
+  /** App-mode links out of this screen; undefined = none. */
+  hotspots?: Hotspot[];
 }
 
 /**

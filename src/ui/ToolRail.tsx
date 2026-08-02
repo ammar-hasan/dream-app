@@ -21,6 +21,7 @@ import {
   FillIcon,
   LassoIcon,
   LineIcon,
+  LinkIcon,
   MoveIcon,
   PanIcon,
   PencilIcon,
@@ -46,6 +47,7 @@ interface ToolDef {
 const TOOLS: ToolDef[] = [
   { id: 'select', key: 'select', shortcut: ['V', 'V'], Icon: SelectIcon, designOnly: true },
   { id: 'lasso', key: 'lasso', shortcut: ['K', 'K'], Icon: LassoIcon, designOnly: true },
+  { id: 'link', key: 'link', shortcut: ['U', 'U'], Icon: LinkIcon, designOnly: true },
   { id: 'move', key: 'move', shortcut: ['V', 'M'], Icon: MoveIcon },
   { id: 'brush', key: 'brush', shortcut: ['B', 'B'], Icon: BrushIcon },
   { id: 'pencil', key: 'pencil', shortcut: ['P', 'P'], Icon: PencilIcon },

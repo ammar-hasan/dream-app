@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { animationSettingsOf } from '../engine/animation';
 import { useDreamStore } from '../store/dreamStore';
 import { exportImage } from './exportImage';
+import { exportAppHtml } from './exportApp';
 import {
   downloadBlob,
   exportAnimationWebM,
@@ -16,7 +17,7 @@ import {
 } from './exportAnimation';
 import { useT } from './i18n';
 
-type Format = 'png' | 'jpeg' | 'webm' | 'sprite';
+type Format = 'png' | 'jpeg' | 'webm' | 'sprite' | 'app';
 
 export function ExportDialog({ onClose }: { onClose: () => void }) {
   const t = useT();
@@ -51,6 +52,11 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
       onClose();
       return;
     }
+    if (format === 'app') {
+      exportAppHtml(doc);
+      onClose();
+      return;
+    }
     exportImage(doc, { format, quality: quality / 100 });
     onClose();
   };
@@ -62,6 +68,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
       ? [
           { id: 'webm' as const, label: t('export.webmLabel') },
           { id: 'sprite' as const, label: t('export.spriteLabel') },
+          { id: 'app' as const, label: t('export.appLabel') },
         ]
       : []),
   ];
@@ -118,6 +125,8 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
         )}
 
         {format === 'sprite' && <p className="dialog-note">{t('export.spriteNote')}</p>}
+
+        {format === 'app' && <p className="dialog-note">{t('export.appNote')}</p>}
 
         {progress && <p className="dialog-note">{t('export.recording', { progress })}</p>}
         {error && <p className="dialog-note">{error}</p>}

@@ -1852,6 +1852,127 @@ textarea:focus-visible,
   }
 }
 
+/* --- App mode: links, preview & export --------------------------------------- */
+
+.field select {
+  min-height: 38px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  font: inherit;
+  background: var(--panel);
+}
+
+.hotspot-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.hotspot-row-main {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hotspot-row-main select {
+  flex: 1;
+  min-width: 0;
+  min-height: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font: inherit;
+  font-size: 12.5px;
+  padding: 2px 6px;
+  background: var(--panel);
+}
+
+.hotspot-row.broken .hotspot-row-main select {
+  border-color: var(--danger);
+}
+
+.hotspot-glyph {
+  color: var(--accent);
+  font-size: 15px;
+}
+
+.hotspot-preview {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.timeline-app-hint {
+  align-self: center;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.timeline-app-hint:hover,
+.timeline-app-hint:focus-visible {
+  background: var(--accent-soft);
+}
+
+.present-style {
+  position: absolute;
+  top: 16px;
+  inset-inline-start: 16px;
+  display: flex;
+  gap: 6px;
+}
+
+.present-style .btn,
+.present-restart {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: transparent;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.present-style .btn.primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.present-restart {
+  position: absolute;
+  bottom: 20px;
+  inset-inline-end: 16px;
+}
+
+.present-canvas.fx-fade-out {
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+.present-canvas.fx-fade-in {
+  opacity: 1;
+  transition: opacity 0.22s ease;
+}
+
+.present-canvas.fx-slide-out {
+  opacity: 0;
+  transform: translateX(-4%);
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease;
+}
+
+.present-canvas.fx-slide-in {
+  opacity: 1;
+  transform: translateX(0);
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease;
+}
+
 /* --- Reduced motion ---------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {

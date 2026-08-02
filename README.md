@@ -22,8 +22,9 @@ BYOK providers and voice input), **Slice 6** (accessibility for everyone:
 kid mode, canvas voice commands and i18n with RTL), the **polish pass**
 (design system, dark theme, brand, micro-delight), the **drawing power
 tools** (mirror symmetry, pen pressure, filled shapes, lasso, magic wand
-and the spray brush) and **game mode** (turn your drawings into a playable
-Catch! mini-game).
+and the spray brush), **game mode** (turn your drawings into a playable
+Catch! mini-game) and **app mode** (link your frames into an interactive
+prototype and export it as one standalone HTML file).
 
 <!-- Screenshots: drop light/dark theme captures into docs/screenshots/ and
      link them here once we have a stable marketing look. -->
@@ -70,7 +71,8 @@ create — literacy optional. Slice 6 ships three pillars plus a settings menu.
   in settings for everyone.
 - **Canvas voice commands** — the mic button in the toolbar. Click, speak,
   done: "undo", "redo", "clear" (asks for a spoken yes first), "new frame",
-  "play"/"stop", "play my game", "brush", "spray", "wand", "eraser", "fill",
+  "play"/"stop", "play my game", "preview my app", "export my app", "brush",
+  "spray", "wand", "eraser", "fill",
   colors ("red",
   "blue", … a friendly vocabulary including "fill red"), "mirror on"/
   "mirror off", "bigger"/"smaller", "save" and "help" (speaks the command
@@ -283,6 +285,39 @@ pro workspace — the mode is persisted per project.
   MS-Paint model; linked masters are a possible future slice).
 - Everything above is undoable through the same command history.
 
+## App mode (interactive prototypes)
+
+Draw your screens as frames, link them with hotspots, preview the app, and
+export it as ONE self-contained HTML file you can send to anyone — it opens
+in any browser, works offline, no Dream required. This is the v0.1 of
+IDEA.md's "create whole applications with just your drawings".
+
+- **The Link tool (U, Design mode)** — with animation on (each frame is one
+  screen), drag a rectangle over a button you drew. The dialog asks "when
+  tapped, go to frame…" plus an optional transition (none / fade / slide).
+  Hotspots show as soft accent-tinted dashed rectangles with a tiny link
+  glyph while the Link tool is active, and every add/edit/delete is undoable.
+- **The Links panel** (Design mode) lists the current screen's hotspots:
+  retarget via the frame dropdown, change the transition, delete. A hotspot
+  whose target frame was deleted is flagged as broken — ignored in previews
+  and exports until you retarget or remove it.
+- **Preview app** — the button in the Links panel (or say "preview my app")
+  opens Present mode in App flavor: only hotspots are tappable (hover shows
+  the pointer and a subtle highlight), arrows and clicks elsewhere do
+  nothing — it's an app, not a slideshow. Fade/slide transitions are
+  transform/opacity-only, with a subtle Restart and Exit. The **Slideshow /
+  App** toggle inside Present mode switches flavors any time.
+- **Export → Interactive app (.html)** — every frame is flattened to a PNG
+  data-URL, hotspots become transparent buttons over the screen image, and
+  ~50 lines of dependency-free JS handle tap → transition → next screen,
+  with responsive fit-to-window scaling, touch support, keyboard-accessible
+  hotspots, a Home-key restart and a small "Made with Dream" corner. The
+  generator is pure TypeScript (`engine/appExport.ts`).
+- **Discovery** — with two or more frames and no links yet, the timeline
+  shows a gentle "Link your frames to make an app →" hint that activates the
+  Link tool. Kid mode skips it (Play mode stays the kid path); voice learned
+  "preview my app" and "export my app".
+
 ## Play mode (Catch!)
 
 The **Play** tab in the mode pill turns the drawing into a mini-game you play
@@ -359,6 +394,10 @@ src/
     history.ts       Command-based undo/redo (invertible commands, no snapshots)
     animation.ts     Frame model (enable/disable/clone), playback timing,
                      onion-skin decisions, sprite-sheet layout — all pure
+    hotspots.ts      App mode: hotspot queries (broken-target detection,
+                     hit-testing) over the frame model — all pure
+    appExport.ts     Standalone prototype export: frames as PNG data URLs +
+                     hotspots → ONE self-contained interactive HTML file
     renderer.ts      Renders a Document onto any 2D context (structural interface)
     symmetry.ts      Mirror mode: reflect stroke/shape ops across the center axes
     spray.ts         Seeded PRNG + deterministic spray-dot layout
@@ -415,7 +454,8 @@ store → React re-renders → viewport redraws the document with `engine/render
 
 ## Keyboard shortcuts
 
-`V` select (Design) / move (Draw) · `K` lasso (Design) · `M` move · `B` brush ·
+`V` select (Design) / move (Draw) · `K` lasso (Design) · `U` link (Design) ·
+`M` move · `B` brush ·
 `P` pencil · `S` spray · `E` eraser ·
 `L` line · `R` rectangle · `O` ellipse · `G` fill · `W` magic wand · `I` eyedropper · `T` text ·
 `C` crop · `H` pan · `Z` zoom ·
@@ -431,7 +471,9 @@ Design mode, with a selection: `Ctrl/Cmd+D` duplicate · `Ctrl/Cmd+G` group ·
 `Ctrl/Cmd+Shift+G` ungroup · `Del`/`Backspace` delete · arrow keys nudge
 (`Shift` = 10px)
 
-Present mode: `→` / `Space` / click next slide · `←` previous · `Esc` exit
+Present mode: `→` / `Space` / click next slide · `←` previous · `Esc` exit —
+in the App flavor arrows do nothing; only hotspots are tappable (`Home`-style
+restart button bottom-end)
 
 ## Testing
 
@@ -443,7 +485,10 @@ Present mode: `→` / `Space` / click next slide · `←` previous · `Esc` exit
   bounds), pen-pressure width interpolation, filled-shape rendering and
   hit-testing, magic-wand region extraction on synthetic buffers
   (mask/extract/erase/stamp), animation (frame model, CRUD commands + undo,
-  playback timing, onion-skin decisions, sprite-sheet layout), renderer
+  playback timing, onion-skin decisions, sprite-sheet layout), app mode
+  (hotspot commands + undo, broken-target detection, standalone-HTML
+  generation: structure, title escaping, percentage geometry, no external
+  URLs), renderer
   (against a recording mock 2D context — no canvas package needed)
 - AI tests: provider registry + key/settings persistence, OpenAI-compatible
   request construction with a mocked fetch, capability degradation, the daily

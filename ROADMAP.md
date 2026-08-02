@@ -5,9 +5,10 @@ editing), slice 3 (design mode), slice 4 (animation + video export +
 presentation mode), slice 7 (AI panel), the accessibility trio — slices 8
 (voice commands), 9 (kid mode) and 10 (i18n) — the release harness, the
 drawing power tools (symmetry, pressure, filled shapes, lasso, magic wand,
-spray) and game mode v1 (Catch!, the first slice-12 template) are done. Each
-slice below lists brief acceptance criteria; slices are roughly ordered by
-dependency, not by a fixed schedule.
+spray), game mode v1 (Catch!, the first slice-12 template) and app mode v1
+(interactive prototypes: hotspots, app preview, standalone HTML export) are
+done. Each slice below lists brief acceptance criteria; slices are roughly
+ordered by dependency, not by a fixed schedule.
 
 ## Slice 2 — Image filters & adjustments ✅
 
@@ -236,6 +237,40 @@ dependency, not by a fixed schedule.
 - ✅ PWA icons: `scripts/gen-icons.mjs` rasterizes the SVG mark to 192/512 PNG
   - a maskable tile via chromium (no image dependencies); wired into the
     manifest with relative paths so the project-page base works.
+
+## Slice 13 — App mode: interactive prototypes (v1 ✅)
+
+- ✅ Hotspots: the Link tool (U, Design mode) drags a rectangle on the
+  canvas → "when tapped, go to frame…" dialog with an optional transition
+  (none / fade / slide). Hotspots are engine data on the frame
+  (`frame.hotspots`, additive and backward compatible, IndexedDB-safe) —
+  soft accent-tinted dashed rects with a tiny link glyph while the tool is
+  active, a Links panel (retarget, re-transition, delete), all undoable
+  through the shared History.
+- ✅ App preview: Present mode gains a Slideshow / App toggle (plus the
+  Links panel's "Preview app" button). In App flavor only hotspots are
+  tappable (hover = pointer + subtle highlight), arrows/Space do nothing,
+  fade/slide transitions are transform/opacity-only, and Restart/Exit
+  affordances stay subtle. Broken hotspots (target frame deleted) are
+  flagged in the panel and ignored in preview and export.
+- ✅ Standalone HTML export (the showstopper): Export → "Interactive app
+  (.html)" produces ONE self-contained file — frames as PNG data-URLs,
+  hotspots as transparent buttons, ~50 lines of dependency-free JS for
+  tap → transition → screen, responsive fit-to-window scaling, touch and
+  keyboard support, a "Made with Dream" corner. Pure generator in
+  `engine/appExport.ts`, unit-tested (structure, escaping, percentage
+  math, no external URLs).
+- ✅ Discovery + voice: a one-line timeline hint ("Link your frames to
+  make an app →") when a document has ≥2 frames and no hotspots (skipped
+  in kid mode — Play stays the kid path); "preview my app" and "export my
+  app" voice commands.
+- Future: real component logic (buttons with states, forms, variables),
+  multi-page sites (navigation chrome, shared headers), code generation
+  (React/HTML scaffold from the prototype model), hotspot targets beyond
+  frames (links, overlays/scrolling), prototype sharing via a URL.
+- Acceptance met: draw two screens, link a drawn button between them,
+  preview the tap, export the HTML — opening the file feels like a magic
+  trick: "I drew this, and now it's an app I can send to anyone."
 
 ## Post-0.1.0 ideas
 

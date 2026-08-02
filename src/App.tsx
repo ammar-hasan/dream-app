@@ -12,6 +12,8 @@ import { CanvasViewport } from './ui/CanvasViewport';
 import { ToolOptionsPanel } from './ui/ToolOptionsPanel';
 import { DesignPanel } from './ui/DesignPanel';
 import { ComponentsPanel } from './ui/ComponentsPanel';
+import { HotspotsPanel } from './ui/HotspotsPanel';
+import { LinkDialog } from './ui/LinkDialog';
 import { AdjustPanel } from './ui/AdjustPanel';
 import { AiPanel } from './ui/AiPanel';
 import { KidPanel } from './ui/KidPanel';
@@ -33,6 +35,7 @@ export default function App() {
   // Splash: shown until the last-document restore settles, then fades out.
   const [splash, setSplash] = useState<'show' | 'fade' | 'gone'>('show');
   const mode = useDreamStore((s) => s.mode);
+  const pendingHotspot = useDreamStore((s) => s.pendingHotspot);
   const aiPanelOpen = useDreamStore((s) => s.aiPanelOpen);
   const kidMode = useUiPrefs((s) => s.kidMode);
   const theme = useUiPrefs((s) => s.theme);
@@ -86,6 +89,7 @@ export default function App() {
             {mode === 'design' && (
               <>
                 <DesignPanel />
+                <HotspotsPanel />
                 <ComponentsPanel />
               </>
             )}
@@ -107,6 +111,7 @@ export default function App() {
       {dialog === 'open' && <OpenDialog onClose={() => setDialog(null)} />}
       {dialog === 'resize' && <ResizeDialog onClose={() => setDialog(null)} />}
       {dialog === 'export' && <ExportDialog onClose={() => setDialog(null)} />}
+      {pendingHotspot && <LinkDialog />}
       {splash !== 'gone' && (
         <div className={`splash${splash === 'fade' ? ' fade' : ''}`} aria-hidden="true">
           <DreamMark className="splash-mark" />

@@ -20,6 +20,7 @@ import {
 } from '../engine/animation';
 import {
   addFrameCommand,
+  addHotspotCommand,
   addLayerCommand,
   addOperationCommand,
   addOperationsCommand,
@@ -29,14 +30,17 @@ import {
   moveFrameCommand,
   moveLayerCommand,
   removeFrameCommand,
+  removeHotspotCommand,
   removeLayerCommand,
   replaceLayerContentCommand,
   resizeDocumentCommand,
   setAnimationEnabledCommand,
   transformLayerCommand,
   translateLayerCommand,
+  updateHotspotCommand,
   updateLayerCommand,
 } from '../engine/history';
+import { createHotspot, MIN_HOTSPOT_SIZE } from '../engine/hotspots';
 import type { PixelBuffer } from '../engine/filters';
 import { distance, normalizeRect, pointInRect } from '../engine/geometry';
 import {
@@ -93,6 +97,8 @@ import type {
   DreamDocument,
   GameCast,
   GameSettings,
+  Hotspot,
+  HotspotTransition,
   ImageOp,
   Operation,
   Point,
@@ -212,6 +218,10 @@ export interface DreamStore {
   wandTolerance: number;
   /** In-progress lasso polygon (Design mode), doc-space points. */
   lassoDraft: Point[] | null;
+  /** In-progress Link-tool drag (app mode), doc-space corners. */
+  linkDraft: { from: Point; to: Point } | null;
+  /** Link rect awaiting the "go to frame…" dialog, if any. */
+  pendingHotspot: Rect | null;
   /** Design mode: ids of the selected ops on the active layer. */
   selection: string[];
   selectDraft: SelectDraft | null;
@@ -232,6 +242,10 @@ export interface DreamStore {
   playbackFrame: number | null;
   /** Slide index while in Present mode. */
   presentIndex: number;
+  /** Frame the current presentation/app preview started on (restart target). */
+  presentStart: number;
+  /** Present mode flavor: a slideshow, or an app preview driven by hotspots. */
+  presentStyle: 'slides' | 'app';
   /** Play mode: true while a Catch! run is live (drives the Play view). */
   gameRunning: boolean;
   /** Workspace to return to when leaving Present mode. */
@@ -327,6 +341,24 @@ export interface DreamStore {
   // --- Present mode ----------------------------------------------------------
   presentNext(): void;
   presentPrev(): void;
+  /** App preview: jump straight to a frame (hotspot taps, restart). */
+  presentGoTo(index: number): void;
+  /** App preview: back to the frame the preview started on. */
+  presentRestart(): void;
+  /** Slideshow vs app preview; reset to 'slides' whenever Present opens. */
+  setPresentStyle(style: 'slides' | 'app'): void;
+  /** Open Present mode as an app preview (the "Preview app" button/voice). */
+  previewApp(): void;
+
+  // --- App mode: hotspots ------------------------------------------------------
+  /** Commit the pendingHotspot rect as a link to a frame (undoable). */
+  addHotspot(targetFrameId: string, transition: HotspotTransition): void;
+  /** Abandon the pending link rect (dialog cancelled). */
+  cancelHotspot(): void;
+  /** Delete a hotspot from the active frame (undoable). */
+  removeHotspot(id: string): void;
+  /** Edit a hotspot's target/transition on the active frame (undoable). */
+  updateHotspot(id: string, patch: Partial<Pick<Hotspot, 'targetFrameId' | 'transition'>>): void;
 
   // --- Play mode (Catch!) ----------------------------------------------------
   /** Cast a layer into a game role (null = back to the default sprite). */
@@ -447,6 +479,8 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
     wandDrag: null,
     wandTolerance: DEFAULT_WAND_TOLERANCE,
     lassoDraft: null,
+    linkDraft: null,
+    pendingHotspot: null,
     selection: [],
     selectDraft: null,
     snappingEnabled: true,
@@ -461,6 +495,8 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
     playing: false,
     playbackFrame: null,
     presentIndex: 0,
+    presentStart: 0,
+    presentStyle: 'slides',
     gameRunning: false,
     lastEditMode: 'draw',
     aiPanelOpen: false,
@@ -479,45 +515,53 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         adjustPreview: null,
         wandDrag: null,
         lassoDraft: null,
+        linkDraft: null,
         selection: [],
         selectDraft: null,
       });
     },
 
     setMode: (mode) =>
-      set((s) => ({
-        mode,
-        // Persisted with the document but intentionally NOT undoable:
-        // flipping your workspace on an undo would be jarring.
-        doc: { ...s.doc, mode },
-        isDirty: true,
-        // Enter the mode with its natural tool; never leave a design-only
-        // tool active in Draw mode, where it is hidden.
-        tool:
-          mode === 'design'
-            ? 'select'
-            : s.tool === 'select' || s.tool === 'lasso'
-              ? 'brush'
-              : s.tool,
-        // Remember where to return when a presentation or game ends; start
-        // the deck on the active frame and stop any playback.
-        lastEditMode: mode === 'draw' || mode === 'design' ? mode : s.lastEditMode,
-        presentIndex: mode === 'present' ? Math.max(0, activeFrameIndex(s.doc)) : s.presentIndex,
-        playing: false,
-        playbackFrame: null,
-        gameRunning: false,
-        selection: [],
-        selectDraft: null,
-        draft: null,
-        previewOp: null,
-        pendingText: null,
-        moveDraft: null,
-        cropDraft: null,
-        adjustPreview: null,
-        wandDraft: null,
-        wandDrag: null,
-        lassoDraft: null,
-      })),
+      set((s) => {
+        const startIndex = Math.max(0, activeFrameIndex(s.doc));
+        return {
+          mode,
+          // Persisted with the document but intentionally NOT undoable:
+          // flipping your workspace on an undo would be jarring.
+          doc: { ...s.doc, mode },
+          isDirty: true,
+          // Enter the mode with its natural tool; never leave a design-only
+          // tool active in Draw mode, where it is hidden.
+          tool:
+            mode === 'design'
+              ? 'select'
+              : s.tool === 'select' || s.tool === 'lasso' || s.tool === 'link'
+                ? 'brush'
+                : s.tool,
+          // Remember where to return when a presentation or game ends; start
+          // the deck on the active frame and stop any playback.
+          lastEditMode: mode === 'draw' || mode === 'design' ? mode : s.lastEditMode,
+          presentIndex: mode === 'present' ? startIndex : s.presentIndex,
+          presentStart: mode === 'present' ? startIndex : s.presentStart,
+          presentStyle: 'slides',
+          playing: false,
+          playbackFrame: null,
+          gameRunning: false,
+          selection: [],
+          selectDraft: null,
+          draft: null,
+          previewOp: null,
+          pendingText: null,
+          moveDraft: null,
+          cropDraft: null,
+          adjustPreview: null,
+          wandDraft: null,
+          wandDrag: null,
+          lassoDraft: null,
+          linkDraft: null,
+          pendingHotspot: null,
+        };
+      }),
     setColor: (color) => set((s) => ({ settings: { ...s.settings, color } })),
     setSize: (size) => set((s) => ({ settings: { ...s.settings, size } })),
     setOpacity: (opacity) =>
@@ -651,6 +695,8 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         wandDraft: null,
         wandDrag: null,
         lassoDraft: null,
+        linkDraft: null,
+        pendingHotspot: null,
         selection: [],
         selectDraft: null,
         zoom: 1,
@@ -661,6 +707,8 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         playing: false,
         playbackFrame: null,
         presentIndex: 0,
+        presentStart: 0,
+        presentStyle: 'slides',
         gameRunning: false,
         lastEditMode: 'draw',
       });
@@ -676,7 +724,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         doc: { ...doc, mode },
         activeLayerId: doc.layers[doc.layers.length - 1]?.id ?? '',
         mode,
-        tool: mode === 'draw' && s.tool === 'select' ? 'brush' : s.tool,
+        tool: mode === 'draw' && (s.tool === 'select' || s.tool === 'link') ? 'brush' : s.tool,
         draft: null,
         previewOp: null,
         pendingText: null,
@@ -686,6 +734,8 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         wandDraft: null,
         wandDrag: null,
         lassoDraft: null,
+        linkDraft: null,
+        pendingHotspot: null,
         selection: [],
         selectDraft: null,
         zoom: 1,
@@ -696,6 +746,8 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         playing: false,
         playbackFrame: null,
         presentIndex: 0,
+        presentStart: 0,
+        presentStyle: 'slides',
         gameRunning: false,
         lastEditMode: 'draw',
       }));
@@ -808,6 +860,13 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         set({ lassoDraft: [point] });
         return;
       }
+      if (tool === 'link') {
+        // Hotspots connect frames — without an animation there is nothing
+        // to link to, so the drag is ignored (the panel explains why).
+        if (!get().doc.frames) return;
+        set({ linkDraft: { from: point, to: point } });
+        return;
+      }
       if (tool === 'text') {
         set({ pendingText: point });
         return;
@@ -842,11 +901,16 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         cropDraft,
         selectDraft,
         lassoDraft,
+        linkDraft,
         wandDrag,
         wandDraft,
       } = get();
       if (lassoDraft) {
         set({ lassoDraft: [...lassoDraft, point] });
+        return;
+      }
+      if (linkDraft) {
+        set({ linkDraft: { ...linkDraft, to: point } });
         return;
       }
       if (wandDrag && wandDraft) {
@@ -951,7 +1015,25 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
     },
 
     pointerUp: (point, event = {}) => {
-      const { draft, settings, moveDraft, cropDraft, selectDraft, lassoDraft, wandDrag } = get();
+      const {
+        draft,
+        settings,
+        moveDraft,
+        cropDraft,
+        selectDraft,
+        lassoDraft,
+        linkDraft,
+        wandDrag,
+      } = get();
+      if (linkDraft) {
+        set({ linkDraft: null });
+        const rect = normalizeRect(linkDraft.from, point);
+        // Tiny drags are slips; a real rect opens the "go to frame…" dialog.
+        if (rect.width >= MIN_HOTSPOT_SIZE && rect.height >= MIN_HOTSPOT_SIZE) {
+          set({ pendingHotspot: rect });
+        }
+        return;
+      }
       if (lassoDraft) {
         set({ lassoDraft: null });
         const layer = activeLayer();
@@ -1232,6 +1314,8 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
           wandDraft: null,
           wandDrag: null,
           lassoDraft: null,
+          linkDraft: null,
+          pendingHotspot: null,
           canUndo: history.canUndo,
           canRedo: history.canRedo,
           isDirty: true,
@@ -1258,6 +1342,8 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
           wandDraft: null,
           wandDrag: null,
           lassoDraft: null,
+          linkDraft: null,
+          pendingHotspot: null,
           canUndo: history.canUndo,
           canRedo: history.canRedo,
           isDirty: true,
@@ -1365,6 +1451,47 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       })),
 
     presentPrev: () => set((s) => ({ presentIndex: Math.max(0, s.presentIndex - 1) })),
+
+    presentGoTo: (index) =>
+      set((s) => ({
+        presentIndex: Math.max(0, Math.min(index, presentationFrames(s.doc).length - 1)),
+      })),
+
+    presentRestart: () => set((s) => ({ presentIndex: s.presentStart })),
+
+    setPresentStyle: (style) => set({ presentStyle: style }),
+
+    previewApp: () => {
+      get().setMode('present');
+      set({ presentStyle: 'app' });
+    },
+
+    // --- App mode: hotspots ------------------------------------------------------
+
+    addHotspot: (targetFrameId, transition) => {
+      const { doc, pendingHotspot } = get();
+      const frameId = doc.activeFrameId;
+      set({ pendingHotspot: null });
+      if (!pendingHotspot || !frameId) return;
+      if (!doc.frames?.some((f) => f.id === targetFrameId)) return;
+      execute(addHotspotCommand(frameId, createHotspot(pendingHotspot, targetFrameId, transition)));
+    },
+
+    cancelHotspot: () => set({ pendingHotspot: null }),
+
+    removeHotspot: (id) => {
+      const { doc } = get();
+      const frameId = doc.activeFrameId;
+      if (!frameId) return;
+      execute(removeHotspotCommand(doc, frameId, id));
+    },
+
+    updateHotspot: (id, patch) => {
+      const { doc } = get();
+      const frameId = doc.activeFrameId;
+      if (!frameId) return;
+      execute(updateHotspotCommand(doc, frameId, id, patch));
+    },
 
     // --- Play mode (Catch!) ----------------------------------------------------
 

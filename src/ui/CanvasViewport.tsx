@@ -14,6 +14,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { renderDocument, renderLayer, renderOperation } from '../engine/renderer';
 import { animationSettingsOf, frameIndexAtTime, onionSkinTargets } from '../engine/animation';
+import { activeHotspots } from '../engine/hotspots';
 import { normalizeRect } from '../engine/geometry';
 import { selectedOps, selectionBounds, unionBounds } from '../engine/selection';
 import { mirrorOperations, SYMMETRY_TOOLS } from '../engine/symmetry';
@@ -78,6 +79,7 @@ export function CanvasViewport() {
   const symmetry = useDreamStore((s) => s.symmetry);
   const wandDraft = useDreamStore((s) => s.wandDraft);
   const lassoDraft = useDreamStore((s) => s.lassoDraft);
+  const linkDraft = useDreamStore((s) => s.linkDraft);
   const selection = useDreamStore((s) => s.selection);
   const selectDraft = useDreamStore((s) => s.selectDraft);
   const zoom = useDreamStore((s) => s.zoom);
@@ -408,6 +410,36 @@ export function CanvasViewport() {
       ctx.setLineDash([4 * px, 4 * px]);
       ctx.stroke();
       ctx.setLineDash([]);
+    }
+
+    // Link tool (app mode): the active frame's hotspots as soft accent-tinted
+    // dashed rects with a tiny link glyph, plus the in-progress drag.
+    if (!playing && tool === 'link') {
+      const px = 1 / zoom;
+      const drawHotspot = (rect: Rect, glyph: boolean) => {
+        ctx.fillStyle = 'rgba(109, 124, 255, 0.10)';
+        ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+        ctx.strokeStyle = ACCENT;
+        ctx.lineWidth = px;
+        ctx.setLineDash([4 * px, 4 * px]);
+        ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+        ctx.setLineDash([]);
+        if (glyph && rect.width > 14 * px && rect.height > 14 * px) {
+          // Tiny link glyph in the top-end corner: ring + diagonal chain bar.
+          const gx = rect.x + rect.width - 7 * px;
+          const gy = rect.y + 7 * px;
+          ctx.lineWidth = 1.5 * px;
+          ctx.beginPath();
+          ctx.arc(gx - 2 * px, gy + 2 * px, 3 * px, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(gx, gy);
+          ctx.lineTo(gx + 3.5 * px, gy - 3.5 * px);
+          ctx.stroke();
+        }
+      };
+      for (const hotspot of activeHotspots(doc)) drawHotspot(hotspot.rect, true);
+      if (linkDraft) drawHotspot(normalizeRect(linkDraft.from, linkDraft.to), false);
     }
     ctx.restore();
   });

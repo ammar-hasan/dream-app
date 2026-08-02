@@ -64,7 +64,9 @@ Conventions for anyone (human or agent) working on Dream.
 ## Structure
 
 - `src/engine/` — types, document, history, animation (frame model, playback
-  timing, onion skin, sprite-sheet layout), renderer, geometry, color, filters
+  timing, onion skin, sprite-sheet layout), hotspots (app-mode links:
+  broken-target detection, hit-testing), appExport (standalone interactive
+  HTML prototype generator — pure string builder), renderer, geometry, color, filters
   (pure RGBA pixel transforms), transform (flip/rotate/crop/resize), symmetry
   (mirror-mode op reflection), spray (seeded dot layout), selection (Design
   mode: hit-testing, lasso/marquee, move/scale/rotate, snapping, align,
@@ -78,7 +80,9 @@ Conventions for anyone (human or agent) working on Dream.
   default cast drawings (`defaults.ts`), tiny WebAudio bleeps (`sounds.ts`,
   feature-detected). No DOM, no React, no store imports.
 - `src/ui/` — React components, hooks, icons, export helpers (image +
-  animation video/sprite sheet; MediaRecorder isolated behind injectable deps),
+  animation video/sprite sheet + app prototype HTML; MediaRecorder isolated
+  behind injectable deps), app-mode pieces (LinkDialog, HotspotsPanel,
+  PresentView's Slideshow/App toggle),
   `i18n/` string tables (add a locale: copy `en.ts`, register in `i18n/index.ts`
   — see README), voice-command executor (`voiceExecutor.ts`, thin layer over
   the store, driven by a fake in tests)

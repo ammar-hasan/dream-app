@@ -49,6 +49,7 @@ export const ar: Record<string, string> = {
   'tools.fill': 'دلو التعبئة',
   'tools.wand': 'العصا السحرية',
   'tools.lasso': 'التحديد الحر',
+  'tools.link': 'رابط',
   'tools.spray': 'رش',
   'tools.eyedropper': 'أداة اختيار اللون',
   'tools.text': 'نص',
@@ -95,6 +96,7 @@ export const ar: Record<string, string> = {
   'options.hint.wand':
     'انقر على منطقة ملوّنة لرفعها. اسحبها لنقلها، اضغط Delete لحذفها، أو انسخها إلى طبقة جديدة. زر Esc يعيدها.',
   'options.hint.lasso': 'ارسم حلقة حول العناصر لتحديدها. زر Shift يضيف إلى التحديد.',
+  'options.hint.link': 'اسحب مستطيلًا فوق زر رسمته لجعله قابلًا للمس.',
   'options.symmetry': 'تناظر',
   'options.symmetryOff': 'إيقاف',
   'options.symmetryVertical': 'عمودي',
@@ -218,9 +220,29 @@ export const ar: Record<string, string> = {
   'timeline.onionOpacity': 'شفافية قشر البصل',
   'timeline.onionNext': 'التالي',
   'timeline.onionNextTitle': 'إظهار الإطار التالي أيضًا',
+  'timeline.appHint': 'اربط إطاراتك لتصنع تطبيقًا ←',
 
   // --- Present mode --------------------------------------------------------------
   'present.exit': 'خروج',
+  'present.style': 'نمط العرض',
+  'present.slides': 'شرائح',
+  'present.app': 'تطبيق',
+  'present.restart': 'إعادة البدء',
+
+  // --- App mode (interactive prototypes) -----------------------------------------
+  'link.title': 'اربط بشاشة',
+  'link.target': 'عند اللمس، انتقل إلى الإطار…',
+  'link.transition': 'الانتقال',
+  'link.transition.none': 'بدون',
+  'link.transition.fade': 'تلاشٍ',
+  'link.transition.slide': 'انزلاق',
+  'link.create': 'إنشاء الرابط',
+  'link.panel': 'الروابط',
+  'link.hint': 'اختر أداة الرابط (U) واسحب مستطيلًا فوق زر لجعله قابلًا للمس.',
+  'link.delete': 'حذف الرابط',
+  'link.broken': 'إطار محذوف',
+  'link.brokenHint': 'هذا الرابط يشير إلى إطار حُذف — اختر هدفًا جديدًا أو احذف الرابط.',
+  'link.preview': 'معاينة التطبيق',
 
   // --- Play mode (Catch!) ----------------------------------------------------------
   'play.cast': 'اختَر أبطال لعبتك',
@@ -337,6 +359,9 @@ export const ar: Record<string, string> = {
   'export.webmNote':
     'يسجل {frames} إطارات بمعدل {fps} إطارًا في الثانية — حوالي {seconds} ثانية من الفيديو. أبقِ هذا التبويب في المقدمة أثناء التسجيل.',
   'export.spriteNote': 'كل الإطارات في شبكة PNG واحدة — مفيدة للألعاب والمشاركة.',
+  'export.appLabel': 'تطبيق تفاعلي (.html)',
+  'export.appNote':
+    'ملف HTML واحد مستقل: إطاراتك كشاشات وروابطك كنقاط لمس. يفتح في أي مكان ويعمل دون إنترنت.',
   'export.recording': 'جارٍ التسجيل… {progress}',
   'export.starting': 'جارٍ البدء…',
   'export.progress': 'إطار {done} من {total}…',
@@ -377,6 +402,9 @@ export const ar: Record<string, string> = {
   'voice.newFrame': 'إطار جديد!',
   'voice.playing': 'يعمل الآن!',
   'voice.playGame': 'هيّا نلعب لعبتك!',
+  'voice.previewApp': 'هذا هو تطبيقك!',
+  'voice.exportApp': 'تم تصدير تطبيقك!',
+  'voice.noApp': 'أضف بعض الإطارات والروابط أولًا.',
   'voice.stopped': 'توقف.',
   'voice.nothingToPlay': 'لا شيء للتشغيل بعد — أضف بعض الإطارات أولًا.',
   'voice.tool': '{tool}!',
@@ -387,6 +415,6 @@ export const ar: Record<string, string> = {
   'voice.mirrorOff': 'التناظر متوقّف.',
   'voice.saved': 'تم الحفظ!',
   'voice.help':
-    'يمكنك أن تقول: فرشاة، قلم، رش، ممحاة، تعبئة، عصا سحرية، لون مثل أحمر أو أزرق، أكبر، أصغر، فعّل التناظر، أوقف التناظر، تراجع، إعادة، امسح، إطار جديد، شغّل، العب لعبتي، أوقف، احفظ، مساعدة.',
+    'يمكنك أن تقول: فرشاة، قلم، رش، ممحاة، تعبئة، عصا سحرية، لون مثل أحمر أو أزرق، أكبر، أصغر، فعّل التناظر، أوقف التناظر، تراجع، إعادة، امسح، إطار جديد، شغّل، العب لعبتي، عاين تطبيقي، صدّر تطبيقي، أوقف، احفظ، مساعدة.',
   'voice.unknown': 'عذرًا، لم أفهم. قل «مساعدة» لتسمع ما أستطيع فعله.',
 };

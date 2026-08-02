@@ -93,6 +93,13 @@ export const LassoIcon = (p: IconProps) => (
   </svg>
 );
 
+export const LinkIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M10 13.5a4.5 4.5 0 0 0 6.4.4l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.7 1.7" />
+    <path d="M14 10.5a4.5 4.5 0 0 0-6.4-.4l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.7-1.7" />
+  </svg>
+);
+
 export const FillIcon = (p: IconProps) => (
   <svg {...base(p)}>
     <path d="m12 2.7 6.5 6.5-8 8a2.8 2.8 0 0 1-4 0l-2.5-2.5a2.8 2.8 0 0 1 0-4Z" />

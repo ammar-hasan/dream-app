@@ -20,6 +20,7 @@ const TOOL_KEYS: Record<string, ToolId> = {
   h: 'pan',
   m: 'move',
   k: 'lasso',
+  u: 'link',
   z: 'zoom',
 };
 
@@ -136,8 +137,8 @@ export function useKeyboardShortcuts(): void {
         return;
       }
       const tool = TOOL_KEYS[key];
-      // Lasso lives in Design mode only (it is hidden from the Draw rail).
-      if (tool && (tool !== 'lasso' || designing)) store.setTool(tool);
+      // Lasso and Link live in Design mode only (hidden from the Draw rail).
+      if (tool && ((tool !== 'lasso' && tool !== 'link') || designing)) store.setTool(tool);
     };
 
     const onKeyUp = (e: KeyboardEvent) => {

@@ -14,6 +14,7 @@ import {
   removeLayerById,
   removeOperation,
   updateLayerProps,
+  withFrameHotspots,
   withFrames,
 } from './document';
 import { disableAnimation, enableAnimation } from './animation';
@@ -25,7 +26,7 @@ import {
   translateLayer,
   type LayerTransform,
 } from './transform';
-import type { DreamDocument, Frame, Layer, Operation, Rect } from './types';
+import type { DreamDocument, Frame, Hotspot, Layer, Operation, Rect } from './types';
 
 export interface Command {
   label: string;
@@ -348,5 +349,88 @@ export function moveFrameCommand(doc: DreamDocument, frameId: string, toIndex: n
       next.splice(fromIndex, 0, frame);
       return withFrames(d, next, d.activeFrameId ?? activeId);
     },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Slice 13 (app mode): hotspot commands. Hotspots are document data on the
+// frame, so add/edit/delete are undoable like every other document mutation.
+// ---------------------------------------------------------------------------
+
+/** Add a hotspot to a frame; revert removes it. */
+export function addHotspotCommand(frameId: string, hotspot: Hotspot): Command {
+  return {
+    label: 'Add link',
+    apply: (d) => {
+      const current = d.frames?.find((f) => f.id === frameId)?.hotspots ?? [];
+      return withFrameHotspots(d, frameId, [...current, hotspot]);
+    },
+    revert: (d) => {
+      const current = d.frames?.find((f) => f.id === frameId)?.hotspots ?? [];
+      return withFrameHotspots(
+        d,
+        frameId,
+        current.filter((h) => h.id !== hotspot.id),
+      );
+    },
+  };
+}
+
+/** Remove a hotspot; revert re-inserts it at its original position. */
+export function removeHotspotCommand(
+  doc: DreamDocument,
+  frameId: string,
+  hotspotId: string,
+): Command {
+  const current = doc.frames?.find((f) => f.id === frameId)?.hotspots ?? [];
+  const index = current.findIndex((h) => h.id === hotspotId);
+  const hotspot = current[index];
+  return {
+    label: 'Delete link',
+    apply: (d) => {
+      const list = d.frames?.find((f) => f.id === frameId)?.hotspots ?? [];
+      return withFrameHotspots(
+        d,
+        frameId,
+        list.filter((h) => h.id !== hotspotId),
+      );
+    },
+    revert: (d) => {
+      if (!hotspot) return d;
+      const list = (d.frames?.find((f) => f.id === frameId)?.hotspots ?? []).slice();
+      list.splice(Math.min(index, list.length), 0, hotspot);
+      return withFrameHotspots(d, frameId, list);
+    },
+  };
+}
+
+/** Edit a hotspot's target or transition; revert restores the previous values. */
+export function updateHotspotCommand(
+  doc: DreamDocument,
+  frameId: string,
+  hotspotId: string,
+  patch: Partial<Pick<Hotspot, 'targetFrameId' | 'transition'>>,
+): Command {
+  const hotspot = doc.frames
+    ?.find((f) => f.id === frameId)
+    ?.hotspots?.find((h) => h.id === hotspotId);
+  const previous: typeof patch = {};
+  if (hotspot) {
+    for (const key of Object.keys(patch) as (keyof typeof patch)[]) {
+      previous[key] = hotspot[key] as never;
+    }
+  }
+  const map = (d: DreamDocument, p: typeof patch) => {
+    const list = d.frames?.find((f) => f.id === frameId)?.hotspots ?? [];
+    return withFrameHotspots(
+      d,
+      frameId,
+      list.map((h) => (h.id === hotspotId ? { ...h, ...p } : h)),
+    );
+  };
+  return {
+    label: 'Edit link',
+    apply: (d) => map(d, patch),
+    revert: (d) => map(d, previous),
   };
 }

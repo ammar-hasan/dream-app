@@ -157,6 +157,35 @@ describe('projects storage (IndexedDB)', () => {
     expect((await loadProject(plain.id))?.game).toBeUndefined();
   });
 
+  it('persists frame hotspots (app mode), absent on old saves', async () => {
+    const animated = enableAnimation(createDocument({ width: 8, height: 8, name: 'Proto' }));
+    const frames = animated.frames ?? [];
+    const doc = {
+      ...animated,
+      frames: [
+        {
+          ...frames[0],
+          hotspots: [
+            {
+              id: 'hs-1',
+              rect: { x: 1, y: 2, width: 3, height: 4 },
+              targetFrameId: frames[0].id,
+              transition: 'slide' as const,
+            },
+          ],
+        },
+      ],
+    };
+    await saveProject(doc);
+    const loaded = await loadProject(doc.id);
+    expect(loaded?.frames?.[0].hotspots).toEqual(doc.frames[0].hotspots);
+
+    // Frames from older saves simply have no hotspots field.
+    const plain = enableAnimation(createDocument({ width: 8, height: 8 }));
+    await saveProject(plain);
+    expect((await loadProject(plain.id))?.frames?.[0].hotspots).toBeUndefined();
+  });
+
   it('old saves (no frames/animation/mode fields) load untouched', async () => {
     // A slice-1-era document shape: nothing but the pre-animation fields.
     const doc = createDocument({ width: 8, height: 8 });

@@ -27,6 +27,8 @@ function makeStore(overrides: Partial<VoiceExecutorStore> = {}) {
     setMode: vi.fn(),
     startGame: vi.fn(),
     stopGame: vi.fn(),
+    previewApp: vi.fn(),
+    exportApp: vi.fn(),
     setTool: vi.fn(),
     setColor: vi.fn(),
     setSize: vi.fn(),
@@ -127,6 +129,34 @@ describe('executeVoiceCommand', () => {
     );
     expect(store.setMode).toHaveBeenCalledWith('play');
     expect(store.startGame).toHaveBeenCalledOnce();
+  });
+
+  it('"preview/export my app" need frames, then call the app actions', () => {
+    const store = makeStore();
+    expect(executeVoiceCommand({ kind: 'preview-app' }, store, () => {})?.message).toBe(
+      'Add some frames and links first.',
+    );
+    expect(store.previewApp).not.toHaveBeenCalled();
+    expect(executeVoiceCommand({ kind: 'export-app' }, store, () => {})?.message).toBe(
+      'Add some frames and links first.',
+    );
+    expect(store.exportApp).not.toHaveBeenCalled();
+
+    const animated = makeStore({
+      doc: {
+        ...createDocument({ width: 10, height: 10 }),
+        frames: [{ id: 'f1', layers: [createLayer('L1')] }],
+        activeFrameId: 'f1',
+      },
+    });
+    expect(executeVoiceCommand({ kind: 'preview-app' }, animated, () => {})?.message).toBe(
+      'Here’s your app!',
+    );
+    expect(animated.previewApp).toHaveBeenCalledOnce();
+    expect(executeVoiceCommand({ kind: 'export-app' }, animated, () => {})?.message).toBe(
+      'Exported your app!',
+    );
+    expect(animated.exportApp).toHaveBeenCalledOnce();
   });
 
   it('tool and color commands set tool settings', () => {

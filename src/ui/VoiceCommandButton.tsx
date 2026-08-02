@@ -20,6 +20,7 @@ import {
   type VoiceExecutorStore,
 } from './voiceExecutor';
 import { saveNow } from './saveNow';
+import { exportAppHtml } from './exportApp';
 import { MicIcon } from './icons';
 
 /** Snapshot of the dream store shaped for the voice executor. */
@@ -42,6 +43,8 @@ function executorStore(): VoiceExecutorStore {
     setMode: s.setMode,
     startGame: s.startGame,
     stopGame: s.stopGame,
+    previewApp: s.previewApp,
+    exportApp: () => exportAppHtml(s.doc),
     setTool: s.setTool,
     setColor: s.setColor,
     setSize: s.setSize,

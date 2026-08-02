@@ -22,6 +22,10 @@ export type VoiceCommand =
   | { kind: 'play' }
   /** "play my game": switch to Play mode and start a Catch! run. */
   | { kind: 'play-game' }
+  /** "preview my app": open Present mode as an interactive prototype. */
+  | { kind: 'preview-app' }
+  /** "export my app": download the standalone HTML prototype. */
+  | { kind: 'export-app' }
   | { kind: 'stop' }
   | { kind: 'tool'; tool: ToolId }
   /** "mirror on" / "mirror off": toggle vertical mirror symmetry. */
@@ -216,6 +220,17 @@ export function parseVoiceCommand(transcript: string): VoiceCommand | null {
 
   if (hasPhrase(normalized, 'new frame', 'add frame', 'another frame', 'next frame')) {
     return { kind: 'new-frame' };
+  }
+
+  // App mode: "preview my app" / "export my app" — checked before a bare
+  // "play"/"stop" so app phrases never fall through to playback.
+  if (has(tokens, new Set(['app', 'prototype']))) {
+    if (has(tokens, new Set(['preview', 'try', 'test', 'open', 'show']))) {
+      return { kind: 'preview-app' };
+    }
+    if (has(tokens, new Set(['export', 'download', 'share', 'send']))) {
+      return { kind: 'export-app' };
+    }
   }
 
   if (has(tokens, STOP_WORDS)) return { kind: 'stop' };

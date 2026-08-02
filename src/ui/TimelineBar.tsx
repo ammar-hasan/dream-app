@@ -9,9 +9,11 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { animationSettingsOf, MAX_FPS, MIN_FPS } from '../engine/animation';
+import { hasHotspots } from '../engine/hotspots';
 import { renderDocument } from '../engine/renderer';
 import type { DreamDocument, Frame } from '../engine/types';
 import { useDreamStore } from '../store/dreamStore';
+import { useUiPrefs } from '../store/uiPrefs';
 import { PauseIcon, PlayIcon, PlusIcon } from './icons';
 import { useT } from './i18n';
 
@@ -69,6 +71,7 @@ export function TimelineBar() {
   const doc = useDreamStore((s) => s.doc);
   const playing = useDreamStore((s) => s.playing);
   const playbackFrame = useDreamStore((s) => s.playbackFrame);
+  const kidMode = useUiPrefs((s) => s.kidMode);
   const [collapsed, setCollapsed] = useState(false);
 
   if (!doc.frames) return null;
@@ -76,6 +79,9 @@ export function TimelineBar() {
   const settings = animationSettingsOf(doc);
   const frames = doc.frames;
   const store = useDreamStore.getState();
+  // App-mode discovery: with 2+ screens and no links yet, nudge grown-ups
+  // toward the Link tool. Kid mode skips it — Play is the kid path.
+  const showAppHint = !kidMode && frames.length >= 2 && !hasHotspots(doc);
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     // Space = play/pause while the timeline has focus (the global handler
@@ -138,6 +144,19 @@ export function TimelineBar() {
               <PlusIcon />
             </button>
           </div>
+
+          {showAppHint && (
+            <button
+              type="button"
+              className="timeline-app-hint"
+              onClick={() => {
+                store.setMode('design');
+                useDreamStore.getState().setTool('link');
+              }}
+            >
+              {t('timeline.appHint')}
+            </button>
+          )}
 
           <div className="timeline-controls">
             <button

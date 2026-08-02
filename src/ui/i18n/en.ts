@@ -50,6 +50,7 @@ export const en: Record<string, string> = {
   'tools.fill': 'Fill bucket',
   'tools.wand': 'Magic wand',
   'tools.lasso': 'Lasso',
+  'tools.link': 'Link',
   'tools.spray': 'Spray',
   'tools.eyedropper': 'Color picker',
   'tools.text': 'Text',
@@ -96,6 +97,7 @@ export const en: Record<string, string> = {
   'options.hint.wand':
     'Click a colored region to lift it out. Drag it to move it, press Delete to remove it, or copy it to a new layer. Esc puts it back.',
   'options.hint.lasso': 'Draw a loop around objects to select them. Shift adds to the selection.',
+  'options.hint.link': 'Drag a rectangle over a button you drew to make it tappable.',
   'options.symmetry': 'Mirror',
   'options.symmetryOff': 'Off',
   'options.symmetryVertical': 'Vertical',
@@ -220,9 +222,30 @@ export const en: Record<string, string> = {
   'timeline.onionOpacity': 'Onion skin opacity',
   'timeline.onionNext': 'Next',
   'timeline.onionNextTitle': 'Also ghost the next frame',
+  'timeline.appHint': 'Link your frames to make an app →',
 
   // --- Present mode --------------------------------------------------------------
   'present.exit': 'Exit',
+  'present.style': 'Presentation style',
+  'present.slides': 'Slideshow',
+  'present.app': 'App',
+  'present.restart': 'Restart',
+
+  // --- App mode (interactive prototypes) -----------------------------------------
+  'link.title': 'Link to a screen',
+  'link.target': 'When tapped, go to frame…',
+  'link.transition': 'Transition',
+  'link.transition.none': 'None',
+  'link.transition.fade': 'Fade',
+  'link.transition.slide': 'Slide',
+  'link.create': 'Create link',
+  'link.panel': 'Links',
+  'link.hint': 'Pick the Link tool (U) and drag a rectangle over a button to make it tappable.',
+  'link.delete': 'Delete link',
+  'link.broken': 'Deleted frame',
+  'link.brokenHint':
+    'This link points to a frame that was deleted — pick a new target or delete it.',
+  'link.preview': 'Preview app',
 
   // --- Play mode (Catch!) ----------------------------------------------------------
   'play.cast': 'Cast your game',
@@ -341,6 +364,9 @@ export const en: Record<string, string> = {
   'export.webmNote':
     'Records {frames} frames at {fps} fps — about {seconds} seconds of video. Keep this tab in front while it records.',
   'export.spriteNote': 'All frames in one PNG grid — handy for games and sharing.',
+  'export.appLabel': 'Interactive app (.html)',
+  'export.appNote':
+    'One self-contained HTML file: your frames as screens, your links as tappable hotspots. Opens anywhere, works offline.',
   'export.recording': 'Recording… {progress}',
   'export.starting': 'Starting…',
   'export.progress': 'Frame {done} of {total}…',
@@ -381,6 +407,9 @@ export const en: Record<string, string> = {
   'voice.newFrame': 'New frame!',
   'voice.playing': 'Playing!',
   'voice.playGame': 'Let’s play your game!',
+  'voice.previewApp': 'Here’s your app!',
+  'voice.exportApp': 'Exported your app!',
+  'voice.noApp': 'Add some frames and links first.',
   'voice.stopped': 'Stopped.',
   'voice.nothingToPlay': 'Nothing to play yet — add some frames first.',
   'voice.tool': '{tool}!',
@@ -391,6 +420,6 @@ export const en: Record<string, string> = {
   'voice.mirrorOff': 'Mirror off.',
   'voice.saved': 'Saved!',
   'voice.help':
-    'You can say: brush, pencil, spray, eraser, fill, wand, a color like red or blue, bigger, smaller, mirror on, mirror off, undo, redo, clear, new frame, play, play my game, stop, save, and help.',
+    'You can say: brush, pencil, spray, eraser, fill, wand, a color like red or blue, bigger, smaller, mirror on, mirror off, undo, redo, clear, new frame, play, play my game, preview my app, export my app, stop, save, and help.',
   'voice.unknown': 'Sorry, I didn’t understand. Say “help” to hear what I can do.',
 };

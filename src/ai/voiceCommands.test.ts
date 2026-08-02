@@ -77,6 +77,17 @@ describe('parseVoiceCommand — animation', () => {
     expect(parseVoiceCommand('game')).toEqual({ kind: 'play-game' });
     expect(parseVoiceCommand('stop the game')).toEqual({ kind: 'stop' });
   });
+
+  it('parses app preview and export phrases', () => {
+    expect(parseVoiceCommand('preview my app')).toEqual({ kind: 'preview-app' });
+    expect(parseVoiceCommand('can you show the app')).toEqual({ kind: 'preview-app' });
+    expect(parseVoiceCommand('try my prototype')).toEqual({ kind: 'preview-app' });
+    expect(parseVoiceCommand('export my app')).toEqual({ kind: 'export-app' });
+    expect(parseVoiceCommand('download the app please')).toEqual({ kind: 'export-app' });
+    // A bare "app" is not a command; "stop the app" still stops.
+    expect(parseVoiceCommand('app')).toBeNull();
+    expect(parseVoiceCommand('stop the app')).toEqual({ kind: 'stop' });
+  });
 });
 
 describe('parseVoiceCommand — tools, colors, sizes', () => {

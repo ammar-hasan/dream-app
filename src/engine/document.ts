@@ -11,7 +11,7 @@
  * even after the user switches frames mid-history (see AGENTS.md).
  */
 
-import type { Color, DreamDocument, Frame, Layer, Operation } from './types';
+import type { Color, DreamDocument, Frame, Hotspot, Layer, Operation } from './types';
 
 let idCounter = 0;
 
@@ -80,6 +80,20 @@ export function withFrameLayers(
 /** The frame whose layers are mirrored into `doc.layers`, if any. */
 export function activeFrameOf(doc: DreamDocument): Frame | undefined {
   return doc.frames?.find((f) => f.id === doc.activeFrameId);
+}
+
+/**
+ * Replace the hotspot list of one frame (app-mode links). Like layer edits,
+ * hotspots are document data and mutate through undoable commands.
+ */
+export function withFrameHotspots(
+  doc: DreamDocument,
+  frameId: string,
+  hotspots: Hotspot[],
+): DreamDocument {
+  if (!doc.frames) return doc;
+  const frames = doc.frames.map((f) => (f.id === frameId ? { ...f, hotspots } : f));
+  return { ...doc, frames, updatedAt: Date.now() };
 }
 
 /** Replace the frames array (and optionally the mirrored active stack). */

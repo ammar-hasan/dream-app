@@ -32,6 +32,7 @@ const HINT_TOOLS = new Set([
   'text',
   'wand',
   'lasso',
+  'link',
 ]);
 
 const SYMMETRY_MODES: { value: SymmetryMode; key: string }[] = [
