@@ -145,7 +145,12 @@ test('connected OpenAI-compatible image generation paints returned PNG pixels', 
   await page.getByRole('button', { name: 'AI helper', exact: true }).click();
   const panel = page.locator('.ai-panel');
   await panel.getByRole('button', { name: /Settings:/ }).click();
-  await panel.locator('.ai-settings-body select').selectOption('openai-compatible');
+  const providerSelect = panel.locator('.ai-settings-body select');
+  await providerSelect.selectOption('openai-compatible');
+  await expect(providerSelect).toHaveValue('openai-compatible');
+  await panel.getByLabel('What should I paint?').fill('a purple moon');
+  await expect(panel.getByRole('button', { name: 'Make it!' })).toBeDisabled();
+  await expect(panel).toContainText('Finish setting up your own AI');
   await panel.getByLabel('Base URL').fill('https://api.openai.com/v1');
   await panel.getByLabel('Model', { exact: true }).fill('gpt-4o-mini');
   await panel.getByLabel('Image model').fill('gpt-image-2');
@@ -153,7 +158,11 @@ test('connected OpenAI-compatible image generation paints returned PNG pixels', 
   await panel.getByLabel('This AI can also paint images').check();
   await panel.getByRole('button', { name: 'Save' }).click();
 
-  await panel.getByLabel('What should I paint?').fill('a purple moon');
+  await providerSelect.selectOption('mock');
+  await providerSelect.selectOption('openai-compatible');
+  await expect(providerSelect).toHaveValue('openai-compatible');
+  await expect(panel.getByRole('button', { name: 'Make it!' })).toBeEnabled();
+
   await panel.getByRole('button', { name: 'Make it!' }).click();
   await expect(panel).toContainText('Ta-da!');
   await expect(page.locator('.layer-list > li')).toHaveCount(2);

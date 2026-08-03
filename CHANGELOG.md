@@ -7,6 +7,13 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Truthful AI provider state** (slice 42): choosing a new own-AI provider
+  now stays visibly selected while setup is incomplete, blocks creation until
+  Save, and explains the required next step. Switching back to a previously
+  configured provider takes effect immediately. The free provider is named
+  and described as an offline scene maker so it cannot be mistaken for an
+  open-ended image model.
+
 - **Agent-safe layer management** (slice 41): dream-mcp agents can now rename,
   show/hide, set opacity, lock/unlock, reorder and remove layers in the active
   frame. Id/name targeting, animated stack mirroring, invalid-value errors and

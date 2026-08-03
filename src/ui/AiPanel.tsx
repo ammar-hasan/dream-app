@@ -36,6 +36,7 @@ import { SparkleIcon } from './icons';
 
 type Tab = 'create' | 'edit' | 'feedback';
 type Busy = Tab | 'settings' | null;
+type ProviderChoice = 'mock' | 'openai-compatible';
 
 interface Notice {
   kind: 'error' | 'ok';
@@ -66,6 +67,9 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
   const [triesLeft, setTriesLeft] = useState(freeTriesLeft());
   const [byok, setByok] = useState(isBYOKActive());
   const [provider, setProvider] = useState<AIProvider>(() => getActiveProvider());
+  const [providerChoice, setProviderChoice] = useState<ProviderChoice>(() =>
+    isBYOKActive() ? 'openai-compatible' : 'mock',
+  );
 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settings, setSettings] = useState<AIProviderSettings>(() =>
@@ -83,6 +87,7 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
     setAIDeps({ decodeImage, encodeImage });
     setProvider(getActiveProvider());
     setByok(isBYOKActive());
+    setProviderChoice(isBYOKActive() ? 'openai-compatible' : 'mock');
     setTriesLeft(freeTriesLeft());
   }, []);
 
@@ -184,19 +189,21 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
     setNotice({ kind: 'ok', text: t('ai.applied') });
   };
 
-  const pickProvider = (id: 'mock' | 'openai-compatible') => {
+  const pickProvider = (id: ProviderChoice) => {
+    setProviderChoice(id);
     try {
       setActiveProvider(id);
+      refreshProvider();
     } catch {
       // BYOK provider not configured yet — saving the form registers it
+      setSettingsOpen(true);
     }
-    if (id === 'mock') refreshProvider();
-    else setSettingsOpen(true);
   };
 
   const saveSettings = () => {
     const p = configureOpenAIProvider(settings, apiKey.trim(), { decodeImage, encodeImage });
     setActiveProvider(p.id);
+    setProviderChoice('openai-compatible');
     refreshProvider();
     setNotice({
       kind: 'ok',
@@ -242,6 +249,9 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
     );
   };
 
+  const providerSetupPending =
+    providerChoice === 'openai-compatible' && provider.id !== 'openai-compatible';
+
   return (
     <section className={`panel ai-panel${kid ? ' kid-ai-panel' : ''}`} aria-label={t('toolbar.ai')}>
       <div className="panel-header">
@@ -285,7 +295,9 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
 
       {activeTab === 'create' && (
         <div className="ai-section">
-          <p className="tool-hint">{t('ai.createHint')}</p>
+          <p className="tool-hint">
+            {t(providerChoice === 'openai-compatible' ? 'ai.createHintConnected' : 'ai.createHint')}
+          </p>
           <div className="ai-prompt-row">
             <textarea
               className="ai-textarea"
@@ -301,12 +313,16 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
             type="button"
             className="btn primary ai-go"
             disabled={
-              busy !== null || createPrompt.trim() === '' || !provider.capabilities.generateImage
+              busy !== null ||
+              providerSetupPending ||
+              createPrompt.trim() === '' ||
+              !provider.capabilities.generateImage
             }
             onClick={() => void create()}
           >
             {busy === 'create' ? t('ai.dreaming') : t('ai.makeIt')}
           </button>
+          {providerSetupPending && <p className="ai-note">{t('ai.finishSetup')}</p>}
           {capabilityNote('generateImage')}
         </div>
       )}
@@ -417,7 +433,9 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
           >
             {settingsOpen ? '▾' : '▸'}{' '}
             {t('ai.settingsToggle', {
-              provider: t(byok ? 'ai.providerByok' : 'ai.providerMock'),
+              provider: t(
+                providerChoice === 'openai-compatible' ? 'ai.providerByok' : 'ai.providerMock',
+              ),
             })}
           </button>
           {settingsOpen && (
@@ -426,8 +444,8 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
                 <span className="option-label">{t('ai.whoHelps')}</span>
                 <select
                   className="font-select"
-                  value={byok ? 'openai-compatible' : 'mock'}
-                  onChange={(e) => pickProvider(e.target.value as 'mock' | 'openai-compatible')}
+                  value={providerChoice}
+                  onChange={(e) => pickProvider(e.target.value as ProviderChoice)}
                 >
                   <option value="mock">{t('ai.providerMockFull')}</option>
                   <option value="openai-compatible">{t('ai.providerByokFull')}</option>

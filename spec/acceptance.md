@@ -522,6 +522,11 @@ holds.
       active frame and its mirrored stack persist the exact result; an unknown
       layer, invalid value or attempt to remove the final layer is refused
       without changing the project.
+159.  GIVEN the user chooses their own AI WHEN its first setup has not been
+      saved THEN that choice remains visible, Create is unavailable and the
+      next step says to Save; WHEN a saved provider is chosen again THEN it
+      becomes active immediately, while the free provider identifies itself
+      as a bounded offline scene maker rather than open-ended generation.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

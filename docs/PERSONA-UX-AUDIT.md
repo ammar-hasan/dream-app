@@ -28,7 +28,7 @@ not merely the presence of a named control.
 
 The audit covered the entire living spec (vision, concepts, interaction map,
 all feature areas, visual identity, integrations, all data contracts and all
-158 acceptance criteria), the product roadmap/research backlog, the automated
+159 acceptance criteria), the product roadmap/research backlog, the automated
 test inventory, and rendered desktop and phone states. A persona passes only
 when their intended outcome is realistically achievable end to end with a
 suitable input method and usable output—not when an adjacent feature exists.
@@ -140,6 +140,11 @@ suitable input method and usable output—not when an adjacent feature exists.
     the active stack, stable ids or names, explicit zero-based order and bounded
     opacity. Bad targets write nothing, animation mirrors remain coherent and
     the final layer cannot be removed.
+22. **Generative identity must be true at the action point.** A bounded offline
+    scene maker says what themes it understands. Choosing an own-AI provider
+    stays visibly pending until Save and disables creation, while returning to
+    an already configured provider takes effect immediately. A prompt can no
+    longer appear to target one provider while another silently handles it.
 
 ### What does not yet fully serve the purpose
 

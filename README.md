@@ -339,7 +339,9 @@ on the document through the same undoable history as your own strokes.
   plus suggestions — each with an **Apply** button where Dream can do it
   for you (contrast/brightness/warmth fixes, centering the selection).
 
-**Dream AI** is the built-in provider: free, offline, deterministic. It
+**Dream AI** is the built-in offline-scene provider: free, offline,
+deterministic. Its Create hint names the scene themes it understands instead
+of implying open-ended image generation. It
 paints procedural scenes (seeded by your words — night, sunset, forest,
 ocean, snow…), edits via the real engine filters, and gives feedback from
 a rule engine that reads the actual document (palette histogram, canvas
@@ -357,6 +359,8 @@ current OpenAI example for both image fields. At the official OpenAI endpoint,
 leaving Image model blank uses that current default; leaving Edits model blank
 keeps BYOK editing disabled instead of making a false capability claim. With
 your own provider active the daily counter disappears and usage is unlimited.
+Choosing your own provider stays visibly pending and disables Create until the
+first Save; choosing an already saved provider activates it immediately.
 Settings (URL, chat model, image model, edits model, active provider) persist
 in localStorage; **API keys live in sessionStorage only** (gone when the tab
 closes) unless you tick "remember key", and are never logged. Examples:

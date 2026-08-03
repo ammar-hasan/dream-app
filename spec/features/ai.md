@@ -47,6 +47,8 @@ moves the Design-mode selection to the canvas center.
 
 Free, works **fully offline**, deterministic: the same prompt at the same
 size paints the same picture, always (the prompt is the seed).
+The provider name and Create guidance identify it as an offline scene maker
+and name its supported themes; they never imply open-ended image generation.
 
 ### Create — the scene vocabulary
 
@@ -161,6 +163,13 @@ base URL, chat model, API key, a visible **Image model** plus "This AI can
 also paint images" for endpoints with image generation, and an optional
 **Edits model** for endpoints with image editing. The current OpenAI example
 for both image fields is `gpt-image-2`.
+
+Choosing the own-AI option keeps that choice visible while its first setup is
+incomplete. Create remains unavailable and explains that Save is required, so
+no prompt can silently run through the offline provider instead. After a
+provider has been saved, switching away and back activates it immediately
+without requiring another Save. The provider named in Settings always matches
+the visible choice; a successful Save confirms the active connection.
 
 - **Chat** (feedback) goes to `/chat/completions`; **image creation** to
   `/images/generations`. Compatible endpoints receive the requested document

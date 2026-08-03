@@ -1025,3 +1025,21 @@ not merely append more content whenever a draft changes.
 - Acceptance met locally: create a project, add a draft and scratch layer,
   configure/reorder the draft, remove the scratch layer, reopen/render the same
   project and retain one protected base layer.
+
+## Slice 42 — Truthful AI provider state ✅
+
+Persona need: let any creator know which image maker will receive the next
+prompt before spending time, a free try or API credit.
+
+- ✅ A first-time own-AI choice stays selected while its form is being filled;
+  Create is disabled with a direct Save instruction until setup is committed.
+- ✅ A saved provider can be switched away from and back to immediately without
+  re-saving its settings or leaving stale provider state in the panel.
+- ✅ The free provider is visibly described as a bounded offline scene maker,
+  with its supported themes named beside the prompt. Connected AI gets separate
+  open-ended guidance.
+- ✅ Browser coverage proves pending setup, reactivation and returned image
+  pixels; a real `gpt-image-2` request rendered a dinosaur on a new layer
+  without persisting the test key in the repository.
+- Acceptance met: the visible provider and guidance match the next Create
+  action, and an unfinished connection can never fall through to offline art.
