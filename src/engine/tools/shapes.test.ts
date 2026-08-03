@@ -29,6 +29,17 @@ describe('shape tools', () => {
     expect(op?.size).toBe(3);
   });
 
+  it('bakes connector ends into lines and ignores them for other shapes', () => {
+    const connector = { ...settings, lineStyle: 'double-arrow' as const };
+    const lineState = lineTool.begin({ point: { x: 0, y: 0 }, shiftKey: false }, connector);
+    lineTool.update(lineState, { point: { x: 20, y: 0 }, shiftKey: false }, connector);
+    expect((lineTool.commit(lineState, connector) as ShapeOp).lineStyle).toBe('double-arrow');
+
+    const rectState = rectangleTool.begin({ point: { x: 0, y: 0 }, shiftKey: false }, connector);
+    rectangleTool.update(rectState, { point: { x: 20, y: 20 }, shiftKey: false }, connector);
+    expect((rectangleTool.commit(rectState, connector) as ShapeOp).lineStyle).toBeUndefined();
+  });
+
   it('shift constrains a line to 45° angles', () => {
     const op = drag(lineTool, { x: 0, y: 0 }, { x: 10, y: 1 }, true);
     expect(op?.to.y).toBeCloseTo(0, 6);

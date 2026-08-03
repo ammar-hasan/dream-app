@@ -85,16 +85,17 @@ Rules:
 
 ## Import & export formats
 
-| Format              | Direction         | Contract                                                                                                                                          |
-| ------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PNG                 | import + export   | import: onto its own centered layer, scaled down to fit; export: flattened document, transparency preserved, `{name}.png`                         |
-| JPEG                | export            | flattened, quality 10–100 (default 92), `{name}.jpg`                                                                                              |
-| Clipboard image     | import            | paste lands like a file import                                                                                                                    |
-| `.dream`            | import + export   | the portable project format — full contract in `data/dream-file.md`                                                                               |
-| WebM                | export (animated) | 30 fps capture stream with authored frame holds; VP9 → VP8 → generic fallback; Original uses `{name}.webm`, social shapes add their suffix        |
-| MP4                 | export (animated) | same timing through feature-detected native recording with a browser-compatible codec; Original uses `{name}.mp4`, social shapes add their suffix |
-| Sprite sheet (PNG)  | export (animated) | all frames in one grid, ≤8 columns, `{name}-frames.png`                                                                                           |
-| Standalone HTML app | export (animated) | the interactive-prototype contract in `features/app-mode.md`, `{name}-app.html`                                                                   |
-| Real-code HTML app  | export (animated) | the AI make-real contract in `features/app-mode.md`, `{name}-code.html`                                                                           |
+| Format              | Direction         | Contract                                                                                                                                                                     |
+| ------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PNG                 | import + export   | import: onto its own centered layer, scaled down to fit; export: flattened document, transparency preserved, `{name}.png`                                                    |
+| JPEG                | export            | flattened, quality 10–100 (default 92), `{name}.jpg`                                                                                                                         |
+| SVG                 | export            | active canvas/frame as scalable visible strokes, spray, shapes, connectors and text; unavailable when visible pixel or eraser content would make it misleading; `{name}.svg` |
+| Clipboard image     | import            | paste lands like a file import                                                                                                                                               |
+| `.dream`            | import + export   | the portable project format — full contract in `data/dream-file.md`                                                                                                          |
+| WebM                | export (animated) | 30 fps capture stream with authored frame holds; VP9 → VP8 → generic fallback; Original uses `{name}.webm`, social shapes add their suffix                                   |
+| MP4                 | export (animated) | same timing through feature-detected native recording with a browser-compatible codec; Original uses `{name}.mp4`, social shapes add their suffix                            |
+| Sprite sheet (PNG)  | export (animated) | all frames in one grid, ≤8 columns, `{name}-frames.png`                                                                                                                      |
+| Standalone HTML app | export (animated) | the interactive-prototype contract in `features/app-mode.md`, `{name}-app.html`                                                                                              |
+| Real-code HTML app  | export (animated) | the AI make-real contract in `features/app-mode.md`, `{name}-code.html`                                                                                                      |
 
 Filenames use the document name, falling back to `dream` when blank.

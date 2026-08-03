@@ -272,9 +272,15 @@ describe('rotation', () => {
   });
 
   it('rotates line shapes but leaves rectangles unchanged', () => {
-    const line = shape({ shape: 'line', from: { x: 10, y: 0 }, to: { x: 20, y: 0 } });
+    const line = shape({
+      shape: 'line',
+      lineStyle: 'double-arrow',
+      from: { x: 10, y: 0 },
+      to: { x: 20, y: 0 },
+    });
     const rotatedLine = rotateOperation(line, center, Math.PI / 2) as ShapeOp;
     expect(rotatedLine.from.y).toBeCloseTo(10);
+    expect(rotatedLine.lineStyle).toBe('double-arrow');
     expect(rotateOperation(shape(), center, 0.3)).toEqual(shape());
   });
 

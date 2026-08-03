@@ -89,12 +89,21 @@ connected provider that explicitly declares generative editing. The built-in
 offline assistant continues to offer deterministic filters and never presents
 itself as generative.
 
-## Export (flattened images)
+## Still-image export
 
 - **PNG** — lossless, transparency preserved. Filename `{name}.png`.
 - **JPEG** — quality slider 10–100, default 92. Filename `{name}.jpg`.
-- The flattened render is the document background plus every visible
-  layer, bottom to top — exactly what the canvas shows.
+- **SVG** — scalable background, visible layers, freehand and pressure-width
+  strokes, spray, shapes, connector ends and text from the active canvas or
+  frame. Layer and mark opacity, authored dimensions and document name are
+  preserved. Filename `{name}.svg`.
+- PNG and JPEG flatten the document background plus every visible layer,
+  bottom to top — exactly what the canvas shows.
+- SVG is offered only when every visible mark can remain genuinely scalable.
+  A visible imported or generated pixel image, baked flood fill, baked image
+  adjustment or eraser mark disables its Export action and explains that PNG
+  remains available. Unsupported content on a hidden layer does not block a
+  truthful SVG of what is visible.
 
 ## Edge cases
 

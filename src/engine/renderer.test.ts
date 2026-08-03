@@ -242,6 +242,30 @@ describe('pressure-width stroke rendering', () => {
   });
 });
 
+describe('connector rendering', () => {
+  it('draws one or two arrowheads as part of the line path', () => {
+    const connector: ShapeOp = {
+      kind: 'shape',
+      id: 'arrow',
+      shape: 'line',
+      from: { x: 10, y: 20 },
+      to: { x: 80, y: 20 },
+      color: '#000000',
+      size: 3,
+      opacity: 1,
+      lineStyle: 'arrow',
+    };
+    const one = new MockContext2D();
+    renderOperation(connector, one);
+    expect(one.calls('lineTo')).toHaveLength(3);
+
+    const both = new MockContext2D();
+    renderOperation({ ...connector, lineStyle: 'double-arrow' }, both);
+    expect(both.calls('lineTo')).toHaveLength(5);
+    expect(both.calls('stroke')).toHaveLength(1);
+  });
+});
+
 describe('spray rendering', () => {
   const spray: StrokeOp = {
     kind: 'stroke',

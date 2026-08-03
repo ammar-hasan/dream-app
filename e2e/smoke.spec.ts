@@ -307,6 +307,54 @@ test('MP4 export appears only when native recording is supported', async ({ page
   await expect(page.getByRole('button', { name: 'MP4 video' })).toHaveCount(supported ? 1 : 0);
 });
 
+test('scientific connectors and labels export as real scalable SVG', async ({ page }) => {
+  await bootApp(page);
+
+  await page.getByRole('button', { name: 'Line', exact: true }).click();
+  await page.getByRole('combobox', { name: 'Line ends' }).selectOption('double-arrow');
+  await drawStroke(page);
+
+  await page.getByRole('button', { name: 'Text', exact: true }).click();
+  const canvas = page.locator('.viewport-canvas');
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('viewport canvas has no box');
+  await page.mouse.click(box.x + box.width / 2 - 50, box.y + box.height / 2 + 60);
+  const input = page.getByRole('textbox', { name: 'Text input' });
+  await expect(input).toBeVisible();
+  await input.fill('H2O');
+  await input.press('Home');
+  await input.press('ArrowRight');
+  await input.press('Shift+ArrowRight');
+  await page.getByRole('button', { name: '₂' }).click();
+  await expect(input).toHaveValue('H₂O');
+  await input.press('Enter');
+
+  await page.getByRole('button', { name: 'Export' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Export' });
+  await dialog.getByRole('button', { name: 'SVG' }).click();
+  await expect(dialog).toContainText('Scalable shapes, strokes, connectors and text');
+  const downloadPromise = page.waitForEvent('download');
+  await dialog.getByRole('button', { name: 'Export' }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe('Untitled.svg');
+  const path = await download.path();
+  expect(path).not.toBeNull();
+  const svg = await readFile(path!, 'utf8');
+  expect(svg).toContain('<svg');
+  expect(svg).toContain('<path d=');
+  expect(svg).toContain('H₂O');
+
+  await page.getByRole('button', { name: 'Eraser', exact: true }).click();
+  await drawStroke(page);
+  await page.getByRole('button', { name: 'Export' }).click();
+  const fallback = page.getByRole('dialog', { name: 'Export' });
+  await fallback.getByRole('button', { name: 'SVG' }).click();
+  await expect(fallback).toContainText('use PNG to keep exactly what you see');
+  await expect(fallback.getByRole('button', { name: 'Export' })).toBeDisabled();
+  await fallback.getByRole('button', { name: 'PNG' }).click();
+  await expect(fallback.getByRole('button', { name: 'Export' })).toBeEnabled();
+});
+
 test('social video export saves synchronized captions as one undoable edit', async ({ page }) => {
   await bootApp(page);
   await page.getByRole('button', { name: /^Animate/ }).click();

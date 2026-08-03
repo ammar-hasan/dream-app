@@ -7,8 +7,10 @@
 
 import { useState } from 'react';
 import { animationSettingsOf, MAX_FRAME_CAPTION_LENGTH } from '../engine/animation';
+import { canExportSvg } from '../engine/svgExport';
 import { useDreamStore } from '../store/dreamStore';
 import { exportImage } from './exportImage';
+import { exportSvg } from './exportSvg';
 import { exportAppHtml } from './exportApp';
 import { exportRealCodeHtml } from './exportRealCode';
 import { downloadDreamFile } from './dreamFile';
@@ -24,7 +26,8 @@ import {
 } from './exportAnimation';
 import { useT } from './i18n';
 
-type Format = 'png' | 'jpeg' | 'webm' | 'mp4' | 'sprite' | 'app' | 'share' | 'code' | 'dream';
+type Format =
+  'png' | 'jpeg' | 'svg' | 'webm' | 'mp4' | 'sprite' | 'app' | 'share' | 'code' | 'dream';
 
 export function ExportDialog({ onClose }: { onClose: () => void }) {
   const t = useT();
@@ -39,6 +42,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
 
   const doc = useDreamStore((s) => s.doc);
   const animated = doc.frames !== undefined;
+  const svgReady = canExportSvg(doc);
   const fps = animationSettingsOf(doc).fps;
   const frames = doc.frames ?? [];
   const [trimStart, setTrimStart] = useState(0);
@@ -134,6 +138,11 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
       }
       return;
     }
+    if (format === 'svg') {
+      exportSvg(doc);
+      onClose();
+      return;
+    }
     exportImage(doc, { format, quality: quality / 100 });
     onClose();
   };
@@ -141,6 +150,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
   const formats: { id: Format; label: string }[] = [
     { id: 'png', label: 'PNG' },
     { id: 'jpeg', label: 'JPEG' },
+    { id: 'svg', label: 'SVG' },
     ...(animated
       ? [
           { id: 'webm' as const, label: t('export.webmLabel') },
@@ -319,6 +329,10 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
 
         {format === 'sprite' && <p className="dialog-note">{t('export.spriteNote')}</p>}
 
+        {format === 'svg' && (
+          <p className="dialog-note">{t(svgReady ? 'export.svgNote' : 'export.svgUnavailable')}</p>
+        )}
+
         {format === 'app' && <p className="dialog-note">{t('export.appNote')}</p>}
 
         {format === 'share' && (
@@ -355,7 +369,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
           <button
             className="btn primary"
             onClick={() => void doExport()}
-            disabled={progress !== null}
+            disabled={progress !== null || (format === 'svg' && !svgReady)}
           >
             {t(format === 'share' ? 'export.shareAction' : 'export.title')}
           </button>

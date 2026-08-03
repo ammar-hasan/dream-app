@@ -93,3 +93,21 @@ test('Persian calligraphy controls have no serious automated violations', async 
   await page.getByRole('combobox', { name: 'نوک قلم‌مو' }).selectOption('calligraphy');
   expect(await seriousViolations(page)).toEqual([]);
 });
+
+test('scientific text and SVG export controls have no serious automated violations', async ({
+  page,
+}) => {
+  await bootApp(page);
+  await page.getByRole('button', { name: 'Text', exact: true }).click();
+  const canvas = page.locator('.viewport-canvas');
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('viewport canvas has no box');
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(page.getByRole('group', { name: 'Science symbols' })).toBeVisible();
+  expect(await seriousViolations(page)).toEqual([]);
+
+  await page.getByRole('textbox', { name: 'Text input' }).press('Escape');
+  await page.getByRole('button', { name: 'Export' }).click();
+  await page.getByRole('dialog', { name: 'Export' }).getByRole('button', { name: 'SVG' }).click();
+  expect(await seriousViolations(page)).toEqual([]);
+});

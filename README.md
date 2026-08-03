@@ -191,12 +191,13 @@ and the language picker.
   Brush also offers a fixed-angle Calligraphy nib for directional thick/thin
   marks using mouse, touch or pen
 - Spray (airbrush) with a density slider; deterministic per-stroke seeds
-- Line, rectangle and ellipse tools with Shift-to-constrain (45° lines, squares, circles)
-  and an optional fill-shapes mode (filled with the current color)
+- Line, rectangle and ellipse tools with Shift-to-constrain (45° lines,
+  squares, circles), plain/arrow/two-way line ends, and an optional fill-shapes
+  mode (filled with the current color)
 - Mirror symmetry (vertical / horizontal / quad) with live mirrored preview
 - Flood fill (bucket), magic wand (move / delete / copy-to-layer a region),
   eyedropper color picker, and a click-to-type text tool with a Persian-script
-  Nastaliq/Naskh-aware font choice
+  Nastaliq/Naskh-aware font choice plus caret-aware scientific symbols
 - Stamp tool: twelve built-in cute stamps at S/M/L plus three coloring-book
   starter scenes, all procedurally generated (no assets), one undo per stamp
 - Comfort mode: a senior-friendly settings toggle — larger text/targets and
@@ -217,11 +218,13 @@ and the language picker.
   and one-tap fit-to-window
 - New document dialog (presets + custom size + background color)
 - Autosave to IndexedDB (imported images included), open/delete saved projects,
-  export flattened PNG or JPEG (with quality setting), and portable `.dream`
+  export flattened PNG or JPEG (with quality setting), export genuinely
+  scalable visible strokes/shapes/connectors/text as SVG, and portable `.dream`
   project files (Export dialog downloads one; the Open dialog opens them, with
-  drag-and-drop)
+  drag-and-drop). SVG is disabled with a plain PNG fallback when visible pixel
+  or eraser content cannot remain vector.
 - Elegant splash while the last document restores; a welcome card (logo +
-  "Pick a brush and start dreaming") that dismisses on your first stroke
+  "Pick a brush and start dreaming") that dismisses when creation begins
 - Light & dark themes with a full design-token system; styled tooltips with
   shortcuts; subtle reduced-motion-aware animation throughout
 - Fully mouse- and touch-driven (Pointer Events), devicePixelRatio-crisp rendering
@@ -670,6 +673,7 @@ src/
                      hotspots → ONE self-contained interactive HTML file
     projectFile.ts   The .dream file format: JSON envelope + raster patches as
                      base64 PNG data URLs, via an injectable RasterCodec
+    svgExport.ts     Truthful scalable export for visible vector-safe content
     layerCache.ts    Incremental compositor: per-layer bitmap cache (reference-
                      equality invalidation, LRU cap, eraser-aware snapshot
                      fallback, oversized-document bypass)
@@ -788,7 +792,8 @@ restart button bottom-end)
   URLs), layer cache (composite ≤ layers+1 draw calls for an unchanged
   500-op document vs. re-issuing every op, per-layer invalidation, LRU +
   memory caps, eraser snapshot fallback), renderer
-  (against a recording mock 2D context — no canvas package needed)
+  (against a recording mock 2D context — no canvas package needed), connector
+  arrowhead geometry and truthful SVG generation/fallback classification
 - AI tests: provider registry + key/settings persistence, OpenAI-compatible
   request construction with a mocked fetch, capability degradation, the daily
   free-tier counter (date rollover via fake timers), the feedback rule engine
@@ -822,7 +827,8 @@ restart button bottom-end)
   difficulty ramp, seeded determinism), sprite content-bbox cropping, default
   cast drawings against the recording mock, and sound feature detection with
   a fake AudioContext
-- Export tests: WebM mime fallback, filenames, progress and error paths with
+- Export tests: SVG structure/escaping/pressure/connector fidelity and stable
+  download names; WebM mime fallback, filenames, progress and error paths with
   mocked recorder/canvas (MediaRecorder can't run in Node — it's isolated
   behind injectable deps in `ui/exportAnimation.ts`), plus the narration
   mix-in path (tracks combined, no-narration path untouched)
@@ -851,7 +857,8 @@ after `npx playwright install`).
 
 - `e2e/smoke.spec.ts` — boot/welcome, brush stroke verified by reading real
   canvas pixels, undo, Design-mode panels, Dream AI generation onto a new
-  layer, kid mode, Arabic RTL, Persian calligraphy RTL, dark theme. Every test is independent (fresh
+  layer, scientific connector/text creation plus downloaded SVG inspection,
+  kid mode, Arabic RTL, Persian calligraphy RTL, dark theme. Every test is independent (fresh
   browser context → empty localStorage/IndexedDB).
 - `e2e/visual.spec.ts` — one full-page screenshot baseline of the welcome
   state (`e2e/visual.spec.ts-snapshots/`), committed as the CSS-regression

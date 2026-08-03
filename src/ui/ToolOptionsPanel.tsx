@@ -63,6 +63,7 @@ export function ToolOptionsPanel() {
   const setColor = useDreamStore((s) => s.setColor);
   const setSize = useDreamStore((s) => s.setSize);
   const setBrushStyle = useDreamStore((s) => s.setBrushStyle);
+  const setLineStyle = useDreamStore((s) => s.setLineStyle);
   const setOpacity = useDreamStore((s) => s.setOpacity);
   const setFontSize = useDreamStore((s) => s.setFontSize);
   const setFontFamily = useDreamStore((s) => s.setFontFamily);
@@ -170,6 +171,24 @@ export function ToolOptionsPanel() {
           >
             <option value="round">{t('options.brushRound')}</option>
             <option value="calligraphy">{t('options.brushCalligraphy')}</option>
+          </select>
+        </label>
+      )}
+
+      {tool === 'line' && (
+        <label className="option-row">
+          <span className="option-label">{t('options.lineStyle')}</span>
+          <select
+            value={settings.lineStyle}
+            onChange={(event) => {
+              const value = event.target.value;
+              setLineStyle(value === 'arrow' || value === 'double-arrow' ? value : 'plain');
+            }}
+            className="font-select"
+          >
+            <option value="plain">{t('options.linePlain')}</option>
+            <option value="arrow">{t('options.lineArrow')}</option>
+            <option value="double-arrow">{t('options.lineDoubleArrow')}</option>
           </select>
         </label>
       )}

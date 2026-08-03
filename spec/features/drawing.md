@@ -68,6 +68,9 @@ commits nothing.
 
 - **Shift constrains:** lines snap to the nearest 45° angle (length
   preserved); rectangles become squares and ellipses become circles.
+- Lines offer three session-only end styles: **Plain**, **Arrow** at the drag
+  endpoint, and **Arrows both ways**. The chosen ends belong to the committed
+  line, remain attached when it is transformed, and undo with that line.
 - Outline width is the current size.
 - **Fill shapes toggle** (options panel): rectangles and ellipses commit
   filled with the current color and **no outline**. Lines are unaffected.
@@ -113,7 +116,11 @@ empty text commits nothing. Font size default 24 px; five named font
 choices: Sans, Serif, Mono, Handwritten and Persian script. The Persian
 choice prefers an installed Nastaliq or Arabic-script text face and falls
 back to a broadly available script-capable face. Esc cancels an in-progress
-text.
+text. Opening the text entry keeps it focused after the placement click and
+dismisses first-run guidance so the writing area is unobstructed. A compact
+science strip beside the entry inserts `₂`, `₃`, `⁺`, `⁻`, `→`, `⇌`, `Δ`,
+`°` or `μ` at the caret, replacing any selected characters; focus returns to
+the entry so typing can continue.
 
 ### Stamp (N)
 

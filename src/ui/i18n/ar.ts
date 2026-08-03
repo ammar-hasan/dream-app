@@ -136,6 +136,10 @@ export const ar: Record<string, string> = {
   'options.brushStyle': 'رأس الفرشاة',
   'options.brushRound': 'دائري',
   'options.brushCalligraphy': 'سنّ الخط',
+  'options.lineStyle': 'نهايات الخط',
+  'options.linePlain': 'خط عادي',
+  'options.lineArrow': 'سهم',
+  'options.lineDoubleArrow': 'سهم باتجاهين',
   'options.opacity': 'الشفافية',
   'options.font': 'الخط',
   'options.textSize': 'حجم النص',
@@ -540,6 +544,9 @@ export const ar: Record<string, string> = {
   'export.trimEnd': 'إطار النهاية',
   'export.trimHint': 'يُقص الفيديو المُصدّر فقط. تبقى حركتك كاملة.',
   'export.spriteNote': 'كل الإطارات في شبكة PNG واحدة — مفيدة للألعاب والمشاركة.',
+  'export.svgNote': 'أشكال وخطوط وموصلات ونصوص قابلة للتكبير للمخططات والشعارات والطباعة.',
+  'export.svgUnavailable':
+    'تحتوي اللوحة على بكسلات ظاهرة أو محو. أخفها أو أزلها لتصدير SVG، أو استخدم PNG للحفاظ على ما تراه تماما.',
   'export.appLabel': 'تطبيق تفاعلي (.html)',
   'export.appNote':
     'ملف HTML واحد مستقل: إطاراتك كشاشات وروابطك كنقاط لمس. يفتح في أي مكان ويعمل دون إنترنت.',
@@ -588,6 +595,8 @@ export const ar: Record<string, string> = {
   'hint.firstRun': 'اختر فرشاة وابدأ الحلم',
   'text.placeholder': 'اكتب هنا…',
   'text.label': 'إدخال نص',
+  'text.scienceSymbols': 'رموز علمية',
+  'text.scienceSymbolList': '₂ ₃ ⁺ ⁻ → ⇌ Δ ° μ',
 
   // --- Settings menu ---------------------------------------------------------------------
   'settings.title': 'الإعدادات',

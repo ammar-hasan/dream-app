@@ -414,6 +414,24 @@ holds.
 132.  GIVEN Settings is open WHEN an automated accessibility scan inspects its
       form controls in either writing direction THEN they form one correctly
       labeled control group with no serious or critical violation.
+133.  GIVEN the Line tool WHEN Arrow or Arrows both ways is selected and a
+      non-zero line is drawn THEN its requested heads render at the correct
+      endpoints, remain attached through supported transforms and save/load,
+      and one Undo removes the complete connector.
+134.  GIVEN the Text tool WHEN the canvas is clicked and science symbols are
+      used THEN the text entry remains visible and focused after that click,
+      first-run guidance no longer obstructs it, each symbol replaces the
+      current selection or inserts at the caret, and typing can continue before
+      one text commit.
+135.  GIVEN an active canvas or frame containing only scalable visible marks
+      WHEN SVG is exported THEN the file preserves its authored dimensions,
+      background, layer and mark opacity, geometry, pressure-width strokes,
+      deterministic spray, connector heads, text and XML-significant
+      characters under the document-derived filename.
+136.  GIVEN visible imported/generated pixels, baked pixel edits or eraser
+      marks WHEN SVG is selected THEN Dream explains why scalable export is
+      unavailable and disables only that Export action while PNG remains a
+      working fallback; hiding all unsupported content makes SVG available.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 
@@ -432,9 +450,11 @@ holds.
    home" → hear and confirm the planned moments → the complete animation plays
    → "record narration" → tell it aloud → "stop recording" → "save".
 6. **Sara (15):** Design mode → draw logo elements → align/distribute →
-   save as component → new project → insert the component → export PNG.
-7. **Zǐxuān (28):** 12-frame bouncing ball (duplicate + onion skin) →
-   play at 6 fps → export WebM and a sprite sheet.
+   save as component → new project → insert the component → export SVG.
+7. **Zǐxuān (28):** draw a reversible-reaction connector → label it with
+   chemical subscripts, superscripts and symbols → export a scalable SVG →
+   duplicate frames to animate the reaction → link explanatory screens into
+   an app.
 8. **Maria (32):** export `.dream` → agent reads it, adds a layer with a shape
    and text, renders a PNG, exports the app HTML via the dream-mcp tools →
    re-import the `.dream` unchanged elsewhere.

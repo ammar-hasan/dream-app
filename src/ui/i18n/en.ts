@@ -137,6 +137,10 @@ export const en: Record<string, string> = {
   'options.brushStyle': 'Brush tip',
   'options.brushRound': 'Round',
   'options.brushCalligraphy': 'Calligraphy nib',
+  'options.lineStyle': 'Line ends',
+  'options.linePlain': 'Plain line',
+  'options.lineArrow': 'Arrow',
+  'options.lineDoubleArrow': 'Arrow both ways',
   'options.opacity': 'Opacity',
   'options.font': 'Font',
   'options.textSize': 'Text size',
@@ -548,6 +552,9 @@ export const en: Record<string, string> = {
   'export.trimEnd': 'End frame',
   'export.trimHint': 'Only the exported video is trimmed. Your animation stays complete.',
   'export.spriteNote': 'All frames in one PNG grid — handy for games and sharing.',
+  'export.svgNote': 'Scalable shapes, strokes, connectors and text for diagrams, logos and print.',
+  'export.svgUnavailable':
+    'This canvas has visible pixel content or erasing. Hide or remove it for SVG, or use PNG to keep exactly what you see.',
   'export.appLabel': 'Interactive app (.html)',
   'export.appNote':
     'One self-contained HTML file: your frames as screens, your links as tappable hotspots. Opens anywhere, works offline.',
@@ -596,6 +603,8 @@ export const en: Record<string, string> = {
   'hint.firstRun': 'Pick a brush and start dreaming',
   'text.placeholder': 'Type here…',
   'text.label': 'Text input',
+  'text.scienceSymbols': 'Science symbols',
+  'text.scienceSymbolList': '₂ ₃ ⁺ ⁻ → ⇌ Δ ° μ',
 
   // --- Settings menu ---------------------------------------------------------------------
   'settings.title': 'Settings',

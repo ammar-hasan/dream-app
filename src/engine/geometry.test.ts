@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  arrowheadPoints,
   boundingRect,
   clamp,
   constrainEnd,
@@ -9,6 +10,15 @@ import {
   pointInPolygon,
   pointInRect,
 } from './geometry';
+
+describe('arrowheadPoints', () => {
+  it('places symmetric wings behind a horizontal tip', () => {
+    const [a, b] = arrowheadPoints({ x: 0, y: 10 }, { x: 20, y: 10 }, 2);
+    expect(a.x).toBeLessThan(20);
+    expect(b.x).toBeLessThan(20);
+    expect(a.y - 10).toBeCloseTo(-(b.y - 10));
+  });
+});
 
 describe('clamp', () => {
   it('bounds values', () => {

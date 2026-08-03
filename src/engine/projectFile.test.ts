@@ -92,6 +92,17 @@ function richDocument(): DreamDocument {
             to: { x: 50, y: 30 },
           },
           {
+            kind: 'shape',
+            id: 'op-connector',
+            shape: 'line',
+            lineStyle: 'double-arrow',
+            color: '#00ffff',
+            opacity: 1,
+            size: 3,
+            from: { x: 20, y: 50 },
+            to: { x: 80, y: 50 },
+          },
+          {
             kind: 'text',
             id: 'op-text',
             color: '#ffffff',

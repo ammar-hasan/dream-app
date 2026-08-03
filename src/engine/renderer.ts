@@ -7,7 +7,7 @@
  */
 
 import { cssColor } from './color';
-import { normalizeRect } from './geometry';
+import { arrowheadPoints, normalizeRect } from './geometry';
 import { sprayDots } from './spray';
 import type { DreamDocument, Layer, Operation, RasterPatch, ShapeOp, StrokeOp } from './types';
 
@@ -204,6 +204,20 @@ function renderShape(op: ShapeOp, ctx: Renderer2D): void {
   if (op.shape === 'line') {
     ctx.moveTo(op.from.x, op.from.y);
     ctx.lineTo(op.to.x, op.to.y);
+    if (op.lineStyle === 'arrow' || op.lineStyle === 'double-arrow') {
+      const [a, b] = arrowheadPoints(op.from, op.to, op.size);
+      ctx.moveTo(op.to.x, op.to.y);
+      ctx.lineTo(a.x, a.y);
+      ctx.moveTo(op.to.x, op.to.y);
+      ctx.lineTo(b.x, b.y);
+    }
+    if (op.lineStyle === 'double-arrow') {
+      const [a, b] = arrowheadPoints(op.to, op.from, op.size);
+      ctx.moveTo(op.from.x, op.from.y);
+      ctx.lineTo(a.x, a.y);
+      ctx.moveTo(op.from.x, op.from.y);
+      ctx.lineTo(b.x, b.y);
+    }
   } else if (op.shape === 'rectangle') {
     const r = normalizeRect(op.from, op.to);
     ctx.rect(r.x, r.y, r.width, r.height);

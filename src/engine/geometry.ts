@@ -2,6 +2,23 @@
 
 import type { Point, Rect } from './types';
 
+/** Two wing endpoints for a 30° arrowhead at `tip`, pointing away from `tail`. */
+export function arrowheadPoints(tail: Point, tip: Point, strokeWidth: number): [Point, Point] {
+  const angle = Math.atan2(tip.y - tail.y, tip.x - tail.x);
+  const length = Math.max(8, strokeWidth * 4);
+  const spread = Math.PI / 6;
+  return [
+    {
+      x: tip.x - Math.cos(angle - spread) * length,
+      y: tip.y - Math.sin(angle - spread) * length,
+    },
+    {
+      x: tip.x - Math.cos(angle + spread) * length,
+      y: tip.y - Math.sin(angle + spread) * length,
+    },
+  ];
+}
+
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }

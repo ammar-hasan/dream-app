@@ -113,6 +113,8 @@ export interface ShapeOp extends OperationBase {
    * stroking the outline. Absent/false = outline (the classic behavior).
    */
   fill?: boolean;
+  /** Line only: optional connector arrowheads; absent behaves as plain. */
+  lineStyle?: 'arrow' | 'double-arrow';
 }
 
 /**
@@ -346,6 +348,8 @@ export interface ToolSettings {
   size: number;
   /** Brush tip: round is uniform; calligraphy is a fixed 45-degree broad nib. */
   brushStyle: 'round' | 'calligraphy';
+  /** Line connector ends; ignored by every other tool. */
+  lineStyle: 'plain' | 'arrow' | 'double-arrow';
   /** 0..1 */
   opacity: number;
   fontSize: number;

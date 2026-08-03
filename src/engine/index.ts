@@ -21,3 +21,4 @@ export * from './animation';
 export * from './hotspots';
 export * from './appExport';
 export * from './projectFile';
+export * from './svgExport';

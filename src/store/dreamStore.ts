@@ -290,6 +290,7 @@ export interface DreamStore {
   setColor(color: Color): void;
   setSize(size: number): void;
   setBrushStyle(brushStyle: ToolSettings['brushStyle']): void;
+  setLineStyle(lineStyle: ToolSettings['lineStyle']): void;
   setOpacity(opacity: number): void;
   setFontSize(fontSize: number): void;
   setFontFamily(fontFamily: string): void;
@@ -614,6 +615,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
     setColor: (color) => set((s) => ({ settings: { ...s.settings, color } })),
     setSize: (size) => set((s) => ({ settings: { ...s.settings, size } })),
     setBrushStyle: (brushStyle) => set((s) => ({ settings: { ...s.settings, brushStyle } })),
+    setLineStyle: (lineStyle) => set((s) => ({ settings: { ...s.settings, lineStyle } })),
     setOpacity: (opacity) =>
       set((s) => ({ settings: { ...s.settings, opacity: Math.min(1, Math.max(0, opacity)) } })),
     setFontSize: (fontSize) => set((s) => ({ settings: { ...s.settings, fontSize } })),
@@ -940,6 +942,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       }
       if (tool === 'text') {
         set({ pendingText: point });
+        get().dismissHint();
         return;
       }
       if (tool === 'stamp') {

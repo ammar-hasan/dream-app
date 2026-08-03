@@ -7,6 +7,16 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Scientific connectors and scalable delivery** (slice 34): the Line tool
+  now draws plain, arrow-ended or two-way connectors, and the Text tool offers
+  caret-aware subscripts, superscripts, arrows and common science symbols.
+  Vector-safe visible work exports as genuine SVG with authored geometry,
+  layer/mark opacity, pressure-width strokes, deterministic spray, text and
+  connector heads intact. Visible pixel edits or erasure disable only SVG and
+  explain the working PNG fallback instead of producing a misleading file.
+  The principal-UX pass also fixed text placement immediately dismissing its
+  own focused input and moved first-run guidance out of the writing path.
+
 - **Persian calligraphy path** (slice 33): فارسی joins English and Arabic as a
   complete parity-checked RTL interface with Iranian Persian recognition,
   spoken feedback, canvas commands and local storyboard sequencing. The Brush

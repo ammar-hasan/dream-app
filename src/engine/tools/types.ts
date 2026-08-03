@@ -35,6 +35,7 @@ export const DEFAULT_SETTINGS: ToolSettings = {
   color: '#1f2937',
   size: 8,
   brushStyle: 'round',
+  lineStyle: 'plain',
   opacity: 1,
   fontSize: 24,
   fontFamily: 'system-ui, sans-serif',

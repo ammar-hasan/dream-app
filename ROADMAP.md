@@ -855,3 +855,26 @@ with a mark that behaves like a broad nib rather than a renamed round brush.
 - Acceptance met: switch to فارسی, keep Settings visible, choose the
   Calligraphy nib, paint a real directional mark, use Persian script text and
   issue Persian voice/story commands without losing English recovery commands.
+
+## Slice 34 — Scientific connectors and scalable delivery ✅
+
+Persona need: let Zǐxuān communicate a scientific idea and let Sara deliver a
+logo without flattening genuinely scalable work into pixels.
+
+- ✅ Lines can be plain, arrow-ended or arrowed both ways. End style is baked
+  into each undoable connector and renders consistently in the canvas and SVG.
+- ✅ Text entry has a compact caret-aware strip for subscripts, superscripts,
+  reaction arrows and common scientific symbols. The placement click no longer
+  closes its own input or leaves first-run guidance over the writing surface.
+- ✅ SVG export preserves the active canvas/frame's visible background, layer
+  and mark opacity, shapes, connectors, text, spray and uniform or
+  pressure-width strokes under a stable document-derived filename.
+- ✅ SVG remains truthful: visible pixels, baked fills/adjustments and eraser
+  marks disable that one action with a plain PNG fallback; hidden unsupported
+  layers do not block the visible vector result.
+- ✅ Pure geometry/export tests, a real downloaded-file browser proof, a
+  serious/critical accessibility scan and two rendered principal-UX states
+  cover the path.
+- Acceptance met: author a reversible-reaction connector, replace `2` with `₂`
+  at the text caret, download a real scalable SVG containing both, and receive
+  an honest fallback if the visible work cannot remain vector.

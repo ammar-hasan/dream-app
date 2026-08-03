@@ -66,6 +66,7 @@ absent as the default, and writers may omit defaults.
 | `from` / `to` | Point                            | —       | the two dragged corners; order-independent                          |
 | `size`        | number                           | —       | outline width                                                       |
 | `fill?`       | boolean                          | absent  | rectangle/ellipse only: interior painted in `color`, **no outline** |
+| `lineStyle?`  | `'arrow'\|'double-arrow'`        | absent  | line only: head at `to`, or heads at both endpoints                 |
 
 ### Fill (`kind: 'fill'`)
 
@@ -78,12 +79,12 @@ A flood fill baked to pixels when committed.
 
 ### Text (`kind: 'text'`)
 
-| Attribute    | Type   | Default     | Rule                                                     |
-| ------------ | ------ | ----------- | -------------------------------------------------------- |
-| `position`   | Point  | —           | top-left anchor of the first line                        |
-| `text`       | string | —           | trimmed on commit; empty commits nothing                 |
-| `fontSize`   | number | 24          | canvas px                                                |
-| `fontFamily` | string | system sans | one of the named choices: Sans, Serif, Mono, Handwritten |
+| Attribute    | Type   | Default     | Rule                                                                     |
+| ------------ | ------ | ----------- | ------------------------------------------------------------------------ |
+| `position`   | Point  | —           | top-left anchor of the first line                                        |
+| `text`       | string | —           | trimmed on commit; empty commits nothing                                 |
+| `fontSize`   | number | 24          | canvas px                                                                |
+| `fontFamily` | string | system sans | one of the named choices: Sans, Serif, Mono, Handwritten, Persian script |
 
 ### Image (`kind: 'image'`)
 
@@ -171,8 +172,9 @@ Takes over ~10 MB earn a size warning in the UI.
 
 ## Tool defaults (session state, not persisted)
 
-New sessions start with: color `#1f2937`, brush size 8, opacity 1, font
-size 24, Sans font, fill-shapes off, spray density 40, symmetry off.
+New sessions start with: color `#1f2937`, brush size 8, Round brush tip,
+opacity 1, font size 24, Sans font, fill-shapes off, plain line ends, spray
+density 40, symmetry off.
 
 ## The frame invariant (serialization rule)
 
