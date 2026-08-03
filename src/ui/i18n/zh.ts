@@ -34,6 +34,7 @@ export const zh: Record<string, string> = {
   'toolbar.listening': '正在聆听…',
   'toolbar.stopListening': '停止聆听',
   'toolbar.settings': '设置',
+  'toolbar.moreActions': '更多操作',
 
   // --- Tools ---------------------------------------------------------------
   'tools.railLabel': '工具',

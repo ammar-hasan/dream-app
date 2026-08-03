@@ -1027,10 +1027,106 @@ test('blocked Presenter popup never exposes private notes on the audience stage'
   await expect(page.locator('.present-counter')).toHaveText('1 / 1');
 });
 
+test('phone toolbar keeps creation, recovery and workspaces visible without scrolling', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await bootApp(page);
+
+  const toolbar = page.locator('.phone-toolbar');
+  await expect(toolbar).toBeVisible();
+  await expect(toolbar.getByRole('button', { name: 'Story' })).toBeVisible();
+  await expect(toolbar.getByRole('button', { name: 'AI helper' })).toBeVisible();
+  await expect(toolbar.getByRole('button', { name: 'Voice commands' })).toBeVisible();
+  await expect(toolbar.getByRole('button', { name: 'Undo' })).toBeVisible();
+  await expect(toolbar.getByRole('button', { name: 'Settings' })).toBeVisible();
+  const more = toolbar.getByRole('button', { name: 'More actions' });
+  await expect(more).toBeVisible();
+  await expect(toolbar.getByRole('tab', { name: 'Draw' })).toBeVisible();
+  await expect(toolbar.getByRole('tab', { name: 'Design' })).toBeVisible();
+  await expect(toolbar.getByRole('tab', { name: 'Play' })).toBeVisible();
+  await expect(toolbar.getByRole('tab', { name: 'Present' })).toBeVisible();
+
+  const metrics = await toolbar.evaluate((element) => ({
+    clientWidth: element.clientWidth,
+    scrollWidth: element.scrollWidth,
+    scrollLeft: element.scrollLeft,
+  }));
+  expect(metrics.scrollLeft).toBe(0);
+  expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth);
+  await expect(toolbar.getByRole('button', { name: 'New' })).toHaveCount(0);
+
+  await more.click();
+  const actions = toolbar.getByRole('group', { name: 'More actions' });
+  await expect(actions).toBeVisible();
+  for (const name of [
+    'New',
+    'Open',
+    'Save',
+    'Import',
+    'Resize',
+    'Export',
+    'Animate',
+    'Redo',
+    'Little Dreamer mode',
+  ]) {
+    await expect(actions.getByRole('button', { name })).toBeVisible();
+  }
+  const [actionsBox, viewportWidth] = await Promise.all([
+    actions.boundingBox(),
+    page.evaluate(() => window.innerWidth),
+  ]);
+  expect(actionsBox && actionsBox.x >= 0 && actionsBox.x + actionsBox.width <= viewportWidth).toBe(
+    true,
+  );
+
+  await page.keyboard.press('Escape');
+  await expect(actions).toHaveCount(0);
+  await expect(more).toBeFocused();
+
+  await more.click();
+  await actions.getByRole('button', { name: 'Export' }).click();
+  await expect(actions).toHaveCount(0);
+  await expect(page.getByRole('dialog', { name: 'Export' })).toBeVisible();
+  await page
+    .getByRole('dialog', { name: 'Export' })
+    .getByRole('button', { name: 'Cancel' })
+    .click();
+
+  await toolbar.getByRole('button', { name: 'Settings' }).click();
+  await page.locator('.settings-item:has-text("Comfort mode") input').check();
+  const minimumPrimarySize = await page
+    .locator('.phone-toolbar-primary .btn')
+    .evaluateAll((buttons) =>
+      Math.min(
+        ...buttons.map((button) => {
+          const box = button.getBoundingClientRect();
+          return Math.min(box.width, box.height);
+        }),
+      ),
+    );
+  expect(minimumPrimarySize).toBeGreaterThanOrEqual(44);
+  await page.locator('.settings-popover select').selectOption('ar');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+
+  const rtlMore = toolbar.getByRole('button', { name: 'إجراءات أخرى' });
+  await rtlMore.click();
+  const rtlActions = toolbar.getByRole('group', { name: 'إجراءات أخرى' });
+  const rtlActionsBox = await rtlActions.boundingBox();
+  expect(
+    rtlActionsBox && rtlActionsBox.x >= 0 && rtlActionsBox.x + rtlActionsBox.width <= viewportWidth,
+  ).toBe(true);
+});
+
 test('phone timeline keeps frames visible while focusing one task at a time', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await bootApp(page);
-  await page.getByRole('button', { name: /^Animate/ }).click();
+  await page.getByRole('button', { name: 'More actions' }).click();
+  await page
+    .getByRole('group', { name: 'More actions' })
+    .getByRole('button', { name: 'Animate' })
+    .click();
   await page.getByRole('button', { name: 'Add frame' }).click();
 
   const tasks = page.getByRole('group', { name: 'Timeline tools' });

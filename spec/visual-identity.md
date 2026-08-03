@@ -96,8 +96,11 @@ Text `#0f141f` / `#ffffff`, dim text `#454d61` / `#ccd4e8`, borders
   of its form controls remain inside the viewport; when the toolbar needs more
   room, only its file/creation region scrolls horizontally while recovery and
   Settings stay anchored — the canvas and panel never create page-level
-  horizontal overflow. At phone width, the whole toolbar scrolls as one row so
-  its fixed controls never overlap creation actions.
+  horizontal overflow. At phone width, the shell becomes two stable rows: a
+  compact icon row for the highest-frequency creation and recovery intents,
+  then a full-width four-workspace switch. Secondary actions open in a
+  viewport-contained two-column tray; the toolbar itself never scrolls or
+  overlaps the canvas.
 
 ## Motion principles
 

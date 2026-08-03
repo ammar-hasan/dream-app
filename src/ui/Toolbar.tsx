@@ -10,7 +10,7 @@
  * measuring the active tab (locale labels vary in width).
  */
 
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useDreamStore } from '../store/dreamStore';
 import { useUiPrefs } from '../store/uiPrefs';
 import { importImageFiles } from './importImage';
@@ -22,6 +22,7 @@ import { VoiceCommandButton } from './VoiceCommandButton';
 import { KID_TOOLS } from './ToolRail';
 import {
   DreamMark,
+  ChevronDownIcon,
   GamepadIcon,
   RedoIcon,
   SparkleIcon,
@@ -52,6 +53,46 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
   const kidMode = useUiPrefs((s) => s.kidMode);
   const locale = useUiPrefs((s) => s.locale);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const mobileToolbarRef = useRef<HTMLElement>(null);
+  const mobileMoreButtonRef = useRef<HTMLButtonElement>(null);
+  const [phoneLayout, setPhoneLayout] = useState(
+    () => globalThis.matchMedia?.('(max-width: 600px)').matches ?? globalThis.innerWidth <= 600,
+  );
+  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
+
+  useEffect(() => {
+    const query = globalThis.matchMedia?.('(max-width: 600px)');
+    const update = () => setPhoneLayout(query?.matches ?? globalThis.innerWidth <= 600);
+    update();
+    if (query) query.addEventListener('change', update);
+    else window.addEventListener('resize', update);
+    return () => {
+      if (query) query.removeEventListener('change', update);
+      else window.removeEventListener('resize', update);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!mobileMoreOpen) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (!mobileToolbarRef.current?.contains(event.target as Node)) setMobileMoreOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      setMobileMoreOpen(false);
+      mobileMoreButtonRef.current?.focus();
+    };
+    window.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [mobileMoreOpen]);
+
+  useEffect(() => {
+    if (!phoneLayout) setMobileMoreOpen(false);
+  }, [phoneLayout]);
 
   // Sliding pill under the active mode tab: measure the tab's box relative
   // to the switch (direction-aware, so RTL slides the same way).
@@ -123,6 +164,30 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
     </button>
   );
 
+  const workspaceSwitch = (
+    <div className="mode-switch" role="tablist" aria-label={t('toolbar.mode')} ref={modeSwitchRef}>
+      {thumb && thumb.w > 0 && (
+        <span
+          className="mode-thumb"
+          style={{ insetInlineStart: thumb.x, width: thumb.w }}
+          aria-hidden="true"
+        />
+      )}
+      {MODES.map((m) => (
+        <button
+          key={m}
+          type="button"
+          role="tab"
+          aria-selected={mode === m}
+          className={`mode-tab${mode === m ? ' active' : ''}`}
+          onClick={() => useDreamStore.getState().setMode(m)}
+        >
+          {t(`toolbar.${m}`)}
+        </button>
+      ))}
+    </div>
+  );
+
   if (kidMode) {
     // Little Dreamer toolbar: nothing to read, nothing to get lost in.
     return (
@@ -161,6 +226,177 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
           {kidToggle}
           <SettingsMenu />
         </div>
+      </header>
+    );
+  }
+
+  if (phoneLayout) {
+    const closeMore = () => setMobileMoreOpen(false);
+    return (
+      <header className="toolbar phone-toolbar" ref={mobileToolbarRef}>
+        <div className="phone-toolbar-primary">
+          <div className="toolbar-group phone-toolbar-identity">
+            <DreamMark className="app-mark" />
+            <span className="doc-name" data-tooltip={docName}>
+              {docName}
+              {isDirty ? ' •' : ''}
+            </span>
+          </div>
+          <button
+            type="button"
+            className="btn icon-btn"
+            aria-label={t('storyboard.short')}
+            data-tooltip={t('storyboard.toolbarHint')}
+            onClick={() => useDreamStore.getState().openStoryboard()}
+          >
+            <StoryIcon />
+          </button>
+          <button
+            type="button"
+            className={`btn icon-btn${aiPanelOpen ? ' primary' : ''}`}
+            aria-pressed={aiPanelOpen}
+            aria-label={t('toolbar.ai')}
+            data-tooltip={t('toolbar.aiTitle')}
+            onClick={() => useDreamStore.getState().toggleAiPanel()}
+          >
+            <SparkleIcon />
+          </button>
+          <VoiceCommandButton />
+          <button
+            className="btn icon-btn"
+            aria-label={t('toolbar.undo')}
+            data-tooltip={t('toolbar.undoTitle')}
+            disabled={!canUndo}
+            onClick={() => useDreamStore.getState().undo()}
+          >
+            <UndoIcon />
+          </button>
+          <SettingsMenu />
+          <button
+            ref={mobileMoreButtonRef}
+            type="button"
+            className={`btn icon-btn phone-more-button${mobileMoreOpen ? ' primary' : ''}`}
+            aria-label={t('toolbar.moreActions')}
+            data-tooltip={t('toolbar.moreActions')}
+            aria-expanded={mobileMoreOpen}
+            aria-controls="phone-more-actions"
+            onClick={() => setMobileMoreOpen((open) => !open)}
+          >
+            <ChevronDownIcon />
+          </button>
+        </div>
+
+        <div className="phone-toolbar-modes">{workspaceSwitch}</div>
+
+        {mobileMoreOpen && (
+          <div
+            id="phone-more-actions"
+            className="phone-more-actions"
+            role="group"
+            aria-label={t('toolbar.moreActions')}
+          >
+            <button
+              className="btn"
+              onClick={() => {
+                closeMore();
+                onNew();
+              }}
+            >
+              {t('toolbar.new')}
+            </button>
+            <button
+              className="btn"
+              onClick={() => {
+                closeMore();
+                onOpen();
+              }}
+            >
+              {t('toolbar.open')}
+            </button>
+            <button
+              className="btn"
+              onClick={() => {
+                closeMore();
+                void saveNow();
+              }}
+            >
+              {t('toolbar.save')}
+            </button>
+            <button
+              className="btn"
+              onClick={() => {
+                closeMore();
+                fileInputRef.current?.click();
+              }}
+            >
+              {t('toolbar.import')}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              hidden
+              onChange={(event) => {
+                closeMore();
+                void importImageFiles(event.target.files ?? []);
+                event.target.value = '';
+              }}
+            />
+            <button
+              className="btn"
+              onClick={() => {
+                closeMore();
+                onResize();
+              }}
+            >
+              {t('toolbar.resize')}
+            </button>
+            <button
+              className="btn"
+              onClick={() => {
+                closeMore();
+                onExport();
+              }}
+            >
+              {t('toolbar.export')}
+            </button>
+            <button
+              type="button"
+              className={`btn${animated ? ' primary' : ''}`}
+              aria-pressed={animated}
+              onClick={() => {
+                closeMore();
+                useDreamStore.getState().toggleAnimation();
+              }}
+            >
+              {t('toolbar.animate')}
+            </button>
+            <button
+              className="btn"
+              disabled={!canRedo}
+              onClick={() => {
+                closeMore();
+                useDreamStore.getState().redo();
+              }}
+            >
+              <RedoIcon />
+              {t('toolbar.redo')}
+            </button>
+            <button
+              type="button"
+              className="btn"
+              aria-pressed={kidMode}
+              onClick={() => {
+                closeMore();
+                toggleKidMode();
+              }}
+            >
+              <StarIcon />
+              {t('toolbar.kidMode')}
+            </button>
+          </div>
+        )}
       </header>
     );
   }
@@ -210,32 +446,7 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
         </div>
 
         <div className="toolbar-group">
-          <div
-            className="mode-switch"
-            role="tablist"
-            aria-label={t('toolbar.mode')}
-            ref={modeSwitchRef}
-          >
-            {thumb && thumb.w > 0 && (
-              <span
-                className="mode-thumb"
-                style={{ insetInlineStart: thumb.x, width: thumb.w }}
-                aria-hidden="true"
-              />
-            )}
-            {MODES.map((m) => (
-              <button
-                key={m}
-                type="button"
-                role="tab"
-                aria-selected={mode === m}
-                className={`mode-tab${mode === m ? ' active' : ''}`}
-                onClick={() => useDreamStore.getState().setMode(m)}
-              >
-                {t(`toolbar.${m}`)}
-              </button>
-            ))}
-          </div>
+          {workspaceSwitch}
           <button
             type="button"
             className={`btn${animated ? ' primary' : ''}`}

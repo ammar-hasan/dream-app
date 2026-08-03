@@ -144,6 +144,15 @@ Current authoritative guidance and professional workflows raise these bars:
 
 Modern interaction craft should make state legible rather than add spectacle:
 
+- **On a phone, prioritize the primary task and move lower-frequency commands
+  into an explicit More menu—not a sideways-scrolling desktop toolbar.** Keep
+  navigation/workspace choices visible for orientation, label disclosed menu
+  actions clearly, and order frequent actions first. Dream therefore keeps its
+  four workspaces plus Story/AI/voice/recovery visible and discloses file and
+  setup actions in one labelled tray.
+  (https://developer.apple.com/design/human-interface-guidelines/designing-for-ios ·
+  https://developer.apple.com/design/human-interface-guidelines/toolbars ·
+  https://developer.apple.com/design/human-interface-guidelines/menus)
 - **Drag in one motion, show a translucent preview, highlight only valid drop
   targets, keep the result selected and provide an alternative to every drag.**
   Failed drops need visible recovery, and known transfer work needs progress.

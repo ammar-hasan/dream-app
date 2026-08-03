@@ -59,6 +59,10 @@ mode and RTL):
   the rail, toolbar and panels get roomier padding.
 - **Stronger contrast** in both themes: text `#0f141f` (light) / `#ffffff`
   (dark), dim text `#454d61` / `#ccd4e8`, borders `#bfc7d8` / `#525b78`.
+- At phone width, primary creation/recovery controls and every action in the
+  disclosed More tray remain at least 44 px in comfort mode. The shell does not
+  require horizontal scrolling, and the four named workspaces stay visible for
+  orientation.
 
 ## Spoken tool names
 

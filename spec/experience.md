@@ -46,10 +46,13 @@ together on screen.
 - On phone-width adult layouts, the bottom timeline keeps frames and their
   add/duplicate/reorder/delete actions visible while an **Animate / Slides /
   App** choice reveals only that job's controls. App offers linking before any
-  links exist and preview afterward. The entire top toolbar remains
-  horizontally scrollable so no command is silently removed or overlapped.
-  Little Dreamer keeps its
-  reading-light animation controls without the job choice.
+  links exist and preview afterward. The top shell never scrolls horizontally:
+  identity, Story, AI, voice, Undo, Settings and all four workspaces stay
+  visible, while a clearly named **More actions** control reveals New, Open,
+  Save, Import, Resize, Export, Animate, Redo and Little Dreamer in a labelled
+  two-column tray. Escape closes the tray and returns focus to its trigger.
+  Little Dreamer keeps its reading-light animation controls without the job
+  choice.
 
 ## Mode × audience matrix
 

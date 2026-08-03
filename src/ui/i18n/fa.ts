@@ -35,6 +35,7 @@ export const fa: Record<string, string> = {
   'toolbar.listening': 'در حال شنیدن...',
   'toolbar.stopListening': 'توقف شنیدن',
   'toolbar.settings': 'تنظیمات',
+  'toolbar.moreActions': 'کارهای بیشتر',
   'tools.railLabel': 'ابزارها',
   'tools.select': 'انتخاب',
   'tools.move': 'جابجایی',

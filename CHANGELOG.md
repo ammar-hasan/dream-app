@@ -7,6 +7,12 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Task-first phone toolbar** (slice 64): the adult 390 px shell now keeps
+  Story, AI, voice, Undo, Settings and all four workspaces visible without
+  sideways scrolling. A labelled, keyboard-safe More tray contains every
+  secondary file, animation, recovery and Little Dreamer action, with 44 px
+  comfort targets and localized labels in all six languages.
+
 - **Decisive selection snapping** (slice 63): selection drags now pair their
   exact guide lines with a compact pointer-side confirmation and one optional
   tactile detent when entering a new guide. Continuing along the same guide is

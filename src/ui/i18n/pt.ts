@@ -35,6 +35,7 @@ export const pt: Record<string, string> = {
   'toolbar.listening': 'Ouvindo…',
   'toolbar.stopListening': 'Parar de ouvir',
   'toolbar.settings': 'Configurações',
+  'toolbar.moreActions': 'Mais ações',
 
   // --- Tools ---------------------------------------------------------------
   'tools.railLabel': 'Ferramentas',

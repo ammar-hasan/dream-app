@@ -277,6 +277,11 @@ play button, everything called "frames".
   controls needed for that job. App leads to linking first and preview once
   links exist. Desktop keeps the complete timeline; Little Dreamer keeps its
   simpler animation-only path.
+- **Phone creation shell**: the top bar keeps Story, AI, voice, Undo, Settings
+  and all four workspaces in stable positions with no sideways scrolling.
+  New/Open/Save/Import/Resize/Export, Animate, Redo and Little Dreamer live in a
+  labelled two-column More tray that closes after use or Escape and preserves
+  44 px comfort targets.
 - **Story to animation**: choose Story, tap Little Dreamer's large “Tell a
   story!”, or say “make a story about…” / «اصنع لي قصة عن…». Dream locally
   plans two to six numbered moments before touching the canvas. Edit, add,

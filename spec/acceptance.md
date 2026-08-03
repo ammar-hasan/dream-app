@@ -638,6 +638,14 @@ holds.
       centering or edge placement THEN the continuation context is cleared and
       “again” changes nothing. Deletion, duplication, clearing, export and every
       other non-nudge action are never repeatable through this phrase.
+174.  GIVEN the adult shell at 390 px width WHEN Dream opens THEN identity,
+      Story, AI, voice, Undo, Settings and the Draw, Design, Play and Present
+      workspaces are all visible without horizontal scrolling. WHEN More
+      actions opens THEN New, Open, Save, Import, Resize, Export, Animate, Redo
+      and Little Dreamer are visible in a labelled, viewport-contained tray;
+      choosing an action closes it, while Escape closes it and restores focus
+      to More. Comfort mode keeps its controls at least 44 px and RTL mirrors
+      placement without changing the logical action order.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

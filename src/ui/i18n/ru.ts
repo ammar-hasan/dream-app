@@ -33,6 +33,7 @@ export const ru: Record<string, string> = {
   'toolbar.listening': 'Слушаю…',
   'toolbar.stopListening': 'Перестать слушать',
   'toolbar.settings': 'Настройки',
+  'toolbar.moreActions': 'Другие действия',
   'tools.railLabel': 'Инструменты',
   'tools.select': 'Выделение',
   'tools.move': 'Перемещение',

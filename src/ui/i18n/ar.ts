@@ -35,6 +35,7 @@ export const ar: Record<string, string> = {
   'toolbar.listening': 'أستمع…',
   'toolbar.stopListening': 'إيقاف الاستماع',
   'toolbar.settings': 'الإعدادات',
+  'toolbar.moreActions': 'إجراءات أخرى',
 
   // --- Tools ---------------------------------------------------------------
   'tools.railLabel': 'الأدوات',

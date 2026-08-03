@@ -1423,6 +1423,25 @@ alignment boundary without watching coordinates or receiving constant noise.
 - ✅ Full release gates remain green: 871 unit tests, 97.74% engine coverage,
   52 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 64 — The phone toolbar follows human priority ✅
+
+Persona need: let a new-phone or low-literacy creator find creation, recovery
+and workspace choices immediately instead of scanning a desktop toolbar
+sideways.
+
+- ✅ At 390 px, identity, Story, AI, voice, Undo, Settings and all four named
+  workspaces remain visible in stable positions with no horizontal scrolling.
+- ✅ New, Open, Save, Import, Resize, Export, Animate, Redo and Little Dreamer
+  remain fully available through one labelled, viewport-contained More tray.
+- ✅ The tray closes after an action or outside press; Escape closes it and
+  returns focus. Localized labels, RTL logical placement, reduced motion and
+  44 px comfort targets preserve the existing accessibility contracts.
+- ✅ Production-browser coverage checks the closed shell, every disclosed
+  action, viewport containment, focus recovery, export route and serious
+  accessibility violations. A rendered 390×844 pass verifies both states.
+- ✅ Full release gates remain green: 871 unit tests, 97.74% engine coverage,
+  53 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1436,9 +1455,10 @@ largest count of controls:
 2. **Conversational phone-first creation:** natural clarification and reference
    handling for voice now covers selected-object identity, color, size and basic
    position plus canvas-edge targets; continue with relationships between
-   objects, broader multi-turn clarification and repair, a task-prioritized
-   mobile shell, and a faithful safe creation path that does not require a child
-   or low-literacy user to configure an AI provider.
+   objects, broader multi-turn clarification and repair, simpler phone editing
+   and export beyond the task-prioritized shell, and a faithful safe creation
+   path that does not require a child or low-literacy user to configure an AI
+   provider.
 3. **Professional substrate:** non-destructive masks/adjustments and blend/color
    foundations, then vector paths, typography, grids, constraints and linked
    reusable systems—Design-only, preserving Draw's first-minute simplicity.
