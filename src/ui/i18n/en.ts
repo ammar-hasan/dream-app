@@ -731,6 +731,12 @@ export const en: Record<string, string> = {
   'voice.selectionDeleted': 'Deleted the selected part. Say undo if you need it back.',
   'voice.selectionDuplicated': 'Made a copy of the selected part.',
   'voice.selectionNeeded': 'Select something first, then say delete it or duplicate it.',
+  'voice.selectionMoveNeeded': 'Select something first, then say move it left or center it.',
+  'voice.selectionMovedLeft': 'Moved the selected part left.',
+  'voice.selectionMovedRight': 'Moved the selected part right.',
+  'voice.selectionMovedUp': 'Moved the selected part up.',
+  'voice.selectionMovedDown': 'Moved the selected part down.',
+  'voice.selectionCentered': 'Centered the selected part.',
   'voice.selectionLocked': 'That selection is locked. Unlock it before changing it.',
   'voice.mirrorOn': 'Mirror on!',
   'voice.mirrorOff': 'Mirror off.',
@@ -743,7 +749,7 @@ export const en: Record<string, string> = {
   'voice.narrationNeedsFrames': 'Add some frames first, then tell your story!',
   'voice.narrationAlready': 'Already recording — say “stop recording” when you’re done.',
   'voice.help':
-    'You can say: brush, pencil, spray, eraser, fill, wand, stamp, a color like red or blue, bigger, smaller, delete it, duplicate it, mirror on, mirror off, undo, redo, clear, new frame, play, play my game, preview my app, export my app, export real code, record narration, stop recording, delete narration, stop, save, and help.',
+    'You can say: brush, pencil, spray, eraser, fill, wand, stamp, a color like red or blue, bigger, smaller, move it left, center it, delete it, duplicate it, mirror on, mirror off, undo, redo, clear, new frame, play, play my game, preview my app, export my app, export real code, record narration, stop recording, delete narration, stop, save, and help.',
   'voice.unknown': 'Sorry, I didn’t understand. Say “help” to hear what I can do.',
   'voice.unavailable':
     'Voice commands are not available in this browser. You can still use every tool by touch, mouse or keyboard.',

@@ -40,6 +40,11 @@ Link tools, the Design panel, the Links panel and the Components panel.
   90°-stepped. With Touch feedback on, crossing a snapped step gives one tiny
   tactile detent on supported devices.
 - **Nudge:** arrow keys move the selection 1 px; Shift = 10 px.
+- **Spoken position:** “move it left/right/up/down” and equivalent localized
+  phrases understand “it” as the visible selection and move it by the same
+  predictable 10 px step as Shift+Arrow. “Center it” places the selection at
+  the canvas center. Each request is one undoable action; missing or locked
+  selections receive specific guidance and a bare direction does nothing.
 - **Spoken size:** while anything is selected, “make it bigger” or “make it
   smaller” understands “it” as the selected artwork and scales the group gently
   about its shared center. Each request is one undoable step; a locked selection

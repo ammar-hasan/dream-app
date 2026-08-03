@@ -44,6 +44,8 @@ export type VoiceCommand =
   | { kind: 'delete-selection' }
   /** "duplicate it": copy the visible selection and select the copy. */
   | { kind: 'duplicate-selection' }
+  /** Move the visible selection by a predictable step, or center it on the canvas. */
+  | { kind: 'move-selection'; direction: 'left' | 'right' | 'up' | 'down' | 'center' }
   | { kind: 'tool'; tool: ToolId }
   /** "mirror on" / "mirror off": toggle vertical mirror symmetry. */
   | { kind: 'mirror'; on: boolean }
@@ -198,6 +200,7 @@ export interface VoiceVocabulary {
   narrationDeletePhrases: string[];
   selectionDeletePhrases: string[];
   selectionDuplicatePhrases: string[];
+  selectionMovePhrases: Record<'left' | 'right' | 'up' | 'down' | 'center', string[]>;
   selectionReferences: string[];
   /** Outcome-level animation creation phrases; trailing words become the story. */
   storyboardPhrases: string[];
@@ -274,6 +277,22 @@ const EN_VOCAB: VoiceVocabulary = {
     'copy that',
     'make another one',
   ],
+  selectionMovePhrases: {
+    left: ['move it left', 'move that left', 'move selection left'],
+    right: ['move it right', 'move that right', 'move selection right'],
+    up: ['move it up', 'move that up', 'move selection up'],
+    down: ['move it down', 'move that down', 'move selection down'],
+    center: [
+      'center it',
+      'centre it',
+      'center that',
+      'centre that',
+      'center selection',
+      'centre selection',
+      'put it in the center',
+      'put it in the centre',
+    ],
+  },
   selectionReferences: ['it', 'that', 'this', 'selection', 'selected', 'object'],
   storyboardPhrases: [
     'make a story about',
@@ -382,6 +401,13 @@ const AR_VOCAB: VoiceVocabulary = {
   narrationDeletePhrases: ['امسح الصوت', 'احذف الصوت', 'امسح التسجيل', 'احذف التسجيل', 'امسح صوتي'],
   selectionDeletePhrases: ['احذف هذا', 'احذفها', 'امسح هذا', 'احذف التحديد'],
   selectionDuplicatePhrases: ['كرر هذا', 'كررها', 'انسخ هذا', 'انسخ التحديد'],
+  selectionMovePhrases: {
+    left: ['حرك هذا لليسار', 'حرك هذا الي اليسار', 'حرك التحديد لليسار'],
+    right: ['حرك هذا لليمين', 'حرك هذا الي اليمين', 'حرك التحديد لليمين'],
+    up: ['حرك هذا للاعلى', 'حرك هذا الي الاعلى', 'حرك التحديد للاعلى'],
+    down: ['حرك هذا للاسفل', 'حرك هذا الي الاسفل', 'حرك التحديد للاسفل'],
+    center: ['ضع هذا في المنتصف', 'وسط هذا', 'وسط التحديد'],
+  },
   selectionReferences: ['هذا', 'هذه', 'التحديد', 'المحدد'],
   storyboardPhrases: [
     'اصنع قصة عن',
@@ -490,6 +516,13 @@ const FA_VOCAB: VoiceVocabulary = {
   narrationDeletePhrases: ['روایت را پاک کن', 'صدا را پاک کن', 'ضبط را حذف کن'],
   selectionDeletePhrases: ['این را حذف کن', 'این رو حذف کن', 'انتخاب را حذف کن'],
   selectionDuplicatePhrases: ['این را کپی کن', 'این رو کپی کن', 'انتخاب را کپی کن', 'تکرارش کن'],
+  selectionMovePhrases: {
+    left: ['این را به چپ ببر', 'این رو به چپ ببر', 'انتخاب را به چپ ببر'],
+    right: ['این را به راست ببر', 'این رو به راست ببر', 'انتخاب را به راست ببر'],
+    up: ['این را بالا ببر', 'این رو بالا ببر', 'انتخاب را بالا ببر'],
+    down: ['این را پایین ببر', 'این رو پایین ببر', 'انتخاب را پایین ببر'],
+    center: ['این را وسط بگذار', 'این رو وسط بگذار', 'انتخاب را وسط بگذار'],
+  },
   selectionReferences: ['این', 'انتخاب', 'انتخاب شده'],
   storyboardPhrases: [
     'یک داستان درباره',
@@ -582,6 +615,13 @@ const ZH_VOCAB: VoiceVocabulary = {
   narrationDeletePhrases: ['删除旁白', '删除录音', '清除旁白'],
   selectionDeletePhrases: ['删除它', '删除这个', '删除选中内容'],
   selectionDuplicatePhrases: ['复制它', '复制这个', '复制选中内容'],
+  selectionMovePhrases: {
+    left: ['把这个向左移动', '把它移到左边', '选中内容向左移动'],
+    right: ['把这个向右移动', '把它移到右边', '选中内容向右移动'],
+    up: ['把这个向上移动', '把它移到上面', '选中内容向上移动'],
+    down: ['把这个向下移动', '把它移到下面', '选中内容向下移动'],
+    center: ['把这个放到中间', '把它放到中间', '选中内容居中'],
+  },
   selectionReferences: ['它', '这个', '选中内容'],
   storyboardPhrases: ['制作一个故事', '制作故事', '创作一个故事', '制作一个动画', '制作动画'],
 };
@@ -704,6 +744,13 @@ const PT_VOCAB: VoiceVocabulary = {
   ],
   selectionDeletePhrases: ['excluir isso', 'apagar isso', 'remover isso', 'excluir seleção'],
   selectionDuplicatePhrases: ['duplicar isso', 'copiar isso', 'duplicar seleção'],
+  selectionMovePhrases: {
+    left: ['mova isso para a esquerda', 'mover seleção para a esquerda'],
+    right: ['mova isso para a direita', 'mover seleção para a direita'],
+    up: ['mova isso para cima', 'mover seleção para cima'],
+    down: ['mova isso para baixo', 'mover seleção para baixo'],
+    center: ['centralize isso', 'coloque isso no centro', 'centralizar seleção'],
+  },
   selectionReferences: ['isso', 'isto', 'seleção', 'selecionado'],
   storyboardPhrases: [
     'crie uma história sobre',
@@ -837,6 +884,13 @@ const RU_VOCAB: VoiceVocabulary = {
   ],
   selectionDeletePhrases: ['удалить это', 'удали это', 'удалить выделенное'],
   selectionDuplicatePhrases: ['дублировать это', 'скопируй это', 'дублировать выделенное'],
+  selectionMovePhrases: {
+    left: ['перемести это влево', 'сдвинь это влево', 'перемести выделенное влево'],
+    right: ['перемести это вправо', 'сдвинь это вправо', 'перемести выделенное вправо'],
+    up: ['перемести это вверх', 'сдвинь это вверх', 'перемести выделенное вверх'],
+    down: ['перемести это вниз', 'сдвинь это вниз', 'перемести выделенное вниз'],
+    center: ['помести это в центр', 'выровняй это по центру', 'выделенное по центру'],
+  },
   selectionReferences: ['это', 'выделение', 'выделенное'],
   storyboardPhrases: [
     'создай историю о',
@@ -896,6 +950,13 @@ function mergeVocabulary(base: VoiceVocabulary, extra: VoiceVocabulary): VoiceVo
       ...base.selectionDuplicatePhrases,
       ...extra.selectionDuplicatePhrases,
     ],
+    selectionMovePhrases: {
+      left: [...base.selectionMovePhrases.left, ...extra.selectionMovePhrases.left],
+      right: [...base.selectionMovePhrases.right, ...extra.selectionMovePhrases.right],
+      up: [...base.selectionMovePhrases.up, ...extra.selectionMovePhrases.up],
+      down: [...base.selectionMovePhrases.down, ...extra.selectionMovePhrases.down],
+      center: [...base.selectionMovePhrases.center, ...extra.selectionMovePhrases.center],
+    },
     selectionReferences: [...base.selectionReferences, ...extra.selectionReferences],
     storyboardPhrases: [...base.storyboardPhrases, ...extra.storyboardPhrases],
   };
@@ -1110,6 +1171,11 @@ export function parseVoiceCommand(transcript: string, locale = 'en'): VoiceComma
   }
   if (hasPhrase(normalized, ...vocab.selectionDuplicatePhrases)) {
     return { kind: 'duplicate-selection' };
+  }
+  for (const direction of ['left', 'right', 'up', 'down', 'center'] as const) {
+    if (hasPhrase(normalized, ...vocab.selectionMovePhrases[direction])) {
+      return { kind: 'move-selection', direction };
+    }
   }
 
   const isClearAll = has(tokens, vocab.clear) || hasPhrase(normalized, ...vocab.clearPhrases);

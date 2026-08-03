@@ -149,7 +149,7 @@ RTL remain first-class product behavior.
   "blue", … a friendly vocabulary including "fill red"), "mirror on"/
   "mirror off", "bigger"/"smaller", "export real code", "record narration"/
   "stop recording"/"delete narration", selected-object “delete it”/“duplicate
-  it”, "save" and "help"
+  it” and “move it left/right/up/down”/“center it”, "save" and "help"
   (speaks the command list). The pipeline is a pure parser
   (`ai/voiceCommands.ts`, case-insensitive, filler-tolerant — "um, can you
   please undo?") plus a thin executor (`ui/voiceExecutor.ts`) against a
@@ -158,7 +158,8 @@ RTL remain first-class product behavior.
   remains visible and explains the touch, mouse and keyboard alternatives.
   Visible selection supplies context: “make it bigger/smaller” scales selected
   artwork, “make it red” recolors vector artwork, “delete it” removes only the
-  selection, and “duplicate it” makes an offset selected copy; every action is
+  selection, “duplicate it” makes an offset selected copy, spoken directions
+  nudge by 10 px, and “center it” uses the canvas center; every action is
   undoable. Bare colors still choose the drawing color. Missing, locked and
   raster selections receive truthful, task-specific guidance.
   Answer words also preserve corrections: “no, undo that” reaches Undo, while a

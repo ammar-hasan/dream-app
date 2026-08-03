@@ -1349,6 +1349,26 @@ without waiting helplessly or discovering a misleading partial download.
 - ✅ Full release gates remain green: 864 unit tests, 97.74% engine coverage,
   51 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 60 — Voice can position “it” ✅
+
+Persona need: let a child or low-literacy creator arrange the visible thing in
+ordinary spatial language without learning drag mechanics or layout jargon.
+
+- ✅ “Move it left/right/up/down” and “center it” resolve only to the visible
+  selection, with natural equivalents in all six locales and English retained
+  in every locale.
+- ✅ Directional moves use the same predictable 10 px coarse step as keyboard
+  nudging; centering uses the true canvas center. Each request is one undoable
+  document action and names its result.
+- ✅ Missing and locked selections receive specific guidance, while a bare
+  direction is treated as ambiguous and leaves artwork, brush and history
+  unchanged.
+- ✅ Parser, executor and store boundaries prove direction mapping, locale
+  normalization, exact movement, centering, lock refusal and undo behavior. A
+  production-browser voice journey proves real selected pixels move.
+- ✅ Full release gates remain green: 866 unit tests, 97.74% engine coverage,
+  51 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1360,10 +1380,11 @@ largest count of controls:
    item-level story/video progress; continue with other operations where
    multi-item work can become opaque.
 2. **Conversational phone-first creation:** natural clarification and reference
-   handling for voice now has a selected-object foundation; continue with more
-   position/relational referents and corrections, a task-prioritized mobile
-   shell, and a faithful safe creation path that does not require a child or
-   low-literacy user to configure an AI provider.
+   handling for voice now covers selected-object identity, color, size and basic
+   position; continue with relational targets, multi-turn clarification and
+   corrections, a task-prioritized mobile shell, and a faithful safe creation
+   path that does not require a child or low-literacy user to configure an AI
+   provider.
 3. **Professional substrate:** non-destructive masks/adjustments and blend/color
    foundations, then vector paths, typography, grids, constraints and linked
    reusable systems—Design-only, preserving Draw's first-minute simplicity.

@@ -7,6 +7,12 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Spoken selection positioning** (slice 60): natural referential commands can
+  move selected artwork left, right, up or down by a predictable 10 px step, or
+  center it on the canvas, in all six locales. Every result is undoable;
+  missing and locked selections are refused truthfully, and bare directions do
+  not guess or mutate the document.
+
 - **Cancellable video recording** (slice 59): WebM and supported MP4 export now
   use determinate progress and keep Cancel/Escape available throughout the
   real-time recording. Stopping releases the recorder and audio mix, downloads

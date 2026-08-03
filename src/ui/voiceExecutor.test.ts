@@ -40,6 +40,8 @@ function makeStore(overrides: Partial<VoiceExecutorStore> = {}) {
     setColor: vi.fn(),
     setSize: vi.fn(),
     scaleSelection: vi.fn(),
+    nudgeSelection: vi.fn(),
+    centerSelection: vi.fn(),
     recolorSelection: vi.fn(),
     deleteSelection: vi.fn(),
     duplicateSelection: vi.fn(),
@@ -337,6 +339,42 @@ describe('executeVoiceCommand', () => {
       /locked/i,
     );
     expect(locked.duplicateSelection).not.toHaveBeenCalled();
+  });
+
+  it('moves or centers only an editable visible selection', () => {
+    const empty = makeStore();
+    expect(
+      executeVoiceCommand({ kind: 'move-selection', direction: 'left' }, empty, () => {})?.message,
+    ).toMatch(/select something first/i);
+    expect(empty.nudgeSelection).not.toHaveBeenCalled();
+
+    const selected = makeStore({ selectionCount: 1, selectionTransformable: true });
+    expect(
+      executeVoiceCommand({ kind: 'move-selection', direction: 'left' }, selected, () => {})
+        ?.message,
+    ).toBe('Moved the selected part left.');
+    expect(selected.nudgeSelection).toHaveBeenCalledWith(-10, 0);
+
+    executeVoiceCommand({ kind: 'move-selection', direction: 'right' }, selected, () => {});
+    executeVoiceCommand({ kind: 'move-selection', direction: 'up' }, selected, () => {});
+    executeVoiceCommand({ kind: 'move-selection', direction: 'down' }, selected, () => {});
+    expect(selected.nudgeSelection).toHaveBeenNthCalledWith(2, 10, 0);
+    expect(selected.nudgeSelection).toHaveBeenNthCalledWith(3, 0, -10);
+    expect(selected.nudgeSelection).toHaveBeenNthCalledWith(4, 0, 10);
+
+    expect(
+      executeVoiceCommand({ kind: 'move-selection', direction: 'center' }, selected, () => {})
+        ?.message,
+    ).toBe('Centered the selected part.');
+    expect(selected.centerSelection).toHaveBeenCalledOnce();
+
+    const locked = makeStore({ selectionCount: 1, selectionTransformable: false });
+    expect(
+      executeVoiceCommand({ kind: 'move-selection', direction: 'right' }, locked, () => {})
+        ?.message,
+    ).toMatch(/locked/i);
+    expect(locked.nudgeSelection).not.toHaveBeenCalled();
+    expect(locked.centerSelection).not.toHaveBeenCalled();
   });
 
   it('save triggers the save callback; help speaks the command list', () => {

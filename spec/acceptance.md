@@ -615,6 +615,13 @@ holds.
       patient longer wait with an indeterminate loader; WHEN the creator cancels
       THEN the dialog becomes ready immediately, the current project remains
       exact and a late result cannot replace it.
+171.  GIVEN visible editable artwork is selected WHEN the person says a
+      localized form of “move it left/right/up/down” THEN the selection moves by
+      exactly 10 px in that direction as one undoable action; WHEN they say
+      “center it” THEN its shared bounds move to the canvas center as one
+      undoable action. Dream names the result. With no selection, a locked
+      selection or only a bare direction, artwork, brush and undo history remain
+      unchanged and the first two cases receive specific guidance.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

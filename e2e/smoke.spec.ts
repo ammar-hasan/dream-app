@@ -411,7 +411,14 @@ test('a spoken story request opens a planned storyboard', async ({ page }) => {
 test('voice resolves natural “it” actions to the visible selection', async ({ page }) => {
   await page.addInitScript(() => {
     let request = 0;
-    const transcripts = ['make it red', 'make it bigger', 'duplicate it', 'delete it'];
+    const transcripts = [
+      'make it red',
+      'make it bigger',
+      'move it right',
+      'center it',
+      'duplicate it',
+      'delete it',
+    ];
     class FakeRecognition {
       lang = '';
       interimResults = false;
@@ -483,6 +490,34 @@ test('voice resolves natural “it” actions to the visible selection', async (
 
   await page.getByRole('button', { name: 'Undo', exact: true }).click();
   await expect.poll(() => nonWhitePixels(page)).toBeLessThanOrEqual(before);
+
+  const redCenter = () =>
+    canvas.evaluate((element) => {
+      const context = (element as HTMLCanvasElement).getContext('2d');
+      if (!context) return 0;
+      const { width, height } = context.canvas;
+      const pixels = context.getImageData(0, 0, width, height).data;
+      let totalX = 0;
+      let count = 0;
+      for (let y = 0; y < height; y += 1) {
+        for (let x = 0; x < width; x += 1) {
+          const index = (y * width + x) * 4;
+          if (pixels[index]! > 200 && pixels[index + 1]! < 120 && pixels[index + 2]! < 120) {
+            totalX += x;
+            count += 1;
+          }
+        }
+      }
+      return count === 0 ? 0 : totalX / count;
+    });
+  const beforeMove = await redCenter();
+
+  await page.getByRole('button', { name: 'Voice commands' }).click();
+  await expect(page.getByRole('status')).toContainText('Moved the selected part right.');
+  await expect.poll(() => redCenter()).toBeGreaterThan(beforeMove + 5);
+
+  await page.getByRole('button', { name: 'Voice commands' }).click();
+  await expect(page.getByRole('status')).toContainText('Centered the selected part.');
 
   await page.getByRole('button', { name: 'Voice commands' }).click();
   await expect(page.getByRole('status')).toContainText('Made a copy of the selected part.');

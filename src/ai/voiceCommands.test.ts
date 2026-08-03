@@ -39,6 +39,18 @@ describe('parseVoiceCommand — history & document', () => {
     expect(parseVoiceCommand('delete everything')).toEqual({ kind: 'clear' });
   });
 
+  it('parses referential selection movement without claiming bare directions', () => {
+    expect(parseVoiceCommand('move it left')).toEqual({
+      kind: 'move-selection',
+      direction: 'left',
+    });
+    expect(parseVoiceCommand('please put it in the center')).toEqual({
+      kind: 'move-selection',
+      direction: 'center',
+    });
+    expect(parseVoiceCommand('left')).toBeNull();
+  });
+
   it('parses confirmations and cancellations', () => {
     expect(parseVoiceCommand('yes')).toEqual({ kind: 'confirm' });
     expect(parseVoiceCommand('yeah sure')).toEqual({ kind: 'confirm' });
@@ -225,6 +237,10 @@ describe('parseVoiceCommand — Arabic vocabulary (locale "ar")', () => {
       name: 'احمر',
       selection: true,
     });
+    expect(parseVoiceCommand('حرّك هذا إلى اليمين', 'ar')).toEqual({
+      kind: 'move-selection',
+      direction: 'right',
+    });
   });
 
   it('parses undo/redo/clear with polite filler', () => {
@@ -379,6 +395,10 @@ describe('parseVoiceCommand — Persian vocabulary (locale "fa")', () => {
       name: 'قرمز',
       selection: true,
     });
+    expect(parseVoiceCommand('این را بالا ببر', 'fa')).toEqual({
+      kind: 'move-selection',
+      direction: 'up',
+    });
   });
 
   it('parses core creation, recovery and calligraphy-adjacent tools', () => {
@@ -423,6 +443,10 @@ describe('parseVoiceCommand — Simplified Chinese vocabulary (locale "zh")', ()
       color: COLOR_WORDS.red,
       name: '红色',
       selection: true,
+    });
+    expect(parseVoiceCommand('请把这个放到中间', 'zh')).toEqual({
+      kind: 'move-selection',
+      direction: 'center',
     });
   });
 
@@ -475,6 +499,10 @@ describe('parseVoiceCommand — Brazilian Portuguese vocabulary (locale "pt")', 
       color: COLOR_WORDS.red,
       name: 'vermelho',
       selection: true,
+    });
+    expect(parseVoiceCommand('mova isso para baixo', 'pt')).toEqual({
+      kind: 'move-selection',
+      direction: 'down',
     });
   });
 
@@ -533,6 +561,10 @@ describe('parseVoiceCommand — Russian vocabulary (locale "ru")', () => {
       color: COLOR_WORDS.red,
       name: 'красным',
       selection: true,
+    });
+    expect(parseVoiceCommand('перемести это влево', 'ru')).toEqual({
+      kind: 'move-selection',
+      direction: 'left',
     });
   });
 

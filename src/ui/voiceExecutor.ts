@@ -46,6 +46,8 @@ export interface VoiceExecutorStore {
   setColor(color: Color): void;
   setSize(size: number): void;
   scaleSelection(factor: number): void;
+  nudgeSelection(dx: number, dy: number): void;
+  centerSelection(): void;
   recolorSelection(color: Color): void;
   deleteSelection(): void;
   duplicateSelection(): void;
@@ -69,6 +71,7 @@ export interface VoiceResult {
 
 const MIN_SIZE = 1;
 const MAX_SIZE = 64;
+const VOICE_NUDGE = 10;
 
 function bigger(size: number): number {
   return Math.min(MAX_SIZE, Math.max(size + 4, Math.round(size * 1.5)));
@@ -188,6 +191,25 @@ export function executeVoiceCommand(
       if (!store.selectionTransformable) return { message: t('voice.selectionLocked') };
       store.duplicateSelection();
       return { message: t('voice.selectionDuplicated') };
+
+    case 'move-selection': {
+      if (store.selectionCount === 0) return { message: t('voice.selectionMoveNeeded') };
+      if (!store.selectionTransformable) return { message: t('voice.selectionLocked') };
+      if (command.direction === 'center') {
+        store.centerSelection();
+        return { message: t('voice.selectionCentered') };
+      }
+      const offsets = {
+        left: [-VOICE_NUDGE, 0],
+        right: [VOICE_NUDGE, 0],
+        up: [0, -VOICE_NUDGE],
+        down: [0, VOICE_NUDGE],
+      } as const;
+      const [dx, dy] = offsets[command.direction];
+      store.nudgeSelection(dx, dy);
+      const messageKey = `voice.selectionMoved${command.direction[0]!.toUpperCase()}${command.direction.slice(1)}`;
+      return { message: t(messageKey) };
+    }
 
     case 'tool':
       store.setTool(command.tool);
