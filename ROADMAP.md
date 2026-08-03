@@ -808,3 +808,25 @@ preserving Dream's local-first trust and presenter privacy.
 - Acceptance met: add private notes to a two-screen prototype, copy its link,
   open a fresh tab directly into the app, and confirm the notes and editor are
   absent.
+
+## Slice 32 — Synchronized video trimming ✅
+
+Persona need: cut a social-video delivery without destructively deleting the
+creator's animation or desynchronizing its recorded story.
+
+- ✅ WebM and MP4 preparation expose inclusive Start frame and End frame
+  choices, with duration and recording progress recalculated for the range.
+- ✅ The range is export-session state only. Frames, order and captions remain
+  intact, no trim history entry is created, and a reopened dialog selects the
+  complete animation.
+- ✅ Narration starts at the selected frame's exact time offset and the recorder
+  ends with the trimmed video, preserving picture/voice alignment.
+- ✅ Caption edits retain their existing one-command undo behavior even when the
+  delivery is trimmed.
+- ✅ Unit tests prove range clamping, duration, rendering count, immutability and
+  audio offset; production-browser and accessibility tests cover the controls
+  and a real one-frame WebM delivery.
+- ✅ Export loads only when requested, restoring the production entry bundle to
+  493.45 kB after the new controls.
+- Acceptance met: trim a two-frame captioned video to frame 2, export it, keep
+  both source frames, and undo the caption batch without a trim edit.

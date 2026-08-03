@@ -531,6 +531,10 @@ export const ar: Record<string, string> = {
   'export.captionNext': 'الإطار التالي',
   'export.captionCopyAll': 'نسخ إلى كل الإطارات',
   'export.captionHint': 'تُدمج النصوص في الفيديو وتُحفظ مع المشروع عند التصدير.',
+  'export.trim': 'قص الفيديو',
+  'export.trimStart': 'إطار البداية',
+  'export.trimEnd': 'إطار النهاية',
+  'export.trimHint': 'يُقص الفيديو المُصدّر فقط. تبقى حركتك كاملة.',
   'export.spriteNote': 'كل الإطارات في شبكة PNG واحدة — مفيدة للألعاب والمشاركة.',
   'export.appLabel': 'تطبيق تفاعلي (.html)',
   'export.appNote':

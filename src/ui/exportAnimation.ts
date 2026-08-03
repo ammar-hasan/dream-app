@@ -180,8 +180,14 @@ export function spriteSheetFileName(docName: string): string {
 }
 
 /** Total recording time in seconds — shown in the export dialog. */
-export function videoDurationSeconds(doc: DreamDocument, fps: number): number {
-  return animationDurationMs(doc.frames?.length ?? 0, fps) / 1000;
+export function videoDurationSeconds(
+  doc: DreamDocument,
+  fps: number,
+  startFrame = 0,
+  endFrame = (doc.frames?.length ?? 0) - 1,
+): number {
+  const range = videoFrameRange(doc.frames?.length ?? 0, startFrame, endFrame);
+  return animationDurationMs(range.count, fps) / 1000;
 }
 
 export interface RecorderLike {
@@ -208,6 +214,7 @@ export interface VideoExportDeps {
     mimeType: string,
     narration: Narration,
     fps: number,
+    narrationOffsetSeconds: number,
   ) => Promise<RecorderSession>;
   /** Defaults to setTimeout; tests pass an instant wait. */
   wait?: (ms: number) => Promise<void>;
@@ -225,12 +232,13 @@ async function defaultRecorderWithNarration(
   mimeType: string,
   narration: Narration,
   fps: number,
+  narrationOffsetSeconds: number,
 ): Promise<RecorderSession> {
   if (typeof MediaRecorder === 'undefined') {
     throw new Error('This browser cannot record video (no MediaRecorder).');
   }
   const stream = canvas.captureStream(fps);
-  const mix = await mixNarrationTracks(stream, narration);
+  const mix = await mixNarrationTracks(stream, narration, {}, narrationOffsetSeconds);
   return {
     recorder: new MediaRecorder(new MediaStream(mix.tracks), { mimeType }) as RecorderLike,
     finish: mix.finish,
@@ -241,8 +249,22 @@ export interface VideoExportOptions {
   fps: number;
   /** Output canvas shape; artwork is contained without cropping. */
   aspect?: VideoAspectPreset;
+  /** Inclusive zero-based frame range; omitted means the complete animation. */
+  startFrame?: number;
+  endFrame?: number;
   /** Called with (frames rendered so far, total frames). */
   onProgress?: (done: number, total: number) => void;
+}
+
+export function videoFrameRange(
+  frameCount: number,
+  startFrame = 0,
+  endFrame = frameCount - 1,
+): { start: number; end: number; count: number } {
+  if (frameCount < 1) return { start: 0, end: -1, count: 0 };
+  const start = Math.max(0, Math.min(frameCount - 1, Math.round(startFrame)));
+  const end = Math.max(start, Math.min(frameCount - 1, Math.round(endFrame)));
+  return { start, end, count: end - start + 1 };
 }
 
 /**
@@ -256,8 +278,10 @@ async function exportAnimationVideo(
   format: 'webm' | 'mp4',
   deps: VideoExportDeps = {},
 ): Promise<Blob> {
-  const frames = doc.frames ?? [];
-  if (frames.length === 0) throw new Error('Nothing to export — add some frames first.');
+  const allFrames = doc.frames ?? [];
+  if (allFrames.length === 0) throw new Error('Nothing to export — add some frames first.');
+  const range = videoFrameRange(allFrames.length, options.startFrame, options.endFrame);
+  const frames = allFrames.slice(range.start, range.end + 1);
 
   const isTypeSupported =
     deps.isTypeSupported ??
@@ -297,7 +321,13 @@ async function exportAnimationVideo(
   let finish: (() => Promise<void>) | undefined;
   if (doc.narration) {
     const createSession = deps.createRecorderWithNarration ?? defaultRecorderWithNarration;
-    const session = await createSession(canvas, mimeType, doc.narration, SOCIAL_VIDEO_CAPTURE_FPS);
+    const session = await createSession(
+      canvas,
+      mimeType,
+      doc.narration,
+      SOCIAL_VIDEO_CAPTURE_FPS,
+      range.start / options.fps,
+    );
     recorder = session.recorder;
     finish = session.finish;
   } else {

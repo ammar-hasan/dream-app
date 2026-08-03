@@ -29,7 +29,7 @@ not merely the presence of a named control.
 
 The audit covered the entire living spec (vision, concepts, interaction map,
 all feature areas, visual identity, integrations, all data contracts and all
-124 acceptance criteria), the product roadmap/research backlog, the automated
+127 acceptance criteria), the product roadmap/research backlog, the automated
 test inventory, and rendered desktop and phone states. A persona passes only
 when their intended outcome is realistically achievable end to end with a
 suitable input method and usable output—not when an adjacent feature exists.
@@ -47,7 +47,7 @@ suitable input method and usable output—not when an adjacent feature exists.
 | Zǐxuān, 28    | Shapes/text, precise layout, animation, presentations, private prototype links, app export and agent-readable projects                       | No chemistry/scientific notation, connectors, diagrams, grids, plot/data import or publication-ready vector export                                                                      | Partial   |
 | Maria, 32     | Portable `.dream`, stable engine surface, local MCP reading/rendering/export plus layer/shape/text authoring, deterministic app/code exports | The MCP package is registry-ready but not publicly installable; agent editing lacks strokes, raster import, layer management, links, components and AI edits                            | Partial   |
 | Aleksandr, 25 | Keyboard shortcuts, marquee/lasso, snapping, align/distribute, grouping, components, layers and reusable assets                              | Productivity stops short of a broad professional design tool: no vector paths, symbols/linked components, constraints, batch export, grids or extensibility                             | Partial   |
-| Ahmed, 42     | Draw-to-animation, narration, shaped WebM/native MP4, burned-in captions, presentations, private links and offline app files                 | No blocking gap for his stated draw → animate → social-video outcome; lightweight trimming would make the workflow more professional but is not required to deliver it                  | **Ready** |
+| Ahmed, 42     | Draw-to-animation, narration, shaped/trimmed WebM or native MP4, burned-in captions, presentations, private links and offline app files      | No blocking gap for his stated draw → animate → social-video outcome; direct platform publishing could shorten delivery but is not required to produce and share the finished video     | **Ready** |
 
 ## Principal UX review
 
@@ -89,6 +89,10 @@ suitable input method and usable output—not when an adjacent feature exists.
     hotspots. Private notes and editable project structure are excluded by
     design, oversize work gets an honest file fallback, and hostile fragments
     are validated as data rather than executed as markup.
+11. **Video trimming respects the source and the story.** Start/end frames are
+    delivery choices, never destructive edits; duration and progress update
+    immediately, and narration advances to the same frame-time offset instead
+    of restarting against the wrong picture.
 
 ### What does not yet fully serve the purpose
 
@@ -113,13 +117,11 @@ suitable input method and usable output—not when an adjacent feature exists.
 
 ## Recommended order
 
-1. Add lightweight video trimming after validating Ahmed's now-complete
-   shaped-caption export with real storytellers.
-2. Add Persian first, then persona-relevant Chinese, Portuguese and Russian;
+1. Add Persian first, then persona-relevant Chinese, Portuguese and Russian;
    pair Persian with calligraphy-specific input and typography.
-3. Add a focused scientific-diagram toolset and scalable export rather than a
+2. Add a focused scientific-diagram toolset and scalable export rather than a
    general-purpose vector editor all at once.
-4. Publish the prepared MCP package only with explicit approval, then deepen
+3. Publish the prepared MCP package only with explicit approval, then deepen
    authoring tools in the order real agent workflows require.
 
 This audit is a release decision aid, not part of the product specification.

@@ -13,6 +13,7 @@ import {
   SOCIAL_VIDEO_CAPTURE_FPS,
   spriteSheetFileName,
   videoFrameLayout,
+  videoFrameRange,
   videoDurationSeconds,
   videoFileName,
   videoOutputSize,
@@ -187,7 +188,10 @@ describe('exportAnimationMp4', () => {
 describe('videoDurationSeconds', () => {
   it('derives duration from frame count and fps', () => {
     expect(videoDurationSeconds(animatedDoc(12), 6)).toBe(2);
+    expect(videoDurationSeconds(animatedDoc(12), 6, 3, 8)).toBe(1);
     expect(videoDurationSeconds(createDocument({ width: 8, height: 8 }), 6)).toBe(0);
+    expect(videoFrameRange(6, 2, 4)).toEqual({ start: 2, end: 4, count: 3 });
+    expect(videoFrameRange(6, 9, 1)).toEqual({ start: 5, end: 5, count: 1 });
   });
 });
 
@@ -254,6 +258,35 @@ describe('exportAnimationWebM', () => {
     expect(ctx.calls('fillRect').length).toBe(2);
   });
 
+  it('records only the inclusive trim range without changing the document', async () => {
+    const doc = animatedDoc(5);
+    const originalFrames = doc.frames;
+    const { canvas, ctx } = fakeCanvas();
+    const progress: [number, number][] = [];
+    await exportAnimationWebM(
+      doc,
+      {
+        fps: 10,
+        startFrame: 1,
+        endFrame: 3,
+        onProgress: (done, total) => progress.push([done, total]),
+      },
+      {
+        isTypeSupported: () => true,
+        createCanvas: () => canvas,
+        createRecorder: () => fakeRecorder({ value: false }, { value: false }),
+        wait: () => Promise.resolve(),
+      },
+    );
+    expect(ctx.calls('fillRect')).toHaveLength(3);
+    expect(progress).toEqual([
+      [1, 3],
+      [2, 3],
+      [3, 3],
+    ]);
+    expect(doc.frames).toBe(originalFrames);
+  });
+
   it('mixes the narration take in when the document has one', async () => {
     const narration = { audio: 'data:audio/webm;base64,AAAA', durationMs: 1200 };
     const doc = { ...animatedDoc(2), narration };
@@ -264,7 +297,7 @@ describe('exportAnimationWebM', () => {
 
     const blob = await exportAnimationWebM(
       doc,
-      { fps: 10 },
+      { fps: 10, startFrame: 1 },
       {
         isTypeSupported: () => true,
         createCanvas: () => canvas,
@@ -272,11 +305,12 @@ describe('exportAnimationWebM', () => {
           plainRecorderUsed = true;
           return fakeRecorder({ value: false }, { value: false });
         },
-        createRecorderWithNarration: (c, mime, n, fps) => {
+        createRecorderWithNarration: (c, mime, n, fps, offset) => {
           expect(c).toBe(canvas);
           seen.mime = mime;
           seen.narration = n;
           seen.fps = fps;
+          expect(offset).toBe(0.1);
           return Promise.resolve({
             recorder: fakeRecorder({ value: false }, { value: false }),
             finish: () => {

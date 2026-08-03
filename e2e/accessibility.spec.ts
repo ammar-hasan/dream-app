@@ -47,6 +47,9 @@ test('social-video caption controls have no serious automated violations', async
   await page.getByRole('button', { name: /^Animate/ }).click();
   await page.getByRole('button', { name: 'Export' }).click();
   await page.getByRole('button', { name: 'WebM video' }).click();
+  await expect(
+    page.getByRole('dialog', { name: 'Export' }).getByRole('button', { name: 'Export' }),
+  ).toBeInViewport();
   expect(await seriousViolations(page)).toEqual([]);
 });
 

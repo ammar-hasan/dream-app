@@ -41,6 +41,8 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
   const animated = doc.frames !== undefined;
   const fps = animationSettingsOf(doc).fps;
   const frames = doc.frames ?? [];
+  const [trimStart, setTrimStart] = useState(0);
+  const [trimEnd, setTrimEnd] = useState(Math.max(0, frames.length - 1));
   const [captions, setCaptions] = useState(() =>
     frames.map((frame) => frame.presentation?.caption ?? ''),
   );
@@ -85,6 +87,8 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
         const blob = await exporter(exportDoc, {
           fps,
           aspect,
+          startFrame: trimStart,
+          endFrame: trimEnd,
           onProgress: (done, total) => setProgress(t('export.progress', { done, total })),
         });
         downloadBlob(blob, videoFileName(exportDoc.name, format, aspect));
@@ -153,7 +157,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
   return (
     <div className="dialog-backdrop" onClick={progress ? undefined : onClose}>
       <div
-        className="dialog"
+        className="dialog export-dialog"
         role="dialog"
         aria-modal="true"
         aria-label={t('export.title')}
@@ -268,11 +272,45 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
               <p className="dialog-note">{t('export.captionHint')}</p>
             </div>
 
+            <div className="video-trim-row" role="group" aria-label={t('export.trim')}>
+              <label>
+                <span>{t('export.trimStart')}</span>
+                <select
+                  value={trimStart}
+                  onChange={(event) => {
+                    const next = Number(event.target.value);
+                    setTrimStart(next);
+                    setTrimEnd((end) => Math.max(end, next));
+                  }}
+                >
+                  {frames.map((_, index) => (
+                    <option key={index} value={index}>
+                      {t('timeline.frame', { n: index + 1 })}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                <span>{t('export.trimEnd')}</span>
+                <select
+                  value={trimEnd}
+                  onChange={(event) => setTrimEnd(Number(event.target.value))}
+                >
+                  {frames.map((_, index) => (
+                    <option key={index} value={index} disabled={index < trimStart}>
+                      {t('timeline.frame', { n: index + 1 })}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <span className="dialog-note">{t('export.trimHint')}</span>
+            </div>
+
             <p className="dialog-note">
               {t(format === 'mp4' ? 'export.mp4Note' : 'export.webmNote', {
                 frames: doc.frames?.length ?? 0,
                 fps,
-                seconds: videoDurationSeconds(doc, fps).toFixed(1),
+                seconds: videoDurationSeconds(doc, fps, trimStart, trimEnd).toFixed(1),
               })}
               {doc.narration ? ` ${t('export.videoWithNarration')}` : ''}
             </p>

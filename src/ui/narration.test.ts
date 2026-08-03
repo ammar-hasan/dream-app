@@ -260,8 +260,9 @@ describe('export mixing', () => {
       createBufferSource: () => ({
         buffer: null,
         connect: () => calls.push('connect'),
-        start: (when) => {
+        start: (when, offset) => {
           expect(when).toBe(0);
+          expect(offset).toBe(1.25);
           calls.push('start');
         },
       }),
@@ -276,9 +277,12 @@ describe('export mixing', () => {
     const canvasStream = {
       getVideoTracks: () => ['video-track' as unknown as MediaStreamTrack],
     };
-    const mix = await mixNarrationTracks(canvasStream, narration, {
-      createAudioContext: () => fakeCtx,
-    });
+    const mix = await mixNarrationTracks(
+      canvasStream,
+      narration,
+      { createAudioContext: () => fakeCtx },
+      1.25,
+    );
     expect(mix.tracks).toEqual(['video-track', 'audio-track']);
     expect(calls).toEqual(['decode', 'connect', 'start']);
     await mix.finish();

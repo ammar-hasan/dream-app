@@ -1172,6 +1172,37 @@ body {
   font-size: 18px;
 }
 
+.export-dialog {
+  width: min(760px, calc(100vw - 32px));
+}
+
+@media (max-height: 800px) {
+  .export-dialog {
+    padding: 16px 20px;
+  }
+
+  .export-dialog .dialog-title {
+    margin-bottom: 8px;
+  }
+
+  .export-dialog .field,
+  .export-dialog .video-caption-editor {
+    margin-bottom: 8px;
+  }
+
+  .export-dialog .video-caption-editor {
+    padding: 8px 12px;
+  }
+
+  .export-dialog .video-caption-editor textarea {
+    min-height: 54px;
+  }
+
+  .export-dialog .video-trim-row {
+    margin-top: 8px;
+  }
+}
+
 .dialog-note {
   color: var(--text-dim);
   line-height: 1.5;
@@ -1277,6 +1308,33 @@ body {
   color: var(--text-dim);
   font-size: 12px;
   font-variant-numeric: tabular-nums;
+}
+
+.video-trim-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.video-trim-row label {
+  display: grid;
+  gap: 5px;
+  color: var(--text-dim);
+  font-size: 12px;
+}
+
+.video-trim-row select {
+  min-height: 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--input);
+  color: var(--text);
+  font: inherit;
+}
+
+.video-trim-row .dialog-note {
+  grid-column: 1 / -1;
 }
 
 .video-caption-editor .dialog-note {

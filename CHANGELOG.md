@@ -7,6 +7,14 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Synchronized video trimming** (slice 32): WebM and MP4 export now offer an
+  inclusive Start frame / End frame range with live duration and range-based
+  progress. Only the delivery is trimmed; source frames, order, captions and
+  undo history remain untouched, and each reopened Export dialog defaults to
+  the whole animation. Narrated exports start audio at the selected frame's
+  exact time offset and stop it with the video. The export dialog now loads on
+  demand, bringing the production entry bundle back to 493.45 kB.
+
 - **Private no-backend prototype links** (slice 31): animated app prototypes
   can now be copied as a compressed, self-contained URL that opens directly in
   the standalone viewer. The link carries only flattened PNG screens, valid
@@ -170,7 +178,7 @@ All notable changes to Dream are documented here. The format is based on
   experience map, visual identity, integrations, and an acceptance
   checklist — detailed enough to rebuild Dream from the spec alone, in any
   stack. AGENTS.md rule 12 makes spec updates part of every behavior change.
-  (The checklist began at 90 points and now contains 124.)
+  (The checklist began at 90 points and now contains 127.)
 - Play mode game templates: **Flappy Dream** (flap through scrolling gates,
   one hit ends the run, 3 shields in kid mode) and **Maze Runner** (seeded,
   always-solvable generated mazes with level-ups) join **Catch!** behind a

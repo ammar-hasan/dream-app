@@ -150,6 +150,7 @@ presenter, Zǐxuān the student, Ali/Fatima the hobbyists). Score: impact
 | 11  | ~~Shareable prototype via URL (compressed viewer state, no backend)~~ ✅ shipped (slice 31)                                                   | Ahmed, Sara, Zǐxuān   | 3      | L      |
 | 12  | ~~Voice-to-storyboard animation with visible bilingual confirmation~~ ✅ shipped (slice 28)                                                   | Zainab, George        | 5      | M      |
 | 13  | ~~Phone timeline task focus for animation, slides and apps~~ ✅ shipped (slice 30)                                                            | George, Ahmed, Sara   | 4      | S      |
+| 14  | ~~Non-destructive frame-range trimming with synchronized narration~~ ✅ shipped (slice 32)                                                    | Ahmed                 | 4      | S      |
 
 Deliberately deferred: **vector/SVG editing** (different medium — Recraft and
 Excalidraw own it; raster-first keeps Dream simple), **real-time

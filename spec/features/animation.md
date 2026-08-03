@@ -148,6 +148,13 @@ The Export dialog offers, for animated documents:
   three centered lines, ellipsize overflow, and are burned into the lower safe
   area over a high-contrast backing. They are part of the project, not a
   separate subtitle file.
+- **Video trim:** Start frame and End frame choose one inclusive contiguous
+  range for WebM or MP4. The duration and recording progress reflect only that
+  range. Trimming changes only the delivery: it never deletes, reorders or
+  alters source frames, captions or undo history, and reopening Export starts
+  with the complete animation again. When narration exists, audio begins at
+  the selected start frame's matching time (`start offset ÷ fps`) and stops
+  with the trimmed video, so picture and voice remain synchronized.
 
 - **WebM video** — recorded on-device in real time (a 12-frame animation
   at 6 fps records for 2 seconds). Codec preference: VP9 → VP8 → generic

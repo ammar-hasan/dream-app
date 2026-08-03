@@ -366,7 +366,7 @@ export interface AudioContextLike {
   createBufferSource(): {
     buffer: unknown;
     connect(destination: unknown): void;
-    start(when?: number): void;
+    start(when?: number, offset?: number): void;
   };
   createMediaStreamDestination(): { stream: { getAudioTracks(): MediaStreamTrack[] } };
   close(): Promise<void>;
@@ -380,14 +380,15 @@ export interface NarrationMix {
 }
 
 /**
- * Bake a take into a canvas capture stream: decode the data URL, play it
- * through a MediaStreamDestination and combine the tracks. The narration
- * plays once from time 0; a longer video simply goes quiet afterwards.
+ * Bake a take into a canvas capture stream: decode the data URL, play it from
+ * the requested source offset through a MediaStreamDestination and combine
+ * the tracks. A longer video simply goes quiet after the take ends.
  */
 export async function mixNarrationTracks(
   canvasStream: { getVideoTracks(): MediaStreamTrack[] },
   narration: Narration,
   deps: { createAudioContext?: () => AudioContextLike } = {},
+  startOffsetSeconds = 0,
 ): Promise<NarrationMix> {
   const createAudioContext =
     deps.createAudioContext ?? (() => new AudioContext() as unknown as AudioContextLike);
@@ -398,7 +399,7 @@ export async function mixNarrationTracks(
   source.buffer = buffer;
   const destination = ctx.createMediaStreamDestination();
   source.connect(destination);
-  source.start(0);
+  source.start(0, Math.max(0, startOffsetSeconds));
   return {
     tracks: combineStreamTracks(canvasStream.getVideoTracks(), destination.stream.getAudioTracks()),
     finish: () => ctx.close(),

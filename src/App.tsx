@@ -25,7 +25,6 @@ import { PlayPanel } from './ui/PlayPanel';
 import { NewDocumentDialog } from './ui/NewDocumentDialog';
 import { OpenDialog } from './ui/OpenDialog';
 import { ResizeDialog } from './ui/ResizeDialog';
-import { ExportDialog } from './ui/ExportDialog';
 import { UpdateToast } from './ui/UpdateToast';
 import { StoryboardDialog } from './ui/StoryboardDialog';
 
@@ -34,6 +33,11 @@ type Dialog = 'new' | 'open' | 'resize' | 'export' | null;
 const PresentView = lazy(async () => {
   const module = await import('./ui/PresentView');
   return { default: module.PresentView };
+});
+
+const ExportDialog = lazy(async () => {
+  const module = await import('./ui/ExportDialog');
+  return { default: module.ExportDialog };
 });
 
 export default function App({ initialShareError = false }: { initialShareError?: boolean }) {
@@ -136,7 +140,11 @@ export default function App({ initialShareError = false }: { initialShareError?:
       {dialog === 'new' && <NewDocumentDialog onClose={() => setDialog(null)} />}
       {dialog === 'open' && <OpenDialog onClose={() => setDialog(null)} />}
       {dialog === 'resize' && <ResizeDialog onClose={() => setDialog(null)} />}
-      {dialog === 'export' && <ExportDialog onClose={() => setDialog(null)} />}
+      {dialog === 'export' && (
+        <Suspense fallback={null}>
+          <ExportDialog onClose={() => setDialog(null)} />
+        </Suspense>
+      )}
       {pendingHotspot && <LinkDialog />}
       {storyboardOpen && (
         <StoryboardDialog

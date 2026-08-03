@@ -318,6 +318,10 @@ test('social video export saves synchronized captions as one undoable edit', asy
   await page.getByLabel('Frame 1 of 2').fill('First message');
   await page.getByRole('button', { name: 'Next frame' }).click();
   await page.getByLabel('Frame 2 of 2').fill('Second message');
+  const trim = page.getByRole('group', { name: 'Trim video' });
+  await trim.getByLabel('Start frame').selectOption({ label: 'Frame 2' });
+  await expect(trim.getByLabel('End frame')).toHaveValue('1');
+  await expect(page.getByText(/about 0\.2 seconds of video/)).toBeVisible();
 
   const downloadPromise = page.waitForEvent('download');
   await page
@@ -326,6 +330,8 @@ test('social video export saves synchronized captions as one undoable edit', asy
     .click();
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toBe('Untitled-vertical.webm');
+  await expect(page.getByRole('button', { name: 'Frame 1' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Frame 2' })).toBeVisible();
   await expect(page.locator('.timeline-frame-caption')).toHaveCount(2);
 
   await page.getByRole('button', { name: 'Undo', exact: true }).click();

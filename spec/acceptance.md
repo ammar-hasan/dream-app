@@ -384,6 +384,17 @@ holds.
       never executes supplied markup or overwrites work: an incoming bad link
       falls back to the editor with a friendly warning, and an outgoing large
       prototype is directed to the Interactive app file.
+125.  GIVEN a multi-frame animation WHEN a start and end frame are chosen for
+      WebM or MP4 THEN the shown duration, progress total and downloaded video
+      cover that inclusive range only, while every source frame and its order
+      remain unchanged and reopening Export defaults to the full animation.
+126.  GIVEN a narration take and a trimmed video beginning after frame 1 WHEN
+      it is exported THEN the take begins at the selected frame's matching
+      time offset and ends with the video, keeping voice synchronized with the
+      retained pictures.
+127.  GIVEN captions are edited while a video range is trimmed WHEN Export is
+      pressed THEN caption edits remain one undoable document change exactly as
+      before; trimming itself adds no history entry.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

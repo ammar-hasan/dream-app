@@ -277,7 +277,9 @@ play button, everything called "frames".
   Either video can stay Original or use a 720p Vertical 9:16, Square 1:1 or
   Landscape 16:9 canvas. Dream contains and centers the complete drawing—no
   cropping or stretching—and records at 30 fps while preserving the authored
-  flipbook holds. Add a short caption per frame in the same dialog, step
+  flipbook holds. Pick an inclusive Start frame / End frame to trim only the
+  delivered video; the source animation stays complete and narration begins at
+  the matching frame-time offset. Add a short caption per frame in the same dialog, step
   previous/next or copy one to all, and the captions are burned into the video
   over a readable safe-area backing. Export saves the batch as one undoable
   edit; shaped filenames include `-vertical`, `-square` or `-landscape`.

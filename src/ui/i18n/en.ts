@@ -539,6 +539,10 @@ export const en: Record<string, string> = {
   'export.captionCopyAll': 'Copy to every frame',
   'export.captionHint':
     'Captions are burned into the video and saved with the project when you export.',
+  'export.trim': 'Trim video',
+  'export.trimStart': 'Start frame',
+  'export.trimEnd': 'End frame',
+  'export.trimHint': 'Only the exported video is trimmed. Your animation stays complete.',
   'export.spriteNote': 'All frames in one PNG grid — handy for games and sharing.',
   'export.appLabel': 'Interactive app (.html)',
   'export.appNote':
