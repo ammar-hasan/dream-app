@@ -34,6 +34,8 @@ export interface VoiceExecutorStore {
   previewApp(): void;
   /** Download the standalone HTML prototype. */
   exportApp(): void;
+  /** Download the AI-generated "real code" HTML file. */
+  exportCode(): void;
   setTool(tool: ToolId): void;
   setColor(color: Color): void;
   setSize(size: number): void;
@@ -122,6 +124,13 @@ export function executeVoiceCommand(
       }
       store.exportApp();
       return { message: t('voice.exportApp') };
+
+    case 'export-code':
+      if (!store.doc.frames || store.doc.frames.length === 0) {
+        return { message: t('voice.noApp') };
+      }
+      store.exportCode();
+      return { message: t('voice.exportCode') };
 
     case 'stop':
       store.pause();

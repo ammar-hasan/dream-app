@@ -101,6 +101,17 @@ describe('parseVoiceCommand — animation', () => {
     expect(parseVoiceCommand('app')).toBeNull();
     expect(parseVoiceCommand('stop the app')).toEqual({ kind: 'stop' });
   });
+
+  it('parses the make-real code export phrases', () => {
+    expect(parseVoiceCommand('export real code')).toEqual({ kind: 'export-code' });
+    expect(parseVoiceCommand('export code')).toEqual({ kind: 'export-code' });
+    expect(parseVoiceCommand('make real')).toEqual({ kind: 'export-code' });
+    expect(parseVoiceCommand('can you make it real please')).toEqual({ kind: 'export-code' });
+    expect(parseVoiceCommand('download the html')).toEqual({ kind: 'export-code' });
+    // A bare "code" is not a command; app phrases stay app phrases.
+    expect(parseVoiceCommand('code')).toBeNull();
+    expect(parseVoiceCommand('export my app')).toEqual({ kind: 'export-app' });
+  });
 });
 
 describe('parseVoiceCommand — tools, colors, sizes', () => {
@@ -190,14 +201,27 @@ describe('parseVoiceCommand — Arabic vocabulary (locale "ar")', () => {
     expect(parseVoiceCommand('أوقف اللعبة', 'ar')).toEqual({ kind: 'stop' });
   });
 
+  it('parses the code export ("صدّر كود حقيقي"), app export stays separate', () => {
+    expect(parseVoiceCommand('صدر كود حقيقي', 'ar')).toEqual({ kind: 'export-code' });
+    expect(parseVoiceCommand('كود حقيقي', 'ar')).toEqual({ kind: 'export-code' });
+    expect(parseVoiceCommand('صدّر الكود', 'ar')).toEqual({ kind: 'export-code' });
+    expect(parseVoiceCommand('صدر التطبيق', 'ar')).toEqual({ kind: 'export-app' });
+  });
+
   it('"العب المتاهة/الطيران/الصيد/فلابي" pick a template; English still works', () => {
-    expect(parseVoiceCommand('العب المتاهة', 'ar')).toEqual({ kind: 'play-game', template: 'maze' });
+    expect(parseVoiceCommand('العب المتاهة', 'ar')).toEqual({
+      kind: 'play-game',
+      template: 'maze',
+    });
     expect(parseVoiceCommand('العب الطيران', 'ar')).toEqual({
       kind: 'play-game',
       template: 'flappy',
     });
     expect(parseVoiceCommand('العب الصيد', 'ar')).toEqual({ kind: 'play-game', template: 'catch' });
-    expect(parseVoiceCommand('العب فلابي', 'ar')).toEqual({ kind: 'play-game', template: 'flappy' });
+    expect(parseVoiceCommand('العب فلابي', 'ar')).toEqual({
+      kind: 'play-game',
+      template: 'flappy',
+    });
     expect(parseVoiceCommand('play maze', 'ar')).toEqual({ kind: 'play-game', template: 'maze' });
   });
 

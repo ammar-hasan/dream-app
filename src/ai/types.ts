@@ -41,7 +41,8 @@ export interface AIImageResult {
 }
 
 export interface AIChatMessage {
-  role: 'user' | 'assistant';
+  /** 'system' lets callers (e.g. code export) steer the conversation. */
+  role: 'system' | 'user' | 'assistant';
   text: string;
 }
 

@@ -410,6 +410,19 @@ export const en: Record<string, string> = {
   'export.appLabel': 'Interactive app (.html)',
   'export.appNote':
     'One self-contained HTML file: your frames as screens, your links as tappable hotspots. Opens anywhere, works offline.',
+  'export.codeLabel': 'Real code (AI) (.html)',
+  'export.codeNote':
+    'AI rewrites your app as real, readable HTML/CSS/JS — screens as semantic markup, your links wired as buttons. Dream AI builds a clean local version; connect your own AI for richer code.',
+  'export.codeProgress': 'Dreaming in code…',
+  'export.codeDone': 'Your code is downloading — open it in any editor and make it yours.',
+  'export.codeDoneLocal':
+    'Your code is downloading — generated locally by Dream AI. Connect your own AI for richer code.',
+  'export.codeNoChat':
+    'This AI cannot write code — switch to Dream AI or add a chat-capable AI in the AI panel.',
+  'export.codeNotCode':
+    'The AI did not answer with code. Try again — or use “Interactive app” for a pixel-perfect export.',
+  'export.codeUnsafe':
+    'The AI added outside links to the code, so Dream stopped it. Try again, or use “Interactive app” instead.',
   'export.dreamLabel': 'Dream project (.dream)',
   'export.dreamNote':
     'The whole project — layers, frames, links, game — as one portable file. Reopen it here, share it, or hand it to an agent via the MCP server.',
@@ -466,6 +479,8 @@ export const en: Record<string, string> = {
   'voice.playGame': 'Let’s play your game!',
   'voice.previewApp': 'Here’s your app!',
   'voice.exportApp': 'Exported your app!',
+  'voice.exportCode': 'Dreaming in code…',
+  'voice.exportCodeDone': 'Your code is ready — check your downloads!',
   'voice.noApp': 'Add some frames and links first.',
   'voice.stopped': 'Stopped.',
   'voice.nothingToPlay': 'Nothing to play yet — add some frames first.',
@@ -477,6 +492,6 @@ export const en: Record<string, string> = {
   'voice.mirrorOff': 'Mirror off.',
   'voice.saved': 'Saved!',
   'voice.help':
-    'You can say: brush, pencil, spray, eraser, fill, wand, stamp, a color like red or blue, bigger, smaller, mirror on, mirror off, undo, redo, clear, new frame, play, play my game, preview my app, export my app, stop, save, and help.',
+    'You can say: brush, pencil, spray, eraser, fill, wand, stamp, a color like red or blue, bigger, smaller, mirror on, mirror off, undo, redo, clear, new frame, play, play my game, preview my app, export my app, export real code, stop, save, and help.',
   'voice.unknown': 'Sorry, I didn’t understand. Say “help” to hear what I can do.',
 };

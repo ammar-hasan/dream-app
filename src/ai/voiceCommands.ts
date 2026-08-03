@@ -29,6 +29,8 @@ export type VoiceCommand =
   | { kind: 'preview-app' }
   /** "export my app": download the standalone HTML prototype. */
   | { kind: 'export-app' }
+  /** "export real code" / "make it real": the AI code export. */
+  | { kind: 'export-code' }
   | { kind: 'stop' }
   | { kind: 'tool'; tool: ToolId }
   /** "mirror on" / "mirror off": toggle vertical mirror symmetry. */
@@ -169,11 +171,15 @@ export interface VoiceVocabulary {
   app: Set<string>;
   appPreview: Set<string>;
   appExport: Set<string>;
+  /** "code" words for the make-real export ("export real code"). */
+  code: Set<string>;
   mirror: Set<string>;
   clearPhrases: string[];
   newFramePhrases: string[];
   mirrorOnPhrases: string[];
   mirrorOffPhrases: string[];
+  /** Whole-phrase ways to ask for the code export ("make it real"). */
+  codePhrases: string[];
 }
 
 const EN_VOCAB: VoiceVocabulary = {
@@ -200,11 +206,20 @@ const EN_VOCAB: VoiceVocabulary = {
   app: new Set(['app', 'prototype']),
   appPreview: new Set(['preview', 'try', 'test', 'open', 'show']),
   appExport: new Set(['export', 'download', 'share', 'send']),
+  code: new Set(['code', 'html']),
   mirror: new Set(['mirror', 'symmetry', 'mirroring']),
   clearPhrases: ['erase everything', 'delete everything', 'start over', 'wipe it'],
   newFramePhrases: ['new frame', 'add frame', 'another frame', 'next frame'],
   mirrorOnPhrases: ['mirror on', 'symmetry on', 'mirroring on'],
   mirrorOffPhrases: ['mirror off', 'symmetry off', 'mirroring off'],
+  codePhrases: [
+    'make real',
+    'make it real',
+    'real code',
+    'export code',
+    'code export',
+    'turn it into code',
+  ],
 };
 
 /**
@@ -288,14 +303,16 @@ const AR_VOCAB: VoiceVocabulary = {
     flappy: new Set(['الطيران', 'طيران', 'فلابي', 'الطائر', 'طائر']),
     maze: new Set(['المتاهة', 'متاهة', 'متاهه']),
   },
-  app: new Set(['تطبيق', 'تطبيقي', 'برنامج']),
+  app: new Set(['تطبيق', 'تطبيقي', 'التطبيق', 'برنامج']),
   appPreview: new Set(['عاين', 'معاينة', 'معاينه', 'جرب', 'افتح', 'اعرض']),
   appExport: new Set(['صدر', 'صدري', 'تصدير', 'حمل', 'نزل', 'شارك']),
+  code: new Set(['كود']),
   mirror: new Set(['مراية', 'مرايه', 'تناظر', 'تطابق']),
   clearPhrases: ['امسح كل شيء', 'احذف كل شيء', 'ابدا من جديد', 'نظف اللوحة'],
   newFramePhrases: ['اطار جديد', 'فريم جديد', 'اضف اطار', 'اطار اخر'],
   mirrorOnPhrases: ['شغل التناظر', 'فعل التناظر', 'شغل المراية', 'تناظر شغال'],
   mirrorOffPhrases: ['اطف التناظر', 'اطفي التناظر', 'اطفي المراية', 'بدون تناظر'],
+  codePhrases: ['كود حقيقي', 'صدر كود حقيقي', 'صدر الكود', 'حوله الي كود'],
 };
 
 function union<T>(a: Set<T>, b: Set<T>): Set<T> {
@@ -328,11 +345,13 @@ function mergeVocabulary(base: VoiceVocabulary, extra: VoiceVocabulary): VoiceVo
     app: union(base.app, extra.app),
     appPreview: union(base.appPreview, extra.appPreview),
     appExport: union(base.appExport, extra.appExport),
+    code: union(base.code, extra.code),
     mirror: union(base.mirror, extra.mirror),
     clearPhrases: [...base.clearPhrases, ...extra.clearPhrases],
     newFramePhrases: [...base.newFramePhrases, ...extra.newFramePhrases],
     mirrorOnPhrases: [...base.mirrorOnPhrases, ...extra.mirrorOnPhrases],
     mirrorOffPhrases: [...base.mirrorOffPhrases, ...extra.mirrorOffPhrases],
+    codePhrases: [...base.codePhrases, ...extra.codePhrases],
   };
 }
 
@@ -449,6 +468,15 @@ export function parseVoiceCommand(transcript: string, locale = 'en'): VoiceComma
   }
   if (hasPhrase(normalized, ...vocab.mirrorOnPhrases)) {
     return { kind: 'mirror', on: true };
+  }
+
+  // Make-real code export: "export real code", "make it real", "كود حقيقي" —
+  // checked before the app block so "export code" never becomes "export app".
+  if (has(tokens, vocab.code) && (has(tokens, vocab.appExport) || has(tokens, vocab.app))) {
+    return { kind: 'export-code' };
+  }
+  if (hasPhrase(normalized, ...vocab.codePhrases)) {
+    return { kind: 'export-code' };
   }
 
   // App mode: "preview my app" / "export my app" — checked before a bare

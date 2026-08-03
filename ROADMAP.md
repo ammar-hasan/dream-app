@@ -6,9 +6,10 @@ presentation mode), slice 7 (AI panel), the accessibility trio — slices 8
 (voice commands), 9 (kid mode) and 10 (i18n) — the release harness, the
 drawing power tools (symmetry, pressure, filled shapes, lasso, magic wand,
 spray), game mode v1 (Catch!, the first slice-12 template), app mode v1
-(interactive prototypes: hotspots, app preview, standalone HTML export) and
+(interactive prototypes: hotspots, app preview, standalone HTML export),
 the developer surface (.dream project files, the dream-mcp server, the stable
-engine API) are done. Each slice below lists brief acceptance criteria; slices
+engine API) and the AI make-real code export (a readable single-file app
+generated from the hotspot graph, BYOK or the free local template) are done. Each slice below lists brief acceptance criteria; slices
 are roughly ordered by dependency, not by a fixed schedule.
 
 ## Slice 2 — Image filters & adjustments ✅
@@ -272,6 +273,49 @@ are roughly ordered by dependency, not by a fixed schedule.
 - Acceptance met: draw two screens, link a drawn button between them,
   preview the tap, export the HTML — opening the file feels like a magic
   trick: "I drew this, and now it's an app I can send to anyone."
+
+## Slice 18 — AI "make real" code export ✅
+
+Research backlog #1 (RESEARCH.md §4): close the tldraw make-real gap on
+Dream's own terms — the hotspot graph is a better input than pixels, and
+BYOK means no platform lock-in. From an animated document, generate a REAL,
+human-readable single-file web app — semantic HTML a developer (persona:
+Maria) or a kid's parent can open, read and extend.
+
+- ✅ Structured app description (`src/ai/makeReal.ts`, pure): document →
+  compact payload — app name, per-screen background + dominant colors
+  (reusing the feedback palette work), text elements (content, position,
+  size, color), shapes/images summarized as kind + box + color (never
+  pixels) and the navigation graph (screen N --hotspot rect--> screen M,
+  transition), capped small enough for cheap models.
+- ✅ Prompt + parsing: a system+user prompt pair asks for ONE self-contained
+  semantic, accessible, responsive, commented HTML file with hash-router
+  navigation; `extractHtmlFromReply` pulls the HTML out of messy replies
+  (preamble, multiple fences, truncated) and `validateGeneratedHtml`
+  rejects anything that isn't a self-contained document (no external http
+  refs) with a friendly error.
+- ✅ Two generation paths: a chat-capable BYOK provider writes the code
+  (works with OpenRouter/Ollama/LM Studio — `chat` messages now accept a
+  `system` role); the built-in Dream AI runs a deterministic TEMPLATE
+  generator instead of refusing — screens as `<section>`s, text as real
+  text, shapes as styled divs, hotspot nav wired to a tiny hash router —
+  honestly labeled "generated locally by Dream AI", free and offline, and
+  counted against the 20/day free tier like other Dream AI actions.
+- ✅ UI: Export → "Real code (AI) (.html)" next to "Interactive app":
+  progress ("Dreaming in code…"), success downloads `{name}-code.html` and
+  shows a small note, errors are friendly (unparseable/unsafe model output
+  suggests retry or the deterministic export). Every generated file opens
+  with "Made with Dream — where drawings come alive."
+- ✅ Voice: "export real code" / "make it real" (EN) and «صدّر كود حقيقي»
+  (AR) run the same flow, announcing when the download lands.
+- Deviation: the Dream AI path generates a clean approximation (drawings
+  become soft dashed panels, images become placeholders) rather than trying
+  to fake richer code offline — the label says exactly what it is, and BYOK
+  is the upgrade path. The deterministic pixel-faithful "Interactive app"
+  export stays untouched as the no-AI default.
+- Acceptance met: draw two linked screens → Export → Real code (AI) → the
+  downloaded file opens as a working app whose source reads like a gift:
+  commented, semantic, your colors and words intact.
 
 ## Slice 14 — The developer surface ✅
 

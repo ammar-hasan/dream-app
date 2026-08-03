@@ -138,7 +138,10 @@ Conventions for anyone (human or agent) working on Dream.
   OpenAICompatibleProvider (BYOK; fetch + image decode are injectable deps),
   registry with settings persistence (API keys: sessionStorage by default,
   localStorage only on opt-in — never log keys), daily usage counter,
-  rule-based document feedback (`analyze.ts`), Web Speech dictation
+  rule-based document feedback (`analyze.ts`), the make-real code export
+  (`makeReal.ts` — app description builder, prompt, reply
+  extraction/validation, deterministic local template; the UI flow lives in
+  `ui/exportRealCode.ts`), Web Speech dictation
   (`speech.ts`, feature-detected), speech synthesis (`say.ts`,
   feature-detected), pure voice-command parser (`voiceCommands.ts` —
   per-locale vocabulary tables; Arabic merges into the English base)

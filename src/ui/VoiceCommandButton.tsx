@@ -12,7 +12,7 @@ import { parseVoiceCommand } from '../ai/voiceCommands';
 import { say } from '../ai/say';
 import { useDreamStore } from '../store/dreamStore';
 import { useUiPrefs } from '../store/uiPrefs';
-import { useT } from './i18n';
+import { t, useT } from './i18n';
 import {
   cancelClear,
   confirmClear,
@@ -21,10 +21,11 @@ import {
 } from './voiceExecutor';
 import { saveNow } from './saveNow';
 import { exportAppHtml } from './exportApp';
+import { exportRealCodeHtml } from './exportRealCode';
 import { MicIcon } from './icons';
 
 /** Snapshot of the dream store shaped for the voice executor. */
-function executorStore(): VoiceExecutorStore {
+function executorStore(announceDone?: (message: string) => void): VoiceExecutorStore {
   const s = useDreamStore.getState();
   const layer = s.doc.layers.find((l) => l.id === s.activeLayerId);
   return {
@@ -46,6 +47,14 @@ function executorStore(): VoiceExecutorStore {
     setGameTemplate: s.setGameTemplate,
     previewApp: s.previewApp,
     exportApp: () => exportAppHtml(s.doc),
+    // Async: the executor says "Dreaming in code…" right away; the result
+    // (or the friendly error) is announced when the generation finishes.
+    exportCode: () => {
+      void exportRealCodeHtml(s.doc).then(
+        () => announceDone?.(t('voice.exportCodeDone')),
+        (error) => announceDone?.(error instanceof Error ? error.message : t('export.failed')),
+      );
+    },
     setTool: s.setTool,
     setColor: s.setColor,
     setSize: s.setSize,
@@ -91,7 +100,7 @@ export function VoiceCommandButton() {
       announce(t('voice.unknown'));
       return;
     }
-    const result = executeVoiceCommand(command, executorStore(), () => void saveNow());
+    const result = executeVoiceCommand(command, executorStore(announce), () => void saveNow());
     if (!result) return;
     if (result.awaitConfirm === 'clear') pendingClearRef.current = true;
     announce(result.message);

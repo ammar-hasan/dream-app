@@ -62,6 +62,46 @@ exported file's behavior contract:
 8. The page title is the document name (HTML-escaped), defaulting to
    "Dream app".
 
+## The exported real-code file (AI)
+
+Export → **Real code (AI) (.html)** downloads `{name}-code.html`: the app
+rewritten as REAL, readable code — a developer (or a kid's parent) can open
+it, learn from it and extend it. Where the interactive-app export is a
+pixel-faithful picture of the app, this export is the app as source.
+
+1. **The input is the app, not pixels.** The app is described structurally
+   and compactly — per screen: its background, dominant colors, texts
+   (content, position, size, color), drawn things summarized as boxes
+   (kind, position, size, color — strokes, shapes, fills, images) and the
+   navigation graph (which rectangle on screen N goes to screen M, with
+   which transition). Broken hotspots are dropped here too.
+2. **Two generation paths.**
+   - With a **chat-capable connected provider**, the description goes out
+     with instructions to reply with exactly ONE self-contained HTML file:
+     semantic (each screen a section, texts as real text, tappable areas as
+     real buttons), accessible, responsive, commented for beginners, with
+     navigation as a small hash router and no external assets.
+   - With **Dream AI**, a deterministic local generator builds the app from
+     the same description — free, fully offline, same document in, same
+     file out. The output is honestly labeled "generated locally by Dream
+     AI — connect your own AI for richer code", and each generation counts
+     against the daily free tier like every other Dream AI action. Its
+     drawings become soft approximation panels and imported images become
+     placeholders — it never pretends to be richer than it is.
+3. **Validation before download.** The result must be one complete HTML
+   document with no external web references. A refusal, chatter without
+   code, or code that links outside is rejected with a friendly error that
+   suggests retrying or using the deterministic interactive-app export
+   instead.
+4. **The file's contract:** it opens with a comment "Made with Dream —
+   where drawings come alive.", is commented and beginner-friendly, carries
+   the drawing's colors and words, opens on the frame active at export
+   time, works fully offline, and navigates by hash so the browser Back
+   button works.
+5. **The flow:** while generating, the dialog shows "Dreaming in code…";
+   on success the file downloads and a small note confirms — naming the
+   local generation when Dream AI wrote it.
+
 ## Discovery
 
 With two or more frames and no links yet, the timeline shows a gentle
@@ -73,7 +113,8 @@ stays the kid path).
 
 "Preview my app" opens the app preview (needs frames — otherwise a kind
 "add some frames and links first"); "Export my app" downloads the HTML
-file.
+file; "Export real code" (or "make it real") downloads the AI-generated
+code file (same frames requirement).
 
 ## Edge cases
 

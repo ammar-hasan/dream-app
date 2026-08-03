@@ -7,11 +7,25 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **AI "make real" code export**: animated documents gain a second app
+  export — "Real code (AI) (.html)" — that turns the app description
+  (screens, texts, shapes as boxes, the hotspot navigation graph) into a
+  real, readable single-file web app instead of a pixel-faithful prototype.
+  With a chat-capable BYOK provider the model writes the code (the reply is
+  extracted robustly and rejected unless it is one self-contained HTML file
+  with no external URLs); with the built-in Dream AI a deterministic local
+  template generates the app — free, offline, honestly labeled "generated
+  locally by Dream AI" — and counts against the 20/day free tier. Generated
+  files are commented, beginner-friendly and start with "Made with Dream —
+  where drawings come alive."
+- Voice intent "export real code" / "make it real" (English) and «صدّر كود
+  حقيقي» (Arabic) for the code export.
 - The living spec (`spec/`): an implementation-agnostic, modular product
   specification — concepts, data contracts, per-feature behavior rules,
   experience map, visual identity, integrations, and a 90-point acceptance
   checklist — detailed enough to rebuild Dream from the spec alone, in any
   stack. AGENTS.md rule 12 makes spec updates part of every behavior change.
+  (The checklist grew to 94 points with the make-real export below.)
 - Play mode game templates: **Flappy Dream** (flap through scrolling gates,
   one hit ends the run, 3 shields in kid mode) and **Maze Runner** (seeded,
   always-solvable generated mazes with level-ups) join **Catch!** behind a

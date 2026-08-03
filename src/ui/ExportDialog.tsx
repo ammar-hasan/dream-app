@@ -10,6 +10,7 @@ import { animationSettingsOf } from '../engine/animation';
 import { useDreamStore } from '../store/dreamStore';
 import { exportImage } from './exportImage';
 import { exportAppHtml } from './exportApp';
+import { exportRealCodeHtml } from './exportRealCode';
 import { downloadDreamFile } from './dreamFile';
 import {
   downloadBlob,
@@ -20,7 +21,7 @@ import {
 } from './exportAnimation';
 import { useT } from './i18n';
 
-type Format = 'png' | 'jpeg' | 'webm' | 'sprite' | 'app' | 'dream';
+type Format = 'png' | 'jpeg' | 'webm' | 'sprite' | 'app' | 'code' | 'dream';
 
 export function ExportDialog({ onClose }: { onClose: () => void }) {
   const t = useT();
@@ -28,6 +29,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
   const [quality, setQuality] = useState(92);
   const [progress, setProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [note, setNote] = useState<string | null>(null);
 
   const doc = useDreamStore((s) => s.doc);
   const animated = doc.frames !== undefined;
@@ -60,6 +62,21 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
       onClose();
       return;
     }
+    if (format === 'code') {
+      setError(null);
+      setNote(null);
+      setProgress(t('export.codeProgress'));
+      try {
+        const { local } = await exportRealCodeHtml(doc);
+        setProgress(null);
+        // Stay open with a small note — the file is already downloading.
+        setNote(t(local ? 'export.codeDoneLocal' : 'export.codeDone'));
+      } catch (err) {
+        setProgress(null);
+        setError(err instanceof Error ? err.message : t('export.failed'));
+      }
+      return;
+    }
     if (format === 'dream') {
       setError(null);
       try {
@@ -82,6 +99,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
           { id: 'webm' as const, label: t('export.webmLabel') },
           { id: 'sprite' as const, label: t('export.spriteLabel') },
           { id: 'app' as const, label: t('export.appLabel') },
+          { id: 'code' as const, label: t('export.codeLabel') },
         ]
       : []),
     { id: 'dream', label: t('export.dreamLabel') },
@@ -106,7 +124,11 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
                 key={id}
                 type="button"
                 className={`btn preset${format === id ? ' active' : ''}`}
-                onClick={() => setFormat(id)}
+                onClick={() => {
+                  setFormat(id);
+                  setError(null);
+                  setNote(null);
+                }}
               >
                 {label}
               </button>
@@ -142,9 +164,16 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
 
         {format === 'app' && <p className="dialog-note">{t('export.appNote')}</p>}
 
+        {format === 'code' && <p className="dialog-note">{t('export.codeNote')}</p>}
+
         {format === 'dream' && <p className="dialog-note">{t('export.dreamNote')}</p>}
 
-        {progress && <p className="dialog-note">{t('export.recording', { progress })}</p>}
+        {progress && (
+          <p className="dialog-note">
+            {format === 'webm' ? t('export.recording', { progress }) : progress}
+          </p>
+        )}
+        {note && <p className="dialog-note">{note}</p>}
         {error && <p className="dialog-note">{error}</p>}
 
         <div className="dialog-actions">

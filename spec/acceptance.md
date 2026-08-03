@@ -158,91 +158,108 @@ holds.
 58. GIVEN 2+ frames and no hotspots WHEN not in kid mode THEN the
     timeline shows "Link your frames to make an app →"; it vanishes once
     a hotspot exists.
+59. GIVEN an animated document WHEN "Real code (AI)" is exported with
+    Dream AI THEN the downloaded `{name}-code.html` contains one section
+    per screen, the texts as real text, a button per hotspot wired to its
+    target screen, no external web references, the header comment "Made
+    with Dream — where drawings come alive." and the honest "generated
+    locally by Dream AI" label — and one free try is spent.
+60. GIVEN a chat-capable BYOK provider WHEN the code export runs THEN the
+    provider receives the structured app description (never pixels) and
+    only a reply containing one self-contained HTML file is downloaded; a
+    refusal or code with external links is rejected with a friendly error
+    suggesting a retry or the deterministic interactive-app export.
+61. GIVEN the code export WHEN the daily free tier is spent THEN it is
+    refused kindly with the BYOK path offered — the same 20/day counter as
+    Create/Edit/Feedback; with BYOK active the export is unlimited.
+62. GIVEN "export real code" spoken THEN the code export runs (needs
+    frames); «صدّر كود حقيقي» works under the Arabic UI, and "export my
+    app" still downloads the deterministic prototype.
 
 ## G. AI
 
-59. GIVEN Dream AI WHEN "a starry night" is created twice at the same
+63. GIVEN Dream AI WHEN "a starry night" is created twice at the same
     document size THEN both pictures are pixel-identical; each lands as a
     new layer named from the prompt.
-60. GIVEN the Edit tab with "warmer" THEN the layer gains sepia 25,
+64. GIVEN the Edit tab with "warmer" THEN the layer gains sepia 25,
     saturation 10, brightness 5 (plus unmentioned defaults); with
     "Selected part only" ticked, only the selection box changes.
-61. GIVEN a blank canvas WHEN feedback is requested THEN it says the
+65. GIVEN a blank canvas WHEN feedback is requested THEN it says the
     canvas is blank and encourages starting; on a flat, low-contrast
     drawing it suggests contrast with a one-click Apply that is undoable.
-62. GIVEN 20 Dream AI actions in a day THEN the 21st is refused kindly
+66. GIVEN 20 Dream AI actions in a day THEN the 21st is refused kindly
     with the BYOK path offered; the counter resets the next local
     calendar day.
-63. GIVEN a BYOK provider without image support THEN Create is disabled
+67. GIVEN a BYOK provider without image support THEN Create is disabled
     with an explanation and Edit always is; feedback still works.
-64. GIVEN an API key saved without "remember key" WHEN the app closes and
+68. GIVEN an API key saved without "remember key" WHEN the app closes and
     reopens THEN the key is gone but URL/model remain; keys never appear
     in logs, settings blobs or error messages.
-65. GIVEN "Test connection" with a bad URL THEN the error asks "is the
+69. GIVEN "Test connection" with a bad URL THEN the error asks "is the
     URL right and the app running?" — no status codes, no jargon.
 
 ## H. Accessibility, i18n & voice
 
-66. GIVEN kid mode turned on THEN the app is in Draw mode with the brush,
+70. GIVEN kid mode turned on THEN the app is in Draw mode with the brush,
     the rail shows the 9 kid tools, the 12-color palette and 3 dot sizes,
     and both voices are on; turning it off restores the adult UI.
-67. GIVEN kid mode WHEN hovering the brush THEN "Brush!" is spoken (where
+71. GIVEN kid mode WHEN hovering the brush THEN "Brush!" is spoken (where
     synthesis exists) and no tooltip shows.
-68. GIVEN comfort mode THEN base text is 16 px, targets ≥ 44 px, and
+72. GIVEN comfort mode THEN base text is 16 px, targets ≥ 44 px, and
     contrast strengthens in the current theme — composing with dark mode,
     kid mode and RTL.
-69. GIVEN "um, can you please undo?" spoken THEN one undo happens and the
+73. GIVEN "um, can you please undo?" spoken THEN one undo happens and the
     status confirms "Took that back!".
-70. GIVEN "clear" spoken THEN the app asks for a spoken yes before
+74. GIVEN "clear" spoken THEN the app asks for a spoken yes before
     wiping; "no" cancels and keeps everything.
-71. GIVEN the Arabic UI WHEN "تراجع" is spoken THEN undo happens; "undo"
+75. GIVEN the Arabic UI WHEN "تراجع" is spoken THEN undo happens; "undo"
     still works too; "شغّل التناظر" turns mirroring on and never starts
     playback.
-72. GIVEN "fill red" THEN the color becomes red `#ef4444` and the fill
+76. GIVEN "fill red" THEN the color becomes red `#ef4444` and the fill
     tool activates.
-73. GIVEN "bigger" at size 8 THEN the size becomes 12; at 64 it stays 64.
-74. GIVEN Arabic selected THEN the whole shell mirrors to RTL instantly
+77. GIVEN "bigger" at size 8 THEN the size becomes 12; at 64 it stays 64.
+78. GIVEN Arabic selected THEN the whole shell mirrors to RTL instantly
     without reload, and every string has an Arabic value (no English
     leakage, no missing keys).
 
 ## I. Persistence, files & offline
 
-75. GIVEN an edit WHEN 800 ms pass without further edits THEN the project
+79. GIVEN an edit WHEN 800 ms pass without further edits THEN the project
     is saved on-device and the dirty dot clears.
-76. GIVEN a drawing WHEN the app is closed and reopened THEN it restores
+80. GIVEN a drawing WHEN the app is closed and reopened THEN it restores
     from the last-opened pointer after the splash.
-77. GIVEN a `.dream` export imported into a fresh Dream THEN document,
+81. GIVEN a `.dream` export imported into a fresh Dream THEN document,
     frames, hotspots and game setup are identical (opaque pixels exactly;
     vector content exactly).
-78. GIVEN a `.dream` file with unknown extra fields WHEN loaded and
+82. GIVEN a `.dream` file with unknown extra fields WHEN loaded and
     re-saved THEN the unknown fields survive verbatim.
-79. GIVEN a corrupt or version-2 `.dream` file WHEN opened THEN a plain
+83. GIVEN a corrupt or version-2 `.dream` file WHEN opened THEN a plain
     error names the problem and nothing changes.
-80. GIVEN the app loaded once WHEN the network is killed and the app
+84. GIVEN the app loaded once WHEN the network is killed and the app
     reloaded THEN it boots and fully works offline.
-81. GIVEN a new version downloaded WHEN the user hasn't pressed Refresh
+85. GIVEN a new version downloaded WHEN the user hasn't pressed Refresh
     THEN the old version keeps running; pressing Refresh swaps once.
-82. GIVEN the install offer dismissed THEN it never returns on that
+86. GIVEN the install offer dismissed THEN it never returns on that
     device.
-83. GIVEN the component library WHEN a component is saved in project A
+87. GIVEN the component library WHEN a component is saved in project A
     THEN it is available in project B.
 
 ## J. Cross-cutting
 
-84. GIVEN any document mutation WHEN undone and redone THEN the result is
+88. GIVEN any document mutation WHEN undone and redone THEN the result is
     bit-identical to never having undone.
-85. GIVEN undo history WHEN the user changes workspace mode, fps, onion
+89. GIVEN undo history WHEN the user changes workspace mode, fps, onion
     settings, game casting or the active frame THEN none of those appear
     as undo steps — but frame add/duplicate/delete/reorder do.
-86. GIVEN a project saved in Play or Present mode WHEN reopened THEN it
+90. GIVEN a project saved in Play or Present mode WHEN reopened THEN it
     opens in Draw.
-87. GIVEN a hidden feature (no speech recognition, no audio, no
+91. GIVEN a hidden feature (no speech recognition, no audio, no
     recorder) THEN its button simply isn't there — never an error.
-88. GIVEN reduced-motion OS preference THEN every animation and
+92. GIVEN reduced-motion OS preference THEN every animation and
     transition in the app and its exports is effectively instant.
-89. GIVEN the dark theme THEN every surface, panel, dialog and tooltip
+93. GIVEN the dark theme THEN every surface, panel, dialog and tooltip
     uses the dark tokens; the choice persists.
-90. GIVEN any list of projects or components THEN it sorts by
+94. GIVEN any list of projects or components THEN it sorts by
     last-modified, newest first.
 
 ## K. The ten end-to-end scenarios (persona proofs)

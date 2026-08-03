@@ -74,24 +74,25 @@ didn't understand. Say 'help'…" and changes nothing.
 
 ### The complete intent table
 
-| Intent | English examples | Arabic examples | What it does |
-|---|---|---|---|
-| undo | "undo", "oops" | تراجع، رجوع | one undo step; "Nothing to undo." when empty |
-| redo | "redo" | إعادة، أعد | one redo step |
-| clear | "clear", "erase everything", "start over" | امسح، نظف | asks "Clear this layer? Say yes…" — spoken yes confirms ("All clear!"), anything else cancels |
-| new frame | "new frame", "add frame" | إطار جديد، فريم جديد | enables animation if needed, adds a frame |
-| play / stop | "play", "animate" / "stop", "pause" | شغّل / أوقف | plays the animation (needs frames) / stops playback and any game |
-| play my game | "play my game", "play flappy", "play maze", "play catch" | العب لعبتي، المتاهة، الطيران | switches to Play (optionally switching template) and starts a run |
-| preview my app | "preview my app", "test the app" | عاين التطبيق | opens the app preview (needs frames) |
-| export my app | "export my app", "share the app" | صدّر التطبيق | downloads the standalone HTML app |
-| tools | "brush", "pencil", "spray", "eraser", "fill", "wand", "lasso", "stamp", "line", "rectangle"/"square", "ellipse"/"circle", "eyedropper", "text", "move" | فرشاة، قلم، رش، ممحاة، دلو، عصا سحرية، لاسو، طابع، خط، مستطيل، بيضاوي، قطارة، نص | activates the tool |
-| colors | "red", "blue", … the 22-word vocabulary below | أحمر، أزرق، … | sets the current color |
-| fill + color | "fill red" | — | sets the color AND activates the fill tool |
-| mirror on/off | "mirror on", "mirror off", "symmetry on" | شغّل التناظر، أطفئ التناظر | vertical symmetry on / off (mirror phrases never trigger "play") |
-| bigger / smaller | "bigger", "thicker" / "smaller", "thinner" | أكبر / أصغر | brush size ×~1.5 or ÷~1.5 (min 1, max 64) |
-| save | "save" | احفظ | saves now |
-| help | "help", "commands" | مساعدة، أوامر | speaks the full command list |
-| confirm / cancel | "yes", "yeah" / "no", "cancel" | نعم / لا، ألغِ | answers the clear confirmation (only as ≤2-word utterances) |
+| Intent           | English examples                                                                                                                                       | Arabic examples                                                                  | What it does                                                                                  |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| undo             | "undo", "oops"                                                                                                                                         | تراجع، رجوع                                                                      | one undo step; "Nothing to undo." when empty                                                  |
+| redo             | "redo"                                                                                                                                                 | إعادة، أعد                                                                       | one redo step                                                                                 |
+| clear            | "clear", "erase everything", "start over"                                                                                                              | امسح، نظف                                                                        | asks "Clear this layer? Say yes…" — spoken yes confirms ("All clear!"), anything else cancels |
+| new frame        | "new frame", "add frame"                                                                                                                               | إطار جديد، فريم جديد                                                             | enables animation if needed, adds a frame                                                     |
+| play / stop      | "play", "animate" / "stop", "pause"                                                                                                                    | شغّل / أوقف                                                                      | plays the animation (needs frames) / stops playback and any game                              |
+| play my game     | "play my game", "play flappy", "play maze", "play catch"                                                                                               | العب لعبتي، المتاهة، الطيران                                                     | switches to Play (optionally switching template) and starts a run                             |
+| preview my app   | "preview my app", "test the app"                                                                                                                       | عاين التطبيق                                                                     | opens the app preview (needs frames)                                                          |
+| export my app    | "export my app", "share the app"                                                                                                                       | صدّر التطبيق                                                                     | downloads the standalone HTML app                                                             |
+| export real code | "export real code", "make it real"                                                                                                                     | صدّر كود حقيقي                                                                   | downloads the AI-generated real-code app (needs frames)                                       |
+| tools            | "brush", "pencil", "spray", "eraser", "fill", "wand", "lasso", "stamp", "line", "rectangle"/"square", "ellipse"/"circle", "eyedropper", "text", "move" | فرشاة، قلم، رش، ممحاة، دلو، عصا سحرية، لاسو، طابع، خط، مستطيل، بيضاوي، قطارة، نص | activates the tool                                                                            |
+| colors           | "red", "blue", … the 22-word vocabulary below                                                                                                          | أحمر، أزرق، …                                                                    | sets the current color                                                                        |
+| fill + color     | "fill red"                                                                                                                                             | —                                                                                | sets the color AND activates the fill tool                                                    |
+| mirror on/off    | "mirror on", "mirror off", "symmetry on"                                                                                                               | شغّل التناظر، أطفئ التناظر                                                       | vertical symmetry on / off (mirror phrases never trigger "play")                              |
+| bigger / smaller | "bigger", "thicker" / "smaller", "thinner"                                                                                                             | أكبر / أصغر                                                                      | brush size ×~1.5 or ÷~1.5 (min 1, max 64)                                                     |
+| save             | "save"                                                                                                                                                 | احفظ                                                                             | saves now                                                                                     |
+| help             | "help", "commands"                                                                                                                                     | مساعدة، أوامر                                                                    | speaks the full command list                                                                  |
+| confirm / cancel | "yes", "yeah" / "no", "cancel"                                                                                                                         | نعم / لا، ألغِ                                                                   | answers the clear confirmation (only as ≤2-word utterances)                                   |
 
 ### The color vocabulary (22 words)
 
@@ -109,7 +110,8 @@ Arabic: أحمر، برتقالي، أصفر، أخضر، فيروزي، سما�
 2. Help, undo, redo, clear, new frame.
 3. **Mirror phrases before play words** — "شغّل التناظر" turns mirroring
    on, it never starts playback.
-4. App preview/export, stop, game intents, play, save.
+4. App preview/export, the make-real code export, stop, game intents,
+   play, save.
 5. Bigger/smaller, bare "mirror" (→ on), "fill + color", tool words,
    color words. Anything unmatched → no-op with the kind fallback message.
 

@@ -8,11 +8,11 @@ ARE the contract.
 
 A provider is anything that can declare and deliver capabilities:
 
-| Capability | Meaning |
-|---|---|
-| `generateImage` | prompt (+ desired size) → a pixel image |
-| `editImage` | prompt + an existing image (+ optional region) → modified pixels |
-| `chat` | a conversation (used for design feedback) |
+| Capability      | Meaning                                                                                                                         |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `generateImage` | prompt (+ desired size) → a pixel image                                                                                         |
+| `editImage`     | prompt + an existing image (+ optional region) → modified pixels                                                                |
+| `chat`          | a conversation (used for design feedback and the make-real code generation; messages may carry a system role to steer the task) |
 
 Rules:
 
@@ -42,14 +42,14 @@ External agents (e.g. AI coding assistants) can operate on `.dream` files
 through a companion tool server speaking the Model Context Protocol over
 stdio. The tool names and their input/output shapes are the contract.
 
-| Tool | Input | Output | Notes |
-|---|---|---|---|
-| `dream.read_project` | `path` | project summary: id, name, size, background, mode, layer count, frame count (null when unanimated), hotspot counts (total + broken), operation counts (total + per kind), game-setup flag, timestamps | read-only |
-| `dream.create_project` | `path`, `width`, `height` (integers 1–8192); optional `background` (default `#ffffff`), `name` (default `Untitled`) | the new project summary | validates size and color |
-| `dream.list_layers` | `path` | per frame (or active stack): layer id, name, visibility, opacity, lock, operation count | |
-| `dream.add_text` | `path`, `text`, `x`, `y`; optional `size` (default 24), `color` (default `#000000`), `fontFamily` (default `sans-serif`), `layer` (id or name; default top layer of the active frame) | the new operation's id + its layer | empty text rejected |
-| `dream.render_png` | `path`, `outPath`; optional `frame` index (default: the active stack) | the written file's path, dimensions and byte size | errors on out-of-range frame |
-| `dream.export_app` | `path`, `outPath` | the standalone HTML file's path, screen count, hotspot count, byte size | needs frames; starts at the active frame |
+| Tool                   | Input                                                                                                                                                                                 | Output                                                                                                                                                                                                | Notes                                    |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| `dream.read_project`   | `path`                                                                                                                                                                                | project summary: id, name, size, background, mode, layer count, frame count (null when unanimated), hotspot counts (total + broken), operation counts (total + per kind), game-setup flag, timestamps | read-only                                |
+| `dream.create_project` | `path`, `width`, `height` (integers 1–8192); optional `background` (default `#ffffff`), `name` (default `Untitled`)                                                                   | the new project summary                                                                                                                                                                               | validates size and color                 |
+| `dream.list_layers`    | `path`                                                                                                                                                                                | per frame (or active stack): layer id, name, visibility, opacity, lock, operation count                                                                                                               |                                          |
+| `dream.add_text`       | `path`, `text`, `x`, `y`; optional `size` (default 24), `color` (default `#000000`), `fontFamily` (default `sans-serif`), `layer` (id or name; default top layer of the active frame) | the new operation's id + its layer                                                                                                                                                                    | empty text rejected                      |
+| `dream.render_png`     | `path`, `outPath`; optional `frame` index (default: the active stack)                                                                                                                 | the written file's path, dimensions and byte size                                                                                                                                                     | errors on out-of-range frame             |
+| `dream.export_app`     | `path`, `outPath`                                                                                                                                                                     | the standalone HTML file's path, screen count, hotspot count, byte size                                                                                                                               | needs frames; starts at the active frame |
 
 Rules:
 
@@ -64,14 +64,15 @@ Rules:
 
 ## Import & export formats
 
-| Format | Direction | Contract |
-|---|---|---|
-| PNG | import + export | import: onto its own centered layer, scaled down to fit; export: flattened document, transparency preserved, `{name}.png` |
-| JPEG | export | flattened, quality 10–100 (default 92), `{name}.jpg` |
-| Clipboard image | import | paste lands like a file import |
-| `.dream` | import + export | the portable project format — full contract in `data/dream-file.md` |
-| WebM | export (animated) | real-time recording at the document fps; VP9 → VP8 → generic fallback; `{name}.webm` |
-| Sprite sheet (PNG) | export (animated) | all frames in one grid, ≤8 columns, `{name}-frames.png` |
-| Standalone HTML app | export (animated) | the interactive-prototype contract in `features/app-mode.md`, `{name}-app.html` |
+| Format              | Direction         | Contract                                                                                                                  |
+| ------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| PNG                 | import + export   | import: onto its own centered layer, scaled down to fit; export: flattened document, transparency preserved, `{name}.png` |
+| JPEG                | export            | flattened, quality 10–100 (default 92), `{name}.jpg`                                                                      |
+| Clipboard image     | import            | paste lands like a file import                                                                                            |
+| `.dream`            | import + export   | the portable project format — full contract in `data/dream-file.md`                                                       |
+| WebM                | export (animated) | real-time recording at the document fps; VP9 → VP8 → generic fallback; `{name}.webm`                                      |
+| Sprite sheet (PNG)  | export (animated) | all frames in one grid, ≤8 columns, `{name}-frames.png`                                                                   |
+| Standalone HTML app | export (animated) | the interactive-prototype contract in `features/app-mode.md`, `{name}-app.html`                                           |
+| Real-code HTML app  | export (animated) | the AI make-real contract in `features/app-mode.md`, `{name}-code.html`                                                   |
 
 Filenames use the document name, falling back to `dream` when blank.

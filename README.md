@@ -139,8 +139,8 @@ create — literacy optional. Slice 6 ships three pillars plus a settings menu.
   "spray", "wand", "stamp", "eraser", "fill",
   colors ("red",
   "blue", … a friendly vocabulary including "fill red"), "mirror on"/
-  "mirror off", "bigger"/"smaller", "save" and "help" (speaks the command
-  list). The pipeline is a pure parser
+  "mirror off", "bigger"/"smaller", "export real code", "save" and "help"
+  (speaks the command list). The pipeline is a pure parser
   (`ai/voiceCommands.ts`, case-insensitive, filler-tolerant — "um, can you
   please undo?") plus a thin executor (`ui/voiceExecutor.ts`) against a
   minimal store interface. Every command confirms in the status area and,
@@ -389,10 +389,24 @@ IDEA.md's "create whole applications with just your drawings".
   with responsive fit-to-window scaling, touch support, keyboard-accessible
   hotspots, a Home-key restart and a small "Made with Dream" corner. The
   generator is pure TypeScript (`engine/appExport.ts`).
+- **Export → Real code (AI) (.html)** — the make-real path: instead of a
+  pixel-faithful prototype, AI rewrites your app as REAL, readable code —
+  screens as semantic `<section>`s, your texts as real text, links wired as
+  real `<button>`s on a tiny hash router, your colors carried over. Dream
+  sends a compact structured description of the app (never pixels) to your
+  chat-capable BYOK provider and validates that the reply is one
+  self-contained HTML file; with the built-in Dream AI a deterministic
+  local template generates the app instead — free, offline, counted against
+  the daily free tier, and honestly labeled "generated locally by Dream AI"
+  (connect your own AI for richer code). The file downloads as
+  `{name}-code.html`, commented and beginner-friendly, starting with "Made
+  with Dream — where drawings come alive." The builder, extractor and
+  template are pure TypeScript (`ai/makeReal.ts`).
 - **Discovery** — with two or more frames and no links yet, the timeline
   shows a gentle "Link your frames to make an app →" hint that activates the
   Link tool. Kid mode skips it (Play mode stays the kid path); voice learned
-  "preview my app" and "export my app".
+  "preview my app" and "export my app" — plus "export real code" (and «صدّر
+  كود حقيقي» in Arabic) for the make-real export.
 
 ## Play mode (games)
 
@@ -605,7 +619,10 @@ src/
                      keyword edits, rule-engine feedback in analyze.ts)
                      + OpenAICompatibleProvider (BYOK) + registry (settings
                      persistence; keys in sessionStorage unless remembered)
-                     + daily free-tier counter + Web Speech dictation
+                     + daily free-tier counter + makeReal (the "real code"
+                     export: app description builder, prompt, reply
+                     extraction/validation, deterministic local template)
+                     + Web Speech dictation
                      (speech.ts) + speech synthesis (say.ts) + the pure
                      voice-command parser (voiceCommands.ts)
   styles/            Plain CSS, token-driven light + dark themes

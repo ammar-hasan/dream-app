@@ -35,14 +35,14 @@ together on screen.
 
 ## Mode × audience matrix
 
-| | Tool rail | Center | Right panel | Notes |
-|---|---|---|---|---|
-| **Draw** (adult) | full rail (no Select/Lasso/Link) | canvas + zoom pill | options · Adjust · Layers (+ AI panel when open) | the default, MS-Paint-simple |
-| **Design** (adult) | full rail | canvas + zoom pill | Design · Links · Components · options · Adjust · Layers | |
-| **Play** (adult) | hidden | the game stage | cast panel only | shortcuts belong to the game |
-| **Present** | — | full-window stage | — | slideshow/app chrome only |
-| **Draw** (kid) | kid rail (9 tools, palette, sizes) | canvas (no zoom pill) | kid panel | |
-| **Play** (kid) | hidden | the game stage | none | big on-screen controls |
+|                    | Tool rail                          | Center                | Right panel                                             | Notes                        |
+| ------------------ | ---------------------------------- | --------------------- | ------------------------------------------------------- | ---------------------------- |
+| **Draw** (adult)   | full rail (no Select/Lasso/Link)   | canvas + zoom pill    | options · Adjust · Layers (+ AI panel when open)        | the default, MS-Paint-simple |
+| **Design** (adult) | full rail                          | canvas + zoom pill    | Design · Links · Components · options · Adjust · Layers |                              |
+| **Play** (adult)   | hidden                             | the game stage        | cast panel only                                         | shortcuts belong to the game |
+| **Present**        | —                                  | full-window stage     | —                                                       | slideshow/app chrome only    |
+| **Draw** (kid)     | kid rail (9 tools, palette, sizes) | canvas (no zoom pill) | kid panel                                               |                              |
+| **Play** (kid)     | hidden                             | the game stage        | none                                                    | big on-screen controls       |
 
 Kid mode has no mode switch at all — Draw and Play are reached via the
 gamepad button.
@@ -52,35 +52,35 @@ gamepad button.
 Typing in a text field never triggers shortcuts. While a game is running,
 all keys belong to the game.
 
-| Keys | Context | Action |
-|---|---|---|
-| Cmd/Ctrl+Z · Cmd/Ctrl+Shift+Z / Ctrl+Y | anywhere | undo · redo |
-| B · P · S · E | — | brush · pencil · spray · eraser |
-| L · R · O | — | line · rectangle · ellipse |
-| G · W · N · I · T | — | fill · magic wand · stamps · eyedropper · text |
-| C · H · Z | — | crop · pan · zoom tool |
-| M | — | move tool |
-| V | Draw → move; Design → select | mode-aware |
-| K · U | Design only | lasso · link |
-| A | — | toggle the AI panel |
-| + / = · − / _ | — | zoom in · out (the ladder) |
-| Space (hold) | not timeline/present/play | pan |
-| Space | timeline focused | play/pause the animation |
-| Shift (while dragging) | shapes | constrain: 45° line, square, circle |
-| Enter | crop active | apply crop |
-| Esc | priority order | cancel wand → clear selection → cancel crop → cancel text |
-| Cmd/Ctrl+D | Design, selection | duplicate |
-| Cmd/Ctrl+G · +Shift | Design, selection | group · ungroup |
-| Del/Backspace | Design, selection | delete selection |
-| Arrow keys | Design, selection | nudge 1 px (Shift = 10 px) |
-| Del/Backspace | wand region floating | delete the region |
-| → ↓ Space PgDn Enter | Present, slideshow | next slide |
-| ← ↑ PgUp | Present, slideshow | previous slide |
-| Esc | Present | exit to the previous workspace |
-| (navigation keys) | Present, app flavor | ignored — hotspots only |
-| ← → | Catch! running | move hero |
-| Space / ↑ / W / tap | Flappy running | flap |
-| Arrows / WASD / swipe | Maze running | glide |
+| Keys                                   | Context                      | Action                                                    |
+| -------------------------------------- | ---------------------------- | --------------------------------------------------------- |
+| Cmd/Ctrl+Z · Cmd/Ctrl+Shift+Z / Ctrl+Y | anywhere                     | undo · redo                                               |
+| B · P · S · E                          | —                            | brush · pencil · spray · eraser                           |
+| L · R · O                              | —                            | line · rectangle · ellipse                                |
+| G · W · N · I · T                      | —                            | fill · magic wand · stamps · eyedropper · text            |
+| C · H · Z                              | —                            | crop · pan · zoom tool                                    |
+| M                                      | —                            | move tool                                                 |
+| V                                      | Draw → move; Design → select | mode-aware                                                |
+| K · U                                  | Design only                  | lasso · link                                              |
+| A                                      | —                            | toggle the AI panel                                       |
+| + / = · − / _                          | —                            | zoom in · out (the ladder)                                |
+| Space (hold)                           | not timeline/present/play    | pan                                                       |
+| Space                                  | timeline focused             | play/pause the animation                                  |
+| Shift (while dragging)                 | shapes                       | constrain: 45° line, square, circle                       |
+| Enter                                  | crop active                  | apply crop                                                |
+| Esc                                    | priority order               | cancel wand → clear selection → cancel crop → cancel text |
+| Cmd/Ctrl+D                             | Design, selection            | duplicate                                                 |
+| Cmd/Ctrl+G · +Shift                    | Design, selection            | group · ungroup                                           |
+| Del/Backspace                          | Design, selection            | delete selection                                          |
+| Arrow keys                             | Design, selection            | nudge 1 px (Shift = 10 px)                                |
+| Del/Backspace                          | wand region floating         | delete the region                                         |
+| → ↓ Space PgDn Enter                   | Present, slideshow           | next slide                                                |
+| ← ↑ PgUp                               | Present, slideshow           | previous slide                                            |
+| Esc                                    | Present                      | exit to the previous workspace                            |
+| (navigation keys)                      | Present, app flavor          | ignored — hotspots only                                   |
+| ← →                                    | Catch! running               | move hero                                                 |
+| Space / ↑ / W / tap                    | Flappy running               | flap                                                      |
+| Arrows / WASD / swipe                  | Maze running                 | glide                                                     |
 
 (Tool keys do nothing while a modifier is held.)
 
@@ -102,7 +102,7 @@ phrases, precedence rules and the color vocabulary — is in
 ### Draw → animate → export
 
 1. Draw a ball. 2. Click **Animate** — the drawing becomes frame 1.
-3. Duplicate the frame, drag the ball down, repeat (onion skin ghosts the
+2. Duplicate the frame, drag the ball down, repeat (onion skin ghosts the
    previous frame at 30%). 4. Press play — 6 fps, looping. 5. Export →
    **WebM video** (records in real time) or **Sprite sheet** (one PNG
    grid).
@@ -111,8 +111,8 @@ phrases, precedence rules and the color vocabulary — is in
 
 1. Draw a character. 2. Switch to **Play**. 3. In the cast panel, cast
    your character's layer as the Hero (or "Draw it now" from any role).
-4. Press the big play button: 3… 2… 1… — your drawing catches stars.
-5. Game over shows score + best; "Play again!" reruns with your latest
+2. Press the big play button: 3… 2… 1… — your drawing catches stars.
+3. Game over shows score + best; "Play again!" reruns with your latest
    edits.
 
 ### Frames → app
@@ -120,8 +120,10 @@ phrases, precedence rules and the color vocabulary — is in
 1. With animation on, draw screen 1; add a frame; draw screen 2. 2. The
    timeline hints "Link your frames to make an app →". 3. With the Link
    tool, drag over the drawn button on screen 1 → "go to frame 2", fade.
-4. **Preview app**: only the hotspot responds. 5. Export → **Interactive
-   app (.html)** — one file that opens anywhere, offline.
+2. **Preview app**: only the hotspot responds. 5. Export → **Interactive
+   app (.html)** — one file that opens anywhere, offline. 6. Or Export →
+   **Real code (AI) (.html)** — the same app as readable, commented code
+   (AI-generated with your own provider, or locally by Dream AI).
 
 ### BYOK setup
 

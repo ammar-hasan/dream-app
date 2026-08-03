@@ -30,6 +30,7 @@ function makeStore(overrides: Partial<VoiceExecutorStore> = {}) {
     setGameTemplate: vi.fn(),
     previewApp: vi.fn(),
     exportApp: vi.fn(),
+    exportCode: vi.fn(),
     setTool: vi.fn(),
     setColor: vi.fn(),
     setSize: vi.fn(),
@@ -167,6 +168,26 @@ describe('executeVoiceCommand', () => {
       'Exported your app!',
     );
     expect(animated.exportApp).toHaveBeenCalledOnce();
+  });
+
+  it('"export real code" needs frames, then runs the code export', () => {
+    const store = makeStore();
+    expect(executeVoiceCommand({ kind: 'export-code' }, store, () => {})?.message).toBe(
+      'Add some frames and links first.',
+    );
+    expect(store.exportCode).not.toHaveBeenCalled();
+
+    const animated = makeStore({
+      doc: {
+        ...createDocument({ width: 10, height: 10 }),
+        frames: [{ id: 'f1', layers: [createLayer('L1')] }],
+        activeFrameId: 'f1',
+      },
+    });
+    expect(executeVoiceCommand({ kind: 'export-code' }, animated, () => {})?.message).toBe(
+      'Dreaming in code…',
+    );
+    expect(animated.exportCode).toHaveBeenCalledOnce();
   });
 
   it('tool and color commands set tool settings', () => {

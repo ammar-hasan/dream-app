@@ -42,15 +42,15 @@ case-insensitively); anything else paints a cheerful day scene. Scenes are
 procedural landscapes: a sky gradient, a celestial body with a soft glow,
 layered hills, and theme extras (stars, trees, sea bands).
 
-| Theme | Trigger words (any) | Character |
-|---|---|---|
-| Night | night, star, moon, space, galaxy, midnight | deep indigo sky, crescent moon, ~140 stars |
-| Sunset | sunset, sunrise, dusk, dawn, evening | violet-to-peach sky, low glowing sun |
-| Forest | forest, tree, woods, jungle, pine | soft green sky, tree line (count scales with width) |
-| Ocean | ocean, sea, beach, water, wave, island | sky, sand band, two-tone sea |
-| Mountain | mountain, snow, winter, alps, peak | pale wintry sky, snow-capped ranges |
-| Desert | desert, cactus, dune, sand | warm cream sky, dune layers |
-| Day (fallback) | — | blue sky, sun, green hills |
+| Theme          | Trigger words (any)                        | Character                                           |
+| -------------- | ------------------------------------------ | --------------------------------------------------- |
+| Night          | night, star, moon, space, galaxy, midnight | deep indigo sky, crescent moon, ~140 stars          |
+| Sunset         | sunset, sunrise, dusk, dawn, evening       | violet-to-peach sky, low glowing sun                |
+| Forest         | forest, tree, woods, jungle, pine          | soft green sky, tree line (count scales with width) |
+| Ocean          | ocean, sea, beach, water, wave, island     | sky, sand band, two-tone sea                        |
+| Mountain       | mountain, snow, winter, alps, peak         | pale wintry sky, snow-capped ranges                 |
+| Desert         | desert, cactus, dune, sand                 | warm cream sky, dune layers                         |
+| Day (fallback) | —                                          | blue sky, sun, green hills                          |
 
 ### Edit — the keyword recipes
 
@@ -58,21 +58,21 @@ The first matching rule wins; its values override a gentle default warm-up
 (saturation +15, brightness +5, sepia +10) — unmentioned sliders keep the
 default.
 
-| Words | Recipe |
-|---|---|
-| black and white, grey/gray, mono | grayscale 100 |
-| vintage, old, retro, sepia | sepia 70, contrast 15, brightness −5 |
-| warm, sunset, cosy/cozy, golden | sepia 25, saturation 10, brightness 5 |
-| cool, cold, blue, winter, icy | hue −15, saturation 10, brightness 5 |
-| bright, lighten, sunnier | brightness 25 |
-| dark, night, moody, dim | brightness −25 |
-| contrast, pop, punch | contrast 30 |
-| blur, soft, dreamy, fog | blur 3 |
-| sharp, crisp, clear | sharpen 60 |
-| invert, negative | invert 100 |
-| colorful, vivid, saturate | saturation 40 |
-| hue, psychedelic, rainbow | hue 120, saturation 20 |
-| (no keyword) | the default warm-up only |
+| Words                            | Recipe                                |
+| -------------------------------- | ------------------------------------- |
+| black and white, grey/gray, mono | grayscale 100                         |
+| vintage, old, retro, sepia       | sepia 70, contrast 15, brightness −5  |
+| warm, sunset, cosy/cozy, golden  | sepia 25, saturation 10, brightness 5 |
+| cool, cold, blue, winter, icy    | hue −15, saturation 10, brightness 5  |
+| bright, lighten, sunnier         | brightness 25                         |
+| dark, night, moody, dim          | brightness −25                        |
+| contrast, pop, punch             | contrast 30                           |
+| blur, soft, dreamy, fog          | blur 3                                |
+| sharp, crisp, clear              | sharpen 60                            |
+| invert, negative                 | invert 100                            |
+| colorful, vivid, saturate        | saturation 40                         |
+| hue, psychedelic, rainbow        | hue 120, saturation 20                |
+| (no keyword)                     | the default warm-up only              |
 
 ### Feedback — the rule list
 
@@ -80,17 +80,17 @@ Rules evaluate the actual document (palette, coverage, contrast, warmth,
 darkness). The first matching suggestions are returned with kind wording;
 when nothing applies: "Honestly? This is looking lovely. Keep going!"
 
-| Condition | Observation gist | Apply action |
-|---|---|---|
-| canvas blank | "the best place to start" | — |
-| coverage < 12% | lots of empty space | — |
-| contrast very low | looks a little flat | contrast +30 |
-| palette chilly (warmth < −0.08) | a little chilly | sepia 25, saturation 10, brightness 5 |
-| palette very warm (warmth > 0.3) | suggest a cool accent | hue −15, saturation 10, brightness 5 |
-| very dark overall | brighten it | brightness +20 |
-| selection sits >10% off-center | center it | center selection |
-| everything on one layer (≥5 marks) | suggest layers | — |
-| canvas > 85% full | suggest breathing room | — |
+| Condition                          | Observation gist          | Apply action                          |
+| ---------------------------------- | ------------------------- | ------------------------------------- |
+| canvas blank                       | "the best place to start" | —                                     |
+| coverage < 12%                     | lots of empty space       | —                                     |
+| contrast very low                  | looks a little flat       | contrast +30                          |
+| palette chilly (warmth < −0.08)    | a little chilly           | sepia 25, saturation 10, brightness 5 |
+| palette very warm (warmth > 0.3)   | suggest a cool accent     | hue −15, saturation 10, brightness 5  |
+| very dark overall                  | brighten it               | brightness +20                        |
+| selection sits >10% off-center     | center it                 | center selection                      |
+| everything on one layer (≥5 marks) | suggest layers            | —                                     |
+| canvas > 85% full                  | suggest breathing room    | —                                     |
 
 The summary always says what it sees: "I see N marks on L layers, covering
 about X% of the canvas. The colors feel warm and cosy / cool and calm /
@@ -99,10 +99,27 @@ nicely balanced."
 ### The free tier
 
 **20 free Dream AI tries per day** (local calendar day, rolls over at
-midnight), counted across Create/Edit/Feedback and shown subtly in the
+midnight), counted across Create/Edit/Feedback **and the make-real code
+export** (`features/app-mode.md`) and shown subtly in the
 panel ("N free tries left today"). At zero: "That is all the free dreams
 for today! Add your own AI in Settings below for unlimited magic."
 Connecting your own provider makes the counter disappear — unlimited.
+
+## Code generation (make real)
+
+The **Real code (AI)** export (`features/app-mode.md`) is the assistant's
+fourth capability, exercised from the export dialog rather than the panel:
+
+- Any **chat-capable provider** can write the code: the app is described
+  structurally (screens, texts, shape boxes, the navigation graph — never
+  pixels) and the provider replies with ONE self-contained HTML file. The
+  conversation may open with a system message that steers this task.
+- **Dream AI** generates the code itself with a deterministic local
+  template — free, offline, honestly labeled — counting against the free
+  tier as above; BYOK stays unlimited.
+- Replies that are not one self-contained HTML document (external web
+  references are never allowed) are rejected with a friendly error
+  suggesting a retry or the deterministic interactive-app export.
 
 ## BYOK — bring your own key
 
