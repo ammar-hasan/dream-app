@@ -310,6 +310,15 @@ export const MazeGameIcon = (p: IconProps) => (
   </svg>
 );
 
+/** Dream Jumper template glyph: a hero hopping toward a flag. */
+export const PlatformerGameIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M3 19h7v-4h6v4h5" />
+    <circle cx="7" cy="10" r="2.5" />
+    <path d="M18 14V4M18 4h4l-2 2 2 2h-4" />
+  </svg>
+);
+
 export const SoundIcon = (p: IconProps) => (
   <svg {...base(p)}>
     <path d="M11 5 6.5 9H3v6h3.5L11 19Z" fill="currentColor" stroke="none" />

@@ -12,12 +12,7 @@
  */
 
 import { mulberry32 } from '../engine/spray';
-import type {
-  DreamDocument,
-  GameCast,
-  GameSettings,
-  GameTemplateId,
-} from '../engine/types';
+import type { DreamDocument, GameCast, GameSettings, GameTemplateId } from '../engine/types';
 
 export type Rng = () => number;
 
@@ -47,7 +42,12 @@ export const KID_GAME_SETTINGS: GameSettings = {
 };
 
 /** Every template id a document can name. */
-export const GAME_TEMPLATE_IDS: readonly GameTemplateId[] = ['catch', 'flappy', 'maze'];
+export const GAME_TEMPLATE_IDS: readonly GameTemplateId[] = [
+  'catch',
+  'flappy',
+  'maze',
+  'platformer',
+];
 
 export function isGameTemplateId(id: unknown): id is GameTemplateId {
   return typeof id === 'string' && (GAME_TEMPLATE_IDS as readonly string[]).includes(id);

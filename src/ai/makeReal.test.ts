@@ -141,7 +141,7 @@ describe('buildAppDescription', () => {
     expect(s2.elements[0]).toMatchObject({ kind: 'drawing', color: '#3b82f6' });
   });
 
-  it('summarizes images and fills as boxes, never pixels', () => {
+  it('keeps a structure-only image box when no encoded raster asset is supplied', () => {
     const doc = appDoc();
     doc.frames![0].layers[0] = createLayer('L', [
       imageOp(10, 20, 8, 6),
@@ -153,6 +153,18 @@ describe('buildAppDescription', () => {
       { kind: 'fill', x: 0, y: 0, width: 320, height: 240, color: '#22c55e' },
     ]);
     expect(JSON.stringify(s1)).not.toContain('data');
+  });
+
+  it('attaches only valid inline PNG assets when supplied by the browser layer', () => {
+    const doc = appDoc();
+    const image = imageOp(10, 20, 8, 6);
+    doc.frames![0].layers[0] = createLayer('L', [image]);
+    const png = 'data:image/png;base64,iVBORw0KGgo=';
+    const element = buildAppDescription(doc, { [image.id]: png }).screens[0].elements[0];
+    expect(element).toMatchObject({ kind: 'image', asset: png });
+
+    const unsafe = buildAppDescription(doc, { [image.id]: 'javascript:alert(1)' });
+    expect(unsafe.screens[0].elements[0]).not.toHaveProperty('asset');
   });
 
   it('drops broken hotspots but keeps valid ones', () => {
@@ -305,6 +317,17 @@ describe('buildTemplateAppHtml', () => {
   it('opens on the frame that was active at export time', () => {
     const html = buildTemplateAppHtml(buildAppDescription(appDoc()));
     expect(html).toContain("var START='screen-2'");
+  });
+
+  it('draws imported images from embedded PNG pixels instead of placeholders', () => {
+    const doc = appDoc();
+    const image = imageOp(10, 20, 8, 6);
+    doc.frames![0].layers[0] = createLayer('L', [image]);
+    const png = 'data:image/png;base64,iVBORw0KGgo=';
+    const html = buildTemplateAppHtml(buildAppDescription(doc, { [image.id]: png }));
+    expect(html).toContain(`<img class="shape" src="${png}"`);
+    expect(html).toContain('width:16px;height:12px');
+    expect(html).not.toContain('image lived here');
   });
 
   it('is honest, self-contained and gift-wrapped', () => {

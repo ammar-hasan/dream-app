@@ -7,6 +7,90 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Social-ready video export** (slice 27): WebM and natively supported MP4
+  exports can now be Original, Vertical 9:16, Square 1:1 or Landscape 16:9 at
+  720p. Dream contains the complete canvas without cropping or stretching,
+  requests a smooth 30 fps recording stream while preserving the chosen
+  flipbook timing, and names shaped files clearly. Every frame can carry a
+  160-character caption, edited while exporting with previous/next and
+  copy-to-all controls, burned over a readable safe-area backing and saved as
+  one undoable project edit. Captions also appear in Slide settings and the
+  timeline. EN/AR copy, exact request/geometry tests and a real browser video
+  proof ship together.
+
+- **Real image fidelity in AI paths:** OpenAI-compatible settings now expose a
+  separate image-generation model. The official OpenAI endpoint defaults a
+  blank value to `gpt-image-2`, sends a supported low-cost draft request
+  without the legacy response-format field, and normalizes the returned image
+  to Dream's exact canvas. Real Code exports now embed imported and AI-made
+  raster pictures as inline PNG image elements instead of placeholder boxes,
+  keeping both local and BYOK output self-contained. Live OpenAI calls and
+  deterministic browser tests cover generation, decoding and painted pixels.
+
+- **Automated accessibility gate** (slice 26): browser checks now scan Draw,
+  Design, Play, slide settings and Presenter for serious/critical violations.
+  The first strict run found six light-theme contrast failures; secondary text
+  is now darker and accent labels/solid controls use dedicated readable tokens,
+  clearing WCAG AA without changing accent fills or borders. The gate runs with
+  the existing end-to-end suite and adds no production dependency.
+
+- **Native MP4 animation export** (slice 25, completing slice 5): animated
+  documents gain an MP4 option only when the browser reports native
+  `video/mp4` recording support. It reuses the exact frame timing, progress
+  and optional narration mix from WebM and always downloads a real `.mp4`
+  container—never relabeled WebM. WebM and sprite-sheet paths remain
+  unchanged; unsupported browsers see no dead MP4 control. EN/AR copy and
+  injectable codec-selection tests ship in parity with no new dependency.
+
+- **Presentation depth** (slice 24, completing slice 6 and research backlog
+  #9): each frame can carry an enter transition (none/fade/slide), an optional
+  1–60 second auto-advance duration and presenter-only speaker notes. The timeline's
+  Slide dialog saves all three as one undoable edit and duplication copies the
+  settings. Present mode adds session-only Auto (pauses on untimed/final
+  slides) and Presenter controls, with a notes/timing/next-slide panel.
+  Legacy decks remain instant and manual; reduced-motion makes transitions
+  immediate; EN/AR copy and `.dream` round-tripping ship in parity.
+
+- **Dream Jumper** (slice 23, completing research backlog #2): a fourth Play
+  template where the user's hero runs and jumps across a short seeded course,
+  collects castable stars and reaches a finish flag. Bounded gaps and height
+  changes keep courses approachable; forgiving one-way platforms avoid edge
+  snags; falls spend a life and respawn while collected stars stay collected.
+  Hero, Collectible, Platforms and Background are castable, with procedural
+  stand-ins. The side-scrolling canvas has a following camera, score/lives,
+  win/game-over cards, sounds and large kid controls. EN+AR labels and “play
+  platformer” / «العب المنصات» voice commands ship in parity, and the offline
+  game maker understands run/jump/platform/flag requests.
+- **Make a game from words** (slice 22, research backlog #2): the Play panel
+  now accepts a short English or Arabic request such as “My Rocket flies
+  through Clouds, nice and slow.” Dream deterministically selects Catch!,
+  Flappy Dream or Maze Runner, interprets easy/hard, fast/slow, many/few and
+  explicit lives/shields, and casts any layers named in the request into
+  semantic roles. The visible picker, cast and settings show exactly what was
+  understood before the user presses Play. The feature-detected prompt mic
+  enables the same flow by voice in the active English/Arabic locale. It is
+  fully offline, makes no AI request, spends no free try and never invents
+  unsupported mechanics.
+- **MCP authoring and registry readiness** (slice 21, research backlog #8):
+  `dream.add_layer` and `dream.add_shape` let agents build a named layer with
+  validated lines, rectangles and ellipses on the active frame, alongside the
+  existing text, inspection, rendering and app-export tools. The demo and
+  dogfood flow now exercise the complete authoring round-trip. The standalone
+  server is prepared as the scoped public package `@ammar-hasan/dream-mcp`
+  with matching `io.github.ammar-hasan/dream-mcp` registry identity, MIT
+  license, curated tarball and schema-valid registry metadata. Publishing to
+  npm or the registry remains an explicit human-approved step.
+- **Generative fill and erase** (slice 20, research backlog #5): BYOK
+  OpenAI-compatible providers can opt into `/images/edits` with an edits-model
+  setting (current OpenAI example: `gpt-image-2`). Dream sends a PNG image plus
+  same-size alpha mask and prompt as multipart data, decodes the base64 result,
+  restores every pixel outside the Design-mode selection, and bakes the result
+  as one undoable edit. With no selection the whole layer is editable.
+  Edits-capable BYOK setups also get one-tap **Erase this**, which removes the
+  selected object and fills the gap naturally. Blank edits model means the
+  capability stays off; built-in Dream AI remains honestly filter-based. The
+  setting persists, keys retain their session-only-by-default rules, and BYOK
+  edits remain outside the 20/day free counter.
 - **Voice narration** (slice 19, research backlog #4): record one voice take
   over your animation from the timeline's mic button — recording starts
   playback so the timing is natural, with a pulsing red dot, elapsed time and
@@ -40,10 +124,10 @@ All notable changes to Dream are documented here. The format is based on
   حقيقي» (Arabic) for the code export.
 - The living spec (`spec/`): an implementation-agnostic, modular product
   specification — concepts, data contracts, per-feature behavior rules,
-  experience map, visual identity, integrations, and a 90-point acceptance
+  experience map, visual identity, integrations, and an acceptance
   checklist — detailed enough to rebuild Dream from the spec alone, in any
   stack. AGENTS.md rule 12 makes spec updates part of every behavior change.
-  (The checklist grew to 94 points with the make-real export below.)
+  (The checklist began at 90 points and now contains 111.)
 - Play mode game templates: **Flappy Dream** (flap through scrolling gates,
   one hit ends the run, 3 shields in kid mode) and **Maze Runner** (seeded,
   always-solvable generated mazes with level-ups) join **Catch!** behind a

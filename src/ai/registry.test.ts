@@ -55,30 +55,48 @@ describe('registry basics', () => {
 describe('settings persistence', () => {
   it('persists provider settings and the active id in localStorage', () => {
     configureOpenAIProvider(
-      { baseUrl: 'https://openrouter.ai/api/v1', model: 'some/model', supportsImages: true },
+      {
+        baseUrl: 'https://openrouter.ai/api/v1',
+        model: 'some/model',
+        editsModel: 'gpt-image-2',
+        supportsImages: true,
+      },
       'sk-abc',
     );
     setActiveProvider('openai-compatible');
 
     const config = JSON.parse(localStorage.getItem(CONFIG_KEY) ?? '{}') as {
       activeId: string;
-      providers: Record<string, { baseUrl?: string; model?: string; supportsImages?: boolean }>;
+      providers: Record<
+        string,
+        { baseUrl?: string; model?: string; editsModel?: string; supportsImages?: boolean }
+      >;
     };
     expect(config.activeId).toBe('openai-compatible');
     expect(config.providers['openai-compatible'].baseUrl).toBe('https://openrouter.ai/api/v1');
     expect(config.providers['openai-compatible'].model).toBe('some/model');
+    expect(config.providers['openai-compatible'].editsModel).toBe('gpt-image-2');
     expect(config.providers['openai-compatible'].supportsImages).toBe(true);
   });
 
   it('rebuilds the BYOK provider from storage (simulated reload)', () => {
-    configureOpenAIProvider({ baseUrl: 'http://localhost:11434/v1', model: 'llama3' }, 'sk-abc');
+    configureOpenAIProvider(
+      {
+        baseUrl: 'http://localhost:11434/v1',
+        model: 'llama3',
+        editsModel: 'gpt-image-2',
+      },
+      'sk-abc',
+    );
     setActiveProvider('openai-compatible');
 
     // A reload re-runs init against the same storage: provider and active id return.
     initAIFromStorage();
     expect(getActiveProvider().id).toBe('openai-compatible');
     expect(getActiveProvider().name).toMatch(/openai/i);
+    expect(getActiveProvider().capabilities.editImage).toBe(true);
     expect(getProviderSettings('openai-compatible').model).toBe('llama3');
+    expect(getProviderSettings('openai-compatible').editsModel).toBe('gpt-image-2');
   });
 });
 

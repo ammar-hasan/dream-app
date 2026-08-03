@@ -35,6 +35,8 @@ import {
   replaceLayerContentCommand,
   resizeDocumentCommand,
   setAnimationEnabledCommand,
+  setFrameCaptionsCommand,
+  setFramePresentationCommand,
   transformLayerCommand,
   translateLayerCommand,
   updateHotspotCommand,
@@ -108,6 +110,7 @@ import type {
   Point,
   RasterPatch,
   Rect,
+  SlidePresentation,
   ToolId,
   ToolSettings,
   WorkspaceMode,
@@ -344,6 +347,10 @@ export interface DreamStore {
   duplicateFrame(): void;
   deleteFrame(id: string): void;
   moveFrame(id: string, toIndex: number): void;
+  /** Edit per-slide transition, timing and notes (one undoable command). */
+  setFramePresentation(frameId: string, presentation: SlidePresentation | undefined): void;
+  /** Edit frame-synchronized video captions as one undoable command. */
+  setFrameCaptions(captions: readonly string[]): void;
   /** Playback/onion-skin preferences (fps, loop, onion…); not undoable. */
   setAnimation(patch: Partial<AnimationSettings>): void;
   /** Save/replace (or clear, with null) the narration take; not undoable. */
@@ -384,7 +391,7 @@ export interface DreamStore {
   setGameCast(role: keyof GameCast, layerId: string | null): void;
   /** Difficulty knobs (fall speed, spawn interval, lives); not undoable. */
   setGameSettings(patch: Partial<GameSettings>): void;
-  /** Choose the game template (Catch!, Flappy Dream, Maze Runner). */
+  /** Choose the game template (Catch!, Flappy Dream, Maze Runner, Dream Jumper). */
   setGameTemplate(template: GameTemplateId): void;
   /** Add a named layer for a game role and make it active; returns its id. */
   createCastLayer(name: string): string;
@@ -1466,6 +1473,39 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       const clamped = Math.max(0, Math.min(toIndex, doc.frames.length - 1));
       if (doc.frames.findIndex((f) => f.id === id) === clamped) return;
       execute(moveFrameCommand(doc, id, clamped));
+    },
+
+    setFramePresentation: (frameId, presentation) => {
+      const { doc } = get();
+      const current = doc.frames?.find((frame) => frame.id === frameId)?.presentation;
+      if (!doc.frames?.some((frame) => frame.id === frameId)) return;
+      if (
+        current?.transition === presentation?.transition &&
+        current?.durationMs === presentation?.durationMs &&
+        current?.notes === presentation?.notes &&
+        current?.caption === presentation?.caption
+      ) {
+        return;
+      }
+      execute(setFramePresentationCommand(doc, frameId, presentation));
+    },
+
+    setFrameCaptions: (captions) => {
+      const { doc } = get();
+      if (!doc.frames) return;
+      const updates = doc.frames.map((frame, index) => ({
+        frameId: frame.id,
+        caption: captions[index]?.trim() || undefined,
+      }));
+      if (
+        updates.every(
+          ({ frameId, caption }) =>
+            doc.frames?.find((frame) => frame.id === frameId)?.presentation?.caption === caption,
+        )
+      ) {
+        return;
+      }
+      execute(setFrameCaptionsCommand(doc, updates));
     },
 
     setAnimation: (patch) =>

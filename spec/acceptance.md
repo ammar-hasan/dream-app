@@ -161,14 +161,16 @@ holds.
 59. GIVEN an animated document WHEN "Real code (AI)" is exported with
     Dream AI THEN the downloaded `{name}-code.html` contains one section
     per screen, the texts as real text, a button per hotspot wired to its
-    target screen, no external web references, the header comment "Made
-    with Dream — where drawings come alive." and the honest "generated
-    locally by Dream AI" label — and one free try is spent.
+    target screen, imported and AI-made raster pictures as inline real image
+    elements, no external web references, the header comment "Made with
+    Dream — where drawings come alive." and the honest "generated locally
+    by Dream AI" label — and one free try is spent.
 60. GIVEN a chat-capable BYOK provider WHEN the code export runs THEN the
-    provider receives the structured app description (never pixels) and
-    only a reply containing one self-contained HTML file is downloaded; a
-    refusal or code with external links is rejected with a friendly error
-    suggesting a retry or the deterministic interactive-app export.
+    provider receives the structured app description plus inline PNG pixels
+    for its visible raster pictures, and only a reply containing one
+    self-contained HTML file is downloaded; a refusal or code with external
+    links is rejected with a friendly error suggesting a retry or the
+    deterministic interactive-app export.
 61. GIVEN the code export WHEN the daily free tier is spent THEN it is
     refused kindly with the BYOK path offered — the same 20/day counter as
     Create/Edit/Feedback; with BYOK active the export is unlimited.
@@ -190,93 +192,148 @@ holds.
 66. GIVEN 20 Dream AI actions in a day THEN the 21st is refused kindly
     with the BYOK path offered; the counter resets the next local
     calendar day.
-67. GIVEN a BYOK provider without image support THEN Create is disabled
-    with an explanation and Edit always is; feedback still works.
+67. GIVEN a BYOK provider without image-generation support THEN Create is
+    disabled with an explanation; Edit is independently disabled unless an
+    edits model is configured, and feedback still works.
 68. GIVEN an API key saved without "remember key" WHEN the app closes and
-    reopens THEN the key is gone but URL/model remain; keys never appear
-    in logs, settings blobs or error messages.
+    reopens THEN the key is gone but URL and model settings remain; keys
+    never appear in logs, settings blobs or error messages.
 69. GIVEN "Test connection" with a bad URL THEN the error asks "is the
     URL right and the app running?" — no status codes, no jargon.
+70. GIVEN a BYOK endpoint with a configured edits model WHEN a selected-area
+    edit runs THEN the provider receives the active-layer image, a same-size
+    alpha mask and the prompt; only pixels inside the selection box can change,
+    and one Undo restores the exact layer.
+71. GIVEN that edits model is blank WHEN BYOK is active THEN generative Edit
+    stays disabled with the working offline alternative offered; the setting
+    persists when present without ever placing the API key in the settings.
+72. GIVEN an edits-capable BYOK provider WHEN **Erase this** is pressed THEN
+    the selection is removed and naturally filled using the neutral erase
+    instruction, the action is undoable, and it spends no Dream AI free try;
+    Dream AI never presents this as a generative erase.
 
 ## H. Accessibility, i18n & voice
 
-70. GIVEN kid mode turned on THEN the app is in Draw mode with the brush,
+73. GIVEN kid mode turned on THEN the app is in Draw mode with the brush,
     the rail shows the 9 kid tools, the 12-color palette and 3 dot sizes,
     and both voices are on; turning it off restores the adult UI.
-71. GIVEN kid mode WHEN hovering the brush THEN "Brush!" is spoken (where
+74. GIVEN kid mode WHEN hovering the brush THEN "Brush!" is spoken (where
     synthesis exists) and no tooltip shows.
-72. GIVEN comfort mode THEN base text is 16 px, targets ≥ 44 px, and
+75. GIVEN comfort mode THEN base text is 16 px, targets ≥ 44 px, and
     contrast strengthens in the current theme — composing with dark mode,
     kid mode and RTL.
-73. GIVEN "um, can you please undo?" spoken THEN one undo happens and the
+76. GIVEN "um, can you please undo?" spoken THEN one undo happens and the
     status confirms "Took that back!".
-74. GIVEN "clear" spoken THEN the app asks for a spoken yes before
+77. GIVEN "clear" spoken THEN the app asks for a spoken yes before
     wiping; "no" cancels and keeps everything.
-75. GIVEN the Arabic UI WHEN "تراجع" is spoken THEN undo happens; "undo"
+78. GIVEN the Arabic UI WHEN "تراجع" is spoken THEN undo happens; "undo"
     still works too; "شغّل التناظر" turns mirroring on and never starts
     playback.
-76. GIVEN "fill red" THEN the color becomes red `#ef4444` and the fill
+79. GIVEN "fill red" THEN the color becomes red `#ef4444` and the fill
     tool activates.
-77. GIVEN "bigger" at size 8 THEN the size becomes 12; at 64 it stays 64.
-78. GIVEN Arabic selected THEN the whole shell mirrors to RTL instantly
+80. GIVEN "bigger" at size 8 THEN the size becomes 12; at 64 it stays 64.
+81. GIVEN Arabic selected THEN the whole shell mirrors to RTL instantly
     without reload, and every string has an Arabic value (no English
     leakage, no missing keys).
 
 ## I. Persistence, files & offline
 
-79. GIVEN an edit WHEN 800 ms pass without further edits THEN the project
+82. GIVEN an edit WHEN 800 ms pass without further edits THEN the project
     is saved on-device and the dirty dot clears.
-80. GIVEN a drawing WHEN the app is closed and reopened THEN it restores
+83. GIVEN a drawing WHEN the app is closed and reopened THEN it restores
     from the last-opened pointer after the splash.
-81. GIVEN a `.dream` export imported into a fresh Dream THEN document,
+84. GIVEN a `.dream` export imported into a fresh Dream THEN document,
     frames, hotspots, game setup and narration are identical (opaque pixels
     exactly; vector content exactly).
-82. GIVEN a `.dream` file with unknown extra fields WHEN loaded and
+85. GIVEN a `.dream` file with unknown extra fields WHEN loaded and
     re-saved THEN the unknown fields survive verbatim.
-83. GIVEN a corrupt or version-2 `.dream` file WHEN opened THEN a plain
+86. GIVEN a corrupt or version-2 `.dream` file WHEN opened THEN a plain
     error names the problem and nothing changes.
-84. GIVEN the app loaded once WHEN the network is killed and the app
+87. GIVEN the app loaded once WHEN the network is killed and the app
     reloaded THEN it boots and fully works offline.
-85. GIVEN a new version downloaded WHEN the user hasn't pressed Refresh
+88. GIVEN a new version downloaded WHEN the user hasn't pressed Refresh
     THEN the old version keeps running; pressing Refresh swaps once.
-86. GIVEN the install offer dismissed THEN it never returns on that
+89. GIVEN the install offer dismissed THEN it never returns on that
     device.
-87. GIVEN the component library WHEN a component is saved in project A
+90. GIVEN the component library WHEN a component is saved in project A
     THEN it is available in project B.
 
 ## J. Cross-cutting
 
-88. GIVEN any document mutation WHEN undone and redone THEN the result is
+91. GIVEN any document mutation WHEN undone and redone THEN the result is
     bit-identical to never having undone.
-89. GIVEN undo history WHEN the user changes workspace mode, fps, onion
+92. GIVEN undo history WHEN the user changes workspace mode, fps, onion
     settings, game casting, the narration or the active frame THEN none of
     those appear as undo steps — but frame add/duplicate/delete/reorder do.
-90. GIVEN a project saved in Play or Present mode WHEN reopened THEN it
+93. GIVEN a project saved in Play or Present mode WHEN reopened THEN it
     opens in Draw.
-91. GIVEN a hidden feature (no speech recognition, no audio, no
+94. GIVEN a hidden feature (no speech recognition, no audio, no
     recorder) THEN its button simply isn't there — never an error.
-92. GIVEN reduced-motion OS preference THEN every animation and
+95. GIVEN reduced-motion OS preference THEN every animation and
     transition in the app and its exports is effectively instant.
-93. GIVEN the dark theme THEN every surface, panel, dialog and tooltip
+96. GIVEN the dark theme THEN every surface, panel, dialog and tooltip
     uses the dark tokens; the choice persists.
-94. GIVEN any list of projects or components THEN it sorts by
+97. GIVEN any list of projects or components THEN it sorts by
     last-modified, newest first.
-95. GIVEN an animated document WHEN the timeline mic is tapped THEN playback
+98. GIVEN an animated document WHEN the timeline mic is tapped THEN playback
     starts and the voice records with a pulsing indicator and elapsed time;
     stopping saves the take, re-recording asks first (never in kid mode),
     deleting removes it, and undo never touches the take.
-96. GIVEN a document with a narration WHEN the animation plays or a Present
+99. GIVEN a document with a narration WHEN the animation plays or a Present
     session opens THEN the take plays once from the start; the mute toggle
     silences it in both places and the choice is session state.
-97. GIVEN a document with a narration WHEN exported to WebM THEN the video
-    carries the voice as its audio track; without a take the export behaves
-    exactly as before (silent).
-98. GIVEN a browser without audio recording THEN the timeline mic simply
-    isn't there; a denied or busy microphone gets a friendly, jargon-free
-    message and nothing is recorded.
-99. GIVEN "record narration" spoken WHEN frames exist THEN recording starts;
-    "stop recording" saves the take, "delete narration" removes it, and
-    «أوقف التسجيل» / «امسح الصوت» never trigger stop or clear.
+100.  GIVEN a document with a narration WHEN exported to WebM THEN the video
+      carries the voice as its audio track; without a take the export behaves
+      exactly as before (silent).
+101.  GIVEN a browser without audio recording THEN the timeline mic simply
+      isn't there; a denied or busy microphone gets a friendly, jargon-free
+      message and nothing is recorded.
+102.  GIVEN "record narration" spoken WHEN frames exist THEN recording starts;
+      "stop recording" saves the take, "delete narration" removes it, and
+      «أوقف التسجيل» / «امسح الصوت» never trigger stop or clear.
+103.  GIVEN a `.dream` project through the agent surface WHEN the agent adds a
+      layer, draws one filled or outlined shape and adds text to it THEN the app
+      opens the same layer stack and content, the project summary counts both
+      operations, and the rendered PNG contains them.
+104.  GIVEN layers named Rocket and Clouds WHEN "My Rocket flies through Clouds,
+      nice and slow" is typed or dictated and submitted in Play THEN Flappy Dream
+      is selected, Rocket is the hero, Clouds are the obstacle, flight speed
+      becomes gentle, and the ready message appears without a network request or
+      an automatic game start.
+105.  GIVEN Dream Jumper WHEN a seeded run starts THEN neighboring platforms
+      remain within the jump envelope, each star scores once, a fall spends one
+      life and respawns, reaching the flag wins, and "play platformer" / «العب
+      المنصات» selects and starts the same template.
+106.  GIVEN a frame WHEN its slide transition, duration and speaker notes are
+      saved THEN they persist together as one undoable edit, redo restores
+      them, and duplicating the frame copies them without linking future edits.
+107.  GIVEN a slideshow WHEN entering a slide with fade or slide selected THEN
+      click, keyboard and automatic navigation use that transition; none and
+      reduced-motion change slides instantly.
+108.  GIVEN Auto is on WHEN a slide has a duration THEN the deck advances after
+      that delay; an untimed slide and the final slide pause without wrapping.
+109.  GIVEN Presenter view is on WHEN the slide changes THEN its presenter panel
+      shows the current slide's notes and timing plus the next slide number;
+      the audience canvas never contains the notes.
+110.  GIVEN a browser that reports native MP4 recording WHEN an animated
+      document is exported as MP4 THEN every frame follows the chosen flipbook
+      timing in a real `.mp4` container, narration is included when present,
+      and browsers without support never show the MP4 option.
+111.  GIVEN the default, Design, Play, slide-settings and Presenter surfaces
+      in either theme WHEN their text and controls are measured THEN normal
+      text, secondary labels and accent labels meet WCAG AA contrast.
+112.  GIVEN an animated document with frame captions WHEN Vertical, Square or
+      Landscape video is exported THEN the complete artwork is contained
+      without cropping or stretching at 720p, captions are burned into their
+      matching frames over a readable backing, the stream requests 30 fps while
+      preserving the chosen flipbook timing, the filename names its shape, and
+      one Undo removes the complete caption edit made in the export dialog.
+113.  GIVEN the official OpenAI endpoint with image creation enabled WHEN no
+      image model is entered and a picture is requested THEN the current GPT
+      Image model receives a supported efficient draft request, no legacy
+      response-format option is sent, and the returned picture fills Dream's
+      exact canvas dimensions; a separately configured compatible endpoint
+      continues to receive its requested model and canvas size.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 
@@ -295,14 +352,14 @@ holds.
    save as component → new project → insert the component → export PNG.
 7. **Zǐxuān (28):** 12-frame bouncing ball (duplicate + onion skin) →
    play at 6 fps → export WebM and a sprite sheet.
-8. **Maria (32):** export `.dream` → agent reads it, adds text, renders a
-   PNG, exports the app HTML via the dream-mcp tools → re-import the
-   `.dream` unchanged elsewhere.
+8. **Maria (32):** export `.dream` → agent reads it, adds a layer with a shape
+   and text, renders a PNG, exports the app HTML via the dream-mcp tools →
+   re-import the `.dream` unchanged elsewhere.
 9. **Aleksandr (25):** keyboard-only: tool keys, marquee, snap-align,
    Cmd+D, nudge, group — a full layout without touching the mouse.
-10. **Ahmed (42):** draw a scene per frame → Present slideshow → app
-    flavor with linked frames → export the standalone HTML → it opens
-    offline on a friend's phone.
+10. **Ahmed (42):** draw a scene per frame → record narration → add readable
+    frame captions → export a vertical 9:16 WebM or native MP4 → the complete
+    artwork, voice and captions play on a friend's phone.
 
 ## L. Visual & feel checkpoints
 

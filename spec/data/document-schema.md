@@ -99,11 +99,21 @@ bytes, length `width × height × 4`, row-major.
 
 ## Frame
 
-| Attribute   | Type      | Rule                           |
-| ----------- | --------- | ------------------------------ |
-| `id`        | string    |                                |
-| `layers`    | Layer[]   | the frame's own complete stack |
-| `hotspots?` | Hotspot[] | absent on frames without links |
+| Attribute       | Type              | Rule                                                   |
+| --------------- | ----------------- | ------------------------------------------------------ |
+| `id`            | string            |                                                        |
+| `layers`        | Layer[]           | the frame's own complete stack                         |
+| `hotspots?`     | Hotspot[]         | absent on frames without links                         |
+| `presentation?` | SlidePresentation | absent when every slide/delivery setting is at default |
+
+## SlidePresentation
+
+| Attribute     | Type                      | Default  | Rule                                                              |
+| ------------- | ------------------------- | -------- | ----------------------------------------------------------------- |
+| `transition?` | `'none'\|'fade'\|'slide'` | `'none'` | how this slide enters                                             |
+| `durationMs?` | number                    | absent   | 1,000–60,000; absent means manual advance                         |
+| `notes?`      | string                    | absent   | presenter-only plain-text speaker notes                           |
+| `caption?`    | string                    | absent   | on-screen video caption; authoring controls cap at 160 characters |
 
 ## Hotspot
 
@@ -138,14 +148,14 @@ Takes over ~10 MB earn a size warning in the UI.
 
 ## GameSetup
 
-| Attribute   | Type                        | Default   | Rule                                                  |
-| ----------- | --------------------------- | --------- | ----------------------------------------------------- |
-| `template?` | `'catch'\|'flappy'\|'maze'` | `'catch'` | unknown/absent → Catch!                               |
-| `cast`      | GameCast                    | `{}`      | uncast roles use built-in stand-ins                   |
-| `settings?` | GameSettings                | absent    | absent until a knob is touched (enables kid defaults) |
+| Attribute   | Type                                      | Default   | Rule                                                  |
+| ----------- | ----------------------------------------- | --------- | ----------------------------------------------------- |
+| `template?` | `'catch'\|'flappy'\|'maze'\|'platformer'` | `'catch'` | unknown/absent → Catch!                               |
+| `cast`      | GameCast                                  | `{}`      | uncast roles use built-in stand-ins                   |
+| `settings?` | GameSettings                              | absent    | absent until a knob is touched (enables kid defaults) |
 
-- **GameCast** (all optional layer ids): `hero`, `good` (Catch! only),
-  `bad` (Catch! only), `obstacle` (Flappy only), `background`.
+- **GameCast** (all optional layer ids): `hero`, `good` (Catch!/Jumper),
+  `bad` (Catch! only), `obstacle` (Flappy/Jumper), `background`.
 - **GameSettings**: `fallSpeed` (px/s, 60–400), `spawnInterval` (seconds,
   0.4–2.5, rounded to 0.1), `lives` (1–9). All clamped. Defaults per
   template and audience: see `../concepts.md` §Game settings.

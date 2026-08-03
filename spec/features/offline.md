@@ -46,15 +46,15 @@ the app boots and works.
 
 ## The installed identity (manifest contract)
 
-| Field | Value |
-|---|---|
-| name / short_name | Dream |
-| description | "An intuitive, elegant design app — draw, design, animate and dream, right in your browser." |
-| display | standalone |
-| start | the app root |
-| background color | `#eef0f6` |
-| theme color | `#6d7cff` |
-| icons | the Dream mark as SVG (any size), 192 px and 512 px PNGs, plus a 512 px maskable tile |
+| Field             | Value                                                                                        |
+| ----------------- | -------------------------------------------------------------------------------------------- |
+| name / short_name | Dream                                                                                        |
+| description       | "An intuitive, elegant design app — draw, design, animate and dream, right in your browser." |
+| display           | standalone                                                                                   |
+| start             | the app root                                                                                 |
+| background color  | `#eef0f6`                                                                                    |
+| theme color       | `#6d7cff`                                                                                    |
+| icons             | the Dream mark as SVG (any size), 192 px and 512 px PNGs, plus a 512 px maskable tile        |
 
 ## Edge cases
 

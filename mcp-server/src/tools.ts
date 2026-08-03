@@ -11,10 +11,16 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { activeFrameIndex } from '../../src/engine/animation';
 import { buildAppExportData, buildAppHtml } from '../../src/engine/appExport';
 import { normalizeHex } from '../../src/engine/color';
-import { appendOperation, createDocument, genId } from '../../src/engine/document';
+import {
+  appendOperation,
+  createDocument,
+  createLayer,
+  genId,
+  insertLayer,
+} from '../../src/engine/document';
 import { hotspotTargetIndex } from '../../src/engine/hotspots';
 import { decodeProject, encodeProject } from '../../src/engine/projectFile';
-import type { DreamDocument, Layer, TextOp } from '../../src/engine/types';
+import type { DreamDocument, Layer, ShapeKind, ShapeOp, TextOp } from '../../src/engine/types';
 import { nodeRasterCodec, renderLayersToPng, renderLayersToPngDataUrl } from './nodeCodec';
 
 /** Load and decode a .dream file. */
@@ -167,6 +173,36 @@ export async function listLayers(projectPath: string): Promise<LayerListing> {
   };
 }
 
+export interface AddLayerOptions {
+  /** Layer name; defaults to the next numbered layer in the active frame. */
+  name?: string;
+}
+
+export interface AddLayerResult {
+  layerId: string;
+  layerName: string;
+  index: number;
+  frameId: string | null;
+}
+
+/** dream.add_layer — add a new top layer to the active frame. */
+export async function addLayer(
+  projectPath: string,
+  options: AddLayerOptions = {},
+): Promise<AddLayerResult> {
+  const doc = await loadProject(projectPath);
+  const name = options.name?.trim() || `Layer ${doc.layers.length + 1}`;
+  const layer = createLayer(name);
+  const index = doc.layers.length;
+  await saveProject(projectPath, insertLayer(doc, layer));
+  return {
+    layerId: layer.id,
+    layerName: layer.name,
+    index,
+    frameId: doc.activeFrameId ?? null,
+  };
+}
+
 export interface AddTextOptions {
   text: string;
   x: number;
@@ -217,6 +253,75 @@ export async function addText(
     opacity: 1,
     fontSize: options.size ?? 24,
     fontFamily: options.fontFamily ?? 'sans-serif',
+  };
+  await saveProject(projectPath, appendOperation(doc, layer.id, op));
+  return { opId: op.id, layerId: layer.id, layerName: layer.name };
+}
+
+export interface AddShapeOptions {
+  shape: ShapeKind;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  /** Outline width in document pixels (default 2). */
+  size?: number;
+  /** Color as #rgb/#rrggbb (default #000000). */
+  color?: string;
+  /** Operation opacity, 0..1 (default 1). */
+  opacity?: number;
+  /** Fill a rectangle or ellipse instead of outlining it. */
+  fill?: boolean;
+  /** Layer id or name; default: the top layer of the active frame. */
+  layer?: string;
+}
+
+/** dream.add_shape — append a line, rectangle or ellipse to a layer. */
+export async function addShape(
+  projectPath: string,
+  options: AddShapeOptions,
+): Promise<AddTextResult> {
+  if (!['line', 'rectangle', 'ellipse'].includes(options.shape)) {
+    throw new Error(`Invalid shape: ${options.shape}`);
+  }
+  const coordinates = [options.x1, options.y1, options.x2, options.y2];
+  if (!coordinates.every(Number.isFinite)) throw new Error('shape coordinates must be finite');
+  if (options.x1 === options.x2 && options.y1 === options.y2) {
+    throw new Error('shape must have a visible size');
+  }
+  const size = options.size ?? 2;
+  if (!Number.isFinite(size) || size <= 0) throw new Error('size must be greater than 0');
+  const opacity = options.opacity ?? 1;
+  if (!Number.isFinite(opacity) || opacity < 0 || opacity > 1) {
+    throw new Error('opacity must be between 0 and 1');
+  }
+  const color = normalizeHex(options.color ?? '#000000');
+  if (!color) throw new Error(`Invalid color: ${options.color}`);
+
+  const doc = await loadProject(projectPath);
+  const layer = options.layer
+    ? doc.layers.find(
+        (candidate) => candidate.id === options.layer || candidate.name === options.layer,
+      )
+    : doc.layers[doc.layers.length - 1];
+  if (!layer) {
+    throw new Error(
+      options.layer
+        ? `No layer with id or name "${options.layer}" in the active frame`
+        : 'The document has no layers',
+    );
+  }
+
+  const op: ShapeOp = {
+    kind: 'shape',
+    id: genId('op'),
+    shape: options.shape,
+    from: { x: options.x1, y: options.y1 },
+    to: { x: options.x2, y: options.y2 },
+    color,
+    opacity,
+    size,
+    ...(options.fill && options.shape !== 'line' ? { fill: true } : {}),
   };
   await saveProject(projectPath, appendOperation(doc, layer.id, op));
   return { opId: op.id, layerId: layer.id, layerName: layer.name };

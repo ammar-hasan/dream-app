@@ -84,6 +84,45 @@ describe('frame CRUD', () => {
     store().undo();
     expect(store().doc.frames?.[0].id).toBe(firstId);
   });
+
+  it('saves slide settings, copies them on duplicate, and undoes the edit', () => {
+    const firstId = store().doc.activeFrameId ?? '';
+    store().setFramePresentation(firstId, {
+      transition: 'fade',
+      durationMs: 5000,
+      notes: 'Introduce the idea',
+    });
+    expect(store().doc.frames?.[0].presentation?.notes).toBe('Introduce the idea');
+    store().undo();
+    expect(store().doc.frames?.[0].presentation).toBeUndefined();
+    store().redo();
+    store().duplicateFrame();
+    expect(store().doc.frames?.[1].presentation).toEqual(store().doc.frames?.[0].presentation);
+    expect(store().doc.frames?.[1].presentation).not.toBe(store().doc.frames?.[0].presentation);
+  });
+
+  it('does not add history for unchanged slide settings', () => {
+    const firstId = store().doc.activeFrameId ?? '';
+    store().setFramePresentation(firstId, undefined);
+    store().undo();
+    expect(store().doc.frames).toBeUndefined();
+  });
+
+  it('saves every video caption as one undoable edit', () => {
+    store().addFrame();
+    store().setFrameCaptions(['  First message  ', 'Second message']);
+    expect(store().doc.frames?.map((frame) => frame.presentation?.caption)).toEqual([
+      'First message',
+      'Second message',
+    ]);
+    store().undo();
+    expect(store().doc.frames?.map((frame) => frame.presentation?.caption)).toEqual([
+      undefined,
+      undefined,
+    ]);
+    store().redo();
+    expect(store().doc.frames?.[1].presentation?.caption).toBe('Second message');
+  });
 });
 
 describe('frame switching + drawing', () => {

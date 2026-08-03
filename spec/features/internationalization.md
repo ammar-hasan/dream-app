@@ -5,8 +5,8 @@ product — including voice — works in any language, including right-to-left.
 
 ## Locales
 
-| Id | Label | Direction |
-|---|---|---|
+| Id   | Label   | Direction     |
+| ---- | ------- | ------------- |
 | `en` | English | left-to-right |
 | `ar` | العربية | right-to-left |
 

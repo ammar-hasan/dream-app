@@ -12,6 +12,7 @@ export class MockContext2D implements Renderer2D {
   lineJoin = 'miter';
   font = '10px sans-serif';
   textBaseline = 'alphabetic';
+  textAlign = 'start';
 
   /** Every method call, recorded as [name, ...args]. */
   readonly log: unknown[][] = [];
@@ -62,6 +63,15 @@ export class MockContext2D implements Renderer2D {
   }
   drawImage(image: unknown, dx: number, dy: number, dw?: number, dh?: number): void {
     this.record('drawImage', image, dx, dy, dw, dh);
+  }
+  setTransform(a: number, b: number, c: number, d: number, e: number, f: number): void {
+    this.record('setTransform', a, b, c, d, e, f);
+  }
+  translate(x: number, y: number): void {
+    this.record('translate', x, y);
+  }
+  scale(x: number, y: number): void {
+    this.record('scale', x, y);
   }
 }
 

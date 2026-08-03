@@ -1,9 +1,31 @@
 {
-  "name": "dream-mcp",
+  "name": "@ammar-hasan/dream-mcp",
   "version": "0.1.0",
-  "description": "MCP server for Dream .dream project files — read, create, render and export Dream documents from any MCP-capable agent.",
+  "description": "MCP server for Dream .dream project files — create, inspect, edit, render and export Dream documents from any MCP-capable agent.",
   "license": "MIT",
-  "private": true,
+  "mcpName": "io.github.ammar-hasan/dream-mcp",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ammar-hasan/dream-app.git",
+    "directory": "mcp-server"
+  },
+  "homepage": "https://github.com/ammar-hasan/dream-app#readme",
+  "bugs": {
+    "url": "https://github.com/ammar-hasan/dream-app/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "drawing",
+    "design",
+    "dream"
+  ],
+  "files": [
+    "dist/**/*.js",
+    "!dist/**/*.test.js",
+    "README.md",
+    "LICENSE"
+  ],
   "bin": {
     "dream-mcp": "dist/mcp-server/src/index.js"
   },
@@ -11,10 +33,15 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "npm run clean && tsc -p tsconfig.json",
     "test": "vitest run",
     "check": "npm run build && npm run test",
+    "prepack": "npm run check",
     "start": "node dist/mcp-server/src/index.js"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",

@@ -26,27 +26,30 @@ the light accent for legibility).
 
 ### Light theme
 
-| Token | Value | Use |
-|---|---|---|
-| accent / accent-strong | `#6d7cff` / `#5a68e8` | primary actions, selection, focus |
-| accent-2 / accent-3 | `#a855f7` / `#f472b6` | gradient partners |
-| signature gradient | 135°, accent → accent-2 (55%) → accent-3 | the mark, primary buttons, title |
-| accent-soft | `#eceefe` | accent-tinted fills |
-| app background | `#eef0f6` | |
-| canvas surround | `#d9deeb` | lets artwork pop |
-| panel / panel-hover | `#ffffff` / `#f1f3f7` | |
-| glass | white at 92% | floating pills, cards |
-| border | `#e2e5ee` | |
-| text / text-dim | `#232838` / `#687085` | |
-| danger / danger-soft | `#dc2626` / `#fef2f2` | |
-| success / success-soft | `#15803d` / `#ecfdf3` | |
-| scrim | slate at 35% | dialog backdrop |
-| tooltip | bg `#232838`, text `#f4f6fb` | |
-| ambient blobs | accent at 14%, pink at 10% | the drift behind the canvas |
+| Token                  | Value                                    | Use                               |
+| ---------------------- | ---------------------------------------- | --------------------------------- |
+| accent / accent-strong | `#6d7cff` / `#5a68e8`                    | primary actions, selection, focus |
+| accent text            | `#4f5ed6`                                | readable accent-colored labels    |
+| accent control         | `#4f5ed6`                                | solid controls with white labels  |
+| accent-2 / accent-3    | `#a855f7` / `#f472b6`                    | gradient partners                 |
+| signature gradient     | 135°, accent → accent-2 (55%) → accent-3 | the mark, primary buttons, title  |
+| accent-soft            | `#eceefe`                                | accent-tinted fills               |
+| app background         | `#eef0f6`                                |                                   |
+| canvas surround        | `#d9deeb`                                | lets artwork pop                  |
+| panel / panel-hover    | `#ffffff` / `#f1f3f7`                    |                                   |
+| glass                  | white at 92%                             | floating pills, cards             |
+| border                 | `#e2e5ee`                                |                                   |
+| text / text-dim        | `#232838` / `#60687c`                    |                                   |
+| danger / danger-soft   | `#dc2626` / `#fef2f2`                    |                                   |
+| success / success-soft | `#15803d` / `#ecfdf3`                    |                                   |
+| scrim                  | slate at 35%                             | dialog backdrop                   |
+| tooltip                | bg `#232838`, text `#f4f6fb`             |                                   |
+| ambient blobs          | accent at 14%, pink at 10%               | the drift behind the canvas       |
 
 ### Dark theme (only the remapped tokens)
 
-accent `#8b93ff`, accent-strong `#7780ff`, accent-soft `rgba(139,147,255,0.16)`,
+accent `#8b93ff`, accent-strong `#7780ff`, accent-text `#8b93ff`, accent-control `#4f5ed6`,
+accent-soft `rgba(139,147,255,0.16)`,
 background `#14161f`, canvas surround `#0e1018`, panel `#1d202c`,
 panel-hover `#282c3b`, glass `rgba(29,32,44,0.92)`, border `#303549`,
 text `#e9ebf4`, text-dim `#9aa1b8`, danger `#f87171` (soft 12% tint),
@@ -89,7 +92,10 @@ Text `#0f141f` / `#ffffff`, dim text `#454d61` / `#ccd4e8`, borders
 - Focus ring: 2 px accent outline, 2 px offset — always visible on
   keyboard focus.
 - Layout constants: side panel 280 px; dialogs max 480 px wide with 24 px
-  padding; toolbar padding 8×16 px.
+  padding; toolbar padding 8×16 px. At desktop widths the side panel and all
+  of its form controls remain inside the viewport; when the toolbar needs more
+  room, only the toolbar scrolls horizontally — the canvas and panel never
+  create page-level horizontal overflow.
 
 ## Motion principles
 
@@ -107,6 +113,13 @@ Text `#0f141f` / `#ffffff`, dim text `#454d61` / `#ccd4e8`, borders
    hover, score pops float and fade (800 ms), bad hits shake (320 ms).
 5. Presentation and exported-app transitions: 220–250 ms, fade or
    horizontal slide (±4% / full-width respectively).
+
+## Video captions
+
+Viewer-facing frame captions sit in the lower safe area of shaped videos,
+centered over a softly rounded dark translucent backing. They use high-contrast
+white text, wrap to at most three lines, stay inside generous side margins and
+never move, crop or stretch the artwork beneath them.
 
 ## Tone of voice
 

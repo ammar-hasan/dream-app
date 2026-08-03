@@ -73,6 +73,18 @@ const TOOLS: Tool[] = [
     },
   },
   {
+    name: 'dream.add_layer',
+    description: 'Add a new top layer to the active frame of a .dream project.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: string('Path to the .dream file'),
+        name: optional(string('Layer name (default: the next numbered layer)')),
+      },
+      required: ['path'],
+    },
+  },
+  {
     name: 'dream.add_text',
     description:
       'Add a text operation to a layer of a .dream project (default: top layer of the active frame).',
@@ -93,6 +105,44 @@ const TOOLS: Tool[] = [
         layer: optional(string('Target layer id or name (default: top layer)')),
       },
       required: ['path', 'text', 'x', 'y'],
+    },
+  },
+  {
+    name: 'dream.add_shape',
+    description:
+      'Add a line, rectangle or ellipse to a layer of a .dream project (default: top layer of the active frame).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: string('Path to the .dream file'),
+        shape: {
+          type: 'string',
+          enum: ['line', 'rectangle', 'ellipse'],
+          description: 'Shape kind',
+        },
+        x1: { type: 'number', description: 'Start X coordinate in document pixels' },
+        y1: { type: 'number', description: 'Start Y coordinate in document pixels' },
+        x2: { type: 'number', description: 'End X coordinate in document pixels' },
+        y2: { type: 'number', description: 'End Y coordinate in document pixels' },
+        size: optional({
+          type: 'number',
+          exclusiveMinimum: 0,
+          description: 'Outline width in pixels (default 2)',
+        }),
+        color: optional(string('Shape color, #rgb or #rrggbb (default #000000)')),
+        opacity: optional({
+          type: 'number',
+          minimum: 0,
+          maximum: 1,
+          description: 'Opacity from 0 to 1 (default 1)',
+        }),
+        fill: optional({
+          type: 'boolean',
+          description: 'Fill rectangles/ellipses instead of outlining them (default false)',
+        }),
+        layer: optional(string('Target layer id or name (default: top layer)')),
+      },
+      required: ['path', 'shape', 'x1', 'y1', 'x2', 'y2'],
     },
   },
   {
@@ -138,6 +188,7 @@ const argsSchema = {
     name: z.string().optional(),
   }),
   'dream.list_layers': z.object({ path: z.string() }),
+  'dream.add_layer': z.object({ path: z.string(), name: z.string().optional() }),
   'dream.add_text': z.object({
     path: z.string(),
     text: z.string(),
@@ -146,6 +197,19 @@ const argsSchema = {
     size: z.number().optional(),
     color: z.string().optional(),
     fontFamily: z.string().optional(),
+    layer: z.string().optional(),
+  }),
+  'dream.add_shape': z.object({
+    path: z.string(),
+    shape: z.enum(['line', 'rectangle', 'ellipse']),
+    x1: z.number(),
+    y1: z.number(),
+    x2: z.number(),
+    y2: z.number(),
+    size: z.number().optional(),
+    color: z.string().optional(),
+    opacity: z.number().optional(),
+    fill: z.boolean().optional(),
     layer: z.string().optional(),
   }),
   'dream.render_png': z.object({
@@ -176,9 +240,17 @@ async function callTool(name: ToolName, args: unknown): Promise<CallToolResult> 
       const { path } = argsSchema[name].parse(args);
       return asJson(await tools.listLayers(path));
     }
+    case 'dream.add_layer': {
+      const { path, ...options } = argsSchema[name].parse(args);
+      return asJson(await tools.addLayer(path, options));
+    }
     case 'dream.add_text': {
       const { path, ...options } = argsSchema[name].parse(args);
       return asJson(await tools.addText(path, options));
+    }
+    case 'dream.add_shape': {
+      const { path, ...options } = argsSchema[name].parse(args);
+      return asJson(await tools.addShape(path, options));
     }
     case 'dream.render_png': {
       const { path, outPath, frame } = argsSchema[name].parse(args);

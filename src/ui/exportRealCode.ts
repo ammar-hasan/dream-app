@@ -19,7 +19,9 @@ import {
 import { getActiveProvider, isBYOKActive, type AIProvider } from '../ai/registry';
 import { consumeFreeTry } from '../ai/usage';
 import type { DreamDocument } from '../engine/types';
+import type { RasterPatch } from '../engine/types';
 import { downloadBlob } from './exportAnimation';
+import { browserRasterCodec } from './dreamFile';
 import { t } from './i18n';
 
 export function codeFileName(docName: string): string {
@@ -31,6 +33,31 @@ export interface RealCodeDeps {
   provider?: AIProvider;
   /** Defaults to a browser download. */
   download?: (blob: Blob, fileName: string) => void;
+  /** Defaults to the browser PNG codec; tests inject a deterministic encoder. */
+  encodeRaster?: (patch: RasterPatch) => Promise<string>;
+}
+
+async function encodeImageAssets(
+  doc: DreamDocument,
+  encode: (patch: RasterPatch) => Promise<string>,
+): Promise<Record<string, string>> {
+  const frames = doc.frames ?? [{ layers: doc.layers }];
+  const images = frames.flatMap((frame) =>
+    frame.layers.flatMap((layer) =>
+      layer.visible ? layer.operations.filter((op) => op.kind === 'image') : [],
+    ),
+  );
+  const assets: Record<string, string> = {};
+  try {
+    await Promise.all(
+      images.map(async (image) => {
+        if (!(image.id in assets)) assets[image.id] = await encode(image.patch);
+      }),
+    );
+  } catch {
+    throw new Error(t('export.codeImageFailed'));
+  }
+  return assets;
 }
 
 export interface RealCodeResult {
@@ -49,7 +76,8 @@ export async function generateRealCodeHtml(
   deps: RealCodeDeps = {},
 ): Promise<RealCodeResult> {
   const provider = deps.provider ?? getActiveProvider();
-  const app = buildAppDescription(doc);
+  const assets = await encodeImageAssets(doc, deps.encodeRaster ?? browserRasterCodec.encode);
+  const app = buildAppDescription(doc, assets);
   if (provider.id === 'mock') {
     return { html: buildTemplateAppHtml(app), local: true };
   }

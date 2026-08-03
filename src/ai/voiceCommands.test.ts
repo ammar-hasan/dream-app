@@ -90,10 +90,14 @@ describe('parseVoiceCommand — animation', () => {
     expect(parseVoiceCommand('stop the game')).toEqual({ kind: 'stop' });
   });
 
-  it('"play flappy" / "play maze" / "play catch" pick a template', () => {
+  it('named games pick a template', () => {
     expect(parseVoiceCommand('play flappy')).toEqual({ kind: 'play-game', template: 'flappy' });
     expect(parseVoiceCommand('play maze')).toEqual({ kind: 'play-game', template: 'maze' });
     expect(parseVoiceCommand('play catch')).toEqual({ kind: 'play-game', template: 'catch' });
+    expect(parseVoiceCommand('play platformer')).toEqual({
+      kind: 'play-game',
+      template: 'platformer',
+    });
     expect(parseVoiceCommand('let’s play the maze game')).toEqual({
       kind: 'play-game',
       template: 'maze',
@@ -232,7 +236,7 @@ describe('parseVoiceCommand — Arabic vocabulary (locale "ar")', () => {
     expect(parseVoiceCommand('record narration', 'ar')).toEqual({ kind: 'record-narration' });
   });
 
-  it('"العب المتاهة/الطيران/الصيد/فلابي" pick a template; English still works', () => {
+  it('Arabic game names pick a template; English still works', () => {
     expect(parseVoiceCommand('العب المتاهة', 'ar')).toEqual({
       kind: 'play-game',
       template: 'maze',
@@ -242,6 +246,10 @@ describe('parseVoiceCommand — Arabic vocabulary (locale "ar")', () => {
       template: 'flappy',
     });
     expect(parseVoiceCommand('العب الصيد', 'ar')).toEqual({ kind: 'play-game', template: 'catch' });
+    expect(parseVoiceCommand('العب المنصات', 'ar')).toEqual({
+      kind: 'play-game',
+      template: 'platformer',
+    });
     expect(parseVoiceCommand('العب فلابي', 'ar')).toEqual({
       kind: 'play-game',
       template: 'flappy',

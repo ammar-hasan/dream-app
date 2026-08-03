@@ -18,6 +18,8 @@ import {
 } from '../../src/engine/document';
 import type { FillOp, StrokeOp } from '../../src/engine/types';
 import {
+  addLayer,
+  addShape,
   addText,
   createProject,
   exportApp,
@@ -118,6 +120,84 @@ describe('dream-mcp tools', () => {
     expect(listing.frames).toBeNull();
     expect(listing.layers).toHaveLength(1);
     expect(listing.layers[0]).toMatchObject({ name: 'Layer 1', operations: 2, visible: true });
+  });
+
+  it('add_layer creates a new top layer in the active frame', async () => {
+    const result = await addLayer(projectPath, { name: 'Agent shapes' });
+    const doc = await loadProject(projectPath);
+    expect(result).toMatchObject({
+      layerId: doc.layers[1].id,
+      layerName: 'Agent shapes',
+      index: 1,
+      frameId: null,
+    });
+    expect(doc.layers[1]).toMatchObject({
+      name: 'Agent shapes',
+      visible: true,
+      locked: false,
+      operations: [],
+    });
+  });
+
+  it('add_layer writes through to an animated document active frame', async () => {
+    const animatedPath = join(dir, 'animated-add.dream');
+    await createProject(animatedPath, { width: 40, height: 30 });
+    await saveProject(animatedPath, enableAnimation(await loadProject(animatedPath)));
+
+    const result = await addLayer(animatedPath, { name: 'Frame artwork' });
+    const doc = await loadProject(animatedPath);
+    const activeFrame = doc.frames?.find((frame) => frame.id === doc.activeFrameId);
+    expect(result.frameId).toBe(doc.activeFrameId);
+    expect(doc.layers.map((layer) => layer.id)).toEqual(
+      activeFrame?.layers.map((layer) => layer.id),
+    );
+    expect(doc.layers.at(-1)).toMatchObject({ name: 'Frame artwork' });
+  });
+
+  it('add_shape appends a normalized shape to a named layer', async () => {
+    const result = await addShape(projectPath, {
+      shape: 'rectangle',
+      x1: 8,
+      y1: 9,
+      x2: 70,
+      y2: 50,
+      size: 4,
+      color: '#0af',
+      opacity: 0.75,
+      fill: true,
+      layer: 'Agent shapes',
+    });
+    const doc = await loadProject(projectPath);
+    const layer = doc.layers.find((candidate) => candidate.id === result.layerId);
+    expect(layer?.operations.find((op) => op.id === result.opId)).toMatchObject({
+      kind: 'shape',
+      shape: 'rectangle',
+      from: { x: 8, y: 9 },
+      to: { x: 70, y: 50 },
+      size: 4,
+      color: '#00aaff',
+      opacity: 0.75,
+      fill: true,
+    });
+  });
+
+  it('add_shape validates geometry, style and target layer', async () => {
+    await expect(
+      addShape(projectPath, { shape: 'line', x1: 1, y1: 1, x2: 1, y2: 1 }),
+    ).rejects.toThrow('visible size');
+    await expect(
+      addShape(projectPath, { shape: 'ellipse', x1: 0, y1: 0, x2: 2, y2: 2, opacity: 2 }),
+    ).rejects.toThrow('between 0 and 1');
+    await expect(
+      addShape(projectPath, {
+        shape: 'line',
+        x1: 0,
+        y1: 0,
+        x2: 2,
+        y2: 2,
+        layer: 'missing',
+      }),
+    ).rejects.toThrow('No layer with id or name "missing"');
   });
 
   it('render_png flattens the document to a real PNG', async () => {

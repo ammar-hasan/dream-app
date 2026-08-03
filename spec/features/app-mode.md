@@ -69,12 +69,14 @@ rewritten as REAL, readable code — a developer (or a kid's parent) can open
 it, learn from it and extend it. Where the interactive-app export is a
 pixel-faithful picture of the app, this export is the app as source.
 
-1. **The input is the app, not pixels.** The app is described structurally
-   and compactly — per screen: its background, dominant colors, texts
-   (content, position, size, color), drawn things summarized as boxes
-   (kind, position, size, color — strokes, shapes, fills, images) and the
-   navigation graph (which rectangle on screen N goes to screen M, with
-   which transition). Broken hotspots are dropped here too.
+1. **The input preserves meaning and real raster content.** The app is
+   described structurally and compactly — per screen: its background,
+   dominant colors, texts (content, position, size, color), drawn things
+   summarized as boxes (kind, position, size, color — strokes, shapes and
+   fills), and the navigation graph (which rectangle on screen N goes to
+   screen M, with which transition). Imported and AI-made raster images are
+   embedded as inline PNGs so they remain real images in the result. Broken
+   hotspots are dropped here too.
 2. **Two generation paths.**
    - With a **chat-capable connected provider**, the description goes out
      with instructions to reply with exactly ONE self-contained HTML file:
@@ -86,8 +88,8 @@ pixel-faithful picture of the app, this export is the app as source.
      file out. The output is honestly labeled "generated locally by Dream
      AI — connect your own AI for richer code", and each generation counts
      against the daily free tier like every other Dream AI action. Its
-     drawings become soft approximation panels and imported images become
-     placeholders — it never pretends to be richer than it is.
+     drawings become soft approximation panels, while imported and AI-made
+     raster images remain their actual pixels in real image elements.
 3. **Validation before download.** The result must be one complete HTML
    document with no external web references. A refusal, chatter without
    code, or code that links outside is rejected with a friendly error that

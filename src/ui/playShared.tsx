@@ -1,6 +1,6 @@
 /**
  * Play mode: shared chrome and sprite helpers for the game views
- * (PlayView, FlappyView, MazeView). Every template gets the same stage:
+ * (PlayView, FlappyView, MazeView, PlatformerView). Every template gets the same stage:
  * the backdrop canvas, cast sprites cropped to their content, the top bar
  * (mute + exit), the ready overlay and the run-sounds hook. The game rules
  * stay in the pure cores (`game/templates/`); this file is only DOM juice.

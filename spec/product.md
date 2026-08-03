@@ -17,18 +17,18 @@ exist in depth but are never thrown at the user — depth surfaces per
 
 The ten design targets (condensed from the product vision document):
 
-| # | Persona | Profile | What Dream must do for them |
-|---|---------|---------|------------------------------|
-| 1 | Zainab, 5, Iraq | pre-literate, on her mother's phone | voice-driven creation, kid mode, games |
-| 2 | Victor, 85, Ireland | retired civil engineer | comfort mode, zero-jargon UI |
-| 3 | Ali, 30, Pakistan | professional artist with a stylus | pen pressure, layers, image editing |
-| 4 | Fatima, 21, Iran | calligraphy explorer | RTL, precise drawing tools |
-| 5 | George, 45, USA | no formal education, new phone | fully visual UI, voice, animations |
-| 6 | Sara, 15, Nigeria | freelance logo designer | Design mode, components, export |
-| 7 | Zǐxuān, 28, China | chemistry PhD | scientific images, animation, apps |
-| 8 | Maria, 32, Brazil | agentic-AI programmer | `.dream` files, the agent tool surface |
-| 9 | Aleksandr, 25, Russia | product design expert | everything, fast — snapping, align, shortcuts |
-| 10 | Ahmed, 42, Palestine | social-media storyteller | draw → animate → export video |
+| #   | Persona               | Profile                             | What Dream must do for them                   |
+| --- | --------------------- | ----------------------------------- | --------------------------------------------- |
+| 1   | Zainab, 5, Iraq       | pre-literate, on her mother's phone | voice-driven creation, kid mode, games        |
+| 2   | Victor, 85, Ireland   | retired civil engineer              | comfort mode, zero-jargon UI                  |
+| 3   | Ali, 30, Pakistan     | professional artist with a stylus   | pen pressure, layers, image editing           |
+| 4   | Fatima, 21, Iran      | calligraphy explorer                | RTL, precise drawing tools                    |
+| 5   | George, 45, USA       | no formal education, new phone      | fully visual UI, voice, animations            |
+| 6   | Sara, 15, Nigeria     | freelance logo designer             | Design mode, components, export               |
+| 7   | Zǐxuān, 28, China     | chemistry PhD                       | scientific images, animation, apps            |
+| 8   | Maria, 32, Brazil     | agentic-AI programmer               | `.dream` files, the agent tool surface        |
+| 9   | Aleksandr, 25, Russia | product design expert               | everything, fast — snapping, align, shortcuts |
+| 10  | Ahmed, 42, Palestine  | social-media storyteller            | draw → animate → export video                 |
 
 ## Design principles
 

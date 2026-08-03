@@ -26,7 +26,10 @@ import {
 const IDLE: MazeInput = { left: false, right: false, up: false, down: false };
 
 function playing(maze?: MazeState): MazeState {
-  return { ...(maze ?? createGame(800, 600, DEFAULT_GAME_SETTINGS, false, gameRng(3))), phase: 'playing' };
+  return {
+    ...(maze ?? createGame(800, 600, DEFAULT_GAME_SETTINGS, false, gameRng(3))),
+    phase: 'playing',
+  };
 }
 
 /** BFS path from start to exit as a direction sequence (test driver). */
@@ -59,7 +62,9 @@ function solvePath(maze: MazeGrid): ('up' | 'down' | 'left' | 'right')[] {
   const dirs: ('up' | 'down' | 'left' | 'right')[] = [];
   for (let cur = exit; cur !== start; cur = parent[cur]) {
     const bit = parentDir[cur];
-    dirs.unshift(bit === WALL_N ? 'up' : bit === WALL_S ? 'down' : bit === WALL_E ? 'right' : 'left');
+    dirs.unshift(
+      bit === WALL_N ? 'up' : bit === WALL_S ? 'down' : bit === WALL_E ? 'right' : 'left',
+    );
   }
   return dirs;
 }

@@ -50,8 +50,8 @@ everything called "frames".
 
 Appears at the bottom whenever a document has frames: a collapse toggle, a
 big play/pause button, live thumbnails (56 px tall, numbered, in play
-order), the dashed `+` add button, frame controls (⧉ ←/→ ✕), the narration
-mic, the fps slider, Loop and Onion toggles. Thumbnails update when their
+order), the dashed `+` add button, frame controls (⧉ ←/→ ✕), a Slide settings
+button, the narration mic, the fps slider, Loop and Onion toggles. Thumbnails update when their
 frame's content changes — editing frame 3 never repaints the others.
 
 ## Voice narration
@@ -89,14 +89,35 @@ and keeps recording a one-tap gesture.
 
 The Export dialog offers, for animated documents:
 
+- **Video shape:** Original preserves the document pixels. Vertical 9:16 is
+  720×1280, Square 1:1 is 720×720 and Landscape 16:9 is 1280×720. Social
+  shapes contain and center the complete artwork over its own background;
+  they never crop or stretch it. The chosen shape adds `-vertical`, `-square`
+  or `-landscape` to the filename. The animation still changes at its chosen
+  1–24 fps; the delivery stream requests 30 fps and repeats held frames, so
+  slow flipbooks remain visually identical in common social-video pipelines.
+- **Frame captions:** every frame can carry a short on-screen caption, edited
+  either with its slide settings or while preparing a video. The export editor
+  steps previous/next, can copy one caption to every frame, and commits all
+  changed captions as one undoable project edit when Export is pressed.
+  Authoring is capped at 160 characters per frame. Captions wrap to at most
+  three centered lines, ellipsize overflow, and are burned into the lower safe
+  area over a high-contrast backing. They are part of the project, not a
+  separate subtitle file.
+
 - **WebM video** — recorded on-device in real time (a 12-frame animation
   at 6 fps records for 2 seconds). Codec preference: VP9 → VP8 → generic
   WebM, the first the device supports; if none, a plain error says this
   browser can't record WebM. Progress shows "Frame N of total" while
   recording; the dialog asks you to keep the tab in front. Filename
-  `{name}.webm`. **A saved narration is baked in as the video's audio
+  `{name}.webm` for Original. **A saved narration is baked in as the video's audio
   track** — the exported movie talks; without a take the export is
   unchanged (silent).
+- **MP4 video** — shown only when the browser reports native MP4 recording
+  support. It uses the browser's compatible MP4 codec, follows the same
+  frame timing/progress flow, includes narration when present, and downloads
+  as `{name}.mp4` for Original. No transcode or relabeled WebM fallback is allowed: an MP4
+  download is always a real MP4 container.
 - **Sprite sheet** — all frames in one PNG grid: up to **8 columns**
   (columns = the smallest of: frame count, 8, and the ceiling of the square
   root of the frame count), rows as needed, each cell the full document
@@ -113,8 +134,9 @@ flipbook is reframed, not just the current frame.
 
 ## Persistence
 
-Frames, animation settings (fps, loop, onion preferences) and the narration
-take are saved with the project. Animation settings and the narration live
+Frames, their captions, animation settings (fps, loop, onion preferences) and
+the narration take are saved with the project. Caption edits are undoable
+document changes. Animation settings and the narration live
 outside undo (principle 3) — undo must never change how fast you watch your
 flipbook, and must never delete a recording. Old saves load unchanged —
 animation simply stays off, and there is no narration.

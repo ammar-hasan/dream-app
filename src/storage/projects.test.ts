@@ -186,6 +186,28 @@ describe('projects storage (IndexedDB)', () => {
     expect((await loadProject(plain.id))?.frames?.[0].hotspots).toBeUndefined();
   });
 
+  it('persists per-frame presentation settings, absent on old saves', async () => {
+    const animated = enableAnimation(createDocument({ width: 8, height: 8, name: 'Deck' }));
+    const frames = animated.frames ?? [];
+    const doc = {
+      ...animated,
+      frames: [
+        {
+          ...frames[0],
+          presentation: { transition: 'fade' as const, durationMs: 5000, notes: 'Welcome' },
+        },
+      ],
+    };
+    await saveProject(doc);
+    expect((await loadProject(doc.id))?.frames?.[0].presentation).toEqual(
+      doc.frames[0].presentation,
+    );
+
+    const plain = enableAnimation(createDocument({ width: 8, height: 8 }));
+    await saveProject(plain);
+    expect((await loadProject(plain.id))?.frames?.[0].presentation).toBeUndefined();
+  });
+
   it('persists the narration take (additive, backward compatible)', async () => {
     const doc = {
       ...createDocument({ width: 8, height: 8, name: 'Story' }),

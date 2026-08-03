@@ -69,11 +69,7 @@ export function passageOpen(maze: MazeGrid, index: number, bit: number): boolean
 }
 
 /** BFS from start to exit — the solvability invariant, exercised by tests. */
-export function mazeSolvable(
-  maze: MazeGrid,
-  start = 0,
-  exit = maze.cols * maze.rows - 1,
-): boolean {
+export function mazeSolvable(maze: MazeGrid, start = 0, exit = maze.cols * maze.rows - 1): boolean {
   const { cols, rows, walls } = maze;
   const seen = new Uint8Array(cols * rows);
   const queue = [start];

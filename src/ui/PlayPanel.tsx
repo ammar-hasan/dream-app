@@ -5,6 +5,8 @@
  * ready. Below: the template's difficulty knobs and the project's best score.
  */
 
+import { useState } from 'react';
+import type { GameCast, GameTemplateId } from '../engine/types';
 import {
   MAX_FALL_SPEED,
   MAX_LIVES,
@@ -13,17 +15,19 @@ import {
   MIN_LIVES,
   MIN_SPAWN_INTERVAL,
 } from '../game/core';
+import { planGameFromPrompt } from '../game/prompt';
 import { TEMPLATES, templateOf } from '../game/templates';
-import type { GameTemplateId } from '../engine/types';
 import type { SliderDef } from '../game/template';
 import { readHighScore, useDreamStore } from '../store/dreamStore';
+import { DictateButton } from './DictateButton';
 import { useT } from './i18n';
-import { CatchGameIcon, FlappyGameIcon, MazeGameIcon } from './icons';
+import { CatchGameIcon, FlappyGameIcon, MazeGameIcon, PlatformerGameIcon } from './icons';
 
 const TEMPLATE_ICONS: Record<GameTemplateId, (p: Record<string, never>) => JSX.Element> = {
   catch: CatchGameIcon,
   flappy: FlappyGameIcon,
   maze: MazeGameIcon,
+  platformer: PlatformerGameIcon,
 };
 
 const SLIDER_RANGES: Record<SliderDef['setting'], { min: number; max: number; step: number }> = {
@@ -36,6 +40,8 @@ export function PlayPanel() {
   const t = useT();
   const doc = useDreamStore((s) => s.doc);
   const template = templateOf(doc);
+  const [gamePrompt, setGamePrompt] = useState('');
+  const [madeTemplate, setMadeTemplate] = useState<GameTemplateId | null>(null);
   const best = readHighScore(doc.id);
   const settings = { ...template.defaultSettings, ...doc.game?.settings };
   const cast = doc.game?.cast ?? {};
@@ -47,6 +53,19 @@ export function PlayPanel() {
     store.setGameCast(role, id);
     store.setMode('draw');
     store.setTool('brush');
+  };
+
+  const makeGame = () => {
+    const plan = planGameFromPrompt(gamePrompt, doc.layers, template.id);
+    if (!plan) return;
+    const store = useDreamStore.getState();
+    store.setGameTemplate(plan.template);
+    if (Object.keys(plan.settings).length > 0) store.setGameSettings(plan.settings);
+    for (const role of Object.keys(plan.cast) as (keyof GameCast)[]) {
+      const layerId = plan.cast[role];
+      if (layerId) store.setGameCast(role, layerId);
+    }
+    setMadeTemplate(plan.template);
   };
 
   return (
@@ -70,6 +89,49 @@ export function PlayPanel() {
           );
         })}
       </div>
+
+      <form
+        className="play-maker"
+        onSubmit={(event) => {
+          event.preventDefault();
+          makeGame();
+        }}
+      >
+        <div className="play-maker-title">
+          <label htmlFor="game-prompt">{t('play.makePrompt')}</label>
+          <DictateButton
+            onText={(text) => {
+              setGamePrompt(text);
+              setMadeTemplate(null);
+            }}
+          />
+        </div>
+        <div className="play-maker-row">
+          <input
+            id="game-prompt"
+            value={gamePrompt}
+            placeholder={t('play.makePlaceholder')}
+            onChange={(event) => {
+              setGamePrompt(event.target.value);
+              setMadeTemplate(null);
+            }}
+          />
+          <button type="submit" className="btn primary" disabled={!gamePrompt.trim()}>
+            {t('play.makeButton')}
+          </button>
+        </div>
+        <p className="tool-hint">{t('play.makeHint')}</p>
+        {madeTemplate && (
+          <p className="play-maker-ready" role="status">
+            {t('play.makeReady', {
+              game: t(
+                TEMPLATES.find((candidate) => candidate.id === madeTemplate)?.nameKey ??
+                  'play.nameCatch',
+              ),
+            })}
+          </p>
+        )}
+      </form>
 
       <h2 className="panel-title">{t('play.cast')}</h2>
       <p className="tool-hint">{t('play.castHint')}</p>

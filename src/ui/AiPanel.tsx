@@ -1,6 +1,6 @@
 /**
  * The AI panel — Dream's intelligent assistant. Three friendly tabs:
- * Create (prompt → new layer), Edit (prompt → filter the active layer, or
+ * Create (prompt → new layer), Edit (prompt → change the active layer, or
  * just the selected part), Feedback (rule-based or chat-backed critique
  * with one-click "Apply" suggestions). A settings drawer configures BYOK
  * (OpenAI-compatible endpoints); the built-in Dream AI is free with a
@@ -9,13 +9,9 @@
  */
 
 import { useEffect, useState } from 'react';
-import {
-  applyAdjustments,
-  blitRegion,
-  DEFAULT_ADJUSTMENTS,
-  extractRegion,
-} from '../engine/filters';
+import { applyAdjustments, DEFAULT_ADJUSTMENTS } from '../engine/filters';
 import { editRegionForSelection } from '../ai/analyze';
+import { ERASE_PROMPT, mergeEditResult } from '../ai/inpaint';
 import {
   configureOpenAIProvider,
   getActiveProvider,
@@ -31,12 +27,12 @@ import {
 } from '../ai/registry';
 import { OpenAICompatibleProvider } from '../ai/openai';
 import { consumeFreeTry, freeTriesLeft } from '../ai/usage';
-import { isSpeechSupported, startDictation, type DictationHandle } from '../ai/speech';
-import { decodeImage } from './importImage';
+import { decodeImage, encodeImage } from './importImage';
 import { rasterizeLayer } from './rasterize';
 import { useDreamStore } from '../store/dreamStore';
+import { DictateButton } from './DictateButton';
 import { t, useT } from './i18n';
-import { MicIcon, SparkleIcon } from './icons';
+import { SparkleIcon } from './icons';
 
 type Tab = 'create' | 'edit' | 'feedback';
 type Busy = Tab | 'settings' | null;
@@ -49,57 +45,6 @@ interface Notice {
 function friendlyError(error: unknown): string {
   if (error instanceof Error && error.message) return error.message;
   return t('ai.error');
-}
-
-/** Mic button that dictates into the prompt box; hidden when unsupported. */
-function MicButton({
-  onText,
-  disabled,
-  big = false,
-}: {
-  onText: (text: string) => void;
-  disabled: boolean;
-  /** Kid mode: a giant, impossible-to-miss mic. */
-  big?: boolean;
-}) {
-  const t = useT();
-  const [listening, setListening] = useState(false);
-  const [handle, setHandle] = useState<DictationHandle | null>(null);
-  if (!isSpeechSupported()) return null;
-
-  const toggle = () => {
-    if (handle) {
-      handle.stop();
-      setHandle(null);
-      setListening(false);
-      return;
-    }
-    const h = startDictation({
-      onText,
-      onEnd: () => {
-        setHandle(null);
-        setListening(false);
-      },
-    });
-    if (h) {
-      setHandle(h);
-      setListening(true);
-    }
-  };
-
-  return (
-    <button
-      type="button"
-      className={`btn icon-btn${big ? ' kid-mic' : ''}${listening ? ' primary' : ''}`}
-      aria-pressed={listening}
-      aria-label={listening ? t('ai.micStop') : t('ai.mic')}
-      title={listening ? t('ai.micStop') : t('ai.micTitle')}
-      disabled={disabled}
-      onClick={toggle}
-    >
-      <MicIcon />
-    </button>
-  );
 }
 
 export function AiPanel({ kid = false }: { kid?: boolean }) {
@@ -132,10 +77,13 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
   const selectionRegion = editRegionForSelection(doc, layer, selection);
   const canEditSelection = selectionRegion !== null;
 
-  // Hand the registry the browser image decoder; rebuild persisted BYOK
-  // providers so image generation keeps working after a reload.
+  // Hand the registry browser image codecs; rebuild persisted BYOK providers
+  // so generation and inpainting keep working after a reload.
   useEffect(() => {
-    setAIDeps({ decodeImage });
+    setAIDeps({ decodeImage, encodeImage });
+    setProvider(getActiveProvider());
+    setByok(isBYOKActive());
+    setTriesLeft(freeTriesLeft());
   }, []);
 
   const refreshProvider = () => {
@@ -185,17 +133,26 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
       const base = rasterizeLayer(layer, doc.width, doc.height);
       if (!base) throw new Error(t('ai.rasterError'));
       const region = selectedOnly ? editRegionForSelection(doc, layer, selection) : null;
-      if (region) {
-        const part = extractRegion(base, region);
-        const result = await p.editImage({ image: part, prompt });
-        blitRegion(base, result.pixels, region.x, region.y);
-        store.applyLayerRaster(base, 'AI edit');
-      } else {
-        const result = await p.editImage({ image: base, prompt });
-        store.applyLayerRaster(result.pixels, 'AI edit');
-      }
+      const result = await p.editImage({ image: base, prompt, mask: region ?? undefined });
+      store.applyLayerRaster(mergeEditResult(base, result.pixels, region), 'AI edit');
       setEditPrompt('');
       setNotice({ kind: 'ok', text: t('ai.edited') });
+    });
+
+  const erase = () =>
+    runAI('edit', async (p) => {
+      const store = useDreamStore.getState();
+      if (!layer || layer.operations.length === 0) return;
+      const base = rasterizeLayer(layer, doc.width, doc.height);
+      if (!base) throw new Error(t('ai.rasterError'));
+      const region = editRegionForSelection(doc, layer, selection);
+      const result = await p.editImage({
+        image: base,
+        prompt: ERASE_PROMPT,
+        mask: region ?? undefined,
+      });
+      store.applyLayerRaster(mergeEditResult(base, result.pixels, region), 'AI erase');
+      setNotice({ kind: 'ok', text: t('ai.erased') });
     });
 
   const look = () =>
@@ -238,7 +195,7 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
   };
 
   const saveSettings = () => {
-    const p = configureOpenAIProvider(settings, apiKey.trim(), { decodeImage });
+    const p = configureOpenAIProvider(settings, apiKey.trim(), { decodeImage, encodeImage });
     setActiveProvider(p.id);
     refreshProvider();
     setNotice({
@@ -255,10 +212,12 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
         {
           baseUrl: settings.baseUrl?.trim() || 'https://api.openai.com/v1',
           model: settings.model?.trim() || 'gpt-4o-mini',
+          imageModel: settings.imageModel?.trim() || undefined,
           apiKey: apiKey.trim() || undefined,
           supportsImages: !!settings.supportsImages,
+          editsModel: settings.editsModel?.trim() || undefined,
         },
-        { decodeImage },
+        { decodeImage, encodeImage },
       );
       await p.testConnection();
       setTestResult({ kind: 'ok', text: t('ai.testOk') });
@@ -336,7 +295,7 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
               value={createPrompt}
               onChange={(e) => setCreatePrompt(e.target.value)}
             />
-            <MicButton onText={setCreatePrompt} disabled={busy !== null} big={kid} />
+            <DictateButton onText={setCreatePrompt} disabled={busy !== null} big={kid} />
           </div>
           <button
             type="button"
@@ -354,7 +313,9 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
 
       {activeTab === 'edit' && (
         <div className="ai-section">
-          <p className="tool-hint">{t('ai.editHint')}</p>
+          <p className="tool-hint">
+            {t(byok && provider.capabilities.editImage ? 'ai.generativeEditHint' : 'ai.editHint')}
+          </p>
           <div className="ai-prompt-row">
             <textarea
               className="ai-textarea"
@@ -363,7 +324,7 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
               value={editPrompt}
               onChange={(e) => setEditPrompt(e.target.value)}
             />
-            <MicButton onText={setEditPrompt} disabled={busy !== null} />
+            <DictateButton onText={setEditPrompt} disabled={busy !== null} />
           </div>
           <label className="checkbox-field option-row" title={t('ai.selectedOnlyTitle')}>
             <input
@@ -389,6 +350,16 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
           >
             {busy === 'edit' ? t('ai.working') : t('ai.editIt')}
           </button>
+          {byok && provider.capabilities.editImage && (
+            <button
+              type="button"
+              className="btn ai-go"
+              disabled={busy !== null || !layer || layer.operations.length === 0}
+              onClick={() => void erase()}
+            >
+              {busy === 'edit' ? t('ai.working') : t('ai.erase')}
+            </button>
+          )}
           {layer && layer.operations.length === 0 && (
             <p className="ai-note">{t('ai.emptyLayer')}</p>
           )}
@@ -483,6 +454,28 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
                 />
               </label>
               <label className="option-row">
+                <span className="option-label">{t('ai.imageModel')}</span>
+                <input
+                  className="ai-input"
+                  type="text"
+                  placeholder={t('ai.imageModelPlaceholder')}
+                  value={settings.imageModel ?? ''}
+                  onChange={(e) => setSettings({ ...settings, imageModel: e.target.value })}
+                />
+              </label>
+              <p className="ai-note">{t('ai.imageModelNote')}</p>
+              <label className="option-row">
+                <span className="option-label">{t('ai.editsModel')}</span>
+                <input
+                  className="ai-input"
+                  type="text"
+                  placeholder={t('ai.editsModelPlaceholder')}
+                  value={settings.editsModel ?? ''}
+                  onChange={(e) => setSettings({ ...settings, editsModel: e.target.value })}
+                />
+              </label>
+              <p className="ai-note">{t('ai.editsModelNote')}</p>
+              <label className="option-row">
                 <span className="option-label">{t('ai.apiKey')}</span>
                 <input
                   className="ai-input"
@@ -505,7 +498,16 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
                 <input
                   type="checkbox"
                   checked={!!settings.supportsImages}
-                  onChange={(e) => setSettings({ ...settings, supportsImages: e.target.checked })}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      supportsImages: e.target.checked,
+                      imageModel:
+                        e.target.checked && !settings.imageModel
+                          ? 'gpt-image-2'
+                          : settings.imageModel,
+                    })
+                  }
                 />
                 {t('ai.canPaint')}
               </label>

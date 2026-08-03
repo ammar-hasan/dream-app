@@ -25,6 +25,27 @@ hotspots respond.
 - No wrap-around: the deck clamps at the first and last slide.
 - A slide counter ("n / N") sits at the bottom center.
 
+### Slide settings
+
+Each real frame can optionally describe how it behaves as a slide. These
+settings are edited together as one undoable change and are copied when the
+frame is duplicated.
+
+- **Transition into this slide:** none (the backward-compatible default),
+  fade or slide. It applies to click, keyboard and automatic navigation.
+- **Duration:** 1–60 seconds. When absent, the slide waits for manual
+  advance. A deck may freely mix timed and manual slides.
+- **On-screen caption:** optional short viewer-facing text shared with video
+  export. It is burned into shaped video exports but does not appear over a
+  live slideshow.
+- **Speaker notes:** optional presenter-only plain text. Notes never appear over the
+  audience canvas; they are revealed only when Presenter view is on.
+
+The **Auto** session toggle follows each slide's duration. It pauses on an
+untimed slide and at the end of the deck. The **Presenter** session toggle
+opens a presenter panel with the current slide number, its notes, its timing and
+the next slide number. Neither toggle is saved with the project.
+
 ## App flavor
 
 A **Slideshow / App** toggle (top-start) switches flavors any time. In App
@@ -47,6 +68,8 @@ flavor it behaves like an app, not a slideshow — full hotspot semantics in
   in Slideshow flavor.
 - Under reduced-motion, transitions render instantly (see
   `../visual-identity.md`).
+- Old projects have no slide settings and therefore remain instant, manual
+  decks with no notes.
 
 ## Voice narration
 

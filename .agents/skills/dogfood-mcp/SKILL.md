@@ -28,8 +28,9 @@ work end to end, not just compile. This skill proves it.
    node mcp-server/examples/demo.mjs
    ```
 
-   It creates a project in a tmp dir, adds text, reads the summary and
-   renders a PNG. It must exit 0 and print the rendered PNG path.
+   It creates a project in a tmp dir, adds a layer, draws a shape, adds text,
+   reads the summary and renders a PNG. It must exit 0 and print the rendered
+   PNG path.
 
 3. **Exercise the tools against a real `.dream` file.** Either reuse the
    demo's tmp project or make your own:
@@ -41,15 +42,17 @@ work end to end, not just compile. This skill proves it.
      const t = await import(pathToFileURL('$PWD/mcp-server/dist/mcp-server/src/tools.js').href);
      const file = '/tmp/dogfood.dream';
      await t.createProject(file, { width: 160, height: 120, name: 'dogfood' });
-     await t.addText(file, { text: 'Dream made this', x: 8, y: 60, size: 16 });
+     await t.addLayer(file, { name: 'Agent artwork' });
+     await t.addShape(file, { shape: 'rectangle', x1: 4, y1: 4, x2: 156, y2: 116, color: '#6d7cff', layer: 'Agent artwork' });
+     await t.addText(file, { text: 'Dream made this', x: 8, y: 60, size: 16, layer: 'Agent artwork' });
      console.log(JSON.stringify(await t.readProject(file), null, 2));
      console.log((await t.renderPng(file, '/tmp/dogfood.png')).outPath);
    })();
    "
    ```
 
-   Expect: a summary listing the text op, and a non-empty
-   `/tmp/dogfood.png` that opens as a 160×120 image with the text on it.
+   Expect: a summary listing one shape and one text op across two layers, and
+   a non-empty `/tmp/dogfood.png` that opens as a 160×120 image with both.
 
 4. **Check the client wiring.** `.mcp.json` at the repo root points MCP
    clients at the built server; it only works after step 1 has produced

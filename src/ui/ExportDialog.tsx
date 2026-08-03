@@ -6,7 +6,7 @@
  */
 
 import { useState } from 'react';
-import { animationSettingsOf } from '../engine/animation';
+import { animationSettingsOf, MAX_FRAME_CAPTION_LENGTH } from '../engine/animation';
 import { useDreamStore } from '../store/dreamStore';
 import { exportImage } from './exportImage';
 import { exportAppHtml } from './exportApp';
@@ -14,14 +14,17 @@ import { exportRealCodeHtml } from './exportRealCode';
 import { downloadDreamFile } from './dreamFile';
 import {
   downloadBlob,
+  exportAnimationMp4,
   exportAnimationWebM,
   exportSpriteSheet,
+  supportsMp4Video,
   videoDurationSeconds,
   videoFileName,
+  type VideoAspectPreset,
 } from './exportAnimation';
 import { useT } from './i18n';
 
-type Format = 'png' | 'jpeg' | 'webm' | 'sprite' | 'app' | 'code' | 'dream';
+type Format = 'png' | 'jpeg' | 'webm' | 'mp4' | 'sprite' | 'app' | 'code' | 'dream';
 
 export function ExportDialog({ onClose }: { onClose: () => void }) {
   const t = useT();
@@ -30,21 +33,37 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
   const [progress, setProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
+  const [aspect, setAspect] = useState<VideoAspectPreset>('original');
+  const [captionIndex, setCaptionIndex] = useState(0);
 
   const doc = useDreamStore((s) => s.doc);
   const animated = doc.frames !== undefined;
   const fps = animationSettingsOf(doc).fps;
+  const frames = doc.frames ?? [];
+  const [captions, setCaptions] = useState(() =>
+    frames.map((frame) => frame.presentation?.caption ?? ''),
+  );
+
+  const setCaption = (value: string) => {
+    setCaptions((current) =>
+      current.map((caption, index) => (index === captionIndex ? value : caption)),
+    );
+  };
 
   const doExport = async () => {
-    if (format === 'webm') {
+    if (format === 'webm' || format === 'mp4') {
       setError(null);
       setProgress(t('export.starting'));
       try {
-        const blob = await exportAnimationWebM(doc, {
+        useDreamStore.getState().setFrameCaptions(captions);
+        const exportDoc = useDreamStore.getState().doc;
+        const exporter = format === 'mp4' ? exportAnimationMp4 : exportAnimationWebM;
+        const blob = await exporter(exportDoc, {
           fps,
+          aspect,
           onProgress: (done, total) => setProgress(t('export.progress', { done, total })),
         });
-        downloadBlob(blob, videoFileName(doc.name));
+        downloadBlob(blob, videoFileName(exportDoc.name, format, aspect));
         onClose();
       } catch (err) {
         setProgress(null);
@@ -97,6 +116,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
     ...(animated
       ? [
           { id: 'webm' as const, label: t('export.webmLabel') },
+          ...(supportsMp4Video() ? [{ id: 'mp4' as const, label: t('export.mp4Label') }] : []),
           { id: 'sprite' as const, label: t('export.spriteLabel') },
           { id: 'app' as const, label: t('export.appLabel') },
           { id: 'code' as const, label: t('export.codeLabel') },
@@ -150,15 +170,87 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
           </label>
         )}
 
-        {format === 'webm' && (
-          <p className="dialog-note">
-            {t('export.webmNote', {
-              frames: doc.frames?.length ?? 0,
-              fps,
-              seconds: videoDurationSeconds(doc, fps).toFixed(1),
-            })}
-            {doc.narration ? ` ${t('export.webmWithNarration')}` : ''}
-          </p>
+        {(format === 'webm' || format === 'mp4') && (
+          <>
+            <div className="field">
+              <span>{t('export.aspect')}</span>
+              <div className="preset-grid video-aspect-grid">
+                {(['original', 'vertical', 'square', 'landscape'] as const).map((id) => (
+                  <button
+                    key={id}
+                    type="button"
+                    className={`btn preset${aspect === id ? ' active' : ''}`}
+                    aria-pressed={aspect === id}
+                    onClick={() => setAspect(id)}
+                  >
+                    {t(`export.aspect.${id}`)}
+                  </button>
+                ))}
+              </div>
+              <span className="dialog-note">{t('export.aspectHint')}</span>
+            </div>
+
+            <div className="video-caption-editor">
+              <div className="video-caption-heading">
+                <span>{t('export.captions')}</span>
+                <span>
+                  {t('export.captionFrame', { current: captionIndex + 1, total: frames.length })}
+                </span>
+              </div>
+              <textarea
+                rows={3}
+                maxLength={MAX_FRAME_CAPTION_LENGTH}
+                value={captions[captionIndex] ?? ''}
+                aria-label={t('export.captionFrame', {
+                  current: captionIndex + 1,
+                  total: frames.length,
+                })}
+                placeholder={t('export.captionPlaceholder')}
+                onChange={(event) => setCaption(event.target.value)}
+              />
+              <div className="video-caption-actions">
+                <button
+                  type="button"
+                  className="btn"
+                  disabled={captionIndex === 0}
+                  onClick={() => setCaptionIndex((index) => Math.max(0, index - 1))}
+                >
+                  {t('export.captionPrevious')}
+                </button>
+                <button
+                  type="button"
+                  className="btn"
+                  disabled={captionIndex >= frames.length - 1}
+                  onClick={() => setCaptionIndex((index) => Math.min(frames.length - 1, index + 1))}
+                >
+                  {t('export.captionNext')}
+                </button>
+                <button
+                  type="button"
+                  className="btn"
+                  disabled={!captions[captionIndex]?.trim()}
+                  onClick={() =>
+                    setCaptions((current) => current.map(() => current[captionIndex] ?? ''))
+                  }
+                >
+                  {t('export.captionCopyAll')}
+                </button>
+                <span className="video-caption-count">
+                  {(captions[captionIndex] ?? '').length}/{MAX_FRAME_CAPTION_LENGTH}
+                </span>
+              </div>
+              <p className="dialog-note">{t('export.captionHint')}</p>
+            </div>
+
+            <p className="dialog-note">
+              {t(format === 'mp4' ? 'export.mp4Note' : 'export.webmNote', {
+                frames: doc.frames?.length ?? 0,
+                fps,
+                seconds: videoDurationSeconds(doc, fps).toFixed(1),
+              })}
+              {doc.narration ? ` ${t('export.videoWithNarration')}` : ''}
+            </p>
+          </>
         )}
 
         {format === 'sprite' && <p className="dialog-note">{t('export.spriteNote')}</p>}
@@ -171,7 +263,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
 
         {progress && (
           <p className="dialog-note">
-            {format === 'webm' ? t('export.recording', { progress }) : progress}
+            {format === 'webm' || format === 'mp4' ? t('export.recording', { progress }) : progress}
           </p>
         )}
         {note && <p className="dialog-note">{note}</p>}

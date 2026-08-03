@@ -40,7 +40,7 @@ together on screen.
 | **Draw** (adult)   | full rail (no Select/Lasso/Link)   | canvas + zoom pill    | options · Adjust · Layers (+ AI panel when open)        | the default, MS-Paint-simple |
 | **Design** (adult) | full rail                          | canvas + zoom pill    | Design · Links · Components · options · Adjust · Layers |                              |
 | **Play** (adult)   | hidden                             | the game stage        | cast panel only                                         | shortcuts belong to the game |
-| **Present**        | —                                  | full-window stage     | —                                                       | slideshow/app chrome only    |
+| **Present**        | —                                  | full-window stage     | presenter notes panel when requested                    | slideshow/app chrome only    |
 | **Draw** (kid)     | kid rail (9 tools, palette, sizes) | canvas (no zoom pill) | kid panel                                               |                              |
 | **Play** (kid)     | hidden                             | the game stage        | none                                                    | big on-screen controls       |
 
@@ -81,6 +81,7 @@ all keys belong to the game.
 | ← →                                    | Catch! running               | move hero                                                 |
 | Space / ↑ / W / tap                    | Flappy running               | flap                                                      |
 | Arrows / WASD / swipe                  | Maze running                 | glide                                                     |
+| ← → / A D · Space ↑ W / tap            | Dream Jumper running         | run · jump                                                |
 
 (Tool keys do nothing while a modifier is held.)
 
@@ -105,7 +106,20 @@ phrases, precedence rules and the color vocabulary — is in
 2. Duplicate the frame, drag the ball down, repeat (onion skin ghosts the
    previous frame at 30%). 4. Press play — 6 fps, looping. 5. Export →
    **WebM video** (records in real time) or **Sprite sheet** (one PNG
-   grid).
+   grid). For video, choose Original, Vertical 9:16, Square 1:1 or Landscape
+   16:9; add a caption to each frame, stepping previous/next or copying one
+   message to all frames; Export saves the captions and burns them into the
+   movie.
+
+### Frames → present
+
+1. Select a frame and open **Slide settings**. 2. Choose how it enters,
+   optionally give it a 1–60 second duration, and add speaker notes; save all
+   three together. 3. Repeat only for slides that need different behavior.
+2. Enter **Present**. Navigate manually, or turn on **Auto** to follow the
+   per-slide timings (untimed slides pause). 5. Turn on **Presenter** to see the
+   current notes, timing and what comes next; turn it off to return to the clean
+   stage.
 
 ### Draw → play
 

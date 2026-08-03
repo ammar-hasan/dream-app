@@ -71,11 +71,14 @@ per-kind attribute tables: `data/document-schema.md`.
 ## Frame
 
 Animation is a **flipbook**: when `frames` is present, each frame owns its
-own complete layer stack (plus optional hotspots). The layers panel and all
-tools always edit the active frame. Turning animation on wraps the current
+own complete layer stack (plus optional hotspots and presentation settings).
+Presentation settings describe how a slide enters, whether it advances after
+1–60 seconds, its short viewer-facing video caption, and presenter-only
+speaker notes. The layers panel and all tools always edit the active frame. Turning animation on wraps the current
 layer stack as frame 1; turning it off keeps only the active frame's stack.
 Frame add/duplicate/delete/reorder are undoable; switching the active frame
-is navigation and is not.
+is navigation and is not. Editing a frame's presentation settings is also
+undoable.
 
 ## Hotspot
 
@@ -109,8 +112,9 @@ container: no nesting, no scene graph, scoped to its layer.
 Play mode turns layers into game pieces. Each template declares roles; a
 role is either cast to a layer (that layer's visible content becomes the
 sprite, cropped to its non-empty pixels) or left on Auto (a friendly
-built-in stand-in is drawn). Roles: **hero** (all templates), **good** /
-**bad** (Catch!), **obstacle** (Flappy Dream), **background** (all: a
+built-in stand-in is drawn). Roles: **hero** (all templates), **good**
+(Catch!/Dream Jumper), **bad** (Catch!), **obstacle** (Flappy Dream/Dream
+Jumper), **background** (all: a
 specific layer, or the rest of the document as backdrop). Casting lives on
 the document and is saved with the project, but — like the workspace mode —
 outside undo: undo never re-casts your game.
@@ -144,11 +148,11 @@ Full rules: `features/animation.md` §Voice narration.
 
 ## Game settings
 
-| Attribute       | Meaning                                                    | Range   | Default (adult)         | Default (kid mode)     |
-| --------------- | ---------------------------------------------------------- | ------- | ----------------------- | ---------------------- |
-| `fallSpeed`     | base speed, px/s (Catch: fall speed; Flappy: flight speed) | 60–400  | Catch 180 · Flappy 170  | Catch 110 · Flappy 120 |
-| `spawnInterval` | seconds between spawns                                     | 0.4–2.5 | Catch 1.1 · Flappy 1.35 | Catch 1.6 · Flappy 1.8 |
-| `lives`         | Catch: lives; Flappy: shields                              | 1–9     | Catch 3 · Flappy 1      | Catch 5 · Flappy 3     |
+| Attribute       | Meaning                                                     | Range   | Default (adult)                     | Default (kid mode)                  |
+| --------------- | ----------------------------------------------------------- | ------- | ----------------------------------- | ----------------------------------- |
+| `fallSpeed`     | base speed, px/s (Catch: fall; Flappy: flight; Jumper: run) | 60–400  | Catch 180 · Flappy 170 · Jumper 230 | Catch 110 · Flappy 120 · Jumper 170 |
+| `spawnInterval` | seconds between spawns                                      | 0.4–2.5 | Catch 1.1 · Flappy 1.35             | Catch 1.6 · Flappy 1.8              |
+| `lives`         | Catch/Jumper: lives; Flappy: shields                        | 1–9     | Catch 3 · Flappy 1 · Jumper 3       | Catch 5 · Flappy 3 · Jumper 5       |
 
 Settings stay unset until the user touches a knob — that's how the gentler
 kid defaults can apply. Full rules: `features/play.md`.

@@ -17,6 +17,8 @@ export const MIN_FPS = 1;
 export const MAX_FPS = 24;
 export const DEFAULT_FPS = 6;
 export const DEFAULT_ONION_OPACITY = 0.3;
+/** Short enough to remain legible when burned into a social-video frame. */
+export const MAX_FRAME_CAPTION_LENGTH = 160;
 
 export const DEFAULT_ANIMATION_SETTINGS: AnimationSettings = {
   fps: DEFAULT_FPS,
@@ -70,12 +72,23 @@ export function cloneFrame(frame: Frame): Frame {
   const cloneOp = <T extends { id: string }>(op: T): T => ({ ...op, id: genId('op') });
   return {
     id: genId('frame'),
+    ...(frame.presentation ? { presentation: { ...frame.presentation } } : {}),
     layers: frame.layers.map((layer) => ({
       ...layer,
       id: genId('layer'),
       operations: layer.operations.map(cloneOp),
     })),
   };
+}
+
+export const MIN_SLIDE_DURATION_SECONDS = 1;
+export const MAX_SLIDE_DURATION_SECONDS = 60;
+export const DEFAULT_SLIDE_DURATION_SECONDS = 5;
+
+/** Clamp editor input to the persisted per-slide timing contract. */
+export function slideDurationMs(seconds: number): number {
+  const finite = Number.isFinite(seconds) ? seconds : DEFAULT_SLIDE_DURATION_SECONDS;
+  return Math.max(MIN_SLIDE_DURATION_SECONDS, Math.min(MAX_SLIDE_DURATION_SECONDS, finite)) * 1000;
 }
 
 /** A fresh frame with one empty layer (flipbook "blank page"). */

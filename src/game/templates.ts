@@ -10,11 +10,17 @@ import type { GameTemplateMeta } from './template';
 import { catchMeta, catchTemplate } from './templates/catch';
 import { flappyMeta, flappyTemplate } from './templates/flappy';
 import { mazeMeta, mazeTemplate } from './templates/maze';
+import { platformerMeta, platformerTemplate } from './templates/platformer';
 
 /** Picker order: the original first, then the new friends. */
-export const TEMPLATES: readonly GameTemplateMeta[] = [catchMeta, flappyMeta, mazeMeta];
+export const TEMPLATES: readonly GameTemplateMeta[] = [
+  catchMeta,
+  flappyMeta,
+  mazeMeta,
+  platformerMeta,
+];
 
-export { catchTemplate, flappyTemplate, mazeTemplate };
+export { catchTemplate, flappyTemplate, mazeTemplate, platformerTemplate };
 
 /** The template a document runs; old saves and unknown ids fall back to Catch!. */
 export function templateOf(doc: DreamDocument): GameTemplateMeta {

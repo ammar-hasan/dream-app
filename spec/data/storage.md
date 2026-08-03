@@ -7,17 +7,17 @@ labeled data contract.
 
 ## The persistence map
 
-| What | Scope | Lifetime | Notes |
-|---|---|---|---|
-| Projects (whole documents) | per device | until deleted | the project library; autosaved |
-| Component library | per device, cross-project | until deleted | shared by all projects |
-| UI preferences (kid mode, voices, theme, comfort, locale, recent colors) | per user/device | until changed | never per document |
-| Last-opened document pointer | per device | overwritten on each autosave | drives launch restore |
-| AI provider settings (URL, model, toggles) | per device | until changed | never contains API keys |
-| AI API keys | per session by default | gone when the app closes | opt-in "remember key" moves them to device storage |
-| AI free-tier counter | per device | resets each local calendar day | |
-| Play-mode best score | per project, per device | until beaten | does NOT travel with `.dream` exports |
-| One-time hints (welcome card, install prompt dismissal) | per device | once dismissed, forever | |
+| What                                                                     | Scope                     | Lifetime                       | Notes                                              |
+| ------------------------------------------------------------------------ | ------------------------- | ------------------------------ | -------------------------------------------------- |
+| Projects (whole documents)                                               | per device                | until deleted                  | the project library; autosaved                     |
+| Component library                                                        | per device, cross-project | until deleted                  | shared by all projects                             |
+| UI preferences (kid mode, voices, theme, comfort, locale, recent colors) | per user/device           | until changed                  | never per document                                 |
+| Last-opened document pointer                                             | per device                | overwritten on each autosave   | drives launch restore                              |
+| AI provider settings (URL, model, toggles)                               | per device                | until changed                  | never contains API keys                            |
+| AI API keys                                                              | per session by default    | gone when the app closes       | opt-in "remember key" moves them to device storage |
+| AI free-tier counter                                                     | per device                | resets each local calendar day |                                                    |
+| Play-mode best score                                                     | per project, per device   | until beaten                   | does NOT travel with `.dream` exports              |
+| One-time hints (welcome card, install prompt dismissal)                  | per device                | once dismissed, forever        |                                                    |
 
 ## Behavioral rules
 
@@ -35,8 +35,9 @@ labeled data contract.
    state, Play/Present workspace mode (reopen as Draw), the wand's floating
    region, dialog state.
 5. **Outside-undo document state.** Workspace mode, animation settings,
-   game casting/settings and active-frame switching are saved with the
-   document but are never undone (see `../product.md` principle 3).
+   game casting/settings, the narration take and active-frame switching are
+   saved with the document but are never undone (see `../product.md`
+   principle 3).
 6. **Keys are secrets.** AI API keys are never written to device storage
    unless the user explicitly ticks "remember key", are never included in
    the settings blob, never logged, and never appear in error messages.
@@ -54,19 +55,19 @@ above.
   by `id`: `projects` (whole documents) and `components`.
 - **Per-device keys** (browser local storage):
 
-| Key | Value |
-|---|---|
-| `dream:kid-mode` | `'1'` / `'0'` |
-| `dream:speak-tool-names` | `'1'` / `'0'` (defaults to the kid-mode value) |
-| `dream:voice-feedback` | `'1'` / `'0'` (defaults to the kid-mode value) |
-| `dream:locale` | locale id, e.g. `'en'`, `'ar'` (default `'en'`) |
-| `dream:theme` | `'light'` / `'dark'`; absent = follow the OS preference |
-| `dream:comfort-mode` | `'1'` / `'0'` |
-| `dream:recent-colors` | JSON array of hex colors, newest first, max 8 |
-| `dream:last-doc-id` | document id; written on every autosave |
-| `dream:hint-dismissed` | `'1'` |
-| `dream:install-dismissed` | `'1'` |
-| `dream:high-score:<documentId>` | best score as an integer string |
-| `dream:ai-usage` | JSON `{ date: 'YYYY-MM-DD', count: number }` (local calendar day) |
-| `dream:ai-config` | JSON `{ activeId, providers: { 'openai-compatible': { baseUrl?, model?, imageModel?, supportsImages?, rememberKey? } } }` — **never contains keys** |
-| `dream:ai-key:<providerId>` | the API key; session storage by default, local storage only with "remember key" |
+| Key                             | Value                                                                                                                                                            |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dream:kid-mode`                | `'1'` / `'0'`                                                                                                                                                    |
+| `dream:speak-tool-names`        | `'1'` / `'0'` (defaults to the kid-mode value)                                                                                                                   |
+| `dream:voice-feedback`          | `'1'` / `'0'` (defaults to the kid-mode value)                                                                                                                   |
+| `dream:locale`                  | locale id, e.g. `'en'`, `'ar'` (default `'en'`)                                                                                                                  |
+| `dream:theme`                   | `'light'` / `'dark'`; absent = follow the OS preference                                                                                                          |
+| `dream:comfort-mode`            | `'1'` / `'0'`                                                                                                                                                    |
+| `dream:recent-colors`           | JSON array of hex colors, newest first, max 8                                                                                                                    |
+| `dream:last-doc-id`             | document id; written on every autosave                                                                                                                           |
+| `dream:hint-dismissed`          | `'1'`                                                                                                                                                            |
+| `dream:install-dismissed`       | `'1'`                                                                                                                                                            |
+| `dream:high-score:<documentId>` | best score as an integer string                                                                                                                                  |
+| `dream:ai-usage`                | JSON `{ date: 'YYYY-MM-DD', count: number }` (local calendar day)                                                                                                |
+| `dream:ai-config`               | JSON `{ activeId, providers: { 'openai-compatible': { baseUrl?, model?, imageModel?, editsModel?, supportsImages?, rememberKey? } } }` — **never contains keys** |
+| `dream:ai-key:<providerId>`     | the API key; session storage by default, local storage only with "remember key"                                                                                  |

@@ -22,17 +22,17 @@ as one undoable change; **Cancel** discards everything. Applied filters are
 destructive (baked to pixels), like MS Paint / Photoshop's apply — not a
 reorderable filter stack.
 
-| Adjustment | Range | Perceptual meaning |
-|---|---|---|
-| Brightness | −100…100 | add/subtract light; ±100 ≈ ±255 channel shift scaled |
-| Contrast | −100…100 | spread/gather tones around mid-gray |
-| Saturation | −100…100 | −100 = gray, +100 = doubled chroma |
-| Hue | −180…180° | rotate the color wheel, luminance-preserving |
-| Grayscale | 0–100 | mix toward luminance gray |
-| Sepia | 0–100 | mix toward the classic warm-brown photo tone |
-| Invert | 0–100 | mix toward the color negative |
-| Blur | 0–20 px | box blur, softens detail (also softens edges) |
-| Sharpen | 0–100 | mix toward a crispness kernel, restores edge pop |
+| Adjustment | Range     | Perceptual meaning                                   |
+| ---------- | --------- | ---------------------------------------------------- |
+| Brightness | −100…100  | add/subtract light; ±100 ≈ ±255 channel shift scaled |
+| Contrast   | −100…100  | spread/gather tones around mid-gray                  |
+| Saturation | −100…100  | −100 = gray, +100 = doubled chroma                   |
+| Hue        | −180…180° | rotate the color wheel, luminance-preserving         |
+| Grayscale  | 0–100     | mix toward luminance gray                            |
+| Sepia      | 0–100     | mix toward the classic warm-brown photo tone         |
+| Invert     | 0–100     | mix toward the color negative                        |
+| Blur       | 0–20 px   | box blur, softens detail (also softens edges)        |
+| Sharpen    | 0–100     | mix toward a crispness kernel, restores edge pop     |
 
 - Adjustments apply in a **fixed order** regardless of slider order: hue →
   saturation → brightness → contrast → grayscale → sepia → invert → blur →
@@ -42,12 +42,12 @@ reorderable filter stack.
 
 ### Presets (exact recipes)
 
-| Preset | Recipe |
-|---|---|
-| B&W | grayscale 100 |
-| Vintage | sepia 70, contrast 15, brightness −5 |
-| Cool | hue −15, saturation 10, brightness 5 |
-| Warm | sepia 25, saturation 10, brightness 5 |
+| Preset  | Recipe                                |
+| ------- | ------------------------------------- |
+| B&W     | grayscale 100                         |
+| Vintage | sepia 70, contrast 15, brightness −5  |
+| Cool    | hue −15, saturation 10, brightness 5  |
+| Warm    | sepia 25, saturation 10, brightness 5 |
 
 ## Move, flip, rotate (per layer)
 
@@ -64,7 +64,7 @@ reorderable filter stack.
 1. Drag a rectangle over the canvas; the outside dims.
 2. **Enter** or **Apply** commits; **Esc** cancels.
 3. Cropping shrinks the whole document: every layer of **every frame**
-  shifts into the new bounds; pixel content is clipped exactly.
+   shifts into the new bounds; pixel content is clipped exactly.
 
 ## Resize
 
@@ -73,6 +73,21 @@ frame**) to a new size. Strokes, shapes and text scale geometrically
 (stroke width and font size scale by the average of the x/y factors);
 pixel content resamples with **nearest-neighbor** (crisp, pixel-art
 faithful — no blur). Undo restores the previous document exactly.
+
+## Generative fill and erase
+
+An edits-capable connected AI can change the active layer from plain words.
+With a Design-mode selection and **Selected part only** on, its bounding box
+is the edit area; the model receives surrounding visual context, but every
+pixel outside the box is preserved exactly. Without a selection, the whole
+layer is editable. The result is baked once and one Undo restores the exact
+previous layer.
+
+**Erase this** is the one-tap preset: remove the selected object and fill its
+space naturally from the surrounding background. It is shown only for a
+connected provider that explicitly declares generative editing. The built-in
+offline assistant continues to offer deterministic filters and never presents
+itself as generative.
 
 ## Export (flattened images)
 
@@ -90,3 +105,5 @@ faithful — no blur). Undo restores the previous document exactly.
   is a Design-mode concern — see `design-mode.md` (90° steps only).
 - Importing while kid mode is on: the adult Import button is hidden; kid
   mode has no import path (by design — no reading-heavy dialogs).
+- A connected provider without an edits model cannot offer generative fill or
+  erase; the existing offline filter path remains available.

@@ -23,6 +23,24 @@ export async function decodeImage(file: Blob): Promise<PixelBuffer> {
   }
 }
 
+/** Encode a pixel buffer as a PNG blob via a scratch canvas. */
+export async function encodeImage(pixels: PixelBuffer): Promise<Blob> {
+  const canvas = document.createElement('canvas');
+  canvas.width = pixels.width;
+  canvas.height = pixels.height;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('2D canvas unavailable');
+  const image = ctx.createImageData(pixels.width, pixels.height);
+  image.data.set(pixels.data);
+  ctx.putImageData(image, 0, 0);
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error('PNG encode failed'));
+    }, 'image/png');
+  });
+}
+
 /** Import every image file in the list; non-image entries are skipped. */
 export async function importImageFiles(files: Iterable<File>): Promise<void> {
   for (const file of files) {

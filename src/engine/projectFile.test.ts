@@ -147,6 +147,12 @@ function richDocument(): DreamDocument {
       {
         id: 'frame-1',
         layers: [], // replaced below with the mirrored stack
+        presentation: {
+          transition: 'fade',
+          durationMs: 5000,
+          notes: 'Welcome everyone',
+          caption: 'Our first message',
+        },
         hotspots: [
           {
             id: 'hot-1',

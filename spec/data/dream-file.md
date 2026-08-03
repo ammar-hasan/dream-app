@@ -28,8 +28,10 @@ rebuilds).
 
 - **Readers must ignore fields they don't know** — at every level
   (envelope, document, frame, layer, operation).
-- **Writers must round-trip unknown fields**: a file read and re-written
-  preserves fields the implementation doesn't understand.
+- **Writers must round-trip unknown document content**: a document read,
+  edited and re-exported preserves unknown fields on the document, frames,
+  layers and operations. Unknown envelope extensions are ignored because the
+  envelope is transport metadata rather than document content.
 - Version bumps are additive where possible; a breaking change increments
   `version`. Readers refuse newer major versions (see errors below).
 
@@ -39,19 +41,19 @@ A reader must reject, with a human-readable error, in these cases (message
 texts are the contract for the web implementation; other implementations
 should be equally plain):
 
-| Violation | Error |
-|---|---|
-| Not JSON | `Not a .dream file: invalid JSON` |
-| JSON isn't an object | `Not a .dream file: expected a JSON object` |
-| `format` mismatch | `Not a .dream file: missing format "dream-project"` |
-| `version` ≠ 1 | `Unsupported .dream version: {v}` |
-| `document` missing/not an object | `Corrupt .dream file: missing document` |
-| `width`/`height` not numeric | `Corrupt .dream file: document has no size` |
-| Malformed frame entry | `Corrupt .dream file: bad frame` |
-| `layers` not an array | `Corrupt .dream file: layers must be an array` |
-| Layer without an `operations` array | `Corrupt .dream file: layer is missing operations` |
-| Raster op without a PNG string payload | `Corrupt .dream file: raster op "{id}" has no PNG payload` |
-| Raster op without numeric patch size | `Corrupt .dream file: raster op "{id}" has no patch size` |
+| Violation                              | Error                                                                    |
+| -------------------------------------- | ------------------------------------------------------------------------ |
+| Not JSON                               | `Not a .dream file: invalid JSON`                                        |
+| JSON isn't an object                   | `Not a .dream file: expected a JSON object`                              |
+| `format` mismatch                      | `Not a .dream file: missing format "dream-project"`                      |
+| `version` ≠ 1                          | `Unsupported .dream version: {v}`                                        |
+| `document` missing/not an object       | `Corrupt .dream file: missing document`                                  |
+| `width`/`height` not numeric           | `Corrupt .dream file: document has no size`                              |
+| Malformed frame entry                  | `Corrupt .dream file: bad frame`                                         |
+| `layers` not an array                  | `Corrupt .dream file: layers must be an array`                           |
+| Layer without an `operations` array    | `Corrupt .dream file: layer is missing operations`                       |
+| Raster op without a PNG string payload | `Corrupt .dream file: raster op "{id}" has no PNG payload`               |
+| Raster op without numeric patch size   | `Corrupt .dream file: raster op "{id}" has no patch size`                |
 | Decoded PNG size ≠ declared patch size | `Corrupt .dream file: raster op "{id}" PNG is {a}×{b}, expected {w}×{h}` |
 
 ## Known fidelity caveat

@@ -176,6 +176,20 @@ export interface Hotspot {
   transition: HotspotTransition;
 }
 
+export type SlideTransition = 'none' | 'fade' | 'slide';
+
+/** Optional presentation behavior attached to one frame/slide. */
+export interface SlidePresentation {
+  /** Transition used when entering this slide. */
+  transition?: SlideTransition;
+  /** Auto-advance delay; absent means wait for the presenter. */
+  durationMs?: number;
+  /** Presenter-only speaker notes shown in Presenter view. */
+  notes?: string;
+  /** Optional on-screen caption burned into video exports for this frame. */
+  caption?: string;
+}
+
 /**
  * One animation frame (or presentation slide, or app screen): it owns its
  * own layer stack, exactly like the top-level document did before animation
@@ -188,6 +202,8 @@ export interface Frame {
   layers: Layer[];
   /** App-mode links out of this screen; undefined = none. */
   hotspots?: Hotspot[];
+  /** Per-frame presentation and video-delivery metadata; absent on old saves. */
+  presentation?: SlidePresentation;
 }
 
 /**
@@ -217,11 +233,11 @@ export interface AnimationSettings {
 export interface GameCast {
   /** Layer id of the character the player controls. */
   hero?: string;
-  /** Layer id of the good falling thing (+1 point). Catch! only. */
+  /** Layer id of a collectible (+1 point). Catch! and Dream Jumper. */
   good?: string;
   /** Layer id of the bad falling thing (-1 life). Catch! only. */
   bad?: string;
-  /** Layer id drawn as the gates/pipes. Flappy Dream only. */
+  /** Layer id drawn as gates or platforms. Flappy Dream and Dream Jumper. */
   obstacle?: string;
   /** Layer id painted as the backdrop; undefined = the rest of the document. */
   background?: string;
@@ -254,7 +270,7 @@ export interface Narration {
  * The Play-mode game templates. `'catch'` is the original; old documents
  * without a `template` field resolve to it.
  */
-export type GameTemplateId = 'catch' | 'flappy' | 'maze';
+export type GameTemplateId = 'catch' | 'flappy' | 'maze' | 'platformer';
 
 /**
  * Play-mode setup, persisted with the document but updated outside History

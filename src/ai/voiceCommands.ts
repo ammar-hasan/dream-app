@@ -212,6 +212,7 @@ const EN_VOCAB: VoiceVocabulary = {
     catch: new Set(['catch', 'catching']),
     flappy: new Set(['flappy', 'flap', 'fly', 'flying', 'bird']),
     maze: new Set(['maze', 'labyrinth']),
+    platformer: new Set(['platformer', 'platform', 'jumper', 'jumping']),
   },
   app: new Set(['app', 'prototype']),
   appPreview: new Set(['preview', 'try', 'test', 'open', 'show']),
@@ -329,6 +330,7 @@ const AR_VOCAB: VoiceVocabulary = {
     catch: new Set(['الصيد', 'صيد', 'التقاط']),
     flappy: new Set(['الطيران', 'طيران', 'فلابي', 'الطائر', 'طائر']),
     maze: new Set(['المتاهة', 'متاهة', 'متاهه']),
+    platformer: new Set(['منصات', 'المنصات', 'قفز', 'القفز']),
   },
   app: new Set(['تطبيق', 'تطبيقي', 'التطبيق', 'برنامج']),
   appPreview: new Set(['عاين', 'معاينة', 'معاينه', 'جرب', 'افتح', 'اعرض']),
@@ -371,6 +373,7 @@ function mergeVocabulary(base: VoiceVocabulary, extra: VoiceVocabulary): VoiceVo
       catch: union(base.templates.catch, extra.templates.catch),
       flappy: union(base.templates.flappy, extra.templates.flappy),
       maze: union(base.templates.maze, extra.templates.maze),
+      platformer: union(base.templates.platformer, extra.templates.platformer),
     },
     app: union(base.app, extra.app),
     appPreview: union(base.appPreview, extra.appPreview),
@@ -447,7 +450,7 @@ function templateIn(
   tokens: Set<string>,
   templates: Record<GameTemplateId, Set<string>>,
 ): GameTemplateId | null {
-  for (const id of ['catch', 'flappy', 'maze'] as const) {
+  for (const id of ['catch', 'flappy', 'maze', 'platformer'] as const) {
     if (has(tokens, templates[id])) return id;
   }
   return null;
@@ -537,7 +540,7 @@ export function parseVoiceCommand(transcript: string, locale = 'en'): VoiceComma
   }
 
   if (has(tokens, vocab.stop)) return { kind: 'stop' };
-  // Game templates: "play flappy" / "play maze" / "play catch" — a template
+  // Game templates: "play flappy" / "play maze" / "play platformer" — a template
   // word with a play/game word (or all alone) picks that game and starts it.
   const template = templateIn(tokens, vocab.templates);
   if (template && (has(tokens, vocab.play) || has(tokens, vocab.game) || tokens.size === 1)) {

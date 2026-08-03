@@ -16,6 +16,7 @@ import { useDreamStore } from '../store/dreamStore';
 import { useUiPrefs } from '../store/uiPrefs';
 import { PauseIcon, PlayIcon, PlusIcon } from './icons';
 import { NarrationControls } from './NarrationControls';
+import { SlideSettingsDialog } from './SlideSettingsDialog';
 import { useT } from './i18n';
 
 const THUMB_HEIGHT = 56;
@@ -64,6 +65,11 @@ const FrameThumbnail = memo(
       >
         <canvas ref={canvasRef} style={{ width, height: THUMB_HEIGHT }} />
         <span className="timeline-frame-number">{index + 1}</span>
+        {frame.presentation?.caption && (
+          <span className="timeline-frame-caption" aria-hidden="true">
+            {t('timeline.captionBadge')}
+          </span>
+        )}
       </button>
     );
   },
@@ -72,6 +78,7 @@ const FrameThumbnail = memo(
   // is deliberately excluded from the comparison.
   (prev, next) =>
     prev.frame.layers === next.frame.layers &&
+    prev.frame.presentation?.caption === next.frame.presentation?.caption &&
     prev.active === next.active &&
     prev.playingHere === next.playingHere &&
     prev.index === next.index &&
@@ -87,11 +94,13 @@ export function TimelineBar() {
   const playbackFrame = useDreamStore((s) => s.playbackFrame);
   const kidMode = useUiPrefs((s) => s.kidMode);
   const [collapsed, setCollapsed] = useState(false);
+  const [slideSettingsOpen, setSlideSettingsOpen] = useState(false);
 
   if (!doc.frames) return null;
 
   const settings = animationSettingsOf(doc);
   const frames = doc.frames;
+  const activeFrame = frames.find((frame) => frame.id === doc.activeFrameId) ?? frames[0];
   const store = useDreamStore.getState();
   // App-mode discovery: with 2+ screens and no links yet, nudge grown-ups
   // toward the Link tool. Kid mode skips it — Play is the kid path.
@@ -99,8 +108,12 @@ export function TimelineBar() {
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     // Space = play/pause while the timeline has focus (the global handler
-    // skips Space-pan inside .timeline-bar). Range inputs keep their keys.
-    if (e.key === ' ' && !(e.target instanceof HTMLInputElement)) {
+    // skips Space-pan inside .timeline-bar). Form fields keep their keys.
+    const target = e.target as HTMLElement;
+    if (
+      e.key === ' ' &&
+      !target.closest('input, textarea, select, [contenteditable="true"], [role="dialog"]')
+    ) {
       e.preventDefault();
       store.togglePlay();
     }
@@ -175,6 +188,15 @@ export function TimelineBar() {
           )}
 
           <div className="timeline-controls">
+            <button
+              type="button"
+              className="btn"
+              data-tooltip={t('slide.edit')}
+              aria-label={t('slide.edit')}
+              onClick={() => setSlideSettingsOpen(true)}
+            >
+              {t('slide.short')}
+            </button>
             <button
               type="button"
               className="btn"
@@ -275,6 +297,13 @@ export function TimelineBar() {
             )}
           </div>
         </>
+      )}
+      {slideSettingsOpen && activeFrame && (
+        <SlideSettingsDialog
+          key={activeFrame.id}
+          frame={activeFrame}
+          onClose={() => setSlideSettingsOpen(false)}
+        />
       )}
     </div>
   );

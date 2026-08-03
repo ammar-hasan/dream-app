@@ -22,8 +22,8 @@ BYOK providers and voice input), **Slice 6** (accessibility for everyone:
 kid mode, canvas voice commands and i18n with RTL), the **polish pass**
 (design system, dark theme, brand, micro-delight), the **drawing power
 tools** (mirror symmetry, pen pressure, filled shapes, lasso, magic wand
-and the spray brush), **game mode** (turn your drawings into a playable
-Catch! mini-game) and **app mode** (link your frames into an interactive
+and the spray brush), **game mode** (describe a game, cast your drawings and
+play Catch!, Flappy Dream, Maze Runner or Dream Jumper) and **app mode** (link your frames into an interactive
 prototype and export it as one standalone HTML file), and the **developer
 surface** (a portable `.dream` file format, an MCP server for agents, and a
 stable engine API), and **voice narration** (record your voice over an
@@ -104,6 +104,11 @@ frame — editing one frame never re-renders the others.
 
 The heart of Dream: a 5-year-old and a 90-year-old should both be able to
 create — literacy optional. Slice 6 ships three pillars plus a settings menu.
+
+The browser suite audits Draw, Design, Play, slide settings and Presenter for
+serious/critical accessibility violations. Light/dark secondary text and
+accent labels use WCAG-AA-readable tokens; reduced motion, keyboard focus and
+RTL remain first-class product behavior.
 
 - **Little Dreamer (kid) mode** — tap the ⭐ in the toolbar (or the settings
   gear). The tool rail becomes giant icon-only buttons for the essentials
@@ -252,10 +257,23 @@ play button, everything called "frames".
   via `canvas.captureStream` + `MediaRecorder`, VP9 with VP8/bare-WebM
   fallback, progress shown while recording) and **Sprite sheet** (all frames
   in one PNG grid, zero dependencies). GIF was skipped — it needs an encoder
-  dependency; the sprite sheet covers the animated-asset use case.
+  dependency; the sprite sheet covers the animated-asset use case. Browsers
+  that natively support MP4 recording also get a real **MP4 video** option
+  with the same timing, progress and narration mix; it is hidden elsewhere.
+  Either video can stay Original or use a 720p Vertical 9:16, Square 1:1 or
+  Landscape 16:9 canvas. Dream contains and centers the complete drawing—no
+  cropping or stretching—and records at 30 fps while preserving the authored
+  flipbook holds. Add a short caption per frame in the same dialog, step
+  previous/next or copy one to all, and the captions are burned into the video
+  over a readable safe-area backing. Export saves the batch as one undoable
+  edit; shaped filenames include `-vertical`, `-square` or `-landscape`.
 - **Present mode**: the mode pill is now Draw / Design / Play / Present. Present
   turns frames into slides: full-viewport rendering, arrow keys / Space /
   click to advance, ← to go back, Esc to exit, slide counter at the bottom.
+  Each slide can enter with no transition, a fade or a slide, advance after
+  1–60 seconds, and carry presenter-only speaker notes. **Auto** follows those
+  durations (pausing on manual slides); **Presenter** reveals notes, timing and
+  what comes next without putting notes on the artwork.
   No editing while presenting. A document without frames is a one-slide deck.
   Present is session-only — a project saved mid-presentation reopens in Draw.
 
@@ -275,9 +293,12 @@ on the document through the same undoable history as your own strokes.
 - **Create**: describe what you want ("a sleepy fox under a starry sky")
   and it appears as a new layer. The mic button 🎤 fills the prompt by
   voice (Web Speech API; hidden where unsupported).
-- **Edit**: describe a change ("warmer", "dreamy", "more pop"). With
-  "Selected part only" ticked, the current Design-mode selection box
-  becomes the edit region; the rest of the layer is untouched.
+- **Edit**: describe a change ("warmer", "dreamy", "more pop"), or connect
+  an edits-capable BYOK model and ask for something new ("put a little boat
+  here"). With "Selected part only" ticked, the current Design-mode selection
+  box becomes the edit region; the rest of the layer is untouched. Capable
+  BYOK providers also expose one-tap **Erase this** to remove the selection
+  and fill the gap naturally. Both actions are one undo step.
 - **Feedback**: "Look at my design" returns kind, concrete observations
   plus suggestions — each with an **Apply** button where Dream can do it
   for you (contrast/brightness/warmth fixes, centering the selection).
@@ -293,19 +314,27 @@ countdown subtly.
 **BYOK — bring your own key.** In the panel's Settings you can point Dream
 at any OpenAI-compatible endpoint: chat goes through `/chat/completions`,
 image generation through `/images/generations` (tick "This AI can also
-paint images" if the endpoint supports it). With your own provider active
-the daily counter disappears and usage is unlimited. Settings (URL, model,
-active provider) persist in localStorage; **API keys live in sessionStorage
-only** (gone when the tab closes) unless you tick "remember key", and are
-never logged. Examples:
+paint images" if the endpoint supports it and enter its **Image model**), and
+generative fill/erase through multipart `/images/edits`. Enter an **Edits
+model** only when that endpoint supports the edits route; `gpt-image-2` is the
+current OpenAI example for both image fields. At the official OpenAI endpoint,
+leaving Image model blank uses that current default; leaving Edits model blank
+keeps BYOK editing disabled instead of making a false capability claim. With
+your own provider active the daily counter disappears and usage is unlimited.
+Settings (URL, chat model, image model, edits model, active provider) persist
+in localStorage; **API keys live in sessionStorage only** (gone when the tab
+closes) unless you tick "remember key", and are never logged. Examples:
 
 ```
 OpenRouter:  base URL https://openrouter.ai/api/v1   model openai/gpt-4o-mini
+OpenAI:      base URL https://api.openai.com/v1      model gpt-4o-mini
+             image model gpt-image-2
+             edits model gpt-image-2
 Ollama:      base URL http://localhost:11434/v1      model llama3.1  (no key needed)
 LM Studio:   base URL http://localhost:1234/v1       model <loaded model>
 ```
 
-The **Test connection** button validates URL/key/model with one cheap
+The **Test connection** button validates URL/key/chat-model with one cheap
 round-trip and reports success or a friendly, jargon-free error. Endpoints
 that can't generate or edit images simply declare so — the panel degrades
 gracefully and offers to switch back to Dream AI.
@@ -413,8 +442,9 @@ IDEA.md's "create whole applications with just your drawings".
   pixel-faithful prototype, AI rewrites your app as REAL, readable code —
   screens as semantic `<section>`s, your texts as real text, links wired as
   real `<button>`s on a tiny hash router, your colors carried over. Dream
-  sends a compact structured description of the app (never pixels) to your
-  chat-capable BYOK provider and validates that the reply is one
+  sends a compact structured description of the app plus inline PNG pixels
+  for visible imported or AI-made images to your chat-capable BYOK provider,
+  and validates that the reply is one
   self-contained HTML file; with the built-in Dream AI a deterministic
   local template generates the app instead — free, offline, counted against
   the daily free tier, and honestly labeled "generated locally by Dream AI"
@@ -431,7 +461,7 @@ IDEA.md's "create whole applications with just your drawings".
 ## Play mode (games)
 
 The **Play** tab in the mode pill turns the drawing into a mini-game you play
-right on the canvas. Three templates ship in the picker:
+right on the canvas. Four templates ship in the picker:
 
 - **Catch!** — things fall from the top; the hero slides left/right to catch
   the good ones (+1 point) and dodge the bad ones (−1 life).
@@ -441,9 +471,18 @@ right on the canvas. Three templates ship in the picker:
 - **Maze Runner** — a freshly generated maze every level (seeded, always
   solvable); guide the hero to the exit with arrows/WASD or swipe. Reaching
   the exit levels up to a bigger maze.
+- **Dream Jumper** — run and jump across a short seeded side-scrolling course,
+  collect stars and reach the flag. Falls spend a life and respawn; cast your
+  own hero, collectibles, platforms and background.
 
-All three share the same casting magic, controls, juice and sounds:
+All four share the same casting magic, controls, juice and sounds:
 
+- **Make a game from words** — type a request like “My Rocket flies through
+  Clouds, nice and slow.” Dream chooses a template, tunes easy/hard,
+  fast/slow, many/few and lives/shields language, and casts layers whose names
+  you mention. Type or use the feature-detected mic; English and Arabic work
+  fully offline with no AI key or free try. The visible picker/settings show
+  what it understood before you press Play.
 - **Casting is the magic** — your own drawings become the game pieces. The
   cast panel assigns a layer to each role the template needs (Hero, plus
   Good/Bad Things, Obstacle or Background depending on the template). Every
@@ -515,13 +554,17 @@ library. Encode/decode is pure and codec-agnostic in
 
 `mcp-server/` is a standalone Node package (not part of the webapp build)
 exposing `.dream` files to agents over stdio MCP: `dream.read_project`,
-`dream.create_project`, `dream.list_layers`, `dream.add_text`,
-`dream.render_png` (real PNGs via `@napi-rs/canvas`) and `dream.export_app`.
+`dream.create_project`, `dream.list_layers`, `dream.add_layer`,
+`dream.add_text`, `dream.add_shape`, `dream.render_png` (real PNGs via
+`@napi-rs/canvas`) and `dream.export_app`.
 Setup and client config (Claude Code, Codex) are in
 [`mcp-server/README.md`](mcp-server/README.md); `npm run check:mcp` from the
 repo root installs, builds and tests it. The repo also ships a root
 `.mcp.json`, so MCP-capable agents working in this repo get dream-mcp
 automatically once `npm run check:mcp` has produced `mcp-server/dist/`.
+The standalone package and official `server.json` are registry-ready under
+`@ammar-hasan/dream-mcp` / `io.github.ammar-hasan/dream-mcp`; public npm and
+MCP Registry publication remain an explicit human-approved release action.
 
 ### The stable engine API
 

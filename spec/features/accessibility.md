@@ -5,6 +5,10 @@ optional. Three pillars: **Little Dreamer (kid) mode**, **comfort mode**,
 and **voice** (spoken names + hands-free commands), all consolidated in the
 settings gear.
 
+Across every mode and dialog, normal-sized text and interactive labels meet
+WCAG AA color contrast in both themes. Brand accent fills may stay bright;
+accent-colored text and solid controls use their darker readable variants.
+
 ## Little Dreamer (kid) mode
 
 Toggle: the ⭐ in the toolbar or the settings gear. Per-user preference,

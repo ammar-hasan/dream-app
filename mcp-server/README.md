@@ -1,5 +1,7 @@
 # dream-mcp
 
+<!-- mcp-name: io.github.ammar-hasan/dream-mcp -->
+
 An MCP (Model Context Protocol) server that lets agents — Claude Code, Codex,
 any MCP-capable client — work with **Dream** `.dream` project files: read
 them, create them, edit them, render them to PNG, and export interactive HTML
@@ -16,7 +18,9 @@ byte-compatible with the browser app, and vice versa.
 | `dream.read_project`   | Summary of a `.dream` file: size, background, mode, layer/frame counts, hotspots (incl. broken), op counts per kind, game setup. |
 | `dream.create_project` | Create a new `.dream` file: `path`, `width`, `height`, optional `background`, `name`.                                            |
 | `dream.list_layers`    | Layer stack(s): id, name, visibility, opacity, lock, op count — plus a per-frame breakdown for animated documents.               |
+| `dream.add_layer`      | Add a new top layer to the active frame, with an optional `name`.                                                                |
 | `dream.add_text`       | Append a text op: `text`, `x`, `y`, optional `size`, `color`, `fontFamily`, `layer` (id or name; default: top layer).            |
+| `dream.add_shape`      | Append a line/rectangle/ellipse with endpoints, optional size/color/opacity/fill, and an optional target `layer`.                |
 | `dream.render_png`     | Flatten the document (or one `frame` index) to a PNG file.                                                                       |
 | `dream.export_app`     | Export an animated document as ONE self-contained interactive HTML prototype (frames as screens, hotspots as tappable links).    |
 
@@ -31,6 +35,10 @@ npm run check     # builds to dist/ and runs the test suite
 The server entry point after building is
 `mcp-server/dist/mcp-server/src/index.js` (the engine is compiled in from the
 repository root, hence the nested path).
+
+The package is prepared for public npm publication as
+`@ammar-hasan/dream-mcp`, but local development does not require a published
+artifact.
 
 ### Claude Code
 
@@ -65,8 +73,26 @@ args = ["/absolute/path/to/dream-app/mcp-server/dist/mcp-server/src/index.js"]
 node examples/demo.mjs
 ```
 
-creates a project in a tmp dir, adds text, reads the summary and renders a
-PNG — the exact functions the MCP tools call.
+creates a project in a tmp dir, adds a layer, draws a rectangle, adds text,
+reads the summary and renders a PNG — the exact functions the MCP tools call.
+
+## Registry publication
+
+`server.json` follows the official MCP Registry schema and identifies the
+server as `io.github.ammar-hasan/dream-mcp`. Package metadata contains the
+matching `mcpName`; `npm pack --dry-run` builds, tests, and previews the exact
+public tarball.
+
+Publishing is intentionally a human-approved release step:
+
+```bash
+cd mcp-server
+npm publish
+mcp-publisher login github
+mcp-publisher publish
+```
+
+The npm package must be public before the Registry will accept its metadata.
 
 ## How it fits the repo
 
@@ -84,6 +110,8 @@ PNG — the exact functions the MCP tools call.
 - Canvas codecs premultiply alpha: a PNG round-trip of _semi-transparent_
   raster pixels is lossy by a rounding step (true of every canvas, browsers
   included). Opaque pixels round-trip exactly.
+- `dream.add_layer`, `dream.add_text`, and `dream.add_shape` target the active
+  frame; a layer can be addressed by id or name where supported.
 - `dream.export_app` needs an animated document (frames are the screens);
   documents without frames get a clear error.
 - Rendering uses the headless skia build — text uses the fonts bundled with

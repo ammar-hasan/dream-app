@@ -15,8 +15,11 @@ import {
   removeOperation,
   updateLayerProps,
   withFrameHotspots,
+  withFrameCaptions,
+  withFramePresentation,
   withFrames,
 } from './document';
+import type { FrameCaptionUpdate } from './document';
 import { disableAnimation, enableAnimation } from './animation';
 import {
   INVERSE_TRANSFORM,
@@ -26,7 +29,15 @@ import {
   translateLayer,
   type LayerTransform,
 } from './transform';
-import type { DreamDocument, Frame, Hotspot, Layer, Operation, Rect } from './types';
+import type {
+  DreamDocument,
+  Frame,
+  Hotspot,
+  Layer,
+  Operation,
+  Rect,
+  SlidePresentation,
+} from './types';
 
 export interface Command {
   label: string;
@@ -349,6 +360,36 @@ export function moveFrameCommand(doc: DreamDocument, frameId: string, toIndex: n
       next.splice(fromIndex, 0, frame);
       return withFrames(d, next, d.activeFrameId ?? activeId);
     },
+  };
+}
+
+/** Replace one slide's presentation settings as a single undoable edit. */
+export function setFramePresentationCommand(
+  doc: DreamDocument,
+  frameId: string,
+  presentation: SlidePresentation | undefined,
+): Command {
+  const previous = doc.frames?.find((frame) => frame.id === frameId)?.presentation;
+  return {
+    label: 'Edit slide settings',
+    apply: (d) => withFramePresentation(d, frameId, presentation),
+    revert: (d) => withFramePresentation(d, frameId, previous),
+  };
+}
+
+/** Replace any number of video captions as one undoable edit. */
+export function setFrameCaptionsCommand(
+  doc: DreamDocument,
+  updates: readonly FrameCaptionUpdate[],
+): Command {
+  const ids = new Set(updates.map(({ frameId }) => frameId));
+  const previous = (doc.frames ?? [])
+    .filter((frame) => ids.has(frame.id))
+    .map((frame) => ({ frameId: frame.id, caption: frame.presentation?.caption }));
+  return {
+    label: 'Edit video captions',
+    apply: (d) => withFrameCaptions(d, updates),
+    revert: (d) => withFrameCaptions(d, previous),
   };
 }
 

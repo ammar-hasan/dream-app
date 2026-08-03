@@ -2,7 +2,13 @@
 
 import { describe, expect, it } from 'vitest';
 import { contentBounds, cropBuffer } from './sprites';
-import { drawDefaultBad, drawDefaultGood, drawDefaultHero } from './defaults';
+import {
+  drawDefaultBad,
+  drawDefaultGate,
+  drawDefaultGood,
+  drawDefaultHero,
+  drawDefaultPlatform,
+} from './defaults';
 import { MockContext2D } from '../test/mockContext';
 import type { PixelBuffer } from '../engine/filters';
 
@@ -66,8 +72,22 @@ describe('default cast drawings', () => {
     expect(ctx.calls('stroke')).toHaveLength(1);
   });
 
-  it('all three save/restore the context', () => {
-    for (const draw of [drawDefaultHero, drawDefaultGood, drawDefaultBad]) {
+  it('platform is a filled earth tile with a grass top', () => {
+    const ctx = new MockContext2D();
+    drawDefaultPlatform(ctx, 50, 50, 64);
+    expect(ctx.calls('rect')).toHaveLength(2);
+    expect(ctx.calls('fill')).toHaveLength(2);
+    expect(ctx.fillStyle).toBe('#4ade80');
+  });
+
+  it('every stand-in saves and restores the context', () => {
+    for (const draw of [
+      drawDefaultHero,
+      drawDefaultGood,
+      drawDefaultBad,
+      drawDefaultGate,
+      drawDefaultPlatform,
+    ]) {
       const ctx = new MockContext2D();
       draw(ctx, 10, 10, 20);
       expect(ctx.calls('save')).toHaveLength(1);

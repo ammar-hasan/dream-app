@@ -1,5 +1,5 @@
 /**
- * Animation export: WebM video and PNG sprite sheet.
+ * Animation export: WebM/MP4 video and PNG sprite sheet.
  *
  * The browser-only bits (canvas.captureStream, MediaRecorder) are isolated
  * behind injectable deps so everything around them — mime fallback, filename
@@ -11,13 +11,135 @@
 
 import { animationDurationMs, spriteSheetLayout } from '../engine/animation';
 import { renderDocument } from '../engine/renderer';
-import type { DreamDocument, Narration } from '../engine/types';
+import type { DreamDocument, Frame, Narration } from '../engine/types';
 import { mixNarrationTracks } from './narration';
+
+export type VideoAspectPreset = 'original' | 'vertical' | 'square' | 'landscape';
+
+export const SOCIAL_VIDEO_CAPTURE_FPS = 30;
+
+export interface VideoOutputSize {
+  width: number;
+  height: number;
+}
+
+export interface VideoFrameLayout extends VideoOutputSize {
+  scale: number;
+  x: number;
+  y: number;
+}
+
+/** Social-ready output sizes; original preserves the document dimensions. */
+export function videoOutputSize(
+  doc: Pick<DreamDocument, 'width' | 'height'>,
+  aspect: VideoAspectPreset,
+): VideoOutputSize {
+  if (aspect === 'vertical') return { width: 720, height: 1280 };
+  if (aspect === 'square') return { width: 720, height: 720 };
+  if (aspect === 'landscape') return { width: 1280, height: 720 };
+  return { width: doc.width, height: doc.height };
+}
+
+/** Contain the artwork without cropping or stretching, centered in the output. */
+export function videoFrameLayout(
+  doc: Pick<DreamDocument, 'width' | 'height'>,
+  aspect: VideoAspectPreset,
+): VideoFrameLayout {
+  const output = videoOutputSize(doc, aspect);
+  const scale = Math.min(output.width / doc.width, output.height / doc.height);
+  return {
+    ...output,
+    scale,
+    x: (output.width - doc.width * scale) / 2,
+    y: (output.height - doc.height * scale) / 2,
+  };
+}
+
+/** Wrap a short caption deterministically; the last of three lines ellipsizes. */
+export function captionLines(text: string, maxChars: number, maxLines = 3): string[] {
+  const clean = text.trim().replace(/\s+/g, ' ');
+  if (!clean || maxChars < 1 || maxLines < 1) return [];
+  const chunks = clean
+    .split(' ')
+    .flatMap((word) =>
+      Array.from({ length: Math.ceil(word.length / maxChars) }, (_, index) =>
+        word.slice(index * maxChars, (index + 1) * maxChars),
+      ),
+    );
+  const lines: string[] = [];
+  let index = 0;
+  while (index < chunks.length && lines.length < maxLines) {
+    let line = chunks[index];
+    index += 1;
+    while (index < chunks.length && `${line} ${chunks[index]}`.length <= maxChars) {
+      line += ` ${chunks[index]}`;
+      index += 1;
+    }
+    lines.push(line);
+  }
+  if (index < chunks.length && lines.length > 0) {
+    const last = lines.length - 1;
+    lines[last] = `${lines[last].slice(0, Math.max(1, maxChars - 1)).trimEnd()}…`;
+  }
+  return lines;
+}
+
+/** Render one frame into its delivery canvas, then burn in its caption. */
+export function renderVideoFrame(
+  doc: DreamDocument,
+  frame: Frame,
+  ctx: CanvasRenderingContext2D,
+  aspect: VideoAspectPreset,
+): void {
+  const layout = videoFrameLayout(doc, aspect);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.fillStyle = doc.background;
+  ctx.fillRect(0, 0, layout.width, layout.height);
+  ctx.save();
+  ctx.translate(layout.x, layout.y);
+  ctx.scale(layout.scale, layout.scale);
+  renderDocument({ ...doc, layers: frame.layers }, ctx, { background: false });
+  ctx.restore();
+
+  const caption = frame.presentation?.caption;
+  if (!caption) return;
+  const fontSize = Math.max(24, Math.min(52, Math.round(layout.width * 0.045)));
+  const maxChars = Math.max(12, Math.floor((layout.width * 0.8) / (fontSize * 0.58)));
+  const lines = captionLines(caption, maxChars);
+  if (lines.length === 0) return;
+  const lineHeight = Math.round(fontSize * 1.24);
+  const padY = Math.round(fontSize * 0.42);
+  const boxWidth = layout.width * 0.84;
+  const boxHeight = lines.length * lineHeight + padY * 2;
+  const boxX = (layout.width - boxWidth) / 2;
+  const boxY = layout.height - Math.max(32, layout.height * 0.07) - boxHeight;
+
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.76)';
+  ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `600 ${fontSize}px system-ui, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  lines.forEach((line, index) => {
+    ctx.fillText(line, layout.width / 2, boxY + padY + lineHeight * (index + 0.5));
+  });
+  ctx.restore();
+}
 
 export const WEBM_MIME_CANDIDATES = [
   'video/webm;codecs=vp9',
   'video/webm;codecs=vp8',
   'video/webm',
+];
+
+export const MP4_MIME_CANDIDATES = [
+  'video/mp4',
+  'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+  'video/mp4;codecs=avc1.42E01E',
 ];
 
 /** First supported WebM variant (VP9 → VP8 → bare), or null when none. */
@@ -28,8 +150,29 @@ export function pickWebmMimeType(isSupported: (mime: string) => boolean): string
   return null;
 }
 
-export function videoFileName(docName: string): string {
-  return `${docName.trim() || 'dream'}.webm`;
+/** First browser-supported MP4 variant, or null when MP4 recording is unavailable. */
+export function pickMp4MimeType(isSupported: (mime: string) => boolean): string | null {
+  for (const mime of MP4_MIME_CANDIDATES) {
+    if (isSupported(mime)) return mime;
+  }
+  return null;
+}
+
+/** Runtime capability used to hide an MP4 option that cannot work. */
+export function supportsMp4Video(): boolean {
+  return (
+    typeof MediaRecorder !== 'undefined' &&
+    pickMp4MimeType((mime) => MediaRecorder.isTypeSupported(mime)) !== null
+  );
+}
+
+export function videoFileName(
+  docName: string,
+  format: 'webm' | 'mp4' = 'webm',
+  aspect: VideoAspectPreset = 'original',
+): string {
+  const suffix = aspect === 'original' ? '' : `-${aspect}`;
+  return `${docName.trim() || 'dream'}${suffix}.${format}`;
 }
 
 export function spriteSheetFileName(docName: string): string {
@@ -96,6 +239,8 @@ async function defaultRecorderWithNarration(
 
 export interface VideoExportOptions {
   fps: number;
+  /** Output canvas shape; artwork is contained without cropping. */
+  aspect?: VideoAspectPreset;
   /** Called with (frames rendered so far, total frames). */
   onProgress?: (done: number, total: number) => void;
 }
@@ -105,9 +250,10 @@ export interface VideoExportOptions {
  * and record it as WebM. Rejects with a friendly Error when the browser
  * can't record (no MediaRecorder, no supported codec, no frames).
  */
-export async function exportAnimationWebM(
+async function exportAnimationVideo(
   doc: DreamDocument,
   options: VideoExportOptions,
+  format: 'webm' | 'mp4',
   deps: VideoExportDeps = {},
 ): Promise<Blob> {
   const frames = doc.frames ?? [];
@@ -116,13 +262,19 @@ export async function exportAnimationWebM(
   const isTypeSupported =
     deps.isTypeSupported ??
     ((mime: string) => typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(mime));
-  const mimeType = pickWebmMimeType(isTypeSupported);
-  if (!mimeType) throw new Error('This browser cannot record WebM video.');
+  const mimeType =
+    format === 'webm' ? pickWebmMimeType(isTypeSupported) : pickMp4MimeType(isTypeSupported);
+  if (!mimeType) {
+    const label = format === 'webm' ? 'WebM' : 'MP4';
+    throw new Error(`This browser cannot record ${label} video.`);
+  }
 
   const createCanvas = deps.createCanvas ?? (() => document.createElement('canvas'));
   const canvas = createCanvas();
-  canvas.width = doc.width;
-  canvas.height = doc.height;
+  const aspect = options.aspect ?? 'original';
+  const output = videoOutputSize(doc, aspect);
+  canvas.width = output.width;
+  canvas.height = output.height;
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Could not create a canvas to render into.');
 
@@ -132,7 +284,9 @@ export async function exportAnimationWebM(
       if (typeof MediaRecorder === 'undefined') {
         throw new Error('This browser cannot record video (no MediaRecorder).');
       }
-      return new MediaRecorder(c.captureStream(options.fps), { mimeType: mime }) as RecorderLike;
+      return new MediaRecorder(c.captureStream(SOCIAL_VIDEO_CAPTURE_FPS), {
+        mimeType: mime,
+      }) as RecorderLike;
     });
   const wait =
     deps.wait ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
@@ -143,7 +297,7 @@ export async function exportAnimationWebM(
   let finish: (() => Promise<void>) | undefined;
   if (doc.narration) {
     const createSession = deps.createRecorderWithNarration ?? defaultRecorderWithNarration;
-    const session = await createSession(canvas, mimeType, doc.narration, options.fps);
+    const session = await createSession(canvas, mimeType, doc.narration, SOCIAL_VIDEO_CAPTURE_FPS);
     recorder = session.recorder;
     finish = session.finish;
   } else {
@@ -160,7 +314,7 @@ export async function exportAnimationWebM(
 
   const frameMs = 1000 / options.fps;
   for (let i = 0; i < frames.length; i += 1) {
-    renderDocument({ ...doc, layers: frames[i].layers }, ctx);
+    renderVideoFrame(doc, frames[i], ctx, aspect);
     options.onProgress?.(i + 1, frames.length);
     await wait(frameMs);
   }
@@ -168,6 +322,24 @@ export async function exportAnimationWebM(
   await stopped;
   await finish?.();
   return new Blob(chunks, { type: mimeType });
+}
+
+/** Record the animation in the first supported WebM codec. */
+export function exportAnimationWebM(
+  doc: DreamDocument,
+  options: VideoExportOptions,
+  deps: VideoExportDeps = {},
+): Promise<Blob> {
+  return exportAnimationVideo(doc, options, 'webm', deps);
+}
+
+/** Record a real MP4 container when the browser natively supports it. */
+export function exportAnimationMp4(
+  doc: DreamDocument,
+  options: VideoExportOptions,
+  deps: VideoExportDeps = {},
+): Promise<Blob> {
+  return exportAnimationVideo(doc, options, 'mp4', deps);
 }
 
 /** Trigger a browser download for a blob. */

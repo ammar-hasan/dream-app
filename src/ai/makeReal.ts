@@ -8,9 +8,9 @@
  *
  * Everything here is pure TypeScript — no DOM, no provider calls:
  *
- * - `buildAppDescription` compresses the document into a small structured
- *   payload (texts, shapes as boxes, the navigation graph — never pixels),
- *   cheap enough for small chat models.
+ * - `buildAppDescription` compresses the document into a structured payload
+ *   (texts, shapes as boxes, the navigation graph, and optional inline PNGs
+ *   for raster image operations), cheap enough for small chat models.
  * - `buildMakeRealPrompt` wraps that description in the system+user prompt
  *   pair sent to a chat-capable BYOK provider.
  * - `extractHtmlFromReply` / `validateGeneratedHtml` pull the one HTML file
@@ -45,7 +45,7 @@ export interface MakeRealText {
   color: string;
 }
 
-/** A drawn thing summarized as a box + color — pixels stay in Dream. */
+/** A drawn thing summarized as a box + color; raster images may carry an inline PNG. */
 export interface MakeRealElement {
   kind: 'rectangle' | 'ellipse' | 'line' | 'drawing' | 'image' | 'fill';
   x: number;
@@ -56,6 +56,9 @@ export interface MakeRealElement {
   /** Outline thickness for unfilled shapes/lines. */
   size?: number;
   filled?: boolean;
+  /** Inline PNG for imported images; omitted only in structure-only descriptions. */
+  asset?: string;
+  opacity?: number;
 }
 
 /** One hotspot: tap this box on screen `index` → show screen `target`. */
@@ -101,7 +104,15 @@ function roundRect(r: Rect): Rect {
 }
 
 /** Summarize one non-text op as a kind + box (+ color). Null = skip. */
-function describeElement(op: Operation): MakeRealElement | null {
+function inlinePng(value: string | undefined): string | undefined {
+  return value && /^data:image\/png;base64,[a-z0-9+/=]+$/i.test(value) ? value : undefined;
+}
+
+function describeElement(
+  op: Operation,
+  imageAssets: Readonly<Record<string, string>>,
+  layerOpacity: number,
+): MakeRealElement | null {
   switch (op.kind) {
     case 'shape':
       return {
@@ -113,14 +124,19 @@ function describeElement(op: Operation): MakeRealElement | null {
       };
     case 'stroke':
       return { kind: 'drawing', ...roundRect(selectionBounds(op)), color: op.color };
-    case 'image':
+    case 'image': {
+      const asset = inlinePng(imageAssets[op.id]);
+      const opacity = op.opacity * layerOpacity;
       return {
         kind: 'image',
         x: round(op.patch.x),
         y: round(op.patch.y),
         width: Math.max(0, round(op.patch.width * op.scale)),
         height: Math.max(0, round(op.patch.height * op.scale)),
+        ...(asset ? { asset } : {}),
+        ...(opacity !== 1 ? { opacity } : {}),
       };
+    }
     case 'fill':
       return { kind: 'fill', ...roundRect(op.patch), color: op.color };
     default:
@@ -128,7 +144,12 @@ function describeElement(op: Operation): MakeRealElement | null {
   }
 }
 
-function describeScreen(doc: DreamDocument, frame: Frame, index: number): MakeRealScreen {
+function describeScreen(
+  doc: DreamDocument,
+  frame: Frame,
+  index: number,
+  imageAssets: Readonly<Record<string, string>>,
+): MakeRealScreen {
   // Reuse the feedback palette work — it reads the document, never pixels out.
   const analysis = analyzeDocument({ ...doc, layers: frame.layers });
   const texts: MakeRealText[] = [];
@@ -149,7 +170,7 @@ function describeScreen(doc: DreamDocument, frame: Frame, index: number): MakeRe
         continue;
       }
       if (elements.length >= MAX_ELEMENTS_PER_SCREEN) continue;
-      const element = describeElement(op);
+      const element = describeElement(op, imageAssets, layer.opacity);
       if (element) elements.push(element);
     }
   }
@@ -177,14 +198,17 @@ function describeScreen(doc: DreamDocument, frame: Frame, index: number): MakeRe
  * texts, shape boxes and dominant colors, plus the navigation graph. A
  * document without frames is a single-screen app.
  */
-export function buildAppDescription(doc: DreamDocument): MakeRealApp {
+export function buildAppDescription(
+  doc: DreamDocument,
+  imageAssets: Readonly<Record<string, string>> = {},
+): MakeRealApp {
   const frames = doc.frames ?? [{ id: 'single', layers: doc.layers }];
   return {
     name: doc.name.trim() || 'Dream app',
     width: doc.width,
     height: doc.height,
     startIndex: doc.frames ? Math.max(0, activeFrameIndex(doc)) : 0,
-    screens: frames.map((frame, index) => describeScreen(doc, frame, index)),
+    screens: frames.map((frame, index) => describeScreen(doc, frame, index, imageAssets)),
   };
 }
 
@@ -207,6 +231,7 @@ export function buildMakeRealPrompt(app: MakeRealApp): { system: string; user: s
     `- Keep the drawn proportions — the canvas is ${app.width}x${app.height} pixels.`,
     '- Navigation: wire the links as a tiny hash router (or show/hide) so a button shows its target screen.',
     '- No external assets or URLs of any kind — everything inline.',
+    '- Image elements may contain an inline data:image/png asset. Preserve it unchanged in a real <img> element.',
     '- Beginner-friendly: short comments explaining each part.',
     `- Start the file with an HTML comment saying: ${DREAM_HEADER_COMMENT}`,
     'App description (JSON):',
@@ -290,8 +315,14 @@ function elementHtml(el: MakeRealElement): string {
         `  <div class="shape" style="${box};background:${el.color}"></div>`
       );
     case 'image':
+      if (el.asset) {
+        return (
+          `  <!-- an imported image, embedded so this file stays offline -->\n` +
+          `  <img class="shape" src="${el.asset}" alt="" style="${box};display:block;opacity:${el.opacity ?? 1}">`
+        );
+      }
       return (
-        `  <!-- an imported image lived here (its pixels stay in Dream) -->\n` +
+        `  <!-- structure-only image description (no pixel asset was supplied) -->\n` +
         `  <div class="shape" style="${box};background:rgba(150,160,180,.25);border:2px dashed rgba(150,160,180,.8);border-radius:8px"></div>`
       );
   }

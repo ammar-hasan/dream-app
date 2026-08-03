@@ -5,11 +5,11 @@
  * Hotspot transitions are CSS opacity/transform on the canvas only.
  */
 
-import { useEffect, useReducer, useRef, useState } from 'react';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { presentationFrames } from '../engine/animation';
 import { hotspotAt, hotspotTargetIndex } from '../engine/hotspots';
 import { renderDocument } from '../engine/renderer';
-import type { DreamDocument, Hotspot } from '../engine/types';
+import type { DreamDocument, Hotspot, SlideTransition } from '../engine/types';
 import { useDreamStore } from '../store/dreamStore';
 import { useT } from './i18n';
 import { MuteIcon, SoundIcon } from './icons';
@@ -37,8 +37,12 @@ export function PresentView() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [, forceRedraw] = useReducer((x: number) => x + 1, 0);
   const [hovered, setHovered] = useState<string | null>(null);
+  const [autoAdvance, setAutoAdvance] = useState(false);
+  const [presenter, setPresenter] = useState(false);
   /** 'out' fades/slides away before the swap, 'in' settles back. */
   const [fx, setFx] = useState<{ kind: 'fade' | 'slide'; phase: 'out' | 'in' } | null>(null);
+  const transitionTimers = useRef<number[]>([]);
+  const transitioning = useRef(false);
 
   const app = presentStyle === 'app';
   const frames = presentationFrames(doc);
@@ -46,6 +50,46 @@ export function PresentView() {
   const frame = doc.frames?.[index];
   const narration = doc.narration;
   const narrationMuted = useDreamStore((s) => s.narrationMuted);
+
+  const clearTransitionTimers = useCallback(() => {
+    transitionTimers.current.forEach((timer) => window.clearTimeout(timer));
+    transitionTimers.current = [];
+    transitioning.current = false;
+  }, []);
+
+  useEffect(() => clearTransitionTimers, [clearTransitionTimers]);
+
+  const transitionTo = useCallback((target: number, transition: SlideTransition) => {
+    if (transitioning.current) return;
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (transition === 'none' || reduced) {
+      useDreamStore.getState().presentGoTo(target);
+      return;
+    }
+    transitioning.current = true;
+    setFx({ kind: transition, phase: 'out' });
+    transitionTimers.current.push(
+      window.setTimeout(() => {
+        useDreamStore.getState().presentGoTo(target);
+        setFx({ kind: transition, phase: 'in' });
+        transitionTimers.current.push(
+          window.setTimeout(() => {
+            setFx(null);
+            transitioning.current = false;
+          }, FX_MS),
+        );
+      }, FX_MS),
+    );
+  }, []);
+
+  const navigateTo = useCallback(
+    (target: number) => {
+      const clamped = Math.max(0, Math.min(target, frames.length - 1));
+      if (clamped === index) return;
+      transitionTo(clamped, doc.frames?.[clamped]?.presentation?.transition ?? 'none');
+    },
+    [doc.frames, frames.length, index, transitionTo],
+  );
 
   // Narration: the take plays once from the start of the presentation
   // (unmuted only); leaving Present — or muting — stops it.
@@ -113,10 +157,10 @@ export function PresentView() {
       if (store.presentStyle === 'app') return;
       if (ADVANCE_KEYS.has(e.key)) {
         e.preventDefault();
-        store.presentNext();
+        navigateTo(store.presentIndex + 1);
       } else if (BACK_KEYS.has(e.key)) {
         e.preventDefault();
-        store.presentPrev();
+        navigateTo(store.presentIndex - 1);
       }
     };
     const onResize = () => forceRedraw();
@@ -126,7 +170,16 @@ export function PresentView() {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('resize', onResize);
     };
-  }, []);
+  }, [navigateTo]);
+
+  // Auto mode respects each slide's own duration. An untimed slide pauses
+  // the deck, so a presenter can mix self-running and spoken sections.
+  useEffect(() => {
+    const duration = frame?.presentation?.durationMs;
+    if (app || !autoAdvance || duration === undefined || index >= frames.length - 1) return;
+    const timer = window.setTimeout(() => navigateTo(index + 1), duration);
+    return () => window.clearTimeout(timer);
+  }, [app, autoAdvance, frame?.presentation?.durationMs, frames.length, index, navigateTo]);
 
   /** Client point → document-space point on the current screen. */
   const toDocPoint = (clientX: number, clientY: number) => {
@@ -139,21 +192,12 @@ export function PresentView() {
     const store = useDreamStore.getState();
     const target = hotspotTargetIndex(store.doc, hotspot);
     if (target === -1 || target === index) return;
-    if (hotspot.transition === 'none') {
-      store.presentGoTo(target);
-      return;
-    }
-    setFx({ kind: hotspot.transition === 'slide' ? 'slide' : 'fade', phase: 'out' });
-    window.setTimeout(() => {
-      store.presentGoTo(target);
-      setFx({ kind: hotspot.transition === 'slide' ? 'slide' : 'fade', phase: 'in' });
-      window.setTimeout(() => setFx(null), FX_MS);
-    }, FX_MS);
+    transitionTo(target, hotspot.transition);
   };
 
   const onClick = (e: React.MouseEvent) => {
     if (!app) {
-      useDreamStore.getState().presentNext();
+      navigateTo(index + 1);
       return;
     }
     if (!frame) return;
@@ -202,7 +246,51 @@ export function PresentView() {
         >
           {t('present.app')}
         </button>
+        {!app && (
+          <>
+            <button
+              type="button"
+              className={`btn${autoAdvance ? ' primary' : ''}`}
+              aria-pressed={autoAdvance}
+              onClick={(e) => {
+                e.stopPropagation();
+                setAutoAdvance(!autoAdvance);
+              }}
+            >
+              {t('present.auto')}
+            </button>
+            <button
+              type="button"
+              className={`btn${presenter ? ' primary' : ''}`}
+              aria-pressed={presenter}
+              onClick={(e) => {
+                e.stopPropagation();
+                setPresenter(!presenter);
+              }}
+            >
+              {t('present.presenter')}
+            </button>
+          </>
+        )}
       </div>
+
+      {!app && presenter && (
+        <aside className="presenter-panel" onClick={(event) => event.stopPropagation()}>
+          <h2>{t('present.presenterTitle')}</h2>
+          <strong>{t('present.currentSlide', { n: index + 1 })}</strong>
+          <p>{frame?.presentation?.notes || t('present.noNotes')}</p>
+          <div className="presenter-meta">
+            {frame?.presentation?.durationMs === undefined
+              ? t('present.manual')
+              : t('present.timed', { seconds: frame.presentation.durationMs / 1000 })}
+          </div>
+          <div className="presenter-next">
+            {index < frames.length - 1
+              ? t('present.nextSlide', { n: index + 2 })
+              : t('present.endOfDeck')}
+          </div>
+        </aside>
+      )}
 
       {!app && (
         <div className="present-counter" aria-live="polite">

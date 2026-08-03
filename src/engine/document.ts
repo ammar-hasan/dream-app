@@ -11,7 +11,15 @@
  * even after the user switches frames mid-history (see AGENTS.md).
  */
 
-import type { Color, DreamDocument, Frame, Hotspot, Layer, Operation } from './types';
+import type {
+  Color,
+  DreamDocument,
+  Frame,
+  Hotspot,
+  Layer,
+  Operation,
+  SlidePresentation,
+} from './types';
 
 let idCounter = 0;
 
@@ -94,6 +102,57 @@ export function withFrameHotspots(
   if (!doc.frames) return doc;
   const frames = doc.frames.map((f) => (f.id === frameId ? { ...f, hotspots } : f));
   return { ...doc, frames, updatedAt: Date.now() };
+}
+
+/** Replace one frame's presentation metadata without touching its layers. */
+export function withFramePresentation(
+  doc: DreamDocument,
+  frameId: string,
+  presentation: SlidePresentation | undefined,
+): DreamDocument {
+  if (!doc.frames?.some((frame) => frame.id === frameId)) return doc;
+  const frames = doc.frames.map((frame) => {
+    if (frame.id !== frameId) return frame;
+    if (!presentation) {
+      const next = { ...frame };
+      delete next.presentation;
+      return next;
+    }
+    return { ...frame, presentation };
+  });
+  return { ...doc, frames, updatedAt: Date.now() };
+}
+
+export interface FrameCaptionUpdate {
+  frameId: string;
+  /** Empty or absent removes the caption while preserving other frame settings. */
+  caption?: string;
+}
+
+/** Replace several frame captions while preserving each frame's slide settings. */
+export function withFrameCaptions(
+  doc: DreamDocument,
+  updates: readonly FrameCaptionUpdate[],
+): DreamDocument {
+  if (!doc.frames || updates.length === 0) return doc;
+  const captions = new Map(updates.map(({ frameId, caption }) => [frameId, caption]));
+  let changed = false;
+  const frames = doc.frames.map((frame) => {
+    if (!captions.has(frame.id)) return frame;
+    const caption = captions.get(frame.id)?.trim() || undefined;
+    if (frame.presentation?.caption === caption) return frame;
+    changed = true;
+    const presentation = { ...frame.presentation };
+    if (caption) presentation.caption = caption;
+    else delete presentation.caption;
+    if (Object.keys(presentation).length === 0) {
+      const next = { ...frame };
+      delete next.presentation;
+      return next;
+    }
+    return { ...frame, presentation };
+  });
+  return changed ? { ...doc, frames, updatedAt: Date.now() } : doc;
 }
 
 /** Replace the frames array (and optionally the mirrored active stack). */

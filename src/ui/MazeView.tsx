@@ -282,13 +282,7 @@ export function MazeView() {
     // Hero: the cast drawing gliding between cells.
     const heroSize = state.cell * 0.8;
     const heroH = (heroSize * cast.hero.height) / Math.max(1, cast.hero.width);
-    ctx.drawImage(
-      cast.hero,
-      state.heroX - heroSize / 2,
-      state.heroY - heroH / 2,
-      heroSize,
-      heroH,
-    );
+    ctx.drawImage(cast.hero, state.heroX - heroSize / 2, state.heroY - heroH / 2, heroSize, heroH);
 
     // HUD: level chip + a running timer while playing.
     ctx.font = 'bold 24px system-ui, sans-serif';

@@ -9,13 +9,7 @@ import {
   gameSetupOf,
   KID_GAME_SETTINGS,
 } from '../core';
-import {
-  createGame,
-  fallSpeedAt,
-  startRun,
-  tick,
-  type GameState,
-} from './catch';
+import { createGame, fallSpeedAt, startRun, tick, type GameState } from './catch';
 import { createDocument } from '../../engine/document';
 
 const IDLE = { left: false, right: false };

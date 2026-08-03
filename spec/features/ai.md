@@ -23,6 +23,19 @@ selection exists), only the selection's bounding box is edited; the rest of
 the layer is untouched. One undoable change ("Done! Undo is there if you
 liked it better before."). Needs a non-empty layer.
 
+When a connected provider declares generative editing, the same box accepts
+open-ended changes such as "put a little boat here." The provider sees the
+whole active-layer image for visual context plus a mask for the selected
+bounding box; Dream accepts only the returned pixels inside that box, so the
+rest of the layer remains exact even if the provider strays. With no selection
+(or "Selected part only" off), the whole layer is the edit area.
+
+Generative editing also reveals **Erase this**. One tap asks the provider to
+remove the object in the masked area and fill the space naturally with the
+surrounding background. It uses the selection when present and otherwise the
+whole layer. Success says "Gone! Undo brings it back." Both fill and erase are
+one undoable bake.
+
 ### Feedback
 
 "Look at my design" returns kind, concrete observations plus suggestions —
@@ -53,6 +66,9 @@ layered hills, and theme extras (stars, trees, sea bands).
 | Day (fallback) | —                                          | blue sky, sun, green hills                          |
 
 ### Edit — the keyword recipes
+
+Dream AI editing is deliberately filter-based, not generative. It never shows
+**Erase this** and never claims to invent or remove image content.
 
 The first matching rule wins; its values override a gentle default warm-up
 (saturation +15, brightness +5, sepia +10) — unmentioned sliders keep the
@@ -111,9 +127,10 @@ The **Real code (AI)** export (`features/app-mode.md`) is the assistant's
 fourth capability, exercised from the export dialog rather than the panel:
 
 - Any **chat-capable provider** can write the code: the app is described
-  structurally (screens, texts, shape boxes, the navigation graph — never
-  pixels) and the provider replies with ONE self-contained HTML file. The
-  conversation may open with a system message that steers this task.
+  structurally (screens, texts, shape boxes and the navigation graph), with
+  imported and AI-made raster images included as inline PNGs. The provider
+  replies with ONE self-contained HTML file. The conversation may open with
+  a system message that steers this task.
 - **Dream AI** generates the code itself with a deterministic local
   template — free, offline, honestly labeled — counting against the free
   tier as above; BYOK stays unlimited.
@@ -124,14 +141,20 @@ fourth capability, exercised from the export dialog rather than the panel:
 ## BYOK — bring your own key
 
 In the panel's Settings, point Dream at any **OpenAI-compatible endpoint**:
-base URL, model, API key, plus "This AI can also paint images" for
-endpoints with image generation.
+base URL, chat model, API key, a visible **Image model** plus "This AI can
+also paint images" for endpoints with image generation, and an optional
+**Edits model** for endpoints with image editing. The current OpenAI example
+for both image fields is `gpt-image-2`.
 
 - **Chat** (feedback) goes to `/chat/completions`; **image creation** to
-  `/images/generations` (requested as base64, size matching the document).
-- **Editing is not offered on BYOK** (no shared image-edit API across
-  providers) — the Edit tab says so kindly and offers to switch back to
-  Dream AI. Image-less endpoints disable the Create tab the same way.
+  `/images/generations`. Compatible endpoints receive the requested document
+  size. At the official OpenAI endpoint, a blank image model uses
+  `gpt-image-2`; GPT Image requests use a valid efficient draft size and the
+  returned pixels are normalized to the document's exact dimensions.
+- **Image editing** goes to `/images/edits` only when the Edits model is
+  non-empty. Blank means no edit capability: the Edit tab says so kindly and
+  offers Dream AI's offline filters. Image-less endpoints disable Create the
+  same way.
 - **Test connection** validates URL/key/model with one cheap round-trip
   and reports success ("It works! Your AI said hello back.") or a friendly,
   jargon-free error ("Could not reach … — is the URL right and the app
@@ -141,8 +164,11 @@ endpoints with image generation.
   default** (gone when the app closes); "Remember key on this device" opts
   into device storage; keys are sent only as the authorization header to
   the configured endpoint, are **never logged**, never appear in error
-  messages, and never land in the settings blob. Settings (URL, model,
-  toggles, active provider) persist on-device.
+  messages, and never land in the settings blob. Settings (URL, chat/image/
+  edits models, toggles, active provider) persist on-device. A Real Code
+  request includes inline pixels for visible raster images because those
+  pixels are required in the self-contained result; other marks remain a
+  compact structural description.
 - Known-good starting points: OpenRouter
   (`https://openrouter.ai/api/v1`, e.g. `openai/gpt-4o-mini`), Ollama
   (`http://localhost:11434/v1`, e.g. `llama3.1`, no key needed), LM Studio
@@ -157,6 +183,9 @@ The AI panel simplifies to a single Create box with a giant mic and a big
 
 - A busy assistant ignores further requests until the current one
   finishes.
+- If an edit service returns a different image size, Dream fits it back to
+  the active layer before applying it; a selected edit still cannot change
+  pixels outside its box.
 - Provider errors surface verbatim when friendly, else "Hmm, that did not
   work. Try again?"
 - An empty AI answer → "The AI answered, but said nothing. Try again?"

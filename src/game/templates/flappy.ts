@@ -159,12 +159,7 @@ function heroHitsGate(
  * Advance the game by `dtMs`. Pure: same (state, input, dt, rng) in → same
  * state out. Events accumulate on the returned state for the UI to consume.
  */
-export function tick(
-  state: FlappyState,
-  input: FlappyInput,
-  dtMs: number,
-  rng: Rng,
-): FlappyState {
+export function tick(state: FlappyState, input: FlappyInput, dtMs: number, rng: Rng): FlappyState {
   const dt = dtMs;
   const next: FlappyState = { ...state, gates: state.gates, pops: state.pops, events: [] };
 

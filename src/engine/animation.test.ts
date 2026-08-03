@@ -12,6 +12,7 @@ import {
   isAnimated,
   onionSkinTargets,
   presentationFrames,
+  slideDurationMs,
   spriteSheetLayout,
 } from './animation';
 import {
@@ -28,6 +29,8 @@ import {
   History,
   moveFrameCommand,
   removeFrameCommand,
+  setFrameCaptionsCommand,
+  setFramePresentationCommand,
   setAnimationEnabledCommand,
 } from './history';
 import type { StrokeOp } from './types';
@@ -121,6 +124,21 @@ describe('cloneFrame / blankFrame', () => {
     expect(clone.layers[0].operations[0]).toMatchObject({ kind: 'stroke' });
   });
 
+  it('copies presentation settings without sharing the metadata object', () => {
+    const frame = {
+      ...createFrame(),
+      presentation: {
+        transition: 'fade' as const,
+        durationMs: 4000,
+        notes: 'Pause here',
+        caption: 'The story begins',
+      },
+    };
+    const clone = cloneFrame(frame);
+    expect(clone.presentation).toEqual(frame.presentation);
+    expect(clone.presentation).not.toBe(frame.presentation);
+  });
+
   it('a blank frame has one empty layer', () => {
     const frame = blankFrame();
     expect(frame.layers).toHaveLength(1);
@@ -144,6 +162,54 @@ describe('frame commands + history', () => {
     expect(undone.frames).toHaveLength(1);
     expect(undone.activeFrameId).toBe(doc.activeFrameId);
     expect(undone.layers).toBe(doc.layers);
+  });
+
+  it('edits slide settings as one undoable command', () => {
+    const history = new History();
+    const doc = animatedDoc();
+    const frameId = doc.activeFrameId ?? '';
+    const edited = history.execute(
+      doc,
+      setFramePresentationCommand(doc, frameId, {
+        transition: 'slide',
+        durationMs: 6000,
+        notes: 'Ask the room',
+      }),
+    );
+    expect(edited.frames?.[0].presentation).toEqual({
+      transition: 'slide',
+      durationMs: 6000,
+      notes: 'Ask the room',
+    });
+    expect(history.undo(edited).frames?.[0].presentation).toBeUndefined();
+  });
+
+  it('edits synchronized video captions together and preserves slide settings', () => {
+    const history = new History();
+    const first = animatedDoc();
+    const second = blankFrame();
+    const doc = history.execute(first, addFrameCommand(first, second));
+    const withTiming = history.execute(
+      doc,
+      setFramePresentationCommand(doc, doc.frames![0].id, { durationMs: 3000 }),
+    );
+    const captions = withTiming.frames!.map((frame, index) => ({
+      frameId: frame.id,
+      caption: index === 0 ? 'First line' : 'Second line',
+    }));
+    const edited = history.execute(withTiming, setFrameCaptionsCommand(withTiming, captions));
+
+    expect(edited.frames?.map((frame) => frame.presentation?.caption)).toEqual([
+      'First line',
+      'Second line',
+    ]);
+    expect(edited.frames?.[0].presentation?.durationMs).toBe(3000);
+    const undone = history.undo(edited);
+    expect(undone.frames?.map((frame) => frame.presentation?.caption)).toEqual([
+      undefined,
+      undefined,
+    ]);
+    expect(undone.frames?.[0].presentation?.durationMs).toBe(3000);
   });
 
   it('duplicateFrame clones the active frame with new ids', () => {
@@ -341,5 +407,14 @@ describe('presentationFrames', () => {
     const doc = enableAnimation(createDocument({ width: 10, height: 10 }));
     expect(presentationFrames(doc)).toBe(doc.frames);
     expect(activeFrameIndex(doc)).toBe(0);
+  });
+});
+
+describe('slideDurationMs', () => {
+  it('converts seconds and clamps invalid editor input to 1..60 seconds', () => {
+    expect(slideDurationMs(7)).toBe(7000);
+    expect(slideDurationMs(0)).toBe(1000);
+    expect(slideDurationMs(99)).toBe(60000);
+    expect(slideDurationMs(Number.NaN)).toBe(5000);
   });
 });

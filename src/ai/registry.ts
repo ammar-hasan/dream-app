@@ -19,6 +19,7 @@ export interface AIProviderSettings {
   baseUrl?: string;
   model?: string;
   imageModel?: string;
+  editsModel?: string;
   supportsImages?: boolean;
   rememberKey?: boolean;
 }
@@ -135,6 +136,7 @@ export function getProviderSettings(id: string): AIProviderSettings {
 /** Dependencies providers need from the browser (image decode for BYOK). */
 export interface AIDeps {
   decodeImage?: (blob: Blob) => Promise<import('../engine/filters').PixelBuffer>;
+  encodeImage?: (pixels: import('../engine/filters').PixelBuffer) => Promise<Blob>;
 }
 
 let defaultDeps: AIDeps = {};
@@ -163,6 +165,7 @@ export function configureOpenAIProvider(
       baseUrl: settings.baseUrl?.trim() || 'https://api.openai.com/v1',
       model: settings.model?.trim() || 'gpt-4o-mini',
       imageModel: settings.imageModel?.trim() || undefined,
+      editsModel: settings.editsModel?.trim() || undefined,
       supportsImages: !!settings.supportsImages,
       apiKey: apiKey || undefined,
     },
@@ -187,6 +190,7 @@ export function initAIFromStorage(deps: AIDeps = defaultDeps): void {
           baseUrl: saved.baseUrl ?? 'https://api.openai.com/v1',
           model: saved.model ?? 'gpt-4o-mini',
           imageModel: saved.imageModel,
+          editsModel: saved.editsModel,
           supportsImages: saved.supportsImages,
           apiKey: getApiKey('openai-compatible') || undefined,
         },

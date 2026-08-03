@@ -111,3 +111,17 @@ export function drawDefaultGate(ctx: Renderer2D, cx: number, cy: number, size: n
   ctx.fill();
   ctx.restore();
 }
+
+/** Grass-topped earth tile: Dream Jumper's platform stand-in. */
+export function drawDefaultPlatform(ctx: Renderer2D, cx: number, cy: number, size: number): void {
+  ctx.save();
+  ctx.fillStyle = '#a16207';
+  ctx.beginPath();
+  ctx.rect(cx - size / 2, cy - size / 2, size, size);
+  ctx.fill();
+  ctx.fillStyle = '#4ade80';
+  ctx.beginPath();
+  ctx.rect(cx - size / 2, cy - size / 2, size, size * 0.22);
+  ctx.fill();
+  ctx.restore();
+}

@@ -79,21 +79,28 @@ are roughly ordered by dependency, not by a fixed schedule.
   onion-skin the in-betweens, play at 6 fps, export WebM or sprite sheet.
 - Deviations from the original note: slices 4–6 were merged into one slice
   (a presentation IS the frame model stepped through manually). Crop/resize
-  apply to EVERY frame. Slice 5's optional audio track and Slice 6's
-  transitions/presenter view remain open (below).
+  apply to EVERY frame. The optional audio track followed in slice 19 and
+  presentation depth in slice 24; only the MP4/WebCodecs path remains below.
 
-## Slice 5 — Video export (remainder)
+## Slice 5 — Video export ✅
 
 - ✅ WebM export shipped in slice 4 (MediaRecorder, VP9/VP8 fallback).
 - ✅ Optional audio track shipped in slice 19 (voice narration baked into the
   WebM via a WebAudio mix).
-- Remaining: MP4/WebCodecs path for players that don't support WebM.
+- ✅ Native MP4 path shipped in slice 25: browsers that report MP4 support
+  record the same canvas/narration stream into a real `.mp4`; unsupported
+  browsers do not see the option. WebCodecs alone produces uncontainerized
+  chunks and would require a muxer dependency, so feature-detected
+  MediaRecorder is the smaller truthful path.
 
-## Slice 6 — Presentation mode (remainder)
+## Slice 6 — Presentation mode ✅
 
 - ✅ Basic deck shipped in slice 4 (frames as slides, keyboard/click
   navigation, fullscreen, slide counter).
-- Remaining: transitions, presenter view with notes, per-slide duration.
+- ✅ Completed in slice 24: optional per-slide enter transitions, 1–60 second
+  auto-advance timing, private speaker notes and an in-session Presenter view.
+  Settings save together as one undoable frame edit; old decks remain instant
+  and manual. Auto pauses on untimed slides and at the end.
 
 ## Slice 7 — AI panel with BYOK providers ✅
 
@@ -108,7 +115,8 @@ are roughly ordered by dependency, not by a fixed schedule.
   keyword→filter edits, rule-engine feedback over the real document), and
   `OpenAICompatibleProvider` for BYOK (`/chat/completions` +
   `/images/generations`, graceful degradation when an endpoint can't do
-  images; no shared edits API → edit capability declared false).
+  images; edit capability was initially false and becomes explicit
+  `/images/edits` opt-in with slice 20).
 - ✅ BYOK settings persisted locally (base URL, model, active provider);
   API keys in sessionStorage by default with an opt-in "remember key"
   (localStorage); keys never logged. Test-connection button with friendly
@@ -171,8 +179,11 @@ are roughly ordered by dependency, not by a fixed schedule.
   speak-tool-names, voice feedback and the language picker.
 - ✅ Accessibility pass: aria-labels on every toolbar/rail button (from the
   string table), `:focus-visible` outlines, keyboard tool switching intact.
-- Remaining: more locales, axe-core audit, reduced-motion respect, localized
-  voice-command vocabularies.
+- ✅ Automated serious/critical accessibility audit shipped in slice 26 across
+  Draw, Design, Play, slide settings and Presenter; it caught and corrected
+  light-theme secondary/accent contrast before becoming a browser gate.
+- Remaining: more locales. Reduced-motion and localized English/Arabic voice
+  vocabularies shipped in later polish slices.
 
 ## Polish pass — design system, theming & micro-delight ✅
 
@@ -309,11 +320,11 @@ Maria) or a kid's parent can open, read and extend.
   with "Made with Dream — where drawings come alive."
 - ✅ Voice: "export real code" / "make it real" (EN) and «صدّر كود حقيقي»
   (AR) run the same flow, announcing when the download lands.
-- Deviation: the Dream AI path generates a clean approximation (drawings
-  become soft dashed panels, images become placeholders) rather than trying
-  to fake richer code offline — the label says exactly what it is, and BYOK
-  is the upgrade path. The deterministic pixel-faithful "Interactive app"
-  export stays untouched as the no-AI default.
+- Fidelity correction: the Dream AI path still turns freehand drawings into
+  honest soft approximation panels, but imported and AI-made raster pictures
+  now remain their real inline PNG pixels instead of placeholder boxes. BYOK
+  receives the same self-contained assets. The deterministic pixel-faithful
+  "Interactive app" export stays untouched as the no-AI default.
 - Acceptance met: draw two linked screens → Export → Real code (AI) → the
   downloaded file opens as a working app whose source reads like a gift:
   commented, semantic, your colors and words intact.
@@ -337,8 +348,9 @@ MCP in her development flow and APIs in her applications.
   package (own package.json/tsconfig; not part of the webapp build, root
   `npm run check` never touches it; `npm run check:mcp` and a separate CI job
   cover it). Tools: `dream.read_project`, `dream.create_project`,
-  `dream.list_layers`, `dream.add_text`, `dream.render_png`,
-  `dream.export_app`. The server compiles the REAL engine in from
+  `dream.list_layers`, `dream.add_layer`, `dream.add_text`,
+  `dream.add_shape`, `dream.render_png`, `dream.export_app`. The server
+  compiles the REAL engine in from
   `src/engine` (no reimplementation); rendering and PNG payloads run on
   `@napi-rs/canvas`. Tool cores are pure functions over the file system
   (`src/tools.ts`, tested in tmp dirs); `src/index.ts` is thin stdio wiring
@@ -356,8 +368,9 @@ MCP in her development flow and APIs in her applications.
   round-trips (true of browser canvases too); opaque pixels round-trip
   exactly.
 - Future: remote MCP (HTTP transport), websocket collaboration on a shared
-  document, a plugin API (custom tools/panels), more MCP tools (add shape /
-  stroke / image ops, layer management, component library access, AI edits).
+  document, a plugin API (custom tools/panels), more MCP tools (freehand
+  strokes, raster import, full layer management, component library access,
+  AI edits).
 
 ## Slice 16 — Research quick wins: stamps, comfort mode, Arabic voice ✅
 
@@ -436,10 +449,9 @@ every piece points at the existing gates (`check`, `check:full`,
 - More locales (voice vocabularies are now per-locale tables — adding one is
   data only); axe-core audit.
 - Per-OS visual baselines if the generous-threshold single baseline flakes.
-- Slice 5/6 remainders: MP4/WebCodecs export, slide transitions,
-  presenter view with notes, per-slide duration.
-- Slice 12 remainder: more game templates (platformer, maze, flappy),
-  conversational game generation.
+- Video and presentation remainders are complete (slices 24–25).
+- Slice 12 is complete: Catch!, Flappy Dream, Maze Runner, Dream Jumper and
+  conversational game creation are shipped.
 
 ## Slice 11 — PWA ✅
 
@@ -481,7 +493,7 @@ every piece points at the existing gates (`check`, `check:full`,
   (both unnecessary today — everything is already local), per-OS visual
   baselines if the single baseline flakes.
 
-## Slice 12 — Games & app generation (v1: Catch! ✅)
+## Slice 12 — Games and conversational creation ✅
 
 - ✅ Play mode: a fourth workspace mode (Draw / Design / Play / Present) that
   turns the drawing into a playable mini-game right on the canvas. First
@@ -507,9 +519,9 @@ every piece points at the existing gates (`check`, `check:full`,
   Template picker cards in the cast panel; casting adapts to each template's
   roles; the choice persists on the document. Voice: "play flappy" / "play
   maze" / "play catch" (EN + AR).
-- Remaining: platformer template, conversational game
-  generation from a sentence. (The MCP/API hooks for developer workflows —
-  persona: Maria — shipped as slice 14, the developer surface.)
+- ✅ Conversational creation shipped in slice 22 and the fourth **Dream
+  Jumper** platformer shipped in slice 23. (The MCP/API hooks for developer
+  workflows — persona: Maria — shipped as slice 14, the developer surface.)
 - Acceptance met: a child draws a blob, casts it as the hero, presses play —
   and their own drawing catches stars.
 
@@ -550,3 +562,163 @@ people actually narrate, and it keeps recording a one-tap gesture).
 - Acceptance met: a kid records "once upon a time…" over her three-frame
   animation, plays it back with her voice, and exports a WebM that talks —
   one tap deep throughout, and nothing ever leaves the device.
+
+## Slice 20 — BYOK generative fill and erase ✅
+
+Research backlog #5 (RESEARCH.md §4): make selective AI editing as immediate
+as Paint's Generative Erase and Firefly's Generative Fill without pretending
+the offline provider is generative. Personas: Ali and Fatima editing artwork;
+Sara removing distractions or adding a missing detail.
+
+- ✅ Honest capability configuration: OpenAI-compatible settings gain an
+  optional edits model (suggested current OpenAI value: `gpt-image-2`). A
+  non-empty value alone enables BYOK editing; blank keeps the capability off
+  for chat-only and generation-only endpoints.
+- ✅ Real `/images/edits`: same-size PNG image + alpha mask + prompt are sent
+  as multipart form data. Transparent mask pixels mark the requested edit;
+  current GPT Image models and compatible endpoints using the legacy singular
+  image field are both handled. Returned base64 PNGs are decoded and normalized
+  back to the layer size.
+- ✅ Generative-fill UX: the selected Design-mode bounding box becomes the
+  mask; without a selection the whole active layer is edited. The source
+  pixels outside a selection are restored even if the model strays beyond the
+  mask, and the final bake is one undoable history command.
+- ✅ One-tap **Erase this** uses the neutral remove-and-fill-background prompt
+  for edits-capable BYOK providers. Dream AI remains honestly filter-based and
+  never shows the generative erase action.
+- ✅ Browser PNG encoding and network/image decoding stay injected; mask,
+  multipart request, capability/persistence, result merge, friendly failures
+  and undoable raster bake are unit-tested. EN+AR strings remain in parity.
+- Acceptance met: select a photobomber, press **Erase this**, and only that
+  area is naturally replaced; undo restores every original pixel.
+
+## Slice 21 — MCP authoring and registry readiness ✅
+
+Research backlog #8 (RESEARCH.md §4): let Maria do useful visual authoring
+through an agent, and make the companion server ready for the official MCP
+registry without performing a public release automatically.
+
+- ✅ Two authoring tools: `dream.add_layer` adds a top layer to the active
+  frame, and `dream.add_shape` appends a line, rectangle or ellipse with
+  validated geometry, color, opacity and fill. Both preserve the active-frame
+  mirror contract in animated documents and return stable ids for follow-up
+  calls.
+- ✅ The example round-trip now creates a project, adds a layer, draws a shape,
+  adds text, reads the summary and renders the real PNG. Unit tests cover
+  normalization, invalid input, layer targeting and animated write-through;
+  the live MCP handshake exposes all eight tools.
+- ✅ Registry-ready package identity and metadata: the publishable npm package
+  is `@ammar-hasan/dream-mcp`, with the matching registry identity
+  `io.github.ammar-hasan/dream-mcp`, MIT license, scoped public publish config,
+  curated tarball and a schema-valid `server.json`.
+- Public npm and registry publication remains pending explicit approval; the
+  package and registry records are external, irreversible user-facing actions.
+- Acceptance met locally: an MCP client creates a `.dream`, adds a named layer
+  with a filled rectangle and text, reads both operations in the summary and
+  renders them into a PNG that opens with the same content in Dream.
+
+## Slice 22 — Make a game from words ✅
+
+Research backlog #2 (RESEARCH.md §4): give Zainab and George the shortest path
+from an idea to a playable result while keeping Dream local-first and honest
+about the mechanics it supports.
+
+- ✅ A compact **Describe your game** maker in the Play cast panel accepts an
+  English or Arabic request, selects Catch!, Flappy Dream, Maze Runner or
+  Dream Jumper and
+  applies difficulty language (easy/hard, fast/slow, many/few, explicit
+  lives/shields) to the existing visible settings. The shared feature-detected
+  prompt mic enables voice creation and follows the active locale.
+- ✅ Mentioned layer names become the cast. Familiar semantic names choose the
+  natural role (`Rocket` → hero, `Clouds` → obstacle, `Stars` → good,
+  `Rocks` → bad); other named layers fill supported roles in mention order.
+- ✅ Planning is deterministic, offline and free: no provider request, no
+  invented physics and no automatic run. The picker, cast rows and settings
+  show exactly what Dream understood, followed by a ready message and the
+  normal Play button.
+- ✅ Pure bilingual planner tests cover template choice, semantic casting,
+  fallback, difficulty composition and blank input; a component test proves
+  the request updates the persisted game setup. EN+AR strings remain in parity.
+- Conversational creation spans every game Dream currently promises; the
+  final platformer followed in slice 23.
+- Acceptance met: with Rocket and Clouds layers, “My Rocket flies through
+  Clouds, nice and slow” prepares a gentle Flappy game with both drawings cast,
+  entirely offline.
+
+## Slice 23 — Dream Jumper platformer ✅
+
+Research backlog #2 (RESEARCH.md §4): complete the approachable game set with
+the classic run-and-jump shape Zainab expects, without adding a physics or
+scene-graph dependency.
+
+- ✅ Fourth template **Dream Jumper**: run left/right, jump across a short
+  side-scrolling course, collect stars and reach the flag. Falling spends a
+  life and respawns; zero lives ends the run; reaching the flag wins with the
+  collected score.
+- ✅ Pure seeded level generator with broad start/finish platforms, bounded
+  gaps and bounded neighboring height changes. The pure core covers movement,
+  edge-triggered jumps, forgiving one-way landing, one-time collectibles,
+  respawn/game-over and win.
+- ✅ Casting extends naturally: Hero, Collectible, Platforms and Background,
+  with smiley/star/grass-earth stand-ins. Run speed and lives reuse the shared
+  persisted settings; kid mode gets slower movement, five lives and large
+  left/jump/right controls.
+- ✅ Canvas view adds a following camera, score/lives HUD, finish flag, pops,
+  shake and existing procedural sounds. Picker becomes a legible 2×2 grid;
+  EN+AR labels and "play platformer" / «العب المنصات» voice selection ship in
+  parity. The words-to-game planner recognizes run/jump/platform/flag requests.
+- Acceptance met: select Dream Jumper, press Play, run and jump across the
+  generated platforms, collect a star and reach the flag; a fresh run produces
+  a different but still approachable course.
+
+## Slice 24 — Presentation depth ✅
+
+Research backlog #9: make the shared frame model credible for real talks while
+keeping old decks manual and unchanged.
+
+- ✅ Each slide owns its enter transition, optional 1–60 second duration and
+  presenter-only notes; one Save and one Undo cover the complete edit.
+- ✅ Auto follows timed slides and pauses at manual or final slides. Presenter
+  view shows notes, timing and what comes next without painting them onto the
+  audience artwork.
+- ✅ Reduced motion makes transitions instant, duplicated frames copy their
+  settings, and the complete contract persists in `.dream` projects.
+
+## Slice 25 — Native MP4 animation export ✅
+
+- ✅ Browsers that advertise an MP4 recording codec expose a true MP4 option;
+  other browsers never see a dead control or a renamed WebM file.
+- ✅ MP4 shares the proven flipbook timing, progress and optional narration
+  mix with WebM. The produced container and filename match the selected format.
+
+## Slice 26 — Automated accessibility floor ✅
+
+- ✅ Serious and critical browser accessibility scans cover Draw, Design,
+  Play, slide settings and Presenter in both themes.
+- ✅ The first strict pass corrected six contrast failures through shared
+  visual tokens; normal, secondary and accent text now meet WCAG AA.
+- Manual assistive-technology and complete focus-order testing remain human
+  validation work, not something an automated scan can certify.
+
+## Slice 27 — Social-ready stories and real image fidelity ✅
+
+Persona: Ahmed, social-media storyteller — send a narrated drawing in the
+shape people actually watch, without losing any artwork.
+
+- ✅ WebM and supported MP4 export Original, Vertical 9:16, Square 1:1 or
+  Landscape 16:9 at 720p. The canvas is contained and centered without crop or
+  stretch; shaped filenames name the selected output.
+- ✅ The recording stream requests 30 fps for platform compatibility while
+  each drawing still holds for its authored 1–24 fps flipbook duration.
+- ✅ Each frame owns a short caption. Export offers previous/next and
+  copy-to-all editing, burns captions into a readable lower safe area, and
+  saves the whole batch as one undoable change. Slide settings and timeline
+  thumbnails expose the same content.
+- ✅ Real Code output embeds the actual inline PNG pixels of imported and
+  AI-made images instead of placeholder boxes. Connected OpenAI image creation
+  exposes its own model and uses the current GPT Image request contract before
+  normalizing the result to the exact Dream canvas.
+- Acceptance met: draw and narrate a multi-frame story, add captions, export a
+  vertical video, and play a complete uncropped, captioned result on a phone;
+  generate a connected-AI image and see real pixels on both the canvas and in
+  the self-contained Real Code app.

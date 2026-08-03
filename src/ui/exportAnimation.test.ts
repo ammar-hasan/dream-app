@@ -3,11 +3,19 @@ import { enableAnimation } from '../engine/animation';
 import { createDocument, createFrame, createLayer } from '../engine/document';
 import type { DreamDocument } from '../engine/types';
 import {
+  captionLines,
+  exportAnimationMp4,
   exportAnimationWebM,
+  MP4_MIME_CANDIDATES,
+  pickMp4MimeType,
   pickWebmMimeType,
+  renderVideoFrame,
+  SOCIAL_VIDEO_CAPTURE_FPS,
   spriteSheetFileName,
+  videoFrameLayout,
   videoDurationSeconds,
   videoFileName,
+  videoOutputSize,
   WEBM_MIME_CANDIDATES,
   type RecorderLike,
 } from './exportAnimation';
@@ -73,12 +81,106 @@ describe('pickWebmMimeType', () => {
   });
 });
 
+describe('pickMp4MimeType', () => {
+  it('prefers browser-selected MP4, then explicit H.264/AAC variants', () => {
+    expect(pickMp4MimeType(() => true)).toBe('video/mp4');
+    expect(pickMp4MimeType((mime) => mime.includes('mp4a'))).toContain('mp4a.40.2');
+  });
+
+  it('returns null after trying every candidate', () => {
+    const seen: string[] = [];
+    expect(
+      pickMp4MimeType((mime) => {
+        seen.push(mime);
+        return false;
+      }),
+    ).toBeNull();
+    expect(seen).toEqual(MP4_MIME_CANDIDATES);
+  });
+});
+
 describe('filename generation', () => {
   it('uses the document name, trimmed, with fallbacks', () => {
     expect(videoFileName('Bounce')).toBe('Bounce.webm');
     expect(videoFileName('  ')).toBe('dream.webm');
+    expect(videoFileName('Bounce', 'mp4')).toBe('Bounce.mp4');
+    expect(videoFileName('Bounce', 'mp4', 'vertical')).toBe('Bounce-vertical.mp4');
     expect(spriteSheetFileName('Bounce')).toBe('Bounce-frames.png');
     expect(spriteSheetFileName('')).toBe('dream-frames.png');
+  });
+});
+
+describe('social video composition', () => {
+  it('uses standard 720p aspect presets and contains artwork without distortion', () => {
+    const doc = { width: 400, height: 200 };
+    expect(videoOutputSize(doc, 'vertical')).toEqual({ width: 720, height: 1280 });
+    expect(videoOutputSize(doc, 'square')).toEqual({ width: 720, height: 720 });
+    expect(videoOutputSize(doc, 'landscape')).toEqual({ width: 1280, height: 720 });
+    expect(videoOutputSize(doc, 'original')).toEqual(doc);
+    expect(videoFrameLayout(doc, 'square')).toEqual({
+      width: 720,
+      height: 720,
+      scale: 1.8,
+      x: 0,
+      y: 180,
+    });
+  });
+
+  it('wraps captions to three lines and ellipsizes overflow', () => {
+    expect(captionLines('  One   two three four five six seven  ', 8, 3)).toEqual([
+      'One two',
+      'three',
+      'four…',
+    ]);
+    expect(captionLines('', 10)).toEqual([]);
+    expect(captionLines('abcdefghijk', 5, 3)).toEqual(['abcde', 'fghij', 'k']);
+  });
+
+  it('centers the frame and burns its caption above the bottom safe edge', () => {
+    const doc = animatedDoc(1);
+    const frame = {
+      ...doc.frames![0],
+      presentation: { caption: 'Speak the truth' },
+    };
+    const ctx = new MockContext2D();
+    renderVideoFrame(doc, frame, ctx as unknown as CanvasRenderingContext2D, 'vertical');
+
+    expect(ctx.calls('translate')[0]).toEqual(['translate', 0, 280]);
+    expect(ctx.calls('scale')[0]).toEqual(['scale', 90, 90]);
+    expect(ctx.calls('fillText').at(-1)?.[1]).toBe('Speak the truth');
+    expect(ctx.calls('fillRect').some((call) => call[3] === 720 && call[4] === 1280)).toBe(true);
+  });
+});
+
+describe('exportAnimationMp4', () => {
+  it('rejects when native MP4 recording is unavailable', async () => {
+    await expect(
+      exportAnimationMp4(animatedDoc(), { fps: 6 }, { isTypeSupported: () => false }),
+    ).rejects.toThrow('cannot record MP4');
+  });
+
+  it('records a real MP4 blob through the shared frame pipeline', async () => {
+    const { canvas } = fakeCanvas();
+    const seen: string[] = [];
+    const blob = await exportAnimationMp4(
+      animatedDoc(2),
+      { fps: 5 },
+      {
+        isTypeSupported: (mime) => {
+          seen.push(mime);
+          return mime === 'video/mp4';
+        },
+        createCanvas: () => canvas,
+        createRecorder: (_canvas, mime) => {
+          expect(mime).toBe('video/mp4');
+          return fakeRecorder({ value: false }, { value: false });
+        },
+        wait: () => Promise.resolve(),
+      },
+    );
+    expect(seen).toEqual(['video/mp4']);
+    expect(blob.type).toBe('video/mp4');
+    expect(blob.size).toBeGreaterThan(0);
   });
 });
 
@@ -189,7 +291,7 @@ describe('exportAnimationWebM', () => {
 
     expect(plainRecorderUsed).toBe(false);
     expect(seen.narration).toEqual(narration);
-    expect(seen.fps).toBe(10);
+    expect(seen.fps).toBe(SOCIAL_VIDEO_CAPTURE_FPS);
     expect(seen.mime).toBe('video/webm;codecs=vp9');
     expect(finished).toBe(true); // mixer released after recording stops
     expect(blob.size).toBeGreaterThan(0);

@@ -9,7 +9,7 @@ import { MockAIProvider } from '../ai/mock';
 import type { AICapabilities, AIProvider } from '../ai/types';
 import { consumeFreeTry, FREE_TRIES_PER_DAY, getUsageToday } from '../ai/usage';
 import { createDocument, createLayer } from '../engine/document';
-import type { DreamDocument, Frame } from '../engine/types';
+import type { DreamDocument, Frame, ImageOp } from '../engine/types';
 import { codeFileName, exportRealCodeHtml, generateRealCodeHtml } from './exportRealCode';
 
 const NO_CHAT: AICapabilities = { chat: false, generateImage: false, editImage: false };
@@ -51,6 +51,35 @@ describe('generateRealCodeHtml', () => {
     expect(local).toBe(true);
     expect(html).toContain('<section class="screen" id="screen-1"');
     expect(html).toContain('generated locally by Dream AI');
+  });
+
+  it('embeds imported image pixels into the local single-file app', async () => {
+    const image: ImageOp = {
+      id: 'photo',
+      kind: 'image',
+      color: '#000000',
+      opacity: 1,
+      scale: 1,
+      patch: {
+        x: 4,
+        y: 5,
+        width: 1,
+        height: 1,
+        data: new Uint8ClampedArray([255, 0, 0, 255]),
+      },
+    };
+    const project = doc();
+    project.frames![0].layers[0] = createLayer('Photo', [image]);
+    const png = 'data:image/png;base64,iVBORw0KGgo=';
+    const encodeRaster = vi.fn(async () => png);
+
+    const { html } = await generateRealCodeHtml(project, {
+      provider: new MockAIProvider(),
+      encodeRaster,
+    });
+    expect(encodeRaster).toHaveBeenCalledOnce();
+    expect(html).toContain(`<img class="shape" src="${png}"`);
+    expect(html).not.toContain('image lived here');
   });
 
   it('asks a chat-capable provider and extracts the HTML from its reply', async () => {

@@ -1,6 +1,6 @@
 /**
  * Play mode dispatcher: the document's chosen template picks the game view —
- * Catch! (this file), Flappy Dream or Maze Runner. The rules live in the
+ * Catch! (this file), Flappy Dream, Maze Runner or Dream Jumper. The rules live in the
  * pure cores (`game/templates/`); the views are only sprites (cast layers
  * rasterized once per run and cropped to their content), the rAF loop and
  * the juice — countdown, score pops, a gentle shake and tiny WebAudio bleeps.
@@ -28,6 +28,7 @@ import { readHighScore, useDreamStore } from '../store/dreamStore';
 import { useUiPrefs } from '../store/uiPrefs';
 import { FlappyView } from './FlappyView';
 import { MazeView } from './MazeView';
+import { PlatformerView } from './PlatformerView';
 import {
   backgroundCanvas,
   PlayReadyOverlay,
@@ -73,6 +74,7 @@ export function PlayView() {
   const template = templateOf(doc);
   if (template.id === 'flappy') return <FlappyView />;
   if (template.id === 'maze') return <MazeView />;
+  if (template.id === 'platformer') return <PlatformerView />;
   return <CatchView />;
 }
 
@@ -83,7 +85,9 @@ function CatchView() {
   const kidMode = useUiPrefs((s) => s.kidMode);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const stateRef = useRef<GameState>(createGame(doc.width, doc.height, templateSettings(doc, kidMode)));
+  const stateRef = useRef<GameState>(
+    createGame(doc.width, doc.height, templateSettings(doc, kidMode)),
+  );
   const castRef = useRef<Cast | null>(null);
   const inputRef = useRef({ left: false, right: false, pointerX: null as number | null });
   const { muted, setMuted, unlock, playEvents } = usePlaySounds(kidMode);

@@ -8,14 +8,15 @@ import {
   catchTemplate,
   flappyTemplate,
   mazeTemplate,
+  platformerTemplate,
   templateOf,
   templateSettings,
   TEMPLATES,
 } from './templates';
 
 describe('TEMPLATES registry', () => {
-  it('lists exactly the three templates, in picker order, one per id', () => {
-    expect(TEMPLATES.map((t) => t.id)).toEqual(['catch', 'flappy', 'maze']);
+  it('lists exactly the four templates, in picker order, one per id', () => {
+    expect(TEMPLATES.map((t) => t.id)).toEqual(['catch', 'flappy', 'maze', 'platformer']);
     expect(TEMPLATES.map((t) => t.id).sort()).toEqual([...GAME_TEMPLATE_IDS].sort());
   });
 
@@ -55,6 +56,13 @@ describe('TEMPLATES registry', () => {
       mazeTemplate.tick(maze, { left: false, right: false, up: false, down: false }, 100, () => 0.5)
         .phase,
     ).toBe('countdown');
+    const jumping = platformerTemplate.startRun(
+      platformerTemplate.createGame(800, 600, DEFAULT_GAME_SETTINGS),
+    );
+    expect(
+      platformerTemplate.tick(jumping, { left: false, right: false, jump: false }, 100, () => 0.5)
+        .phase,
+    ).toBe('countdown');
   });
 });
 
@@ -71,12 +79,14 @@ describe('templateOf', () => {
     expect(templateOf(doc).id).toBe('flappy');
     doc.game.template = 'maze';
     expect(templateOf(doc).id).toBe('maze');
+    doc.game.template = 'platformer';
+    expect(templateOf(doc).id).toBe('platformer');
   });
 
   it('an unknown stored id falls back to Catch!', () => {
     const doc = {
       ...createDocument({ width: 100, height: 100 }),
-      game: { template: 'platformer' as GameTemplateId, cast: {} },
+      game: { template: 'shooter' as GameTemplateId, cast: {} },
     };
     expect(templateOf(doc).id).toBe('catch');
   });

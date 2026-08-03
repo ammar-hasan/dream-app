@@ -183,6 +183,27 @@ describe('layers', () => {
   });
 });
 
+describe('raster baking', () => {
+  it('replaces the active layer as one undoable AI-style bake', () => {
+    store().setTool('brush');
+    store().pointerDown({ x: 1, y: 1 });
+    store().pointerUp({ x: 5, y: 5 });
+    expect(store().doc.layers[0].operations[0].kind).toBe('stroke');
+
+    const pixels = new Uint8ClampedArray(100 * 80 * 4).fill(42);
+    store().applyLayerRaster({ data: pixels, width: 100, height: 80 }, 'AI edit');
+    expect(store().doc.layers[0].operations).toHaveLength(1);
+    expect(store().doc.layers[0].operations[0]).toMatchObject({ kind: 'image', scale: 1 });
+
+    store().undo();
+    expect(store().doc.layers[0].operations[0].kind).toBe('stroke');
+    store().redo();
+    const baked = store().doc.layers[0].operations[0];
+    expect(baked.kind).toBe('image');
+    if (baked.kind === 'image') expect(baked.patch.data).toBe(pixels);
+  });
+});
+
 describe('settings and viewport', () => {
   it('setOpacity clamps to 0..1', () => {
     store().setOpacity(1.5);
