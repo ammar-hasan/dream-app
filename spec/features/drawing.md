@@ -1,0 +1,181 @@
+# Drawing
+
+**Purpose.** The heart of Dream: pick a tool, make marks. Every tool works
+with mouse, touch and stylus, commits through the shared undo history, and
+feels immediate on a 5-year-old's tablet and a pro's pen display alike.
+
+## Shared behavior
+
+1. Every tool gesture produces a live preview while dragging and commits
+   exactly one undoable change on release (a mirrored gesture or a stamp is
+   still **one** undo step).
+2. A single tap with a stroke tool paints a visible dot (round cap).
+3. Tool settings — color, size (1–64 px), opacity (0–1) — live in the
+   options panel and are session-only. Session defaults: color `#1f2937`,
+   size 8, opacity 1.
+4. All stroke tools paint with round line caps and joins.
+5. The color UI offers a 16-color palette, a custom color picker, and a
+   recent-colors row (last 8, newest first, persisted per user).
+6. Locked or hidden layers reject edits; the status area says why.
+
+## The tools
+
+### Brush (B)
+
+Soft, opacity-aware round stroke. Honors the opacity setting. With a
+stylus, width responds to pen pressure (see below).
+
+### Pencil (P)
+
+Hard, always fully opaque round stroke, regardless of the opacity setting.
+Pressure-capable like the brush.
+
+### Eraser (E)
+
+Removes content with a round stroke, always fully opaque. **The eraser
+erases to transparency** — it removes everything below it, including the
+document background (erased areas export as transparent pixels). This is
+deliberate: the eraser is a subtractive tool, not a background-color brush.
+Pressure-capable.
+
+### Spray (S)
+
+An airbrush: a mist of small dots scattered along the stroke path.
+
+- Dot radius region: dots fall uniformly within a disc of radius `size/2`
+  around the stroke path.
+- Dot size: `max(1, round(size/8))` px squares.
+- Density slider 1–100 (default 40): dots per step = `max(1, round(density/8))`.
+- Honors the opacity setting.
+- **Deterministic:** every spray stroke carries a random seed rolled at the
+  start of the gesture; the same stroke redraws — in the viewport, in
+  thumbnails, in every export — with the identical mist.
+
+### Line / Rectangle / Ellipse (L / R / O)
+
+Drag from one corner to the other; release commits. A zero-length drag
+commits nothing.
+
+- **Shift constrains:** lines snap to the nearest 45° angle (length
+  preserved); rectangles become squares and ellipses become circles.
+- Outline width is the current size.
+- **Fill shapes toggle** (options panel): rectangles and ellipses commit
+  filled with the current color and **no outline**. Lines are unaffected.
+
+### Flood fill (G)
+
+Click to fill the contiguous region of matching color on the active layer
+with the current color.
+
+- Match rule: a pixel joins the region when each of its red, green, blue
+  **and alpha** channels is within the tolerance of the clicked pixel.
+  Tolerance default: 0 (exact match only).
+- The fill is baked to pixels at commit time (a raster region), so it
+  stays put even if the content around it later changes.
+- Clicking a region that already is the fill color does nothing (no undo
+  step, no change).
+
+### Magic wand (W)
+
+Click a pixel to lift the contiguous similar-colored region of the active
+layer into a **floating patch**.
+
+- Tolerance slider, default 32, per-channel 0–255 (same match rule as
+  flood fill). Perceptually: 0 selects only the exact color; 32 selects a
+  flat color and its near shades (anti-aliased edges, lightly textured
+  fills); very high values swallow most of the layer.
+- While floating: **drag** moves it, **Delete/Backspace** removes it,
+  **"Copy to new layer"** duplicates it onto its own layer, **Esc** puts it
+  back where it came from. The document is untouched until one of these
+  resolves.
+- Move and delete bake the whole layer to pixels (the same destructive-bake
+  model as filters) — each outcome is one undoable change.
+
+### Eyedropper (I)
+
+Click anywhere to make the active layer's color at that point the current
+color (transparency ignored).
+
+### Text (T)
+
+Click to place an anchor, type, and commit. Committed text is trimmed;
+empty text commits nothing. Font size default 24 px; four named font
+choices: Sans, Serif, Mono, Handwritten. Esc cancels an in-progress text.
+
+### Stamp (N)
+
+Click-to-place one of twelve built-in doodles. No assets — each stamp is a
+chunky, multi-color drawing composed from shapes and strokes, so it scales
+crisply and its colors are fixed and friendly.
+
+- The twelve: **star, heart, smiley, flower, sun, moon, cloud, tree, fish,
+  butterfly, cat, rocket**.
+- Sizes (bounding box): **Small 48 px, Medium 96 px, Big 160 px**.
+- One click = one undoable placement on the active layer.
+- All parts of one stamp are grouped, so Design mode selects and moves the
+  whole doodle as one object.
+- The picker is shared by the adult options panel and the kid panel (big
+  grid, spoken names in kid mode).
+
+### Starter scenes ("Start with a picture")
+
+The stamp picker also offers three coloring-book starter scenes — black
+outline art sized to the document, inserted as a **new layer**, ready to
+color in with brush or fill: **Sunny garden, Night sky, Under the sea**.
+Insertion is undoable.
+
+## Mirror / symmetry
+
+An options-panel mode: **off / vertical / horizontal / quad**. While on,
+every brush, pencil, eraser, spray, line, rectangle and ellipse gesture is
+reflected live across the canvas center axes (vertical mirror flips left↔
+right across the vertical center line; horizontal flips top↔bottom; quad
+does both).
+
+- Soft dashed accent lines show the active mirror axes while drawing.
+- Mirrored marks are real operations committed **together with the
+  original in one undoable change** — a single undo removes the whole
+  symmetric bloom.
+- Text, fill, images and stamps are never mirrored.
+- Session-only (like zoom): not saved with the project.
+
+## Pen pressure
+
+With a stylus, brush, pencil and eraser strokes modulate width per pointer
+sample: effective width = size × pressure, clamped to a 0.1–1 multiplier,
+interpolated smoothly between points (segment width is the average of its
+two endpoints' multipliers, never below 0.5 px). Mouse and touch strokes
+carry no pressure data and render at uniform width.
+
+## Zoom & pan
+
+- Zoom range **25%–800%**, stepped ladder: 25, 33, 50, 67, 100, 150, 200,
+  300, 400, 600, 800%.
+- Mouse-wheel zoom anchors at the cursor (the point under the cursor stays
+  put). `+`/`-` keys and the zoom pill step the ladder.
+- Pan: hold Space and drag, use the pan tool (H), or drag with the pan
+  tool on touch.
+- The floating **zoom pill** (bottom-end of the canvas, hidden in kid
+  mode): `−`, the current percent, `+`; tapping the percent fits the
+  document to the window (fit = the largest zoom that leaves 24 px margins
+  on every side).
+
+## The built-in palette (16 colors)
+
+`#000000` `#6b7280` `#9ca3af` `#ffffff` `#7c2d12` `#b45309` `#dc2626`
+`#f97316` `#facc15` `#16a34a` `#0d9488` `#2563eb` `#4f46e5` `#9333ea`
+`#db2777` `#f9a8d4`
+
+(Kid mode uses its own 12-color bright palette — see `accessibility.md`.)
+
+## Edge cases
+
+- Drawing while an animation is playing does nothing — playback is
+  watching, not editing; pause first.
+- Drawing on a locked or hidden layer is refused with a friendly status
+  message.
+- Tool gestures that would commit nothing (zero-length shape, empty text,
+  fill on the same color) leave no trace in undo history.
+- Switching tools mid-gesture cancels the in-progress gesture.
+- Spray strokes keep their seed through undo/redo, save/load and export:
+  the mist never re-randomizes.

@@ -6,7 +6,7 @@
  */
 
 import type { VoiceCommand } from '../ai/voiceCommands';
-import type { Color, DreamDocument, ToolId, WorkspaceMode } from '../engine/types';
+import type { Color, DreamDocument, GameTemplateId, ToolId, WorkspaceMode } from '../engine/types';
 import type { SymmetryMode } from '../engine/symmetry';
 import { t } from './i18n';
 
@@ -28,6 +28,8 @@ export interface VoiceExecutorStore {
   setMode(mode: WorkspaceMode): void;
   startGame(): void;
   stopGame(): void;
+  /** Choose the Play-mode game template ("play flappy" / "play maze"). */
+  setGameTemplate(template: GameTemplateId): void;
   /** Open Present mode as an interactive app preview. */
   previewApp(): void;
   /** Download the standalone HTML prototype. */
@@ -102,6 +104,7 @@ export function executeVoiceCommand(
       return { message: t('voice.playing') };
 
     case 'play-game':
+      if (command.template) store.setGameTemplate(command.template);
       store.setMode('play');
       store.startGame();
       return { message: t('voice.playGame') };

@@ -62,6 +62,8 @@ export function useKeyboardShortcuts(): void {
         store.redo();
         return;
       }
+      // While a game runs, the keys belong to the game (arrows, WASD, Space).
+      if (store.mode === 'play' && store.gameRunning) return;
       // Wand floating region: Delete removes it (both workspace modes).
       if ((e.key === 'Delete' || e.key === 'Backspace') && store.wandDraft) {
         e.preventDefault();

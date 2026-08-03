@@ -11,7 +11,7 @@
  * forms unified) so "شغّل" and "شغل" match the same word.
  */
 
-import type { Color, ToolId } from '../engine/types';
+import type { Color, GameTemplateId, ToolId } from '../engine/types';
 
 export type VoiceCommand =
   | { kind: 'undo' }
@@ -22,8 +22,9 @@ export type VoiceCommand =
   | { kind: 'cancel' }
   | { kind: 'new-frame' }
   | { kind: 'play' }
-  /** "play my game": switch to Play mode and start a Catch! run. */
-  | { kind: 'play-game' }
+  /** "play my game": switch to Play mode and start a run. An optional
+   *  template ("play flappy", "play maze", "play catch") selects it first. */
+  | { kind: 'play-game'; template?: GameTemplateId }
   /** "preview my app": open Present mode as an interactive prototype. */
   | { kind: 'preview-app' }
   /** "export my app": download the standalone HTML prototype. */
@@ -163,6 +164,8 @@ export interface VoiceVocabulary {
   help: Set<string>;
   save: Set<string>;
   game: Set<string>;
+  /** Template names for "play flappy" / "play maze" / "play catch". */
+  templates: Record<GameTemplateId, Set<string>>;
   app: Set<string>;
   appPreview: Set<string>;
   appExport: Set<string>;
@@ -189,6 +192,11 @@ const EN_VOCAB: VoiceVocabulary = {
   help: new Set(['help', 'commands', 'options']),
   save: new Set(['save']),
   game: new Set(['game', 'games']),
+  templates: {
+    catch: new Set(['catch', 'catching']),
+    flappy: new Set(['flappy', 'flap', 'fly', 'flying', 'bird']),
+    maze: new Set(['maze', 'labyrinth']),
+  },
   app: new Set(['app', 'prototype']),
   appPreview: new Set(['preview', 'try', 'test', 'open', 'show']),
   appExport: new Set(['export', 'download', 'share', 'send']),
@@ -275,6 +283,11 @@ const AR_VOCAB: VoiceVocabulary = {
   help: new Set(['مساعدة', 'مساعده', 'اوامر']),
   save: new Set(['احفظ', 'حفظ', 'خزن']),
   game: new Set(['لعبة', 'لعبه', 'لعبتي', 'العاب']),
+  templates: {
+    catch: new Set(['الصيد', 'صيد', 'التقاط']),
+    flappy: new Set(['الطيران', 'طيران', 'فلابي', 'الطائر', 'طائر']),
+    maze: new Set(['المتاهة', 'متاهة', 'متاهه']),
+  },
   app: new Set(['تطبيق', 'تطبيقي', 'برنامج']),
   appPreview: new Set(['عاين', 'معاينة', 'معاينه', 'جرب', 'افتح', 'اعرض']),
   appExport: new Set(['صدر', 'صدري', 'تصدير', 'حمل', 'نزل', 'شارك']),
@@ -307,6 +320,11 @@ function mergeVocabulary(base: VoiceVocabulary, extra: VoiceVocabulary): VoiceVo
     help: union(base.help, extra.help),
     save: union(base.save, extra.save),
     game: union(base.game, extra.game),
+    templates: {
+      catch: union(base.templates.catch, extra.templates.catch),
+      flappy: union(base.templates.flappy, extra.templates.flappy),
+      maze: union(base.templates.maze, extra.templates.maze),
+    },
     app: union(base.app, extra.app),
     appPreview: union(base.appPreview, extra.appPreview),
     appExport: union(base.appExport, extra.appExport),
@@ -373,6 +391,16 @@ function toolIn(tokens: Set<string>, tools: Record<string, ToolId>): ToolId | nu
   return null;
 }
 
+function templateIn(
+  tokens: Set<string>,
+  templates: Record<GameTemplateId, Set<string>>,
+): GameTemplateId | null {
+  for (const id of ['catch', 'flappy', 'maze'] as const) {
+    if (has(tokens, templates[id])) return id;
+  }
+  return null;
+}
+
 /** Phrase-level checks that single tokens can't express. */
 function hasPhrase(normalized: string, ...phrases: string[]): boolean {
   return phrases.some((p) => normalized.includes(p));
@@ -435,6 +463,12 @@ export function parseVoiceCommand(transcript: string, locale = 'en'): VoiceComma
   }
 
   if (has(tokens, vocab.stop)) return { kind: 'stop' };
+  // Game templates: "play flappy" / "play maze" / "play catch" — a template
+  // word with a play/game word (or all alone) picks that game and starts it.
+  const template = templateIn(tokens, vocab.templates);
+  if (template && (has(tokens, vocab.play) || has(tokens, vocab.game) || tokens.size === 1)) {
+    return { kind: 'play-game', template };
+  }
   // "play my game" beats a bare "play" (which is animation playback).
   if (has(tokens, vocab.game)) return { kind: 'play-game' };
   if (has(tokens, vocab.play)) return { kind: 'play' };

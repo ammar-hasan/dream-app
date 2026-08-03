@@ -27,7 +27,16 @@ export interface AudioContextLike {
   resume?(): void;
 }
 
-export type GameSound = 'start' | 'count' | 'go' | 'catch-good' | 'catch-bad' | 'game-over';
+export type GameSound =
+  | 'start'
+  | 'count'
+  | 'go'
+  | 'catch-good'
+  | 'catch-bad'
+  | 'game-over'
+  | 'flap'
+  | 'gate'
+  | 'maze-win';
 
 /** [frequency Hz, duration s, wave] per sound — bright for good, low for bad. */
 const RECIPES: Record<GameSound, [number, number, string]> = {
@@ -37,6 +46,9 @@ const RECIPES: Record<GameSound, [number, number, string]> = {
   'catch-good': [880, 0.12, 'sine'],
   'catch-bad': [160, 0.25, 'sawtooth'],
   'game-over': [220, 0.5, 'triangle'],
+  flap: [620, 0.07, 'square'],
+  gate: [990, 0.14, 'sine'],
+  'maze-win': [660, 0.45, 'triangle'],
 };
 
 type AudioContextCtor = new () => AudioContextLike;

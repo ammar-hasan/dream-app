@@ -7,6 +7,16 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- The living spec (`spec/`): an implementation-agnostic, modular product
+  specification — concepts, data contracts, per-feature behavior rules,
+  experience map, visual identity, integrations, and a 90-point acceptance
+  checklist — detailed enough to rebuild Dream from the spec alone, in any
+  stack. AGENTS.md rule 12 makes spec updates part of every behavior change.
+- Play mode game templates: **Flappy Dream** (flap through scrolling gates,
+  one hit ends the run, 3 shields in kid mode) and **Maze Runner** (seeded,
+  always-solvable generated mazes with level-ups) join **Catch!** behind a
+  shared template interface and a picker in the cast panel. Voice: "play
+  flappy" / "play maze" / "play catch" in English and Arabic.
 - The agent harness: in-repo infrastructure for AI agents developing Dream —
   `CLAUDE.md` bootstrap, four Claude Code subagents (`.claude/agents/`:
   dream-engine, dream-ui, dream-verify, dream-release), three project skills

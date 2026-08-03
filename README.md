@@ -394,16 +394,26 @@ IDEA.md's "create whole applications with just your drawings".
   Link tool. Kid mode skips it (Play mode stays the kid path); voice learned
   "preview my app" and "export my app".
 
-## Play mode (Catch!)
+## Play mode (games)
 
 The **Play** tab in the mode pill turns the drawing into a mini-game you play
-right on the canvas. The first template is **Catch!**: things fall from the
-top, and the hero slides left/right to catch the good ones (+1 point) and
-dodge the bad ones (−1 life).
+right on the canvas. Three templates ship in the picker:
+
+- **Catch!** — things fall from the top; the hero slides left/right to catch
+  the good ones (+1 point) and dodge the bad ones (−1 life).
+- **Flappy Dream** — the hero flies; tap, click, Space or ↑ flaps against
+  gravity while gates scroll in from the right. Each gate threaded scores +1;
+  one hit ends the run (kid mode gets 3 gentle shields).
+- **Maze Runner** — a freshly generated maze every level (seeded, always
+  solvable); guide the hero to the exit with arrows/WASD or swipe. Reaching
+  the exit levels up to a bigger maze.
+
+All three share the same casting magic, controls, juice and sounds:
 
 - **Casting is the magic** — your own drawings become the game pieces. The
-  cast panel assigns a layer to each role: the Hero (the catcher), the Good
-  Thing, the Bad Thing and the Background. Every role offers a layer dropdown
+  cast panel assigns a layer to each role the template needs (Hero, plus
+  Good/Bad Things, Obstacle or Background depending on the template). Every
+  role offers a layer dropdown
   or "Draw it now" (creates a named layer, casts it and lands you in Draw
   mode with the brush ready). Roles left on Auto get a friendly stand-in
   drawn by the engine: a smiley hero, a gold star, a grumpy spiky rock
@@ -421,7 +431,8 @@ dodge the bad ones (−1 life).
   with a mute toggle in the corner.
 - **Kid mode + voice**: the kid toolbar has a gamepad button that jumps
   straight into Play mode with a giant play button; saying "play my game"
-  switches over and starts a run, and "stop" ends it.
+  switches over and starts a run, "play flappy" / "play maze" / "play catch"
+  pick a template first, and "stop" ends it.
 - The **game core is pure TypeScript** (`game/core.ts`): one
   `tick(state, input, dtMs, rng) → state` function with an injectable seeded
   RNG, fully unit-tested (spawning, collisions, scoring, lives, game over,

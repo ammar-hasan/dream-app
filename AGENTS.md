@@ -88,6 +88,14 @@ Conventions for anyone (human or agent) working on Dream.
     fakes, runs only under `import.meta.env.PROD`, and offline behavior is
     verified by `e2e/offline.spec.ts` (a real killed server, not network
     emulation).
+12. **The living spec (`spec/`) rides with behavior changes.** Any change to
+    product behavior MUST update `spec/` in the same commit. The spec
+    describes the PRODUCT, never the code — no file paths, module names,
+    identifiers, frameworks or tooling in it (data contracts like storage
+    keys, `.dream` fields and MCP tool names are the labeled exception). If
+    you cannot point to the spec rule your change implements, the change
+    isn't done. Freshness is a review rule, not tooling — deliberately no
+    scripts couple spec files to source paths.
 
 ## Structure
 
@@ -149,6 +157,11 @@ Conventions for anyone (human or agent) working on Dream.
   renderer (`src/nodeCodec.ts`, `@napi-rs/canvas`). Compiles the engine in
   from `src/engine`; never imported by the webapp; gated by `check:mcp` and
   its own CI job.
+- `spec/` — the living product spec (rule 12): product vision, concepts,
+  data contracts (`data/`), one file per feature area (`features/`),
+  experience map, visual identity, integrations and the acceptance
+  checklist. Product language only — read it to learn WHAT Dream is, never
+  HOW it's built.
 - Harness (agent infrastructure, no app code): `CLAUDE.md` (bootstrap
   pointer), `.claude/agents/` (subagent definitions), `.agents/skills/`
   (project skills), `.mcp.json` (auto-wires dream-mcp for repo agents),

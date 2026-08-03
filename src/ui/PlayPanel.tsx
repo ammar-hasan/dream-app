@@ -1,12 +1,11 @@
 /**
- * Play mode panel: the casting couch. Each game role (hero, good thing, bad
- * thing, background) gets a layer dropdown plus "draw it now" — which makes a
- * named layer, casts it and lands you in Draw mode with the brush ready.
- * Below: the difficulty knobs and the project's best score.
+ * Play mode panel: pick a game template, then the casting couch. Each role
+ * of the chosen template gets a layer dropdown plus "draw it now" — which
+ * makes a named layer, casts it and lands you in Draw mode with the brush
+ * ready. Below: the template's difficulty knobs and the project's best score.
  */
 
 import {
-  gameSetupOf,
   MAX_FALL_SPEED,
   MAX_LIVES,
   MAX_SPAWN_INTERVAL,
@@ -14,25 +13,35 @@ import {
   MIN_LIVES,
   MIN_SPAWN_INTERVAL,
 } from '../game/core';
-import type { GameCast } from '../engine/types';
+import { TEMPLATES, templateOf } from '../game/templates';
+import type { GameTemplateId } from '../engine/types';
+import type { SliderDef } from '../game/template';
 import { readHighScore, useDreamStore } from '../store/dreamStore';
 import { useT } from './i18n';
+import { CatchGameIcon, FlappyGameIcon, MazeGameIcon } from './icons';
 
-const ROLES: { role: keyof GameCast; key: string; shortKey?: string }[] = [
-  { role: 'hero', key: 'play.hero', shortKey: 'play.roleHero' },
-  { role: 'good', key: 'play.good', shortKey: 'play.roleGood' },
-  { role: 'bad', key: 'play.bad', shortKey: 'play.roleBad' },
-  { role: 'background', key: 'play.background' },
-];
+const TEMPLATE_ICONS: Record<GameTemplateId, (p: Record<string, never>) => JSX.Element> = {
+  catch: CatchGameIcon,
+  flappy: FlappyGameIcon,
+  maze: MazeGameIcon,
+};
+
+const SLIDER_RANGES: Record<SliderDef['setting'], { min: number; max: number; step: number }> = {
+  fallSpeed: { min: MIN_FALL_SPEED, max: MAX_FALL_SPEED, step: 10 },
+  spawnInterval: { min: MIN_SPAWN_INTERVAL, max: MAX_SPAWN_INTERVAL, step: 0.1 },
+  lives: { min: MIN_LIVES, max: MAX_LIVES, step: 1 },
+};
 
 export function PlayPanel() {
   const t = useT();
   const doc = useDreamStore((s) => s.doc);
-  const setup = gameSetupOf(doc);
+  const template = templateOf(doc);
   const best = readHighScore(doc.id);
+  const settings = { ...template.defaultSettings, ...doc.game?.settings };
+  const cast = doc.game?.cast ?? {};
 
   /** "Draw it now": new named layer, cast into the role, brush in hand. */
-  const drawItNow = (role: keyof GameCast, name: string) => {
+  const drawItNow = (role: (typeof template.roles)[number]['role'], name: string) => {
     const store = useDreamStore.getState();
     const id = store.createCastLayer(name);
     store.setGameCast(role, id);
@@ -42,15 +51,35 @@ export function PlayPanel() {
 
   return (
     <section className="panel play-panel" aria-label={t('play.cast')}>
+      <h2 className="panel-title">{t('play.pickTemplate')}</h2>
+      <div className="play-templates" role="group" aria-label={t('play.pickTemplate')}>
+        {TEMPLATES.map((meta) => {
+          const Icon = TEMPLATE_ICONS[meta.id];
+          const selected = meta.id === template.id;
+          return (
+            <button
+              type="button"
+              key={meta.id}
+              className={`play-template-card${selected ? ' selected' : ''}`}
+              aria-pressed={selected}
+              onClick={() => useDreamStore.getState().setGameTemplate(meta.id)}
+            >
+              <Icon />
+              <span>{t(meta.nameKey)}</span>
+            </button>
+          );
+        })}
+      </div>
+
       <h2 className="panel-title">{t('play.cast')}</h2>
       <p className="tool-hint">{t('play.castHint')}</p>
 
-      {ROLES.map(({ role, key, shortKey }) => (
+      {template.roles.map(({ role, labelKey, nameKey }) => (
         <div className="option-row play-cast-row" key={role}>
-          <span className="option-label">{t(key)}</span>
+          <span className="option-label">{t(labelKey)}</span>
           <select
-            aria-label={t(key)}
-            value={setup.cast[role] ?? ''}
+            aria-label={t(labelKey)}
+            value={cast[role] ?? ''}
             onChange={(e) => useDreamStore.getState().setGameCast(role, e.target.value || null)}
           >
             <option value="">
@@ -62,8 +91,8 @@ export function PlayPanel() {
               </option>
             ))}
           </select>
-          {shortKey && (
-            <button type="button" className="btn" onClick={() => drawItNow(role, t(shortKey))}>
+          {nameKey && (
+            <button type="button" className="btn" onClick={() => drawItNow(role, t(nameKey))}>
               {t('play.drawIt')}
             </button>
           )}
@@ -72,49 +101,29 @@ export function PlayPanel() {
 
       <h2 className="panel-title">{t('play.settings')}</h2>
 
-      <label className="option-row">
-        <span className="option-label">{t('play.fallSpeed')}</span>
-        <input
-          type="range"
-          min={MIN_FALL_SPEED}
-          max={MAX_FALL_SPEED}
-          step={10}
-          value={setup.settings.fallSpeed}
-          onChange={(e) =>
-            useDreamStore.getState().setGameSettings({ fallSpeed: Number(e.target.value) })
-          }
-        />
-        <span className="option-value">{setup.settings.fallSpeed}</span>
-      </label>
+      {template.sliders.length === 0 && <p className="tool-hint">{t('play.mazeNote')}</p>}
 
-      <label className="option-row">
-        <span className="option-label">{t('play.spawnRate')}</span>
-        <input
-          type="range"
-          min={MIN_SPAWN_INTERVAL}
-          max={MAX_SPAWN_INTERVAL}
-          step={0.1}
-          value={setup.settings.spawnInterval}
-          onChange={(e) =>
-            useDreamStore.getState().setGameSettings({ spawnInterval: Number(e.target.value) })
-          }
-        />
-        <span className="option-value">{setup.settings.spawnInterval}s</span>
-      </label>
-
-      <label className="option-row">
-        <span className="option-label">{t('play.lives')}</span>
-        <input
-          type="range"
-          min={MIN_LIVES}
-          max={MAX_LIVES}
-          value={setup.settings.lives}
-          onChange={(e) =>
-            useDreamStore.getState().setGameSettings({ lives: Number(e.target.value) })
-          }
-        />
-        <span className="option-value">{setup.settings.lives}</span>
-      </label>
+      {template.sliders.map(({ setting, labelKey }) => {
+        const range = SLIDER_RANGES[setting];
+        return (
+          <label className="option-row" key={setting}>
+            <span className="option-label">{t(labelKey)}</span>
+            <input
+              type="range"
+              min={range.min}
+              max={range.max}
+              step={range.step}
+              value={settings[setting]}
+              onChange={(e) =>
+                useDreamStore.getState().setGameSettings({ [setting]: Number(e.target.value) })
+              }
+            />
+            <span className="option-value">
+              {setting === 'spawnInterval' ? `${settings[setting]}s` : settings[setting]}
+            </span>
+          </label>
+        );
+      })}
 
       <p className="tool-hint">{t('play.best', { score: best })}</p>
     </section>

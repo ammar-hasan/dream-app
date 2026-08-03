@@ -27,6 +27,7 @@ function makeStore(overrides: Partial<VoiceExecutorStore> = {}) {
     setMode: vi.fn(),
     startGame: vi.fn(),
     stopGame: vi.fn(),
+    setGameTemplate: vi.fn(),
     previewApp: vi.fn(),
     exportApp: vi.fn(),
     setTool: vi.fn(),
@@ -127,6 +128,15 @@ describe('executeVoiceCommand', () => {
     expect(executeVoiceCommand({ kind: 'play-game' }, store, () => {})?.message).toBe(
       'Let’s play your game!',
     );
+    expect(store.setMode).toHaveBeenCalledWith('play');
+    expect(store.startGame).toHaveBeenCalledOnce();
+    expect(store.setGameTemplate).not.toHaveBeenCalled();
+  });
+
+  it('"play flappy" selects the template before starting the run', () => {
+    const store = makeStore();
+    executeVoiceCommand({ kind: 'play-game', template: 'flappy' }, store, () => {});
+    expect(store.setGameTemplate).toHaveBeenCalledWith('flappy');
     expect(store.setMode).toHaveBeenCalledWith('play');
     expect(store.startGame).toHaveBeenCalledOnce();
   });

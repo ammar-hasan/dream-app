@@ -2,7 +2,7 @@
 
 import { beforeEach, describe, expect, it } from 'vitest';
 import { readHighScore, useDreamStore } from './dreamStore';
-import { DEFAULT_GAME_SETTINGS } from '../game/core';
+import { DEFAULT_GAME_SETTINGS, gameSetupOf } from '../game/core';
 
 function store() {
   return useDreamStore.getState();
@@ -84,6 +84,52 @@ describe('run state', () => {
     store().loadDocument(saved);
     expect(store().mode).toBe('draw');
     expect(store().doc.game).toEqual(saved.game);
+  });
+});
+
+describe('template selection', () => {
+  it('old documents default to catch; picking a template persists it', () => {
+    expect(gameSetupOf(store().doc).template).toBe('catch');
+    store().setGameTemplate('flappy');
+    expect(store().doc.game?.template).toBe('flappy');
+    expect(store().isDirty).toBe(true);
+  });
+
+  it('re-picking the current template is a no-op', () => {
+    store().setGameTemplate('catch');
+    expect(store().doc.game).toBeUndefined();
+    expect(store().isDirty).toBe(false);
+  });
+
+  it('survives a save/load round-trip', () => {
+    store().setGameTemplate('maze');
+    const saved = store().doc;
+    store().loadDocument(saved);
+    expect(store().doc.game?.template).toBe('maze');
+  });
+
+  it('keeps cast and settings when switching templates', () => {
+    const layerId = store().doc.layers[0].id;
+    store().setGameCast('hero', layerId);
+    store().setGameSettings({ lives: 7 });
+    store().setGameTemplate('flappy');
+    expect(store().doc.game?.cast.hero).toBe(layerId);
+    expect(store().doc.game?.settings?.lives).toBe(7);
+    expect(store().doc.game?.template).toBe('flappy');
+  });
+
+  it('casting and knobs keep the chosen template', () => {
+    store().setGameTemplate('maze');
+    store().setGameCast('hero', store().doc.layers[0].id);
+    expect(store().doc.game?.template).toBe('maze');
+    store().setGameSettings({ fallSpeed: 100 });
+    expect(store().doc.game?.template).toBe('maze');
+  });
+
+  it('switching template is metadata: undo does not revert it', () => {
+    store().setGameTemplate('flappy');
+    store().undo();
+    expect(store().doc.game?.template).toBe('flappy');
   });
 });
 

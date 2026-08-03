@@ -91,3 +91,23 @@ export function drawDefaultBad(ctx: Renderer2D, cx: number, cy: number, size: nu
   ctx.stroke();
   ctx.restore();
 }
+
+/** Dreamy pipe: the Flappy Dream gate when no obstacle is cast. Drawn as a
+ *  vertical bar sprite — the view stretches it over each gate band. */
+export function drawDefaultGate(ctx: Renderer2D, cx: number, cy: number, size: number): void {
+  const w = size * 0.5;
+  ctx.save();
+  ctx.fillStyle = '#34d399'; // soft emerald
+  ctx.beginPath();
+  ctx.rect(cx - w / 2, cy - size / 2, w, size);
+  ctx.fill();
+  // Rim bands top and bottom, like a pipe's lip
+  ctx.fillStyle = '#10b981';
+  ctx.beginPath();
+  ctx.rect(cx - w / 2 - size * 0.05, cy - size / 2, w + size * 0.1, size * 0.12);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.rect(cx - w / 2 - size * 0.05, cy + size / 2 - size * 0.12, w + size * 0.1, size * 0.12);
+  ctx.fill();
+  ctx.restore();
+}

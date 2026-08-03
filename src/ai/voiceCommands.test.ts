@@ -78,6 +78,19 @@ describe('parseVoiceCommand — animation', () => {
     expect(parseVoiceCommand('stop the game')).toEqual({ kind: 'stop' });
   });
 
+  it('"play flappy" / "play maze" / "play catch" pick a template', () => {
+    expect(parseVoiceCommand('play flappy')).toEqual({ kind: 'play-game', template: 'flappy' });
+    expect(parseVoiceCommand('play maze')).toEqual({ kind: 'play-game', template: 'maze' });
+    expect(parseVoiceCommand('play catch')).toEqual({ kind: 'play-game', template: 'catch' });
+    expect(parseVoiceCommand('let’s play the maze game')).toEqual({
+      kind: 'play-game',
+      template: 'maze',
+    });
+    // A bare template word is a command too; a bare "play" stays animation.
+    expect(parseVoiceCommand('maze')).toEqual({ kind: 'play-game', template: 'maze' });
+    expect(parseVoiceCommand('play')).toEqual({ kind: 'play' });
+  });
+
   it('parses app preview and export phrases', () => {
     expect(parseVoiceCommand('preview my app')).toEqual({ kind: 'preview-app' });
     expect(parseVoiceCommand('can you show the app')).toEqual({ kind: 'preview-app' });
@@ -175,6 +188,17 @@ describe('parseVoiceCommand — Arabic vocabulary (locale "ar")', () => {
   it('"العب لعبتي" routes to the game; "أوقف اللعبة" still stops', () => {
     expect(parseVoiceCommand('العب لعبتي', 'ar')).toEqual({ kind: 'play-game' });
     expect(parseVoiceCommand('أوقف اللعبة', 'ar')).toEqual({ kind: 'stop' });
+  });
+
+  it('"العب المتاهة/الطيران/الصيد/فلابي" pick a template; English still works', () => {
+    expect(parseVoiceCommand('العب المتاهة', 'ar')).toEqual({ kind: 'play-game', template: 'maze' });
+    expect(parseVoiceCommand('العب الطيران', 'ar')).toEqual({
+      kind: 'play-game',
+      template: 'flappy',
+    });
+    expect(parseVoiceCommand('العب الصيد', 'ar')).toEqual({ kind: 'play-game', template: 'catch' });
+    expect(parseVoiceCommand('العب فلابي', 'ar')).toEqual({ kind: 'play-game', template: 'flappy' });
+    expect(parseVoiceCommand('play maze', 'ar')).toEqual({ kind: 'play-game', template: 'maze' });
   });
 
   it('parses tools', () => {

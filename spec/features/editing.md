@@ -1,0 +1,92 @@
+# Image editing
+
+**Purpose.** Bring pictures in, then adjust, filter, crop, resize, flip and
+rotate them — the Photoshop-depth half of "simple as Paint, deep as
+Photoshop", all undoable.
+
+## Image import
+
+1. Three ways in: the **Import** button (file picker, multiple images
+   allowed), **drag-and-drop** onto the canvas, **paste** from the
+   clipboard.
+2. Each image lands **centered on its own new layer**, scaled down to fit
+   the canvas if larger (never upscaled), and becomes the active layer.
+3. Import is one undoable change per image. Pixels survive save/load
+   round-trips (opaque pixels exactly; see the alpha caveat in
+   `../data/dream-file.md`).
+
+## The Adjust panel (filters & adjustments)
+
+Sliders with a **live preview**; **Apply** bakes the result into the layer
+as one undoable change; **Cancel** discards everything. Applied filters are
+destructive (baked to pixels), like MS Paint / Photoshop's apply — not a
+reorderable filter stack.
+
+| Adjustment | Range | Perceptual meaning |
+|---|---|---|
+| Brightness | −100…100 | add/subtract light; ±100 ≈ ±255 channel shift scaled |
+| Contrast | −100…100 | spread/gather tones around mid-gray |
+| Saturation | −100…100 | −100 = gray, +100 = doubled chroma |
+| Hue | −180…180° | rotate the color wheel, luminance-preserving |
+| Grayscale | 0–100 | mix toward luminance gray |
+| Sepia | 0–100 | mix toward the classic warm-brown photo tone |
+| Invert | 0–100 | mix toward the color negative |
+| Blur | 0–20 px | box blur, softens detail (also softens edges) |
+| Sharpen | 0–100 | mix toward a crispness kernel, restores edge pop |
+
+- Adjustments apply in a **fixed order** regardless of slider order: hue →
+  saturation → brightness → contrast → grayscale → sepia → invert → blur →
+  sharpen. Same slider values, same pixels, every time.
+- Only the active layer is affected; transparency is preserved (except
+  blur, which softens transparent edges too).
+
+### Presets (exact recipes)
+
+| Preset | Recipe |
+|---|---|
+| B&W | grayscale 100 |
+| Vintage | sepia 70, contrast 15, brightness −5 |
+| Cool | hue −15, saturation 10, brightness 5 |
+| Warm | sepia 25, saturation 10, brightness 5 |
+
+## Move, flip, rotate (per layer)
+
+- The **Move tool (M in Draw mode, V in Draw mode)** drags the active
+  layer's entire content. One drag = one undoable change.
+- **Flip horizontal / flip vertical / rotate 90° CW / rotate 90° CCW** act
+  on the active layer, around the center of **the layer's own content**, so
+  the content stays in place (it does not orbit the canvas center).
+- Text stays upright after a flip/rotate (its anchor moves, glyphs don't
+  mirror). Pixel content is re-baked pixel-perfectly for 90° steps.
+
+## Crop (C)
+
+1. Drag a rectangle over the canvas; the outside dims.
+2. **Enter** or **Apply** commits; **Esc** cancels.
+3. Cropping shrinks the whole document: every layer of **every frame**
+  shifts into the new bounds; pixel content is clipped exactly.
+
+## Resize
+
+A dialog scales the whole document (and all its content, on **every
+frame**) to a new size. Strokes, shapes and text scale geometrically
+(stroke width and font size scale by the average of the x/y factors);
+pixel content resamples with **nearest-neighbor** (crisp, pixel-art
+faithful — no blur). Undo restores the previous document exactly.
+
+## Export (flattened images)
+
+- **PNG** — lossless, transparency preserved. Filename `{name}.png`.
+- **JPEG** — quality slider 10–100, default 92. Filename `{name}.jpg`.
+- The flattened render is the document background plus every visible
+  layer, bottom to top — exactly what the canvas shows.
+
+## Edge cases
+
+- Adjust/Apply on an empty or locked layer is refused kindly.
+- Crop/resize on an animated document applies to every frame and is a
+  single undo step.
+- Rotating a selection that contains rectangles, ellipses or pixel content
+  is a Design-mode concern — see `design-mode.md` (90° steps only).
+- Importing while kid mode is on: the adult Import button is hidden; kid
+  mode has no import path (by design — no reading-heavy dialogs).

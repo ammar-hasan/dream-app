@@ -455,7 +455,14 @@ every piece points at the existing gates (`check`, `check:full`,
   (`game/sounds.ts`, feature-detected; on in kid mode, off for adults).
 - ✅ Kid mode + voice: gamepad button in the kid toolbar, giant play button
   and big on-screen arrows; "play my game" starts a run, "stop" ends it.
-- Remaining: more templates (platformer, maze, flappy), conversational game
+- ✅ Template system + two more templates (slice 17): a shared template
+  interface (`game/template.ts`) with Catch! refactored onto it, plus **Flappy
+  Dream** (flap through scrolling gates; kid mode gets 3 shields) and **Maze
+  Runner** (seeded, always-solvable generated mazes; level-up grows the maze).
+  Template picker cards in the cast panel; casting adapts to each template's
+  roles; the choice persists on the document. Voice: "play flappy" / "play
+  maze" / "play catch" (EN + AR).
+- Remaining: platformer template, conversational game
   generation from a sentence. (The MCP/API hooks for developer workflows —
   persona: Maria — shipped as slice 14, the developer surface.)
 - Acceptance met: a child draws a blob, casts it as the hero, presses play —

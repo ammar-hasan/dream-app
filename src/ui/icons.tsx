@@ -285,6 +285,31 @@ export const GamepadIcon = (p: IconProps) => (
   </svg>
 );
 
+/** Catch! template glyph: a star falling into a basket. */
+export const CatchGameIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="m12 2.5 1.6 3.4 3.7.4-2.8 2.5.8 3.6L12 10.6l-3.3 1.8.8-3.6-2.8-2.5 3.7-.4Z" />
+    <path d="M5 16.5h14l-1.6 4a2 2 0 0 1-1.9 1.3H8.5a2 2 0 0 1-1.9-1.3Z" />
+  </svg>
+);
+
+/** Flappy Dream template glyph: a bird between two gates. */
+export const FlappyGameIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M3 3h3v7H3zM3 16h3v5H3zM18 3h3v5h-3zM18 14h3v7h-3z" />
+    <circle cx="12" cy="12" r="3.2" />
+    <path d="M10 10.5c-1.8-.6-3.2.2-4 1.8" />
+  </svg>
+);
+
+/** Maze Runner template glyph: a tiny maze with a path. */
+export const MazeGameIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M4 4h16v16H4z" />
+    <path d="M4 8h8V4M12 12H8v4M12 12h8M16 12v4h4" />
+  </svg>
+);
+
 export const SoundIcon = (p: IconProps) => (
   <svg {...base(p)}>
     <path d="M11 5 6.5 9H3v6h3.5L11 19Z" fill="currentColor" stroke="none" />

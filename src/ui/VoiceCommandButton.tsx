@@ -43,6 +43,7 @@ function executorStore(): VoiceExecutorStore {
     setMode: s.setMode,
     startGame: s.startGame,
     stopGame: s.stopGame,
+    setGameTemplate: s.setGameTemplate,
     previewApp: s.previewApp,
     exportApp: () => exportAppHtml(s.doc),
     setTool: s.setTool,

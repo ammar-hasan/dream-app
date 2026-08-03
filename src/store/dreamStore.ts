@@ -74,7 +74,7 @@ import { translateOperation, type FlipDirection, type RotateDirection } from '..
 import { mirrorOperations, type SymmetryMode } from '../engine/symmetry';
 import { createStamp, STAMP_SIZES, type StampId, type StampSize } from '../engine/stamps';
 import { createStarterScene, type SceneId } from '../engine/starterScenes';
-import { clampGameSettings, gameSetupOf } from '../game/core';
+import { clampGameSettings, gameSetupOf, isGameTemplateId } from '../game/core';
 import {
   createFillOperation,
   createTextOperation,
@@ -99,6 +99,7 @@ import type {
   DreamDocument,
   GameCast,
   GameSettings,
+  GameTemplateId,
   Hotspot,
   HotspotTransition,
   ImageOp,
@@ -372,11 +373,13 @@ export interface DreamStore {
   /** Edit a hotspot's target/transition on the active frame (undoable). */
   updateHotspot(id: string, patch: Partial<Pick<Hotspot, 'targetFrameId' | 'transition'>>): void;
 
-  // --- Play mode (Catch!) ----------------------------------------------------
+  // --- Play mode (game templates) -------------------------------------------
   /** Cast a layer into a game role (null = back to the default sprite). */
   setGameCast(role: keyof GameCast, layerId: string | null): void;
   /** Difficulty knobs (fall speed, spawn interval, lives); not undoable. */
   setGameSettings(patch: Partial<GameSettings>): void;
+  /** Choose the game template (Catch!, Flappy Dream, Maze Runner). */
+  setGameTemplate(template: GameTemplateId): void;
   /** Add a named layer for a game role and make it active; returns its id. */
   createCastLayer(name: string): string;
   startGame(): void;
@@ -1533,7 +1536,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       execute(updateHotspotCommand(doc, frameId, id, patch));
     },
 
-    // --- Play mode (Catch!) ----------------------------------------------------
+    // --- Play mode (game templates) ------------------------------------------
 
     setGameCast: (role, layerId) =>
       set((s) => {
@@ -1541,9 +1544,9 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         if (layerId) cast[role] = layerId;
         else delete cast[role];
         // Metadata like `mode`: persisted, but undo must never re-cast.
-        // `settings` is carried through untouched — casting is not a knob.
+        // `settings` and `template` are carried through untouched.
         return {
-          doc: { ...s.doc, game: { cast, settings: s.doc.game?.settings } },
+          doc: { ...s.doc, game: { ...s.doc.game, cast } },
           isDirty: true,
         };
       }),
@@ -1552,7 +1555,16 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       set((s) => {
         const setup = gameSetupOf(s.doc);
         const settings = clampGameSettings({ ...setup.settings, ...patch });
-        return { doc: { ...s.doc, game: { ...setup, settings } }, isDirty: true };
+        return { doc: { ...s.doc, game: { ...s.doc.game, ...setup, settings } }, isDirty: true };
+      }),
+
+    setGameTemplate: (template) =>
+      set((s) => {
+        if (!isGameTemplateId(template) || gameSetupOf(s.doc).template === template) return {};
+        return {
+          doc: { ...s.doc, game: { cast: { ...s.doc.game?.cast }, settings: s.doc.game?.settings, template } },
+          isDirty: true,
+        };
       }),
 
     createCastLayer: (name) => {

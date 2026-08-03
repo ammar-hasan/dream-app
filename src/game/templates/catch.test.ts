@@ -4,17 +4,19 @@ import { describe, expect, it } from 'vitest';
 import {
   clampGameSettings,
   COUNTDOWN_MS,
-  createGame,
   DEFAULT_GAME_SETTINGS,
-  fallSpeedAt,
   gameRng,
   gameSetupOf,
   KID_GAME_SETTINGS,
+} from '../core';
+import {
+  createGame,
+  fallSpeedAt,
   startRun,
   tick,
   type GameState,
-} from './core';
-import { createDocument } from '../engine/document';
+} from './catch';
+import { createDocument } from '../../engine/document';
 
 const IDLE = { left: false, right: false };
 

@@ -1,33 +1,26 @@
 /**
- * Play mode dispatcher: the document's chosen template picks the game view —
- * Catch! (this file), Flappy Dream or Maze Runner. The rules live in the
- * pure cores (`game/templates/`); the views are only sprites (cast layers
- * rasterized once per run and cropped to their content), the rAF loop and
- * the juice — countdown, score pops, a gentle shake and tiny WebAudio bleeps.
- *
- * Catch!: things fall from the top; the hero — the user's own cast layer, or
- * a smiley stand-in — slides left/right to catch the good ones (+1) and
- * dodge the bad ones (−1 life). Arrows, touch-drag and big on-screen arrows
- * (kid mode) all steer.
+ * Play mode: the Flappy Dream view. The hero drawing flies; tap/click/Space
+ * flaps, gravity pulls down, gates scroll in from the right. The rules live
+ * in the pure core (`game/templates/flappy.ts`); this view is only sprites,
+ * the rAF loop and the juice — tilt, gate pops, shield blinks and bleeps.
  */
 
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { DreamDocument } from '../engine/types';
 import { gameRng, POP_MS, SHAKE_MS, type GamePhase } from '../game/core';
-import { templateOf, templateSettings } from '../game/templates';
+import { templateSettings } from '../game/templates';
 import {
   createGame,
+  gateWidthAt,
   startRun,
   tick,
-  type GameEvent,
-  type GameState,
-} from '../game/templates/catch';
-import { drawDefaultBad, drawDefaultGood, drawDefaultHero } from '../game/defaults';
+  type FlappyEvent,
+  type FlappyState,
+} from '../game/templates/flappy';
+import { drawDefaultGate, drawDefaultHero } from '../game/defaults';
 import type { GameSound } from '../game/sounds';
 import { readHighScore, useDreamStore } from '../store/dreamStore';
 import { useUiPrefs } from '../store/uiPrefs';
-import { FlappyView } from './FlappyView';
-import { MazeView } from './MazeView';
 import {
   backgroundCanvas,
   PlayReadyOverlay,
@@ -39,21 +32,21 @@ import { useT } from './i18n';
 import { PlayIcon } from './icons';
 
 const HERO_SPRITE = 120;
-const THING_SPRITE = 64;
+const GATE_SPRITE = 96;
 
-const SOUNDS: Record<GameEvent, GameSound> = {
+const SOUNDS: Record<FlappyEvent, GameSound> = {
   start: 'start',
   count: 'count',
   go: 'go',
-  'catch-good': 'catch-good',
-  'catch-bad': 'catch-bad',
+  flap: 'flap',
+  gate: 'gate',
+  hit: 'catch-bad',
   'game-over': 'game-over',
 };
 
 interface Cast {
   hero: HTMLCanvasElement;
-  good: HTMLCanvasElement;
-  bad: HTMLCanvasElement;
+  gate: HTMLCanvasElement;
   background: HTMLCanvasElement;
 }
 
@@ -61,31 +54,23 @@ function buildCast(doc: DreamDocument): Cast {
   const cast = doc.game?.cast ?? {};
   return {
     hero: spriteCanvas(doc, cast.hero, drawDefaultHero, HERO_SPRITE),
-    good: spriteCanvas(doc, cast.good, drawDefaultGood, THING_SPRITE),
-    bad: spriteCanvas(doc, cast.bad, drawDefaultBad, THING_SPRITE),
-    background: backgroundCanvas(doc, [cast.hero, cast.good, cast.bad]),
+    gate: spriteCanvas(doc, cast.obstacle, drawDefaultGate, GATE_SPRITE),
+    background: backgroundCanvas(doc, [cast.hero, cast.obstacle]),
   };
 }
 
-/** The template dispatcher — App mounts this for Play mode. */
-export function PlayView() {
-  const doc = useDreamStore((s) => s.doc);
-  const template = templateOf(doc);
-  if (template.id === 'flappy') return <FlappyView />;
-  if (template.id === 'maze') return <MazeView />;
-  return <CatchView />;
-}
-
-function CatchView() {
+export function FlappyView() {
   const t = useT();
   const doc = useDreamStore((s) => s.doc);
   const gameRunning = useDreamStore((s) => s.gameRunning);
   const kidMode = useUiPrefs((s) => s.kidMode);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const stateRef = useRef<GameState>(createGame(doc.width, doc.height, templateSettings(doc, kidMode)));
+  const stateRef = useRef<FlappyState>(
+    createGame(doc.width, doc.height, templateSettings(doc, kidMode)),
+  );
   const castRef = useRef<Cast | null>(null);
-  const inputRef = useRef({ left: false, right: false, pointerX: null as number | null });
+  const flapRef = useRef(false);
   const { muted, setMuted, unlock, playEvents } = usePlaySounds(kidMode);
   const [phase, setPhase] = useState<GamePhase>('ready');
   const [finalScore, setFinalScore] = useState<{
@@ -114,7 +99,7 @@ function CatchView() {
   };
 
   // The store's gameRunning flag is the cross-component trigger (voice
-  // "play my game", "stop"); the local overlay buttons go through it too.
+  // "play flappy", "stop"); the local overlay buttons go through it too.
   useEffect(() => {
     if (gameRunning && (stateRef.current.phase === 'ready' || stateRef.current.phase === 'over')) {
       begin();
@@ -136,7 +121,8 @@ function CatchView() {
       const dt = Math.min(now - last, 100); // tab-switch guard
       last = now;
       const before = stateRef.current;
-      const after = tick(before, inputRef.current, dt, gameRng(Math.random() * 2 ** 31));
+      const after = tick(before, { flap: flapRef.current }, dt, gameRng(Math.random() * 2 ** 31));
+      flapRef.current = false; // edge-triggered: consumed by this tick
       if (after !== before) {
         playEvents(after.events, SOUNDS);
         stateRef.current = after;
@@ -152,8 +138,6 @@ function CatchView() {
           store.stopGame();
           return; // stop the loop; the overlay takes over
         }
-        // Countdown → playing (re-arms this effect, which is fine — the
-        // state ref carries the run across).
         if (after.phase !== before.phase) setPhase(after.phase);
       }
       draw();
@@ -170,32 +154,20 @@ function CatchView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, doc]);
 
-  // Keyboard steering, live only mid-run so arrows never fight the editor.
+  // Space / ArrowUp / W flap, live only mid-run so keys never fight the editor.
   useEffect(() => {
     if (phase !== 'countdown' && phase !== 'playing') return;
-    const onKey = (down: boolean) => (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
+    const onKeydown = (e: KeyboardEvent) => {
+      if (e.key === ' ' || e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') {
         e.preventDefault();
-        inputRef.current.left = down;
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        inputRef.current.right = down;
+        flapRef.current = true;
       }
     };
-    const keydown = onKey(true);
-    const keyup = onKey(false);
-    const input = inputRef.current;
-    window.addEventListener('keydown', keydown);
-    window.addEventListener('keyup', keyup);
-    return () => {
-      window.removeEventListener('keydown', keydown);
-      window.removeEventListener('keyup', keyup);
-      input.left = false;
-      input.right = false;
-    };
+    window.addEventListener('keydown', onKeydown);
+    return () => window.removeEventListener('keydown', onKeydown);
   }, [phase]);
 
-  /** Paint the whole frame: backdrop, things, hero, pops, HUD, countdown. */
+  /** Paint the whole frame: backdrop, gates, hero, pops, HUD, countdown. */
   const draw = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -222,7 +194,7 @@ function CatchView() {
     ctx.translate((width - doc.width * scale) / 2, (height - doc.height * scale) / 2);
     ctx.scale(scale, scale);
 
-    // The bad-catch shake: a little tremor that fades with shakeMs.
+    // The hit shake: a little tremor that fades with shakeMs.
     if (state.shakeMs > 0) {
       const power = (state.shakeMs / SHAKE_MS) * 6;
       ctx.translate((Math.random() - 0.5) * power, (Math.random() - 0.5) * power);
@@ -230,26 +202,25 @@ function CatchView() {
 
     ctx.drawImage(cast.background, 0, 0, doc.width, doc.height);
 
-    for (const thing of state.things) {
-      const sprite = thing.kind === 'good' ? cast.good : cast.bad;
-      ctx.drawImage(
-        sprite,
-        thing.x - thing.size / 2,
-        thing.y - thing.size / 2,
-        thing.size,
-        thing.size,
-      );
+    // Gates: the cast obstacle stretched over the two solid bands.
+    const gateW = gateWidthAt(doc.height);
+    for (const gate of state.gates) {
+      const gapTop = gate.gapY - gate.gapH / 2;
+      const gapBottom = gate.gapY + gate.gapH / 2;
+      ctx.drawImage(cast.gate, gate.x, 0, gateW, gapTop);
+      ctx.drawImage(cast.gate, gate.x, gapBottom, gateW, doc.height - gapBottom);
     }
 
-    // Hero: the cast drawing scaled to the catcher's width, aspect kept.
-    const heroH = (state.heroWidth * cast.hero.height) / Math.max(1, cast.hero.width);
-    ctx.drawImage(
-      cast.hero,
-      state.heroX - state.heroWidth / 2,
-      state.heroY + state.heroHeight / 2 - heroH,
-      state.heroWidth,
-      heroH,
-    );
+    // Hero: tilted by its vertical velocity; blinks during the mercy window.
+    const tilt = Math.max(-0.45, Math.min(0.6, state.vy / 900));
+    const blink = state.invincibleMs > 0 && Math.floor(state.invincibleMs / 120) % 2 === 0;
+    ctx.save();
+    ctx.translate(state.heroX, state.heroY);
+    ctx.rotate(tilt);
+    ctx.globalAlpha = blink ? 0.4 : 1;
+    const heroH = (state.heroSize * cast.hero.height) / Math.max(1, cast.hero.width);
+    ctx.drawImage(cast.hero, -state.heroSize / 2, -heroH / 2, state.heroSize, heroH);
+    ctx.restore();
 
     // Score pops float up and fade.
     for (const pop of state.pops) {
@@ -262,7 +233,7 @@ function CatchView() {
       ctx.globalAlpha = 1;
     }
 
-    // HUD: score on a dark chip (readable over any drawing), lives as hearts.
+    // HUD: score on a dark chip, shields as hearts.
     ctx.font = 'bold 26px system-ui, sans-serif';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
@@ -272,8 +243,8 @@ function CatchView() {
     ctx.fillRect(10, 8, chipWidth, 40);
     ctx.fillStyle = '#f8fafc';
     ctx.fillText(scoreText, 22, 15);
-    for (let i = 0; i < state.lives; i += 1) {
-      ctx.fillStyle = '#ef4444';
+    for (let i = 0; i < state.shields; i += 1) {
+      ctx.fillStyle = '#38bdf8';
       ctx.beginPath();
       ctx.ellipse(doc.width - 30 - i * 30, 28, 10, 10, 0, 0, Math.PI * 2);
       ctx.fill();
@@ -281,7 +252,6 @@ function CatchView() {
 
     if (state.phase === 'countdown') {
       const n = Math.max(1, Math.ceil(state.countdownMs / 800));
-      // A soft dark disc keeps the numeral readable over any drawing.
       ctx.fillStyle = 'rgba(16, 19, 26, 0.55)';
       ctx.beginPath();
       ctx.ellipse(doc.width / 2, doc.height / 2, 96, 96, 0, 0, Math.PI * 2);
@@ -294,36 +264,19 @@ function CatchView() {
     }
   };
 
-  /** Finger steering: convert a pointer event to document x. */
-  const steerWith = (e: ReactPointerEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const scale = Math.min(rect.width / doc.width, rect.height / doc.height) * 0.94;
-    const originX = (rect.width - doc.width * scale) / 2;
-    inputRef.current.pointerX = (e.clientX - rect.left - originX) / scale;
-  };
-
-  const stopSteering = () => {
-    inputRef.current.pointerX = null;
-  };
-
   return (
     <div className={`play-view${kidMode ? ' kid-play' : ''}`}>
       <canvas
         ref={canvasRef}
         className="play-canvas"
-        onPointerDown={steerWith}
-        onPointerMove={(e) => {
-          if (e.buttons > 0) steerWith(e);
+        onPointerDown={() => {
+          flapRef.current = true;
         }}
-        onPointerUp={stopSteering}
-        onPointerLeave={stopSteering}
       />
 
       <PlayTopbar muted={muted} onToggleMute={() => setMuted((m) => !m)} kidMode={kidMode} />
 
-      {phase === 'ready' && <PlayReadyOverlay kidMode={kidMode} hintKey="play.hint" />}
+      {phase === 'ready' && <PlayReadyOverlay kidMode={kidMode} hintKey="play.hintFlappy" />}
 
       {phase === 'over' && finalScore && (
         <div className="play-overlay">
@@ -347,28 +300,16 @@ function CatchView() {
       )}
 
       {kidMode && phase === 'playing' && (
-        <div className="play-arrows">
-          <button
-            type="button"
-            className="btn play-arrow"
-            aria-label={t('play.moveLeft')}
-            onPointerDown={() => (inputRef.current.left = true)}
-            onPointerUp={() => (inputRef.current.left = false)}
-            onPointerLeave={() => (inputRef.current.left = false)}
-          >
-            ◀
-          </button>
-          <button
-            type="button"
-            className="btn play-arrow"
-            aria-label={t('play.moveRight')}
-            onPointerDown={() => (inputRef.current.right = true)}
-            onPointerUp={() => (inputRef.current.right = false)}
-            onPointerLeave={() => (inputRef.current.right = false)}
-          >
-            ▶
-          </button>
-        </div>
+        <button
+          type="button"
+          className="btn play-flap-btn"
+          aria-label={t('play.flap')}
+          onPointerDown={() => {
+            flapRef.current = true;
+          }}
+        >
+          {t('play.flap')}
+        </button>
       )}
     </div>
   );

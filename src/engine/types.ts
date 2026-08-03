@@ -211,14 +211,18 @@ export interface AnimationSettings {
 /**
  * Play mode: which layer plays which role in the mini-game. Any role left
  * undefined gets a friendly procedurally-drawn default (see game/defaults.ts).
+ * Which roles a template actually uses is declared by the template itself
+ * (see game/template.ts).
  */
 export interface GameCast {
-  /** Layer id of the catcher the player moves. */
+  /** Layer id of the character the player controls. */
   hero?: string;
-  /** Layer id of the good falling thing (+1 point). */
+  /** Layer id of the good falling thing (+1 point). Catch! only. */
   good?: string;
-  /** Layer id of the bad falling thing (-1 life). */
+  /** Layer id of the bad falling thing (-1 life). Catch! only. */
   bad?: string;
+  /** Layer id drawn as the gates/pipes. Flappy Dream only. */
+  obstacle?: string;
   /** Layer id painted as the backdrop; undefined = the rest of the document. */
   background?: string;
 }
@@ -234,12 +238,20 @@ export interface GameSettings {
 }
 
 /**
+ * The Play-mode game templates. `'catch'` is the original; old documents
+ * without a `template` field resolve to it.
+ */
+export type GameTemplateId = 'catch' | 'flappy' | 'maze';
+
+/**
  * Play-mode setup, persisted with the document but updated outside History
  * (like `mode` and `animation`): undo must never re-cast your game. Absent on
  * old saves — defaults apply (see game/core.ts). `settings` stays undefined
  * until the user touches a knob, so kid mode can apply its gentler defaults.
  */
 export interface GameSetup {
+  /** Which template Play mode runs; undefined (old saves) = 'catch'. */
+  template?: GameTemplateId;
   cast: GameCast;
   settings?: GameSettings;
 }
