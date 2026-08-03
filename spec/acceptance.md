@@ -628,6 +628,13 @@ holds.
       and Dream names the result; GIVEN no selection or a locked selection THEN
       artwork, brush and undo history remain exact and Dream says what is
       needed.
+173.  GIVEN a directional voice nudge just succeeded WHEN the next voice turn
+      is a localized form of “again” or “a little more” THEN the same 10 px
+      nudge repeats as one undoable action and Dream names it; GIVEN any other
+      intervening command, failed or empty listen, unavailable selection,
+      centering or edge placement THEN the continuation context is cleared and
+      “again” changes nothing. Deletion, duplication, clearing, export and every
+      other non-nudge action are never repeatable through this phrase.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

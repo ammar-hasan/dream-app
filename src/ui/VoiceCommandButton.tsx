@@ -17,6 +17,7 @@ import {
   cancelClear,
   confirmClear,
   executeVoiceCommand,
+  type VoiceExecutorContext,
   type VoiceExecutorStore,
 } from './voiceExecutor';
 import { saveNow } from './saveNow';
@@ -102,6 +103,7 @@ export function VoiceCommandButton() {
   const handleRef = useRef<DictationHandle | null>(null);
   const transcriptRef = useRef('');
   const pendingClearRef = useRef(false);
+  const executorContextRef = useRef<VoiceExecutorContext>({ lastNudge: null });
   const speechSupported = isSpeechSupported();
 
   /** Show the feedback and say it aloud when the voice preference is on. */
@@ -117,6 +119,7 @@ export function VoiceCommandButton() {
     // A pending "clear this layer?" confirmation intercepts yes/no first.
     if (pendingClearRef.current) {
       pendingClearRef.current = false;
+      executorContextRef.current.lastNudge = null;
       if (command?.kind === 'confirm') {
         announce(confirmClear(executorStore()).message);
         return;
@@ -129,10 +132,16 @@ export function VoiceCommandButton() {
     }
 
     if (!command) {
+      executorContextRef.current.lastNudge = null;
       announce(t('voice.unknown'));
       return;
     }
-    const result = executeVoiceCommand(command, executorStore(announce), () => void saveNow());
+    const result = executeVoiceCommand(
+      command,
+      executorStore(announce),
+      () => void saveNow(),
+      executorContextRef.current,
+    );
     if (!result) return;
     if (result.awaitConfirm === 'clear') pendingClearRef.current = true;
     announce(result.message);
@@ -153,13 +162,17 @@ export function VoiceCommandButton() {
         onText: (text) => {
           transcriptRef.current = text;
         },
-        onError: (friendly) => announce(friendly),
+        onError: (friendly) => {
+          executorContextRef.current.lastNudge = null;
+          announce(friendly);
+        },
         onEnd: () => {
           handleRef.current = null;
           setListening(false);
           const text = transcriptRef.current.trim();
           transcriptRef.current = '';
           if (text) runTranscript(text);
+          else executorContextRef.current.lastNudge = null;
         },
       },
       { lang: speechLanguage(useUiPrefs.getState().locale) },

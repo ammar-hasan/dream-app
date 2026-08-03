@@ -62,6 +62,18 @@ describe('parseVoiceCommand — history & document', () => {
     });
   });
 
+  it('parses safe immediate-repeat phrases as conversation context', () => {
+    expect(parseVoiceCommand('again')).toEqual({ kind: 'repeat-selection-move' });
+    expect(parseVoiceCommand('a little more')).toEqual({ kind: 'repeat-selection-move' });
+    expect(parseVoiceCommand('play again')).toEqual({ kind: 'play' });
+    expect(parseVoiceCommand('delete it again')).toEqual({ kind: 'delete-selection' });
+    expect(parseVoiceCommand('red again')).toEqual({
+      kind: 'color',
+      color: COLOR_WORDS.red,
+      name: 'red',
+    });
+  });
+
   it('parses confirmations and cancellations', () => {
     expect(parseVoiceCommand('yes')).toEqual({ kind: 'confirm' });
     expect(parseVoiceCommand('yeah sure')).toEqual({ kind: 'confirm' });
@@ -256,6 +268,7 @@ describe('parseVoiceCommand — Arabic vocabulary (locale "ar")', () => {
       kind: 'place-selection',
       edge: 'top',
     });
+    expect(parseVoiceCommand('مرة أخرى', 'ar')).toEqual({ kind: 'repeat-selection-move' });
   });
 
   it('parses undo/redo/clear with polite filler', () => {
@@ -418,6 +431,7 @@ describe('parseVoiceCommand — Persian vocabulary (locale "fa")', () => {
       kind: 'place-selection',
       edge: 'right',
     });
+    expect(parseVoiceCommand('یک کم بیشتر', 'fa')).toEqual({ kind: 'repeat-selection-move' });
   });
 
   it('parses core creation, recovery and calligraphy-adjacent tools', () => {
@@ -471,6 +485,7 @@ describe('parseVoiceCommand — Simplified Chinese vocabulary (locale "zh")', ()
       kind: 'place-selection',
       edge: 'bottom',
     });
+    expect(parseVoiceCommand('再来一次', 'zh')).toEqual({ kind: 'repeat-selection-move' });
   });
 
   it('parses recovery, confirmation and creation without word spaces', () => {
@@ -531,6 +546,7 @@ describe('parseVoiceCommand — Brazilian Portuguese vocabulary (locale "pt")', 
       kind: 'place-selection',
       edge: 'left',
     });
+    expect(parseVoiceCommand('mais um pouco', 'pt')).toEqual({ kind: 'repeat-selection-move' });
   });
 
   it('parses recovery, confirmation and creation with polite filler', () => {
@@ -597,6 +613,7 @@ describe('parseVoiceCommand — Russian vocabulary (locale "ru")', () => {
       kind: 'place-selection',
       edge: 'right',
     });
+    expect(parseVoiceCommand('ещё раз', 'ru')).toEqual({ kind: 'repeat-selection-move' });
   });
 
   it('parses recovery, confirmation and creation with polite filler', () => {

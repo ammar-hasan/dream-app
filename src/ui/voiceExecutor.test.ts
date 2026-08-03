@@ -8,6 +8,7 @@ import {
   cancelClear,
   confirmClear,
   executeVoiceCommand,
+  type VoiceExecutorContext,
   type VoiceExecutorStore,
 } from './voiceExecutor';
 
@@ -401,6 +402,50 @@ describe('executeVoiceCommand', () => {
       executeVoiceCommand({ kind: 'place-selection', edge: 'bottom' }, locked, () => {})?.message,
     ).toMatch(/locked/i);
     expect(locked.placeSelection).not.toHaveBeenCalled();
+  });
+
+  it('repeats only the immediately preceding successful directional nudge', () => {
+    const context: VoiceExecutorContext = { lastNudge: null };
+    const selected = makeStore({ selectionCount: 1, selectionTransformable: true });
+
+    expect(
+      executeVoiceCommand({ kind: 'repeat-selection-move' }, selected, () => {}, context)?.message,
+    ).toBe('Move something first, then say again.');
+    expect(selected.nudgeSelection).not.toHaveBeenCalled();
+
+    executeVoiceCommand(
+      { kind: 'move-selection', direction: 'right' },
+      selected,
+      () => {},
+      context,
+    );
+    expect(context.lastNudge).toBe('right');
+    executeVoiceCommand({ kind: 'repeat-selection-move' }, selected, () => {}, context);
+    expect(selected.nudgeSelection).toHaveBeenNthCalledWith(1, 10, 0);
+    expect(selected.nudgeSelection).toHaveBeenNthCalledWith(2, 10, 0);
+
+    executeVoiceCommand(
+      { kind: 'color', color: '#ef4444', name: 'red' },
+      selected,
+      () => {},
+      context,
+    );
+    expect(context.lastNudge).toBeNull();
+    executeVoiceCommand({ kind: 'repeat-selection-move' }, selected, () => {}, context);
+    expect(selected.nudgeSelection).toHaveBeenCalledTimes(2);
+
+    executeVoiceCommand({ kind: 'move-selection', direction: 'left' }, selected, () => {}, context);
+    executeVoiceCommand(
+      { kind: 'move-selection', direction: 'center' },
+      selected,
+      () => {},
+      context,
+    );
+    expect(context.lastNudge).toBeNull();
+
+    const missing = makeStore();
+    executeVoiceCommand({ kind: 'move-selection', direction: 'up' }, missing, () => {}, context);
+    expect(context.lastNudge).toBeNull();
   });
 
   it('save triggers the save callback; help speaks the command list', () => {

@@ -70,6 +70,10 @@ export interface VoiceResult {
   awaitConfirm?: 'clear';
 }
 
+export interface VoiceExecutorContext {
+  lastNudge: 'left' | 'right' | 'up' | 'down' | null;
+}
+
 const MIN_SIZE = 1;
 const MAX_SIZE = 64;
 const VOICE_NUDGE = 10;
@@ -93,7 +97,11 @@ export function executeVoiceCommand(
   command: VoiceCommand,
   store: VoiceExecutorStore,
   save: () => void,
+  context?: VoiceExecutorContext,
 ): VoiceResult | null {
+  if (context && command.kind !== 'move-selection' && command.kind !== 'repeat-selection-move') {
+    context.lastNudge = null;
+  }
   switch (command.kind) {
     // confirm/cancel are only meaningful while awaiting one — handled by the
     // caller, which knows whether a confirmation is pending.
@@ -194,6 +202,7 @@ export function executeVoiceCommand(
       return { message: t('voice.selectionDuplicated') };
 
     case 'move-selection': {
+      if (context) context.lastNudge = null;
       if (store.selectionCount === 0) return { message: t('voice.selectionMoveNeeded') };
       if (!store.selectionTransformable) return { message: t('voice.selectionLocked') };
       if (command.direction === 'center') {
@@ -208,9 +217,19 @@ export function executeVoiceCommand(
       } as const;
       const [dx, dy] = offsets[command.direction];
       store.nudgeSelection(dx, dy);
+      if (context) context.lastNudge = command.direction;
       const messageKey = `voice.selectionMoved${command.direction[0]!.toUpperCase()}${command.direction.slice(1)}`;
       return { message: t(messageKey) };
     }
+
+    case 'repeat-selection-move':
+      if (!context?.lastNudge) return { message: t('voice.nothingToRepeat') };
+      return executeVoiceCommand(
+        { kind: 'move-selection', direction: context.lastNudge },
+        store,
+        save,
+        context,
+      );
 
     case 'place-selection': {
       if (store.selectionCount === 0) return { message: t('voice.selectionPlaceNeeded') };

@@ -63,6 +63,9 @@ Default: `en`. The settings gear switches language **instantly at runtime**
 - Referential position commands—left, right, up, down, canvas center and each
   canvas edge—have natural phrases in every supported language and keep English
   available in every locale.
+- One-turn continuation phrases equivalent to “again” and “a little more” are
+  available in every supported language and follow the same safe nudge-only
+  boundary.
 - Speech recognition listens in the UI language for canvas commands.
 - Spoken tool names and voice feedback speak in the UI language.
 

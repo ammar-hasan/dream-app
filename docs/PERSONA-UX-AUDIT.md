@@ -213,9 +213,9 @@ is a refusal to confuse breadth with completion.
    “it” to visible selected artwork, preserve brush meaning where appropriate
    and never turn “delete it” into a whole-layer clear. Spoken directions nudge
    predictably, center the selection or place it at a named canvas edge; mixed
-   spoken corrections no longer disappear behind a leading yes/no.
-   Relationships between objects, multi-turn clarification and repair, and
-   offline recognition are not present.
+   spoken corrections no longer disappear behind a leading yes/no, and one-turn
+   “again” safely continues a nudge. Relationships between objects, broader
+   multi-turn clarification and repair, and offline recognition are not present.
 7. **Direct manipulation now has a foundation, not full depth.** Predictive hit
    chrome, contextual cursors, open/closed-hand drags, named drop targets and
    post-component-drop selection, compact pointer ghosts and exact-scale

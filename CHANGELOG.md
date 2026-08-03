@@ -7,6 +7,12 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Safe spoken continuation** (slice 62): immediately after a successful
+  directional nudge, “again” or “a little more” repeats that same 10 px move in
+  all six locales. The ephemeral context clears on every interruption, failure
+  or non-nudge command; ambiguous repetition can never repeat a destructive
+  action.
+
 - **Spoken canvas-edge placement** (slice 61): selected artwork now understands
   natural requests to go to the left, right, top or bottom canvas edge in every
   supported locale. Placement uses the shared visual bounds, stays distinct

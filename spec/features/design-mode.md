@@ -47,6 +47,11 @@ Link tools, the Design panel, the Links panel and the Components panel.
   selection's shared bounds flush with that canvas edge. Each request is one
   undoable action; missing or locked selections receive specific guidance and
   a bare direction does nothing.
+- **Spoken continuation:** immediately after a successful directional nudge,
+  “again” or “a little more” repeats the same 10 px nudge. This one-turn memory
+  is cleared by every other command, failed or empty listen, or unavailable
+  selection. Centering, edge placement, deletion, duplication and every other
+  action are never repeatable through an ambiguous “again.”
 - **Spoken size:** while anything is selected, “make it bigger” or “make it
   smaller” understands “it” as the selected artwork and scales the group gently
   about its shared center. Each request is one undoable step; a locked selection

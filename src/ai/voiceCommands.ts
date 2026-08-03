@@ -48,6 +48,8 @@ export type VoiceCommand =
   | { kind: 'move-selection'; direction: 'left' | 'right' | 'up' | 'down' | 'center' }
   /** Place the visible selection flush with a named canvas edge. */
   | { kind: 'place-selection'; edge: 'left' | 'right' | 'top' | 'bottom' }
+  /** Repeat only the immediately preceding successful directional nudge. */
+  | { kind: 'repeat-selection-move' }
   | { kind: 'tool'; tool: ToolId }
   /** "mirror on" / "mirror off": toggle vertical mirror symmetry. */
   | { kind: 'mirror'; on: boolean }
@@ -204,6 +206,7 @@ export interface VoiceVocabulary {
   selectionDuplicatePhrases: string[];
   selectionMovePhrases: Record<'left' | 'right' | 'up' | 'down' | 'center', string[]>;
   selectionPlacePhrases: Record<'left' | 'right' | 'top' | 'bottom', string[]>;
+  selectionRepeatPhrases: string[];
   selectionReferences: string[];
   /** Outcome-level animation creation phrases; trailing words become the story. */
   storyboardPhrases: string[];
@@ -302,6 +305,7 @@ const EN_VOCAB: VoiceVocabulary = {
     top: ['put it at the top', 'put that at the top', 'move it to the top edge'],
     bottom: ['put it at the bottom', 'put that at the bottom', 'move it to the bottom edge'],
   },
+  selectionRepeatPhrases: ['again', 'a little more', 'move it again', 'one more step'],
   selectionReferences: ['it', 'that', 'this', 'selection', 'selected', 'object'],
   storyboardPhrases: [
     'make a story about',
@@ -423,6 +427,7 @@ const AR_VOCAB: VoiceVocabulary = {
     top: ['ضع هذا عند الحافة العلوية', 'ضع هذا في الاعلي'],
     bottom: ['ضع هذا عند الحافة السفلية', 'ضع هذا في الاسفل'],
   },
+  selectionRepeatPhrases: ['مرة اخري', 'حركه مرة اخري', 'قليلا بعد'],
   selectionReferences: ['هذا', 'هذه', 'التحديد', 'المحدد'],
   storyboardPhrases: [
     'اصنع قصة عن',
@@ -544,6 +549,7 @@ const FA_VOCAB: VoiceVocabulary = {
     top: ['این را بالای بوم بگذار', 'این را در لبه بالا بگذار'],
     bottom: ['این را پایین بوم بگذار', 'این را در لبه پایین بگذار'],
   },
+  selectionRepeatPhrases: ['دوباره', 'یک کم بیشتر', 'یه کم بیشتر'],
   selectionReferences: ['این', 'انتخاب', 'انتخاب شده'],
   storyboardPhrases: [
     'یک داستان درباره',
@@ -649,6 +655,7 @@ const ZH_VOCAB: VoiceVocabulary = {
     top: ['把这个放到顶部', '把它移到画布顶部'],
     bottom: ['把这个放到底部', '把它移到画布底部'],
   },
+  selectionRepeatPhrases: ['再来一次', '再移动一点', '再一点'],
   selectionReferences: ['它', '这个', '选中内容'],
   storyboardPhrases: ['制作一个故事', '制作故事', '创作一个故事', '制作一个动画', '制作动画'],
 };
@@ -784,6 +791,7 @@ const PT_VOCAB: VoiceVocabulary = {
     top: ['coloque isso no topo', 'coloque isso na borda superior'],
     bottom: ['coloque isso embaixo', 'coloque isso na borda inferior'],
   },
+  selectionRepeatPhrases: ['de novo', 'mais um pouco', 'mova de novo'],
   selectionReferences: ['isso', 'isto', 'seleção', 'selecionado'],
   storyboardPhrases: [
     'crie uma história sobre',
@@ -930,6 +938,7 @@ const RU_VOCAB: VoiceVocabulary = {
     top: ['помести это у верхнего края', 'поставь это сверху'],
     bottom: ['помести это у нижнего края', 'поставь это снизу'],
   },
+  selectionRepeatPhrases: ['ещё раз', 'еще раз', 'ещё немного', 'еще немного'],
   selectionReferences: ['это', 'выделение', 'выделенное'],
   storyboardPhrases: [
     'создай историю о',
@@ -1002,6 +1011,7 @@ function mergeVocabulary(base: VoiceVocabulary, extra: VoiceVocabulary): VoiceVo
       top: [...base.selectionPlacePhrases.top, ...extra.selectionPlacePhrases.top],
       bottom: [...base.selectionPlacePhrases.bottom, ...extra.selectionPlacePhrases.bottom],
     },
+    selectionRepeatPhrases: [...base.selectionRepeatPhrases, ...extra.selectionRepeatPhrases],
     selectionReferences: [...base.selectionReferences, ...extra.selectionReferences],
     storyboardPhrases: [...base.storyboardPhrases, ...extra.storyboardPhrases],
   };
@@ -1227,7 +1237,6 @@ export function parseVoiceCommand(transcript: string, locale = 'en'): VoiceComma
       return { kind: 'place-selection', edge };
     }
   }
-
   const isClearAll = has(tokens, vocab.clear) || hasPhrase(normalized, ...vocab.clearPhrases);
   if (isClearAll) return { kind: 'clear' };
 
@@ -1291,6 +1300,12 @@ export function parseVoiceCommand(transcript: string, locale = 'en'): VoiceComma
     return hasSelectionReference(normalized, vocab.selectionReferences)
       ? { kind: 'color', ...color, selection: true }
       : { kind: 'color', ...color };
+  }
+
+  // Continuation is intentionally last: any explicit action in the same
+  // utterance wins, so “play again” can never become a selection nudge.
+  if (hasPhrase(normalized, ...vocab.selectionRepeatPhrases)) {
+    return { kind: 'repeat-selection-move' };
   }
 
   return null;

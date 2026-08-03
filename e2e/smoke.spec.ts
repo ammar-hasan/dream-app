@@ -415,6 +415,7 @@ test('voice resolves natural “it” actions to the visible selection', async (
       'make it red',
       'make it bigger',
       'move it right',
+      'again',
       'center it',
       'put it at the top',
       'duplicate it',
@@ -516,6 +517,11 @@ test('voice resolves natural “it” actions to the visible selection', async (
   await page.getByRole('button', { name: 'Voice commands' }).click();
   await expect(page.getByRole('status')).toContainText('Moved the selected part right.');
   await expect.poll(() => redCenter()).toBeGreaterThan(beforeMove + 5);
+  const afterFirstMove = await redCenter();
+
+  await page.getByRole('button', { name: 'Voice commands' }).click();
+  await expect(page.getByRole('status')).toContainText('Moved the selected part right.');
+  await expect.poll(() => redCenter()).toBeGreaterThan(afterFirstMove + 5);
 
   await page.getByRole('button', { name: 'Voice commands' }).click();
   await expect(page.getByRole('status')).toContainText('Centered the selected part.');

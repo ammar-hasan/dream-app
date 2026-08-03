@@ -102,6 +102,11 @@ requires an editable vector selection. Missing, locked and pixel selections get
 specific guidance; Dream never claims that unchanged pixels were recolored or
 silently changes a hidden setting. Bare directions do not guess at an object or
 change the document.
+Immediately after a successful directional nudge, “again” or “a little more”
+repeats that same 10 px nudge. The memory lasts for one voice turn only. Any
+other command, failed or empty listen, missing or locked selection, centering or
+edge placement clears it. Ambiguous repetition can never repeat deletion,
+duplication, clearing, export or another non-nudge action.
 
 ### The complete intent table
 
@@ -125,6 +130,7 @@ change the document.
 | bigger / smaller | "bigger", "make it bigger", "thicker" / "smaller", "make it smaller", "thinner"                                                                        | أكبر / أصغر                                                                      | selected artwork scales gently about its center; with no selection, brush size ×~1.5 or ÷~1.5    |
 | move / center it | "move it left/right/up/down", "center it"                                                                                                              | حرّك هذا لليسار/اليمين/الأعلى/الأسفل، ضع هذا في المنتصف                          | nudges the selection by 10 px or centers it on the canvas; each is one undoable action           |
 | place at edge    | "put it at the top", "move it to the right edge"                                                                                                       | ضع هذا عند الحافة العلوية / اليمنى                                               | places the selection's shared bounds flush with that canvas edge as one undoable action          |
+| continue nudge   | "again", "a little more"                                                                                                                               | مرة أخرى، قليلًا بعد                                                             | immediately repeats only the last successful directional 10 px nudge; otherwise refuses safely   |
 | delete / copy it | "delete it", "remove that" / "duplicate it", "copy that"                                                                                               | احذف هذا / انسخ هذا                                                              | deletes only the selection / makes and selects an offset copy; both are undoable                 |
 | save             | "save"                                                                                                                                                 | احفظ                                                                             | saves now                                                                                        |
 | help             | "help", "commands"                                                                                                                                     | مساعدة، أوامر                                                                    | speaks the full command list                                                                     |
@@ -216,6 +222,9 @@ keeps it silent. Every tactile cue repeats an already-visible interaction state.
 - “Put it at the left/right/top/bottom edge” requires a visible editable
   selection and places its shared bounds exactly at that canvas edge as one
   undoable action. It never changes a hidden alignment setting.
+- “Again” and “a little more” work only on the voice turn immediately after a
+  successful directional nudge. Any interruption or unavailable selection
+  clears the context; no destructive or non-nudge action is repeatable.
 - “Make it red” requires selected editable vector artwork and is one undoable
   recolor. A bare “red” remains a brush choice; raster pixels are referred to AI
   Edit rather than receiving false success feedback.

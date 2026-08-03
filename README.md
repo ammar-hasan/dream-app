@@ -150,7 +150,7 @@ RTL remain first-class product behavior.
   "mirror off", "bigger"/"smaller", "export real code", "record narration"/
   "stop recording"/"delete narration", selected-object “delete it”/“duplicate
   it”, “move it left/right/up/down”/“center it” and “put it at the top edge”,
-  "save" and "help"
+  the immediate continuation “again”, "save" and "help"
   (speaks the command list). The pipeline is a pure parser
   (`ai/voiceCommands.ts`, case-insensitive, filler-tolerant — "um, can you
   please undo?") plus a thin executor (`ui/voiceExecutor.ts`) against a
@@ -162,8 +162,11 @@ RTL remain first-class product behavior.
   selection, “duplicate it” makes an offset selected copy, spoken directions
   nudge by 10 px, and “center it” uses the canvas center; every action is
   undoable. “Put it at the top/right/left/bottom edge” aligns the shared bounds
-  to that canvas edge. Bare colors still choose the drawing color. Missing,
-  locked and raster selections receive truthful, task-specific guidance.
+  to that canvas edge. Immediately after a successful directional nudge,
+  “again” repeats only that nudge; every interruption clears this ephemeral
+  context, and destructive or non-nudge actions are never repeatable. Bare
+  colors still choose the drawing color. Missing, locked and raster selections
+  receive truthful, task-specific guidance.
   Answer words also preserve corrections: “no, undo that” reaches Undo, while a
   standalone “no” still safely answers a pending destructive confirmation.
   The vocabulary is **per-locale**: with

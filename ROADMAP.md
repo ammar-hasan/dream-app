@@ -1389,6 +1389,24 @@ precision.
 - ✅ Full release gates remain green: 869 unit tests, 97.74% engine coverage,
   51 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 62 — “Again” is conversational and safe ✅
+
+Persona need: let a child or low-literacy creator refine placement naturally—
+“move it right… again”—without making an ambiguous word dangerous.
+
+- ✅ “Again”, “a little more” and natural equivalents in all six locales repeat
+  only the immediately preceding successful directional 10 px nudge.
+- ✅ The one-turn, session-only context clears after any other command, unknown,
+  failed or empty listen, missing/locked selection, centering or edge placement.
+- ✅ Destructive commands, duplication, color, size, clearing, export and every
+  other non-nudge action are categorically ineligible for ambiguous repetition.
+- ✅ Parser and executor tests prove every locale, successful continuation,
+  interruption clearing, no-context refusal and failed-nudge clearing. A
+  production-browser speech journey proves two successive spoken nudges move
+  real selected pixels twice.
+- ✅ Full release gates remain green: 871 unit tests, 97.74% engine coverage,
+  51 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1402,9 +1420,9 @@ largest count of controls:
 2. **Conversational phone-first creation:** natural clarification and reference
    handling for voice now covers selected-object identity, color, size and basic
    position plus canvas-edge targets; continue with relationships between
-   objects, multi-turn clarification and corrections, a task-prioritized mobile
-   shell, and a faithful safe creation path that does not require a child or
-   low-literacy user to configure an AI provider.
+   objects, broader multi-turn clarification and repair, a task-prioritized
+   mobile shell, and a faithful safe creation path that does not require a child
+   or low-literacy user to configure an AI provider.
 3. **Professional substrate:** non-destructive masks/adjustments and blend/color
    foundations, then vector paths, typography, grids, constraints and linked
    reusable systems—Design-only, preserving Draw's first-minute simplicity.

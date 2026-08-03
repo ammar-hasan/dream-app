@@ -759,6 +759,7 @@ export const pt: Record<string, string> = {
   'voice.selectionPlacedRight': 'Coloquei a parte selecionada na borda direita.',
   'voice.selectionPlacedTop': 'Coloquei a parte selecionada na borda superior.',
   'voice.selectionPlacedBottom': 'Coloquei a parte selecionada na borda inferior.',
+  'voice.nothingToRepeat': 'Mova algo primeiro e depois diga de novo.',
   'voice.selectionLocked': 'Essa seleção está bloqueada. Desbloqueie antes de mudar.',
   'voice.mirrorOn': 'Espelhamento ligado!',
   'voice.mirrorOff': 'Espelhamento desligado.',
@@ -771,7 +772,7 @@ export const pt: Record<string, string> = {
   'voice.narrationNeedsFrames': 'Adicione alguns quadros primeiro, depois conte sua história!',
   'voice.narrationAlready': 'Já estou gravando — diga “parar gravação” quando terminar.',
   'voice.help':
-    'Você pode dizer: pincel, lápis, spray, borracha, preencher, varinha, carimbo, uma cor como vermelho ou azul, maior, menor, mova isso para a esquerda, centralize isso, coloque isso no topo, apagar isso, copiar isso, espelhamento ligado, espelhamento desligado, desfazer, refazer, limpar, novo quadro, tocar, jogar meu jogo, pré-visualizar meu app, exportar meu app, exportar código real, gravar narração, parar gravação, excluir narração, parar, salvar, e ajuda.',
+    'Você pode dizer: pincel, lápis, spray, borracha, preencher, varinha, carimbo, uma cor como vermelho ou azul, maior, menor, mova isso para a esquerda, de novo, centralize isso, coloque isso no topo, apagar isso, copiar isso, espelhamento ligado, espelhamento desligado, desfazer, refazer, limpar, novo quadro, tocar, jogar meu jogo, pré-visualizar meu app, exportar meu app, exportar código real, gravar narração, parar gravação, excluir narração, parar, salvar, e ajuda.',
   'voice.unknown': 'Desculpe, não entendi. Diga “ajuda” para ouvir o que eu posso fazer.',
   'voice.unavailable':
     'Os comandos de voz não estão disponíveis neste navegador. Você ainda pode usar todas as ferramentas por toque, mouse ou teclado.',
