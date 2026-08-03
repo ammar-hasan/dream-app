@@ -36,6 +36,9 @@ rebuilds).
   `version`. Readers refuse newer major versions (see errors below).
 - A layer without `blendMode` is an older/default layer and reads as
   `"normal"`. A writer may include the explicit default.
+- A layer without `adjustments` is older/default content and reads with every
+  adjustment at zero. Missing or non-numeric settings recover to zero; numeric
+  settings outside their documented range recover to the nearest valid value.
 
 ## Reader validation
 

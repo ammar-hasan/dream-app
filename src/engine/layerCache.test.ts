@@ -103,6 +103,25 @@ describe('LayerCache', () => {
     expect(ctx.globalCompositeOperation).toBe('screen');
   });
 
+  it('re-renders a layer when its editable adjustments change', () => {
+    const doc = bigDoc(1, 5);
+    const factories = makeMockFactories();
+    const cache = new LayerCache(factories);
+    cache.render(doc, new MockContext2D());
+    expect(factories.created).toHaveLength(1);
+
+    const adjusted = withLayers(doc, [
+      {
+        ...doc.layers[0],
+        adjustments: { ...doc.layers[0].adjustments!, saturation: -100 },
+      },
+    ]);
+    cache.render(adjusted, new MockContext2D());
+
+    expect(factories.created).toHaveLength(2);
+    expect(factories.created[1].context.calls('getImageData')).toHaveLength(1);
+  });
+
   it('honors visibility and the layer filter without invalidating entries', () => {
     const doc = bigDoc(2, 10);
     const factories = makeMockFactories();

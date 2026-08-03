@@ -8,11 +8,13 @@ import {
   boxBlur,
   convolve,
   DEFAULT_ADJUSTMENTS,
+  adjustmentsEqual,
   extractRegion,
   FILTER_PRESETS,
   grayscale,
   invert,
   isIdentity,
+  normalizeAdjustments,
   rotateHue,
   sepia,
   sharpen,
@@ -161,6 +163,17 @@ describe('blur and sharpen', () => {
 });
 
 describe('applyAdjustments', () => {
+  it('normalizes incomplete or invalid portable settings to bounded defaults', () => {
+    const normalized = normalizeAdjustments({ brightness: 250, hue: -45, blur: 'lots' });
+    expect(normalized).toEqual({
+      ...DEFAULT_ADJUSTMENTS,
+      brightness: 100,
+      hue: -45,
+    });
+    expect(adjustmentsEqual(normalized, { ...normalized })).toBe(true);
+    expect(adjustmentsEqual(normalized, DEFAULT_ADJUSTMENTS)).toBe(false);
+  });
+
   it('identity adjustments return an equal copy, not the input', () => {
     const src = onePixel();
     const out = applyAdjustments(src, { ...DEFAULT_ADJUSTMENTS });

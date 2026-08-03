@@ -227,6 +227,8 @@ export const ar: Record<string, string> = {
 
   // --- Adjust panel -----------------------------------------------------------
   'adjust.title': 'تعديل',
+  'adjust.editable': 'قابل للتعديل',
+  'adjust.editableHint': 'تُحفظ الإعدادات من دون تسطيح علاماتك الأصلية',
   'adjust.flipH': 'قلب أفقي',
   'adjust.flipHTitle': 'قلب الطبقة أفقيًا',
   'adjust.flipV': 'قلب عمودي',

@@ -251,9 +251,14 @@ export function CanvasViewport() {
       );
     }
     if (adjustPreview) {
-      replaceDisplayOperations(adjustPreview.layerId, [
-        previewImage(adjustPreview.buffer, 0, 0, '__adjust-preview'),
-      ]);
+      displayDoc = {
+        ...displayDoc,
+        layers: displayDoc.layers.map((layer) =>
+          layer.id === adjustPreview.layerId
+            ? { ...layer, adjustments: adjustPreview.adjustments }
+            : layer,
+        ),
+      };
     }
     if (wandDraft) {
       replaceDisplayOperations(wandDraft.layerId, [

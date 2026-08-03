@@ -29,6 +29,18 @@ export interface Adjustments {
   sharpen: number;
 }
 
+export const ADJUSTMENT_RANGES: Record<keyof Adjustments, readonly [number, number]> = {
+  brightness: [-100, 100],
+  contrast: [-100, 100],
+  saturation: [-100, 100],
+  hue: [-180, 180],
+  grayscale: [0, 100],
+  sepia: [0, 100],
+  invert: [0, 100],
+  blur: [0, 20],
+  sharpen: [0, 100],
+};
+
 export const DEFAULT_ADJUSTMENTS: Adjustments = {
   brightness: 0,
   contrast: 0,
@@ -40,6 +52,26 @@ export const DEFAULT_ADJUSTMENTS: Adjustments = {
   blur: 0,
   sharpen: 0,
 };
+
+/** Recover a complete, bounded settings object from optional portable data. */
+export function normalizeAdjustments(value: unknown): Adjustments {
+  const source =
+    typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : {};
+  const normalized = { ...DEFAULT_ADJUSTMENTS };
+  for (const key of Object.keys(DEFAULT_ADJUSTMENTS) as (keyof Adjustments)[]) {
+    const candidate = source[key];
+    if (typeof candidate !== 'number' || !Number.isFinite(candidate)) continue;
+    const [min, max] = ADJUSTMENT_RANGES[key];
+    normalized[key] = Math.min(max, Math.max(min, candidate));
+  }
+  return normalized;
+}
+
+export function adjustmentsEqual(a: Adjustments, b: Adjustments): boolean {
+  return (Object.keys(DEFAULT_ADJUSTMENTS) as (keyof Adjustments)[]).every(
+    (key) => a[key] === b[key],
+  );
+}
 
 export interface FilterPreset {
   id: string;

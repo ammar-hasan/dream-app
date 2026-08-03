@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { useDreamStore } from './dreamStore';
-import type { PixelBuffer } from '../engine/filters';
+import { DEFAULT_ADJUSTMENTS, type PixelBuffer } from '../engine/filters';
 import type { ImageOp } from '../engine/types';
 
 const store = () => useDreamStore.getState();
@@ -77,6 +77,19 @@ describe('move tool', () => {
 });
 
 describe('filter apply / cancel', () => {
+  it('stores editable layer adjustments without replacing marks and undoes them independently', () => {
+    store().importImage(image(10, 10));
+    const layerId = store().activeLayerId;
+    const operations = store().doc.layers[1].operations;
+    store().setLayerAdjustments(layerId, { ...DEFAULT_ADJUSTMENTS, grayscale: 100 });
+
+    expect(store().doc.layers[1].operations).toBe(operations);
+    expect(store().doc.layers[1].adjustments?.grayscale).toBe(100);
+    store().undo();
+    expect(store().doc.layers[1].operations).toBe(operations);
+    expect(store().doc.layers[1].adjustments?.grayscale).toBe(0);
+  });
+
   it('applyLayerRaster bakes the preview into one image op, undoable', () => {
     store().importImage(image(10, 10));
     const layerId = store().activeLayerId;
@@ -100,7 +113,7 @@ describe('filter apply / cancel', () => {
     const depth = store().doc.layers.length;
     store().setAdjustPreview({
       layerId: store().activeLayerId,
-      buffer: image(100, 80),
+      adjustments: { ...DEFAULT_ADJUSTMENTS, contrast: 20 },
     });
     expect(store().adjustPreview).not.toBeNull();
     store().setAdjustPreview(null); // Cancel
@@ -111,7 +124,10 @@ describe('filter apply / cancel', () => {
 
   it('applyLayerRaster clears the preview', () => {
     store().importImage(image(10, 10));
-    store().setAdjustPreview({ layerId: store().activeLayerId, buffer: image(100, 80) });
+    store().setAdjustPreview({
+      layerId: store().activeLayerId,
+      adjustments: { ...DEFAULT_ADJUSTMENTS, contrast: 20 },
+    });
     store().applyLayerRaster(image(100, 80));
     expect(store().adjustPreview).toBeNull();
   });

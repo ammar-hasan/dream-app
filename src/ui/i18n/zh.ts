@@ -224,6 +224,8 @@ export const zh: Record<string, string> = {
 
   // --- Adjust panel -----------------------------------------------------------
   'adjust.title': '调整',
+  'adjust.editable': '可编辑',
+  'adjust.editableHint': '保存设置时不会拼合原始笔触',
   'adjust.flipH': '水平翻转',
   'adjust.flipHTitle': '水平翻转图层',
   'adjust.flipV': '垂直翻转',

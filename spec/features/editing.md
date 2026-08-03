@@ -19,10 +19,11 @@ Photoshop", all undoable.
 
 ## The Adjust panel (filters & adjustments)
 
-Sliders with a **live preview**; **Apply** bakes the result into the layer
-as one undoable change; **Cancel** discards everything. Applied filters are
-destructive (baked to pixels), like MS Paint / Photoshop's apply — not a
-reorderable filter stack.
+Sliders with a **live preview**; an **Editable** label explains that the effect
+does not flatten the original marks. **Apply** saves the settings on the active
+layer as one undoable change; **Cancel** returns to the last saved settings.
+Reopening Adjust restores those values so they can be refined or reset later.
+Presets choose the same editable settings rather than replacing content.
 
 | Adjustment | Range     | Perceptual meaning                                   |
 | ---------- | --------- | ---------------------------------------------------- |
@@ -39,8 +40,13 @@ reorderable filter stack.
 - Adjustments apply in a **fixed order** regardless of slider order: hue →
   saturation → brightness → contrast → grayscale → sepia → invert → blur →
   sharpen. Same slider values, same pixels, every time.
-- Only the active layer is affected; transparency is preserved (except
-  blur, which softens transparent edges too).
+- The active layer is flattened for appearance with its opacity, then its
+  adjustments and blend mode are applied in that order. Original strokes, shapes,
+  text and pixels stay independently editable, and future marks on the layer
+  receive the same saved effect. Transparency is preserved (except blur, which
+  softens transparent edges too).
+- A locked layer exposes its saved appearance but refuses adjustment and
+  transform changes. An empty layer has nothing to adjust.
 
 ### Presets (exact recipes)
 
@@ -111,14 +117,15 @@ itself as generative.
   export-only and never changes the document. Pixel or eraser content omits
   only the SVG member rather than blocking the complete pack.
 - SVG is offered only when every visible mark can remain genuinely scalable.
-  A visible imported or generated pixel image, baked flood fill, baked image
-  adjustment or eraser mark disables its Export action and explains that PNG
-  remains available. Unsupported content on a hidden layer does not block a
-  truthful SVG of what is visible.
+  A visible imported or generated pixel image, baked flood fill, non-neutral
+  editable adjustment or eraser mark disables its Export action and explains
+  that PNG remains available. Unsupported content on a hidden layer does not
+  block a truthful SVG of what is visible.
 
 ## Edge cases
 
-- Adjust/Apply on an empty or locked layer is refused kindly.
+- Adjust/Apply on an empty or locked layer is refused kindly; Cancel remains a
+  safe exit from any uncommitted preview.
 - Crop/resize on an animated document applies to every frame and is a
   single undo step.
 - Rotating a selection that contains rectangles, ellipses or pixel content

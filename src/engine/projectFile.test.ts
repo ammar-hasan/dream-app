@@ -6,6 +6,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
+import { DEFAULT_ADJUSTMENTS } from './filters';
 import {
   DREAM_PROJECT_VERSION,
   decodeProject,
@@ -55,6 +56,7 @@ function richDocument(): DreamDocument {
         visible: true,
         opacity: 0.8,
         blendMode: 'multiply',
+        adjustments: { ...DEFAULT_ADJUSTMENTS, contrast: 12 },
         locked: false,
         operations: [
           {
@@ -121,6 +123,7 @@ function richDocument(): DreamDocument {
         visible: false,
         opacity: 1,
         blendMode: 'normal',
+        adjustments: { ...DEFAULT_ADJUSTMENTS },
         locked: true,
         operations: [
           {
@@ -184,6 +187,7 @@ function richDocument(): DreamDocument {
             visible: true,
             opacity: 1,
             blendMode: 'screen',
+            adjustments: { ...DEFAULT_ADJUSTMENTS },
             locked: false,
             operations: [
               {
@@ -237,18 +241,29 @@ describe('projectFile', () => {
     expect(await decodeProject(text, fakeCodec)).toEqual(plain);
   });
 
-  it('opens older projects without blend modes as normal layers', async () => {
+  it('opens older projects without blend modes or adjustments using neutral defaults', async () => {
     const text = await encodeProject(withMirroredLayers(richDocument()), fakeCodec);
     const parsed = JSON.parse(text);
-    for (const layer of parsed.document.layers) delete layer.blendMode;
+    for (const layer of parsed.document.layers) {
+      delete layer.blendMode;
+      delete layer.adjustments;
+    }
     for (const frame of parsed.document.frames) {
-      for (const layer of frame.layers) delete layer.blendMode;
+      for (const layer of frame.layers) {
+        delete layer.blendMode;
+        delete layer.adjustments;
+      }
     }
 
     const decoded = await decodeProject(JSON.stringify(parsed), fakeCodec);
     expect(decoded.layers.every((layer) => layer.blendMode === 'normal')).toBe(true);
     expect(
       decoded.frames?.every((frame) => frame.layers.every((layer) => layer.blendMode === 'normal')),
+    ).toBe(true);
+    expect(
+      decoded.frames?.every((frame) =>
+        frame.layers.every((layer) => layer.adjustments?.contrast === 0),
+      ),
     ).toBe(true);
   });
 

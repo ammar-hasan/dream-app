@@ -191,6 +191,63 @@ test('Design blend modes visibly combine layers and undo exactly', async ({ page
   await expect.poll(sampleCenter).toEqual([0, 0, 255, 255]);
 });
 
+test('layer adjustments stay editable without flattening original marks', async ({ page }) => {
+  await bootApp(page);
+  const canvas = page.locator('.viewport-canvas');
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('viewport canvas has no box');
+  const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  const sampleCenter = () =>
+    canvas.evaluate((element) => {
+      const target = element as HTMLCanvasElement;
+      const rect = target.getBoundingClientRect();
+      const context = target.getContext('2d');
+      if (!context) throw new Error('no 2d context');
+      return Array.from(
+        context.getImageData(
+          Math.floor((rect.width / 2) * (target.width / rect.width)),
+          Math.floor((rect.height / 2) * (target.height / rect.height)),
+          1,
+          1,
+        ).data,
+      );
+    });
+  const drawLine = async (fromX: number, fromY: number, toX: number, toY: number) => {
+    await page.mouse.move(fromX, fromY);
+    await page.mouse.down();
+    await page.mouse.move(toX, toY, { steps: 8 });
+    await page.mouse.up();
+  };
+
+  await page.locator('.tool-options input[type="range"]').first().fill('64');
+  await page.locator('.tool-options input[type="color"]').fill('#ff0000');
+  await drawLine(center.x - 100, center.y, center.x + 100, center.y);
+  await expect.poll(sampleCenter).toEqual([255, 0, 0, 255]);
+
+  const adjust = page.getByRole('region', { name: 'Adjust' });
+  await expect(adjust.getByText('Editable', { exact: true })).toBeVisible();
+  await adjust.getByRole('slider', { name: 'Grayscale' }).fill('100');
+  await expect.poll(sampleCenter).toEqual([54, 54, 54, 255]);
+  await adjust.getByRole('button', { name: 'Apply', exact: true }).click();
+
+  // A later vector mark remains a real independent operation under the same
+  // editable effect; Undo removes only that mark, not the adjustment.
+  await page.locator('.tool-options input[type="color"]').fill('#0000ff');
+  await drawLine(center.x, center.y - 100, center.x, center.y + 100);
+  await expect.poll(sampleCenter).toEqual([18, 18, 18, 255]);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(sampleCenter).toEqual([54, 54, 54, 255]);
+
+  // Reset is a preview until Apply; Cancel returns to the saved effect.
+  await adjust.getByRole('button', { name: 'Reset', exact: true }).click();
+  await expect.poll(sampleCenter).toEqual([255, 0, 0, 255]);
+  await adjust.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await expect.poll(sampleCenter).toEqual([54, 54, 54, 255]);
+
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(sampleCenter).toEqual([255, 0, 0, 255]);
+});
+
 test('canvas pointers preview the object and explain direct-manipulation state', async ({
   page,
 }) => {

@@ -26,6 +26,18 @@ import * as tools from './tools';
 const string = (description: string) => ({ type: 'string', description });
 const optional = (schema: object) => schema;
 
+const adjustmentProperties = {
+  brightness: { type: 'number', minimum: -100, maximum: 100 },
+  contrast: { type: 'number', minimum: -100, maximum: 100 },
+  saturation: { type: 'number', minimum: -100, maximum: 100 },
+  hue: { type: 'number', minimum: -180, maximum: 180 },
+  grayscale: { type: 'number', minimum: 0, maximum: 100 },
+  sepia: { type: 'number', minimum: 0, maximum: 100 },
+  invert: { type: 'number', minimum: 0, maximum: 100 },
+  blur: { type: 'number', minimum: 0, maximum: 20 },
+  sharpen: { type: 'number', minimum: 0, maximum: 100 },
+} as const;
+
 const TOOLS: Tool[] = [
   {
     name: 'dream.read_project',
@@ -65,7 +77,7 @@ const TOOLS: Tool[] = [
   {
     name: 'dream.list_layers',
     description:
-      'List the layers of a .dream project (id, name, visibility, opacity, blend mode, lock, op count). Animated documents also get a per-frame breakdown.',
+      'List the layers of a .dream project (id, name, visibility, opacity, blend mode, editable adjustments, lock, op count). Animated documents also get a per-frame breakdown.',
     inputSchema: {
       type: 'object',
       properties: { path: string('Path to the .dream file') },
@@ -87,7 +99,7 @@ const TOOLS: Tool[] = [
   {
     name: 'dream.update_layer',
     description:
-      'Rename, show/hide, set opacity/blend mode, lock/unlock or reorder a layer in the active frame of a .dream project.',
+      'Rename, show/hide, set opacity/blend mode/editable adjustments, lock/unlock or reorder a layer in the active frame of a .dream project.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -105,6 +117,13 @@ const TOOLS: Tool[] = [
           type: 'string',
           enum: ['normal', 'multiply', 'screen', 'overlay', 'darken', 'lighten'],
           description: 'How the flattened layer combines with artwork below',
+        }),
+        adjustments: optional({
+          type: 'object',
+          properties: adjustmentProperties,
+          additionalProperties: false,
+          minProperties: 1,
+          description: 'Partial editable layer adjustment settings',
         }),
         locked: optional({ type: 'boolean', description: 'Whether the layer is locked' }),
         index: optional({
@@ -292,6 +311,21 @@ const argsSchema = {
     visible: z.boolean().optional(),
     opacity: z.number().optional(),
     blendMode: z.enum(['normal', 'multiply', 'screen', 'overlay', 'darken', 'lighten']).optional(),
+    adjustments: z
+      .object({
+        brightness: z.number().finite().min(-100).max(100).optional(),
+        contrast: z.number().finite().min(-100).max(100).optional(),
+        saturation: z.number().finite().min(-100).max(100).optional(),
+        hue: z.number().finite().min(-180).max(180).optional(),
+        grayscale: z.number().finite().min(0).max(100).optional(),
+        sepia: z.number().finite().min(0).max(100).optional(),
+        invert: z.number().finite().min(0).max(100).optional(),
+        blur: z.number().finite().min(0).max(20).optional(),
+        sharpen: z.number().finite().min(0).max(100).optional(),
+      })
+      .strict()
+      .refine((value) => Object.keys(value).length > 0, 'at least one adjustment is required')
+      .optional(),
     locked: z.boolean().optional(),
     index: z.number().optional(),
   }),

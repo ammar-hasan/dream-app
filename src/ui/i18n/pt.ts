@@ -233,6 +233,8 @@ export const pt: Record<string, string> = {
 
   // --- Adjust panel -----------------------------------------------------------
   'adjust.title': 'Ajustar',
+  'adjust.editable': 'Editável',
+  'adjust.editableHint': 'Salva os ajustes sem achatar seus traços originais',
   'adjust.flipH': 'Virar H',
   'adjust.flipHTitle': 'Virar camada horizontalmente',
   'adjust.flipV': 'Virar V',

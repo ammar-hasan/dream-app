@@ -708,6 +708,13 @@ holds.
       pixels or moving a wand region is still in progress THEN its preview stays
       at the owning layer's stack position and uses the same opacity/blending as
       the committed result; release or Apply produces no appearance jump.
+182.  GIVEN a layer containing native marks or pixels WHEN a person previews
+      adjustments and chooses Apply THEN only the editable settings are saved as
+      one undoable change; the original operations and later marks remain
+      independently editable under that effect, Cancel restores the last saved
+      appearance, `.dream` and agent read/write preserve the values, raster
+      delivery matches the canvas, and non-neutral effects refuse an untruthful
+      scalable export.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

@@ -213,6 +213,8 @@ export const ru: Record<string, string> = {
   'rotation.15': '{angle}° · Шаг 15°',
   'rotation.90': '{angle}° · Шаги 90°',
   'adjust.title': 'Коррекция',
+  'adjust.editable': 'Изменяемо',
+  'adjust.editableHint': 'Настройки сохраняются без сведения исходных штрихов',
   'adjust.flipH': 'Отразить по горизонтали',
   'adjust.flipHTitle': 'Отразить слой по горизонтали',
   'adjust.flipV': 'Отразить по вертикали',

@@ -223,6 +223,19 @@ Modern interaction craft should make state legible rather than add spectacle:
   preserves the same keyboard/touch path and never creates hidden state.
   (https://help.figma.com/hc/en-us/articles/360040667874-Create-unique-effects-with-Blend-modes ·
   https://help.procreate.com/procreate/handbook/5.4/layers/layers-blend)
+- **An effect is only truly non-destructive when the decision remains
+  revisitable.** Adobe's February 2026 guidance makes editable settings, layer
+  naming and non-replaced source pixels the adjustment-layer contract.
+  Procreate pairs full-layer effects with live on-canvas controls and explicit
+  Preview, Apply, Reset, Undo and Cancel actions. Dream adopts the smaller
+  substrate appropriate to its current layer model: one complete editable
+  settings object per layer, exact preview through the production compositor,
+  explicit Apply/Cancel and ordinary history. The visible Editable label matters
+  because preserving marks is a trust property, not an implementation detail.
+  Stacked adjustment layers and painted masks remain separate future depth.
+  (https://helpx.adobe.com/photoshop/desktop/create-manage-layers/color-adjustment-fill-layers/create-adjustment-layers.html ·
+  https://help.procreate.com/procreate/handbook/adjustments/adjustments-interface ·
+  https://help.procreate.com/procreate/handbook/layers/layers-mask)
 
 ## 3. Trend watch
 

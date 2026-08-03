@@ -7,6 +7,7 @@
  */
 
 import { cssColor } from './color';
+import { applyAdjustments, isIdentity, normalizeAdjustments } from './filters';
 import { arrowheadPoints, normalizeRect } from './geometry';
 import { sprayDots } from './spray';
 import type {
@@ -49,6 +50,16 @@ export interface Renderer2D {
   ): void;
   fillText(text: string, x: number, y: number): void;
   fillRect(x: number, y: number, w: number, h: number): void;
+  getImageData(
+    sx: number,
+    sy: number,
+    sw: number,
+    sh: number,
+  ): {
+    data: Uint8ClampedArray;
+    width: number;
+    height: number;
+  };
   putImageData(image: unknown, dx: number, dy: number): void;
   drawImage(image: unknown, dx: number, dy: number, dw?: number, dh?: number): void;
 }
@@ -95,7 +106,7 @@ function resolveFactories(opts: RenderOptions): ResolvedFactories {
       : undefined);
   if (!createCanvas || !createImageData) {
     throw new Error(
-      'renderDocument: raster operations need `createCanvas`/`createImageData` options outside a browser environment',
+      'renderDocument: raster operations and layer adjustments need `createCanvas`/`createImageData` options outside a browser environment',
     );
   }
   return { createCanvas, createImageData };
@@ -147,7 +158,28 @@ export function compositeLayerBitmap(layer: Layer, bitmap: unknown, ctx: Rendere
   }
 }
 
-/** Flatten one blended layer before combining it with the artwork below. */
+/** Render one layer bitmap with its editable adjustments applied. */
+export function renderLayerBitmap(
+  layer: Layer,
+  width: number,
+  height: number,
+  opts: RenderOptions = {},
+): CanvasLike {
+  const { createCanvas, createImageData } = resolveFactories(opts);
+  const bitmap = createCanvas(width, height);
+  const layerCtx = bitmap.getContext('2d');
+  if (!layerCtx) return bitmap;
+  renderLayer(layer, layerCtx, opts);
+  const adjustments = normalizeAdjustments(layer.adjustments);
+  if (!isIdentity(adjustments)) {
+    const source = layerCtx.getImageData(0, 0, width, height);
+    const adjusted = applyAdjustments(source, adjustments);
+    layerCtx.putImageData(createImageData(adjusted.data, width, height), 0, 0);
+  }
+  return bitmap;
+}
+
+/** Flatten one effected or blended layer before combining it with the artwork below. */
 export function renderCompositedLayer(
   layer: Layer,
   width: number,
@@ -155,28 +187,12 @@ export function renderCompositedLayer(
   ctx: Renderer2D,
   opts: RenderOptions = {},
 ): void {
-  if (!layer.blendMode || layer.blendMode === 'normal') {
+  const adjustments = normalizeAdjustments(layer.adjustments);
+  if ((!layer.blendMode || layer.blendMode === 'normal') && isIdentity(adjustments)) {
     renderLayer(layer, ctx, opts);
     return;
   }
-  const createCanvas =
-    opts.createCanvas ??
-    (typeof document !== 'undefined'
-      ? (canvasWidth: number, canvasHeight: number): CanvasLike => {
-          const canvas = document.createElement('canvas');
-          canvas.width = canvasWidth;
-          canvas.height = canvasHeight;
-          return canvas;
-        }
-      : undefined);
-  if (!createCanvas) {
-    throw new Error(
-      'renderDocument: blended layers need a `createCanvas` option outside a browser',
-    );
-  }
-  const bitmap = createCanvas(width, height);
-  const layerCtx = bitmap.getContext('2d');
-  if (layerCtx) renderLayer(layer, layerCtx, opts);
+  const bitmap = renderLayerBitmap(layer, width, height, opts);
   compositeLayerBitmap(layer, bitmap, ctx);
 }
 

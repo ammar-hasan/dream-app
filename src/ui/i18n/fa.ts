@@ -216,6 +216,8 @@ export const fa: Record<string, string> = {
   'rotation.15': '{angle}° · چفت ۱۵°',
   'rotation.90': '{angle}° · گام‌های ۹۰°',
   'adjust.title': 'تنظیم',
+  'adjust.editable': 'قابل ویرایش',
+  'adjust.editableHint': 'تنظیمات بدون تخت‌کردن نقش‌های اصلی شما ذخیره می‌شوند',
   'adjust.flipH': 'برعکس افقی',
   'adjust.flipHTitle': 'برعکس کردن لایه به صورت افقی',
   'adjust.flipV': 'برعکس عمودی',

@@ -5,6 +5,8 @@
  * Everything here must stay unit-testable in Node.
  */
 
+import type { Adjustments } from './filters';
+
 export interface Point {
   x: number;
   y: number;
@@ -174,6 +176,8 @@ export interface Layer {
   opacity: number;
   /** How this layer's flattened result combines with the artwork below. */
   blendMode?: LayerBlendMode;
+  /** Editable color and pixel effects applied after this layer is flattened. */
+  adjustments?: Adjustments;
   locked: boolean;
   /** Bottom-to-top paint order. */
   operations: Operation[];

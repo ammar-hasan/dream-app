@@ -38,33 +38,35 @@ a project saved while playing or presenting reopens in Draw.
 ## Layer
 
 A named, ordered sheet of content. Layers stack bottom-to-top; each layer's
-opacity multiplies everything on it, then its blend mode determines how that
-flattened layer combines with the visible artwork below it.
+content is flattened for appearance with its opacity, its editable adjustments
+are applied, then its blend mode determines how the result combines with the
+visible artwork below it.
 
-| Attribute    | Type                                                             | Default     | Meaning                                                           |
-| ------------ | ---------------------------------------------------------------- | ----------- | ----------------------------------------------------------------- |
-| `id`         | string                                                           | generated   |                                                                   |
-| `name`       | string                                                           | `"Layer N"` | user-renameable                                                   |
-| `visible`    | boolean                                                          | `true`      | hidden layers don't paint and can't be hit                        |
-| `opacity`    | number 0–1                                                       | `1`         | multiplies the alpha of everything on the layer                   |
-| `blendMode`  | `'normal'\|'multiply'\|'screen'\|'overlay'\|'darken'\|'lighten'` | `'normal'`  | combines this flattened layer with the artwork below              |
-| `locked`     | boolean                                                          | `false`     | locked layers reject all edits (adding, moving, deleting content) |
-| `operations` | list of Operation                                                | `[]`        | the layer's content, bottom-to-top paint order                    |
+| Attribute     | Type                                                             | Default     | Meaning                                                           |
+| ------------- | ---------------------------------------------------------------- | ----------- | ----------------------------------------------------------------- |
+| `id`          | string                                                           | generated   |                                                                   |
+| `name`        | string                                                           | `"Layer N"` | user-renameable                                                   |
+| `visible`     | boolean                                                          | `true`      | hidden layers don't paint and can't be hit                        |
+| `opacity`     | number 0–1                                                       | `1`         | multiplies the alpha of everything on the layer                   |
+| `blendMode`   | `'normal'\|'multiply'\|'screen'\|'overlay'\|'darken'\|'lighten'` | `'normal'`  | combines this flattened layer with the artwork below              |
+| `adjustments` | AdjustmentSettings                                               | all neutral | editable color and pixel effects; original operations stay intact |
+| `locked`      | boolean                                                          | `false`     | locked layers reject all edits (adding, moving, deleting content) |
+| `operations`  | list of Operation                                                | `[]`        | the layer's content, bottom-to-top paint order                    |
 
-Layer add, delete, rename, reorder, visibility, opacity, blend-mode and lock
-changes are all undoable.
+Layer add, delete, rename, reorder, visibility, opacity, blend-mode, adjustment
+and lock changes are all undoable.
 
 ## Operation
 
 One committed mark on a layer. Five kinds:
 
-| Kind       | Made by                                              | Essence                                                                                                             |
-| ---------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| **stroke** | brush, pencil, eraser, spray                         | a polyline with width, color, round caps/joins; optionally per-point widths (pen pressure) and a spray seed/density |
-| **shape**  | line, rectangle, ellipse tools                       | two corner points + outline width; rectangles/ellipses may instead be filled with the current color (no outline)    |
-| **fill**   | flood fill (bucket)                                  | a contiguous filled region, baked to pixels at commit time                                                          |
-| **text**   | text tool                                            | a string at an anchor point with font size and family                                                               |
-| **image**  | image import, baked filters, wand moves, AI pictures | a pixel rectangle placed at a position with a scale                                                                 |
+| Kind       | Made by                                               | Essence                                                                                                             |
+| ---------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **stroke** | brush, pencil, eraser, spray                          | a polyline with width, color, round caps/joins; optionally per-point widths (pen pressure) and a spray seed/density |
+| **shape**  | line, rectangle, ellipse tools                        | two corner points + outline width; rectangles/ellipses may instead be filled with the current color (no outline)    |
+| **fill**   | flood fill (bucket)                                   | a contiguous filled region, baked to pixels at commit time                                                          |
+| **text**   | text tool                                             | a string at an anchor point with font size and family                                                               |
+| **image**  | image import, AI pixel edits, wand moves, AI pictures | a pixel rectangle placed at a position with a scale                                                                 |
 
 Every operation carries: `id`, `color`, `opacity` (0–1, multiplied with the
 layer's opacity), and an optional `groupId` (Design-mode grouping). Full

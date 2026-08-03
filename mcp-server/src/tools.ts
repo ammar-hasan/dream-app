@@ -22,6 +22,11 @@ import {
   updateLayerProps,
 } from '../../src/engine/document';
 import { hotspotTargetIndex } from '../../src/engine/hotspots';
+import {
+  ADJUSTMENT_RANGES,
+  normalizeAdjustments,
+  type Adjustments,
+} from '../../src/engine/filters';
 import { decodeProject, encodeProject } from '../../src/engine/projectFile';
 import { pressureWidth } from '../../src/engine/tools/stroke';
 import { DEFAULT_SETTINGS } from '../../src/engine/tools/types';
@@ -152,6 +157,7 @@ export interface LayerInfo {
   visible: boolean;
   opacity: number;
   blendMode: LayerBlendMode;
+  adjustments: Adjustments;
   locked: boolean;
   operations: number;
 }
@@ -169,6 +175,7 @@ function layerInfo(layer: Layer): LayerInfo {
     visible: layer.visible,
     opacity: layer.opacity,
     blendMode: layer.blendMode ?? 'normal',
+    adjustments: normalizeAdjustments(layer.adjustments),
     locked: layer.locked,
     operations: layer.operations.length,
   };
@@ -226,6 +233,7 @@ export interface UpdateLayerOptions {
   visible?: boolean;
   opacity?: number;
   blendMode?: string;
+  adjustments?: Partial<Adjustments>;
   locked?: boolean;
   /** New zero-based stack index; 0 is the bottom. */
   index?: number;
@@ -252,11 +260,14 @@ export async function updateLayer(
     options.visible !== undefined ||
     options.opacity !== undefined ||
     options.blendMode !== undefined ||
+    options.adjustments !== undefined ||
     options.locked !== undefined ||
     options.index !== undefined;
   if (!hasUpdate) throw new Error('Provide at least one layer property to update');
 
-  const patch: Partial<Pick<Layer, 'name' | 'visible' | 'opacity' | 'blendMode' | 'locked'>> = {};
+  const patch: Partial<
+    Pick<Layer, 'name' | 'visible' | 'opacity' | 'blendMode' | 'adjustments' | 'locked'>
+  > = {};
   if (options.name !== undefined) {
     const name = options.name.trim();
     if (!name) throw new Error('layer name must not be empty');
@@ -275,6 +286,26 @@ export async function updateLayer(
       throw new Error('blendMode must be normal, multiply, screen, overlay, darken or lighten');
     }
     patch.blendMode = options.blendMode;
+  }
+  if (options.adjustments !== undefined) {
+    if (
+      typeof options.adjustments !== 'object' ||
+      options.adjustments === null ||
+      Object.keys(options.adjustments).length === 0
+    ) {
+      throw new Error('adjustments must contain at least one setting');
+    }
+    const adjustments = normalizeAdjustments(layer.adjustments);
+    for (const [name, value] of Object.entries(options.adjustments)) {
+      if (!(name in ADJUSTMENT_RANGES)) throw new Error(`Unknown adjustment: ${name}`);
+      const key = name as keyof Adjustments;
+      const [min, max] = ADJUSTMENT_RANGES[key];
+      if (typeof value !== 'number' || !Number.isFinite(value) || value < min || value > max) {
+        throw new Error(`${name} must be between ${min} and ${max}`);
+      }
+      adjustments[key] = value;
+    }
+    patch.adjustments = adjustments;
   }
   if (
     options.index !== undefined &&

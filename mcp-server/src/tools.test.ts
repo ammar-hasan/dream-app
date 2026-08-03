@@ -32,6 +32,7 @@ import {
   saveProject,
   updateLayer,
 } from './tools';
+import { nodeRasterCodec } from './nodeCodec';
 
 let dir: string;
 let projectPath: string;
@@ -168,6 +169,7 @@ describe('dream-mcp tools', () => {
       visible: false,
       opacity: 0.4,
       blendMode: 'multiply',
+      adjustments: { brightness: 12, blur: 2 },
       locked: true,
       index: 0,
     });
@@ -177,6 +179,7 @@ describe('dream-mcp tools', () => {
       visible: false,
       opacity: 0.4,
       blendMode: 'multiply',
+      adjustments: expect.objectContaining({ brightness: 12, blur: 2, contrast: 0 }),
       locked: true,
       index: 0,
       frameId: null,
@@ -208,6 +211,12 @@ describe('dream-mcp tools', () => {
     await expect(updateLayer(managedPath, { layer: 'Layer 1', blendMode: 'burn' })).rejects.toThrow(
       'blendMode must be',
     );
+    await expect(updateLayer(managedPath, { layer: 'Layer 1', adjustments: {} })).rejects.toThrow(
+      'at least one setting',
+    );
+    await expect(
+      updateLayer(managedPath, { layer: 'Layer 1', adjustments: { blur: 21 } }),
+    ).rejects.toThrow('blur must be between 0 and 20');
     await expect(updateLayer(managedPath, { layer: 'Layer 1', index: 1 })).rejects.toThrow(
       'integer from 0 to 0',
     );
@@ -413,6 +422,31 @@ describe('dream-mcp tools', () => {
     expect(result.bytes).toBeGreaterThan(0);
     const png = await readFile(outPath);
     expect(png.subarray(0, 4)).toEqual(PNG_MAGIC);
+  });
+
+  it('render_png applies the same editable layer adjustments as the app', async () => {
+    const adjustedPath = join(dir, 'adjusted.dream');
+    const outPath = join(dir, 'adjusted.png');
+    await createProject(adjustedPath, { width: 10, height: 10 });
+    await addShape(adjustedPath, {
+      shape: 'rectangle',
+      x1: 0,
+      y1: 0,
+      x2: 10,
+      y2: 10,
+      color: '#ff0000',
+      fill: true,
+    });
+    await updateLayer(adjustedPath, {
+      layer: 'Layer 1',
+      adjustments: { grayscale: 100 },
+    });
+    await renderPng(adjustedPath, outPath);
+
+    const png = await readFile(outPath);
+    const decoded = await nodeRasterCodec.decode(`data:image/png;base64,${png.toString('base64')}`);
+    const center = (5 * decoded.width + 5) * 4;
+    expect([...decoded.data.slice(center, center + 4)]).toEqual([54, 54, 54, 255]);
   });
 
   it('render_png can pick a frame and errors without frames', async () => {

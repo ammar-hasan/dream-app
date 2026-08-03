@@ -35,7 +35,7 @@ project and remains editable after reopening. Older projects and layers without
 an explicit mode open as Normal. Hidden layers do not blend; layer opacity is
 applied before the flattened layer is combined with the artwork below.
 
-In-progress drawing, whole-layer movement, selection transforms, adjustments
+In-progress drawing, whole-layer movement, selection transforms, adjustment previews
 and wand movement remain inside the owning layer at its real stack position.
 Their live appearance therefore includes that layer's opacity and blend mode
 before release or Apply; committing the gesture must not cause a surprise jump

@@ -1,6 +1,7 @@
 /** Pure SVG export for documents whose visible marks remain genuinely vector. */
 
 import { arrowheadPoints, normalizeRect } from './geometry';
+import { isIdentity, normalizeAdjustments } from './filters';
 import { sprayDots } from './spray';
 import type { DreamDocument, Operation, Point } from './types';
 
@@ -85,12 +86,13 @@ export function canExportSvg(doc: DreamDocument): boolean {
   return doc.layers.every(
     (layer) =>
       !layer.visible ||
-      layer.operations.every(
-        (op) =>
-          op.kind !== 'fill' &&
-          op.kind !== 'image' &&
-          !(op.kind === 'stroke' && op.tool === 'eraser'),
-      ),
+      (isIdentity(normalizeAdjustments(layer.adjustments)) &&
+        layer.operations.every(
+          (op) =>
+            op.kind !== 'fill' &&
+            op.kind !== 'image' &&
+            !(op.kind === 'stroke' && op.tool === 'eraser'),
+        )),
   );
 }
 

@@ -229,6 +229,8 @@ export const en: Record<string, string> = {
 
   // --- Adjust panel -----------------------------------------------------------
   'adjust.title': 'Adjust',
+  'adjust.editable': 'Editable',
+  'adjust.editableHint': 'Saves settings without flattening your original marks',
   'adjust.flipH': 'Flip H',
   'adjust.flipHTitle': 'Flip layer horizontally',
   'adjust.flipV': 'Flip V',

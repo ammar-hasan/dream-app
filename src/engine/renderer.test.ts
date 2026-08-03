@@ -68,6 +68,24 @@ describe('renderDocument', () => {
     ]);
     expect(ctx.globalCompositeOperation).toBe('multiply');
   });
+
+  it('applies editable adjustments to a flattened layer bitmap', () => {
+    const doc = docWithStroke();
+    doc.layers[0] = {
+      ...doc.layers[0],
+      adjustments: { ...doc.layers[0].adjustments!, brightness: 10 },
+    };
+    const factories = makeMockFactories();
+    const ctx = new MockContext2D();
+
+    renderDocument(doc, ctx, factories);
+
+    expect(factories.created).toHaveLength(1);
+    const layerContext = factories.created[0].context;
+    expect(layerContext.calls('getImageData')).toEqual([['getImageData', 0, 0, 100, 80]]);
+    expect(layerContext.calls('putImageData')).toHaveLength(1);
+    expect(ctx.calls('drawImage')).toHaveLength(1);
+  });
 });
 
 describe('stroke rendering', () => {

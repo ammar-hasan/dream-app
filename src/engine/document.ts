@@ -20,6 +20,7 @@ import type {
   Operation,
   SlidePresentation,
 } from './types';
+import { DEFAULT_ADJUSTMENTS } from './filters';
 
 let idCounter = 0;
 
@@ -36,6 +37,7 @@ export function createLayer(name = 'Layer', operations: Operation[] = []): Layer
     visible: true,
     opacity: 1,
     blendMode: 'normal',
+    adjustments: { ...DEFAULT_ADJUSTMENTS },
     locked: false,
     operations,
   };
@@ -283,7 +285,9 @@ export function moveLayer(doc: DreamDocument, layerId: string, toIndex: number):
 export function updateLayerProps(
   doc: DreamDocument,
   layerId: string,
-  patch: Partial<Pick<Layer, 'name' | 'visible' | 'opacity' | 'blendMode' | 'locked'>>,
+  patch: Partial<
+    Pick<Layer, 'name' | 'visible' | 'opacity' | 'blendMode' | 'adjustments' | 'locked'>
+  >,
 ): DreamDocument {
   return mapLayer(doc, layerId, (layer) => ({ ...layer, ...patch }));
 }

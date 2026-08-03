@@ -1,25 +1,21 @@
 /**
  * Right panel: per-layer image adjustments and transforms (slice 2).
  *
- * The active layer is rasterized onto a scratch canvas; slider changes run
- * the pure engine filters over that buffer and show the result as a live
- * preview (store.adjustPreview replaces the layer in the viewport). Apply
- * bakes the filtered raster into the layer as one undoable command; Cancel
- * discards everything. The engine itself never touches the DOM — the canvas
- * dance lives here.
+ * Slider changes preview an editable layer effect. Apply stores only the
+ * settings as one undoable change, preserving every original operation;
+ * Cancel discards the session preview.
  */
 
 import { useEffect, useMemo, useState } from 'react';
 import {
-  applyAdjustments,
+  adjustmentsEqual,
   DEFAULT_ADJUSTMENTS,
   FILTER_PRESETS,
   isIdentity,
+  normalizeAdjustments,
   type Adjustments,
 } from '../engine/filters';
-import type { Layer } from '../engine/types';
 import { useDreamStore } from '../store/dreamStore';
-import { rasterizeLayer } from './rasterize';
 import { useT } from './i18n';
 
 interface SliderDef {
@@ -42,66 +38,72 @@ const SLIDERS: SliderDef[] = [
   { key: 'sharpen', min: 0, max: 100 },
 ];
 
-function isRasterCapable(layer: Layer): boolean {
-  return layer.operations.some((op) => op.kind === 'image' || op.kind === 'fill');
-}
-
 export function AdjustPanel() {
   const t = useT();
   const doc = useDreamStore((s) => s.doc);
   const activeLayerId = useDreamStore((s) => s.activeLayerId);
   const layer = doc.layers.find((l) => l.id === activeLayerId);
-  const [adj, setAdj] = useState<Adjustments>({ ...DEFAULT_ADJUSTMENTS });
+  const persisted = useMemo(() => normalizeAdjustments(layer?.adjustments), [layer?.adjustments]);
+  const [draft, setDraft] = useState<{ layerId: string; adjustments: Adjustments } | null>(null);
+  const adj = draft && draft.layerId === layer?.id ? draft.adjustments : persisted;
+  const changed = !adjustmentsEqual(adj, persisted);
 
-  const rasterCapable = layer ? isRasterCapable(layer) : false;
+  const update = (adjustments: Adjustments) => {
+    if (!layer || layer.locked) return;
+    setDraft({ layerId: layer.id, adjustments });
+  };
 
-  // Base raster for previews; recomputed whenever the layer content changes.
-  const base = useMemo(
-    () => (layer && rasterCapable ? rasterizeLayer(layer, doc.width, doc.height) : null),
-    [layer, rasterCapable, doc.width, doc.height],
-  );
-
-  // Push the live preview into the store; identity adjustments show the original.
+  // The document stays untouched until Apply; the canvas renders this session
+  // value through the exact same layer compositor used after commit.
   useEffect(() => {
     const store = useDreamStore.getState();
-    if (!base || !layer || isIdentity(adj)) {
+    if (!layer || !changed) {
       if (store.adjustPreview) store.setAdjustPreview(null);
       return;
     }
-    store.setAdjustPreview({ layerId: layer.id, buffer: applyAdjustments(base, adj) });
-  }, [base, adj, layer]);
+    store.setAdjustPreview({ layerId: layer.id, adjustments: adj });
+  }, [adj, changed, layer]);
 
   // Switching layers or unmounting discards any in-progress preview.
   useEffect(() => {
-    setAdj({ ...DEFAULT_ADJUSTMENTS });
+    setDraft(null);
     return () => useDreamStore.getState().setAdjustPreview(null);
   }, [activeLayerId]);
 
   if (!layer || layer.operations.length === 0) return null;
 
   const store = useDreamStore.getState;
-  const identity = isIdentity(adj);
-
   const apply = () => {
-    if (!base) return;
-    store().applyLayerRaster(applyAdjustments(base, adj));
-    setAdj({ ...DEFAULT_ADJUSTMENTS });
+    if (!layer || layer.locked || !changed) return;
+    store().setLayerAdjustments(layer.id, adj);
+    setDraft(null);
   };
 
   const cancel = () => {
     store().setAdjustPreview(null);
-    setAdj({ ...DEFAULT_ADJUSTMENTS });
+    setDraft(null);
   };
 
   return (
     <section className="panel adjust-panel" aria-label={t('adjust.title')}>
-      <h2 className="panel-title">{t('adjust.title')}</h2>
+      <h2 className="panel-title">
+        {t('adjust.title')}
+        <span
+          className="panel-badge"
+          tabIndex={0}
+          aria-label={t('adjust.editableHint')}
+          data-tooltip={t('adjust.editableHint')}
+        >
+          {t('adjust.editable')}
+        </span>
+      </h2>
 
       <div className="option-row transform-actions">
         <button
           type="button"
           className="btn"
           aria-label={t('adjust.flipH')}
+          disabled={layer.locked}
           onClick={() => store().flipLayer('horizontal')}
           data-tooltip={t('adjust.flipHTitle')}
         >
@@ -111,6 +113,7 @@ export function AdjustPanel() {
           type="button"
           className="btn"
           aria-label={t('adjust.flipV')}
+          disabled={layer.locked}
           onClick={() => store().flipLayer('vertical')}
           data-tooltip={t('adjust.flipVTitle')}
         >
@@ -120,6 +123,7 @@ export function AdjustPanel() {
           type="button"
           className="btn"
           aria-label={t('adjust.rotateCcwTitle')}
+          disabled={layer.locked}
           onClick={() => store().rotateLayer('ccw')}
           data-tooltip={t('adjust.rotateCcwTitle')}
         >
@@ -129,6 +133,7 @@ export function AdjustPanel() {
           type="button"
           className="btn"
           aria-label={t('adjust.rotateCwTitle')}
+          disabled={layer.locked}
           onClick={() => store().rotateLayer('cw')}
           data-tooltip={t('adjust.rotateCwTitle')}
         >
@@ -136,56 +141,62 @@ export function AdjustPanel() {
         </button>
       </div>
 
-      {rasterCapable && (
-        <>
-          <div className="option-row preset-row">
-            {FILTER_PRESETS.map((preset) => (
-              <button
-                key={preset.id}
-                type="button"
-                className="btn"
-                onClick={() => setAdj({ ...preset.adjustments })}
-              >
-                {t(`adjust.preset.${preset.id}`)}
-              </button>
-            ))}
-          </div>
-
-          {SLIDERS.map(({ key, min, max, unit }) => (
-            <label className="option-row" key={key}>
-              <span className="option-label">{t(`adjust.${key}`)}</span>
-              <input
-                type="range"
-                min={min}
-                max={max}
-                value={adj[key]}
-                onChange={(e) => setAdj({ ...adj, [key]: Number(e.target.value) })}
-              />
-              <span className="option-value">
-                {adj[key]}
-                {unit ?? ''}
-              </span>
-            </label>
-          ))}
-
-          <div className="option-row adjust-actions">
-            <button type="button" className="btn primary" disabled={identity} onClick={apply}>
-              {t('common.apply')}
-            </button>
-            <button type="button" className="btn" disabled={identity} onClick={cancel}>
-              {t('common.cancel')}
-            </button>
+      <>
+        <div className="option-row preset-row">
+          {FILTER_PRESETS.map((preset) => (
             <button
+              key={preset.id}
               type="button"
               className="btn"
-              disabled={identity}
-              onClick={() => setAdj({ ...DEFAULT_ADJUSTMENTS })}
+              disabled={layer.locked}
+              aria-pressed={adjustmentsEqual(adj, preset.adjustments)}
+              onClick={() => update({ ...preset.adjustments })}
             >
-              {t('common.reset')}
+              {t(`adjust.preset.${preset.id}`)}
             </button>
-          </div>
-        </>
-      )}
+          ))}
+        </div>
+
+        {SLIDERS.map(({ key, min, max, unit }) => (
+          <label className="option-row" key={key}>
+            <span className="option-label">{t(`adjust.${key}`)}</span>
+            <input
+              type="range"
+              min={min}
+              max={max}
+              value={adj[key]}
+              disabled={layer.locked}
+              onChange={(e) => update({ ...adj, [key]: Number(e.target.value) })}
+            />
+            <span className="option-value">
+              {adj[key]}
+              {unit ?? ''}
+            </span>
+          </label>
+        ))}
+
+        <div className="option-row adjust-actions">
+          <button
+            type="button"
+            className="btn primary"
+            disabled={!changed || layer.locked}
+            onClick={apply}
+          >
+            {t('common.apply')}
+          </button>
+          <button type="button" className="btn" disabled={!changed} onClick={cancel}>
+            {t('common.cancel')}
+          </button>
+          <button
+            type="button"
+            className="btn"
+            disabled={isIdentity(adj) || layer.locked}
+            onClick={() => update({ ...DEFAULT_ADJUSTMENTS })}
+          >
+            {t('common.reset')}
+          </button>
+        </div>
+      </>
     </section>
   );
 }

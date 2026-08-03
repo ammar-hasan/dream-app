@@ -7,6 +7,12 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Editable layer adjustments** (slice 72): the full color/filter set now
+  saves as revisitable layer settings instead of flattening original marks.
+  Exact live preview, Apply/Cancel/Reset, Undo, `.dream`, raster delivery and
+  agent read/write share the same contract; visible adjusted work refuses an
+  untruthful SVG, and older projects recover neutral settings.
+
 - **Truthful live layer previews** (slice 71): drawing, whole-layer movement,
   selection transforms, adjustments and wand movement now preview inside the
   owning layer at its real stack position. Opacity and blend modes apply before

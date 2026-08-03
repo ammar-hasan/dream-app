@@ -19,16 +19,15 @@ are roughly ordered by dependency, not by a fixed schedule.
 - ✅ Per-layer raster filters: brightness, contrast, saturation, hue, grayscale,
   sepia, invert, blur (box) and sharpen (3x3 kernel) — pure functions in
   `engine/filters.ts` with unit tests on synthetic pixel buffers.
-- ✅ Live preview on a scratch canvas; Apply bakes one undoable raster command
-  (RasterPatch-style, like flood fill), Cancel discards. Presets: B&W, Vintage,
-  Cool, Warm.
+- ✅ Live preview; Apply saves one undoable editable layer effect without
+  replacing original marks, Cancel restores saved settings. Presets: B&W,
+  Vintage, Cool, Warm. (Upgraded from the original baked model in slice 72.)
 - ✅ Move tool for layer content; per-layer flip H/V and rotate 90° CW/CCW;
   crop tool (whole document) and resize dialog (scale-to-fit, nearest sampling).
 - ✅ Export flattened PNG or JPEG (quality setting), including imported images
   and filter results.
-- Deviation from the original note: applied filters are baked into a single
-  raster op (undoable, like Photoshop's destructive apply) rather than kept as a
-  reorderable filter stack — simpler and consistent with the baked fill model.
+- Current scope is one complete revisitable settings object per layer rather
+  than a reorderable stack; masks and stacked effects remain future depth.
 
 ## Slice 3 — Design mode: layers, components & selection ✅
 
@@ -1593,6 +1592,28 @@ visibly misleading.
 - ✅ Full release gates remain green: 883 unit tests, 97.18% engine coverage,
   59 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 72 — Editable layer adjustments ✅
+
+Persona need: let Ali and every experimenting creator change the mood of work
+without sacrificing the real strokes, shapes, type or pixels they may need to
+refine later.
+
+- ✅ Brightness, contrast, saturation, hue, grayscale, sepia, invert, blur and
+  sharpen now save as editable active-layer settings. Apply is one undoable
+  decision, Cancel restores the last saved appearance, Reset remains a preview
+  and a visible Editable explanation makes the preservation promise explicit.
+- ✅ The effect applies to the layer's flattened appearance before blending, so
+  original operations and future marks stay independently editable while
+  canvas, cached rendering, raster delivery, animation and prototypes agree.
+- ✅ Settings survive `.dream`, older or malformed values recover safely, and
+  agent layer read/write exposes the complete validated contract. Honest SVG is
+  withheld for a visible non-neutral effect rather than approximating pixels.
+- ✅ A real browser applies grayscale to a native red stroke, adds and undoes a
+  later blue stroke beneath the saved effect, previews Reset, cancels back to
+  the saved effect and finally undoes only the adjustment.
+- ✅ Full release gates remain green: 888 unit tests, 97.54% engine coverage,
+  60 browser journeys, 25 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1612,10 +1633,11 @@ largest count of controls:
    clarification and repair, literacy-light controls and export beyond the
    task-prioritized shell/dock, and a faithful safe creation path that does not
    require a child or low-literacy user to configure an AI provider.
-3. **Professional substrate:** core portable layer blending is established;
-   continue with non-destructive masks/adjustments and color foundations, then
-   vector paths, typography, grids, constraints and linked reusable systems—
-   Design-only, preserving Draw's first-minute simplicity.
+3. **Professional substrate:** core portable layer blending and editable
+   per-layer adjustments are established; continue with masks, effect stacks
+   and color foundations, then vector paths, typography, grids, constraints and
+   linked reusable systems—progressively disclosed without crowding first-minute
+   Draw.
 4. **Outcome-grade delivery:** publication preflight for scientific figures,
    professional brand/print export, and short-video audio/caption/safe-zone
    control.

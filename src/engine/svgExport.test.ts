@@ -104,6 +104,16 @@ describe('SVG export', () => {
     expect(buildSvg(doc)).toContain('style="mix-blend-mode:overlay"');
   });
 
+  it('refuses a visible layer whose editable adjustments require raster pixels', () => {
+    const doc = withOps([]);
+    doc.layers[0] = {
+      ...doc.layers[0],
+      adjustments: { ...doc.layers[0].adjustments!, brightness: 20 },
+    };
+    expect(canExportSvg(doc)).toBe(false);
+    expect(() => buildSvg(doc)).toThrow(/vector-safe/);
+  });
+
   it('refuses visible pixel content or erasers but ignores hidden unsupported layers', () => {
     const fill: Operation = {
       kind: 'fill',

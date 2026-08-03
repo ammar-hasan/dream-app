@@ -232,8 +232,8 @@ and the language picker.
   starter scenes, all procedurally generated (no assets), one undo per stamp
 - Comfort mode: a senior-friendly settings toggle — larger text/targets and
   higher-contrast tokens, composing with dark theme, kid mode and RTL
-- Layers: add, delete, rename, reorder, visibility, opacity, Design-only blend mode,
-  lock — all undoable
+- Layers: add, delete, rename, reorder, visibility, opacity, Design-only blend
+  mode, editable adjustments, lock — all undoable
 - Image import: file picker, drag-and-drop onto the canvas, or paste from the
   clipboard — each image lands centered on its own layer (scaled down to fit);
   valid image/component drags and invalid content get distinct named targets
@@ -241,7 +241,8 @@ and the language picker.
   CW/CCW per layer (around the layer's own content, so it stays in place)
 - Adjust panel: brightness, contrast, saturation, hue, grayscale, sepia, invert,
   blur (box) and sharpen (3x3 kernel) with live preview and B&W / Vintage / Cool /
-  Warm presets — Apply bakes one undoable raster command, Cancel discards
+  Warm presets — Apply saves one undoable editable effect without flattening
+  original marks; Cancel restores the last saved settings
 - Crop tool (drag a rectangle, Apply or Enter) and a Resize dialog that scales
   the document and its content to fit (nearest-neighbor for raster pixels)
 - Undo/redo across every operation (200-step command history)

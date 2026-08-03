@@ -45,7 +45,7 @@ import {
   updateLayerCommand,
 } from '../engine/history';
 import { createHotspot, MIN_HOTSPOT_SIZE } from '../engine/hotspots';
-import type { PixelBuffer } from '../engine/filters';
+import type { Adjustments, PixelBuffer } from '../engine/filters';
 import { distance, normalizeRect, pointInRect } from '../engine/geometry';
 import {
   alignOps,
@@ -171,10 +171,10 @@ export interface WandDraft {
   offset: Point;
 }
 
-/** Live filter preview that replaces a layer's rendering while adjusting. */
+/** Session-only layer settings shown live before one Apply/Cancel decision. */
 export interface AdjustPreview {
   layerId: string;
-  buffer: PixelBuffer;
+  adjustments: Adjustments;
 }
 
 export type CornerHandle = 'nw' | 'ne' | 'sw' | 'se';
@@ -337,12 +337,13 @@ export interface DreamStore {
   setLayerVisibility(id: string, visible: boolean): void;
   setLayerOpacity(id: string, opacity: number): void;
   setLayerBlendMode(id: string, blendMode: LayerBlendMode): void;
+  setLayerAdjustments(id: string, adjustments: Adjustments): void;
   setLayerLocked(id: string, locked: boolean): void;
   moveLayer(id: string, toIndex: number): void;
 
   /** Place a decoded image as a new layer, centered (scaled down to fit). */
   importImage(buffer: PixelBuffer, name?: string): void;
-  /** Show (or clear) the live filter preview for a layer. */
+  /** Show (or clear) session-only non-destructive settings before Apply. */
   setAdjustPreview(preview: AdjustPreview | null): void;
   /** Bake the previewed raster into the layer as an undoable command. */
   applyLayerRaster(buffer: PixelBuffer, label?: string): void;
@@ -1303,6 +1304,11 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
 
     setLayerBlendMode: (id, blendMode) =>
       execute(updateLayerCommand(get().doc, id, { blendMode }, 'Layer blend mode')),
+
+    setLayerAdjustments: (id, adjustments) => {
+      execute(updateLayerCommand(get().doc, id, { adjustments }, 'Layer adjustments'));
+      set({ adjustPreview: null });
+    },
 
     setLayerLocked: (id, locked) =>
       execute(updateLayerCommand(get().doc, id, { locked }, 'Toggle layer lock')),

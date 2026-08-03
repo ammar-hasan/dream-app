@@ -4,7 +4,7 @@
  * Redrawing a big document on every pointermove (stroke previews, pan, zoom)
  * re-issues every operation; this cache keeps one offscreen bitmap per layer
  * and only re-renders a layer when its content actually changed — immutable
- * updates mean a new `operations` reference or a new opacity — then
+ * updates mean a new `operations`/adjustments reference or a new opacity — then
  * composites the bitmaps with one `drawImage` per layer.
  *
  * DOM-free like the rest of the engine: bitmap canvases come from the
@@ -21,7 +21,7 @@
  *   directly, capping bitmap memory (~4 bytes/pixel/bitmap).
  */
 
-import { compositeLayerBitmap, renderCompositedLayer, renderLayer } from './renderer';
+import { compositeLayerBitmap, renderCompositedLayer, renderLayerBitmap } from './renderer';
 import type { CanvasLike, RenderOptions, Renderer2D } from './renderer';
 import type { DreamDocument, Layer } from './types';
 
@@ -34,6 +34,7 @@ const DEFAULT_MAX_ENTRIES = 16;
 interface LayerEntry {
   operations: Layer['operations'];
   opacity: number;
+  adjustments: Layer['adjustments'];
   canvas: CanvasLike;
 }
 
@@ -157,16 +158,24 @@ export class LayerCache {
 
   private entryFor(doc: DreamDocument, layer: Layer): LayerEntry {
     const hit = this.entries.get(layer.id);
-    if (hit && hit.operations === layer.operations && hit.opacity === layer.opacity) {
+    if (
+      hit &&
+      hit.operations === layer.operations &&
+      hit.opacity === layer.opacity &&
+      hit.adjustments === layer.adjustments
+    ) {
       // LRU: re-insert to mark as most recently used.
       this.entries.delete(layer.id);
       this.entries.set(layer.id, hit);
       return hit;
     }
-    const canvas = this.createCanvas(doc.width, doc.height);
-    const layerCtx = canvas.getContext('2d');
-    if (layerCtx) renderLayer(layer, layerCtx, this.opts);
-    const entry: LayerEntry = { operations: layer.operations, opacity: layer.opacity, canvas };
+    const canvas = renderLayerBitmap(layer, doc.width, doc.height, this.opts);
+    const entry: LayerEntry = {
+      operations: layer.operations,
+      opacity: layer.opacity,
+      adjustments: layer.adjustments,
+      canvas,
+    };
     this.deleteEntry(layer.id);
     this.entries.set(layer.id, entry);
     while (this.entries.size > this.maxEntries) {

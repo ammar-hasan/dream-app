@@ -28,15 +28,33 @@ absent as the default, and writers may omit defaults.
 
 ## Layer
 
-| Attribute    | Type                                                             | Default                 | Rule                                                       |
-| ------------ | ---------------------------------------------------------------- | ----------------------- | ---------------------------------------------------------- |
-| `id`         | string                                                           | generated               |                                                            |
-| `name`       | string                                                           | `"Layer"` / `"Layer N"` | user-renameable                                            |
-| `visible`    | boolean                                                          | `true`                  |                                                            |
-| `opacity`    | number                                                           | `1`                     | 0–1; multiplies every operation's alpha                    |
-| `blendMode`  | `'normal'\|'multiply'\|'screen'\|'overlay'\|'darken'\|'lighten'` | `'normal'`              | combines the flattened layer with visible artwork below it |
-| `locked`     | boolean                                                          | `false`                 | rejects all content edits                                  |
-| `operations` | Operation[]                                                      | `[]`                    | bottom-to-top paint order                                  |
+| Attribute     | Type                                                             | Default                 | Rule                                                       |
+| ------------- | ---------------------------------------------------------------- | ----------------------- | ---------------------------------------------------------- |
+| `id`          | string                                                           | generated               |                                                            |
+| `name`        | string                                                           | `"Layer"` / `"Layer N"` | user-renameable                                            |
+| `visible`     | boolean                                                          | `true`                  |                                                            |
+| `opacity`     | number                                                           | `1`                     | 0–1; multiplies every operation's alpha                    |
+| `blendMode`   | `'normal'\|'multiply'\|'screen'\|'overlay'\|'darken'\|'lighten'` | `'normal'`              | combines the flattened layer with visible artwork below it |
+| `adjustments` | AdjustmentSettings                                               | all neutral             | editable effects applied without replacing operations      |
+| `locked`      | boolean                                                          | `false`                 | rejects all content edits                                  |
+| `operations`  | Operation[]                                                      | `[]`                    | bottom-to-top paint order                                  |
+
+### AdjustmentSettings
+
+| Attribute    | Range     | Default | Rule                                      |
+| ------------ | --------- | ------: | ----------------------------------------- |
+| `brightness` | −100…100  |       0 | additive light shift                      |
+| `contrast`   | −100…100  |       0 | tone spread around mid-gray               |
+| `saturation` | −100…100  |       0 | chroma scale                              |
+| `hue`        | −180…180° |       0 | luminance-preserving color-wheel rotation |
+| `grayscale`  | 0…100     |       0 | mix toward luminance gray                 |
+| `sepia`      | 0…100     |       0 | mix toward warm-brown tones               |
+| `invert`     | 0…100     |       0 | mix toward the color negative             |
+| `blur`       | 0…20 px   |       0 | box-blur radius                           |
+| `sharpen`    | 0…100     |       0 | mix toward a crispness kernel             |
+
+The complete settings object is saved on the layer. It affects the layer's
+flattened appearance but never replaces its operation list.
 
 ## Operation — shared base
 
@@ -89,7 +107,7 @@ A flood fill baked to pixels when committed.
 
 ### Image (`kind: 'image'`)
 
-Imported images, baked filter results, wand moves, AI pictures.
+Imported images, AI pixel-edit results, wand moves, AI pictures.
 
 | Attribute | Type         | Rule                                             |
 | --------- | ------------ | ------------------------------------------------ |

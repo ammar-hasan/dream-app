@@ -17,9 +17,9 @@ byte-compatible with the browser app, and vice versa.
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | `dream.read_project`   | Summary of a `.dream` file: size, background, mode, layer/frame counts, hotspots (incl. broken), op counts per kind, game setup. |
 | `dream.create_project` | Create a new `.dream` file: `path`, `width`, `height`, optional `background`, `name`.                                            |
-| `dream.list_layers`    | Layer stack(s): id, name, visibility, opacity, blend mode, lock, op count — plus a per-frame breakdown for animated documents.   |
+| `dream.list_layers`    | Layer stack(s): id, name, visibility, opacity, blend mode, editable adjustments, lock, op count — plus animated frame breakdown. |
 | `dream.add_layer`      | Add a new top layer to the active frame, with an optional `name`.                                                                |
-| `dream.update_layer`   | Rename, show/hide, set opacity/blend mode, lock/unlock or move a layer to a zero-based stack index.                              |
+| `dream.update_layer`   | Rename, show/hide, set opacity/blend mode/partial editable adjustments, lock/unlock or move a layer by zero-based stack index.   |
 | `dream.remove_layer`   | Remove a layer by id or name from the active frame; refuses to remove the final layer.                                           |
 | `dream.add_stroke`     | Append a validated brush/pencil/eraser polyline with optional pressure, style and target layer.                                  |
 | `dream.add_text`       | Append a text op: `text`, `x`, `y`, optional `size`, `color`, `fontFamily`, `layer` (id or name; default: top layer).            |

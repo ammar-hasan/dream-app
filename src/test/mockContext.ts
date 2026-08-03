@@ -58,6 +58,10 @@ export class MockContext2D implements Renderer2D {
   fillRect(x: number, y: number, w: number, h: number): void {
     this.record('fillRect', x, y, w, h);
   }
+  getImageData(sx: number, sy: number, sw: number, sh: number) {
+    this.record('getImageData', sx, sy, sw, sh);
+    return { data: new Uint8ClampedArray(sw * sh * 4), width: sw, height: sh };
+  }
   putImageData(image: unknown, dx: number, dy: number): void {
     this.record('putImageData', image, dx, dy);
   }
