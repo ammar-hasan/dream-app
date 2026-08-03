@@ -68,6 +68,8 @@ export interface VoiceResult {
   message: string;
   /** Set when the command needs a spoken yes/no before it runs. */
   awaitConfirm?: 'clear';
+  /** Set when Dream needs one directional answer before moving artwork. */
+  awaitClarify?: 'selection-direction';
 }
 
 export interface VoiceExecutorContext {
@@ -200,6 +202,14 @@ export function executeVoiceCommand(
       if (!store.selectionTransformable) return { message: t('voice.selectionLocked') };
       store.duplicateSelection();
       return { message: t('voice.selectionDuplicated') };
+
+    case 'clarify-selection-move':
+      if (store.selectionCount === 0) return { message: t('voice.selectionMoveNeeded') };
+      if (!store.selectionTransformable) return { message: t('voice.selectionLocked') };
+      return {
+        message: t('voice.selectionMoveWhichWay'),
+        awaitClarify: 'selection-direction',
+      };
 
     case 'move-selection': {
       if (context) context.lastNudge = null;

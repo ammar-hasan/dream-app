@@ -220,7 +220,10 @@ Simplified Chinese, Brazilian Portuguese and Russian phrases, precedence rules a
 - Voice also has a compact conversation surface: listening is visible, the
   growing transcript shows what Dream hears, the interpreted phrase stays with
   its result, and the same localized command can be typed when recognition is
-  unavailable. Results and errors are announced without moving focus.
+  unavailable. Results and errors are announced without moving focus. When a
+  selected-object movement request omits its direction, Dream asks instead of
+  guessing and offers four labelled direction choices beside the spoken and
+  typed answer paths.
 - Every destructive or surprising action is either undoable (almost
   everything) or asks first (voice "clear").
 - Tooltips show name + shortcut everywhere except kid mode.

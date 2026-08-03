@@ -379,6 +379,25 @@ describe('executeVoiceCommand', () => {
     expect(locked.centerSelection).not.toHaveBeenCalled();
   });
 
+  it('clarifies an ambiguous move only when artwork can move', () => {
+    const empty = makeStore();
+    expect(
+      executeVoiceCommand({ kind: 'clarify-selection-move' }, empty, () => {})?.message,
+    ).toMatch(/select something first/i);
+
+    const selected = makeStore({ selectionCount: 1, selectionTransformable: true });
+    expect(executeVoiceCommand({ kind: 'clarify-selection-move' }, selected, () => {})).toEqual({
+      message: 'Which way — left, right, up or down?',
+      awaitClarify: 'selection-direction',
+    });
+    expect(selected.nudgeSelection).not.toHaveBeenCalled();
+
+    const locked = makeStore({ selectionCount: 1, selectionTransformable: false });
+    expect(
+      executeVoiceCommand({ kind: 'clarify-selection-move' }, locked, () => {})?.message,
+    ).toMatch(/locked/i);
+  });
+
   it('places only an editable visible selection at a named canvas edge', () => {
     const empty = makeStore();
     expect(

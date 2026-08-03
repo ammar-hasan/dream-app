@@ -192,7 +192,10 @@ Modern interaction craft should make state legible rather than add spectacle:
   programmatically announced results. Browser speech recognition is still not
   universally available and may depend on a remote service, so Dream shows the
   live transcript and result while preserving the same intent surface through
-  typing instead of treating speech as a binary capability.
+  typing instead of treating speech as a binary capability. When a request is
+  incomplete, a small explicit choice set should reveal what Dream needs,
+  preserve the original context and make no speculative edit; the same choice
+  must remain available through speech, touch, mouse and keyboard.
   (https://developer.apple.com/design/human-interface-guidelines/design-principles ·
   https://developer.apple.com/design/human-interface-guidelines/feedback ·
   https://www.w3.org/WAI/WCAG22/Understanding/status-messages ·

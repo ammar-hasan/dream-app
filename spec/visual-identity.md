@@ -141,6 +141,10 @@ Text `#0f141f` / `#ffffff`, dim text `#454d61` / `#ccd4e8`, borders
     state label and live transcript carry the meaning, so motion and sound are
     never the sole signal. The conversation card enters like other popovers and
     becomes instant under reduced motion.
+11. A voice clarification presents its finite answers as compact labelled
+    buttons with redundant directional arrows. The buttons use the ordinary
+    focus, hover and comfort-target language; no animation or color alone
+    communicates the choice.
 
 ## Video captions
 

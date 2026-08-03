@@ -1489,6 +1489,30 @@ heard and recover when a browser or microphone cannot recognize speech.
 - ✅ Full release gates remain green: 872 unit tests, 97.74% engine coverage,
   55 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 67 — Voice asks instead of guessing ✅
+
+Persona need: let Zainab and George speak an incomplete instruction naturally,
+understand the missing choice and finish it without restarting or risking an
+unexpected edit.
+
+- ✅ With editable selected artwork, “move it” changes nothing and asks whether
+  to move left, right, up or down. Missing and locked selections keep their
+  existing truthful guidance instead of opening an impossible follow-up.
+- ✅ The next one-word direction works through speech or typing in English,
+  Arabic, Persian, Simplified Chinese, Brazilian Portuguese and Russian. The
+  resolved 10 px nudge becomes the one safe action that “again” may repeat.
+- ✅ Four compact, labelled direction choices provide a visible touch, mouse
+  and keyboard route. Unknown answers repeat the question, Cancel cancels, and
+  another valid command replaces the pending question.
+- ✅ Browser coverage proves no movement before the answer, a spoken follow-up,
+  the visible-choice path, repair behavior and serious accessibility scans.
+- ✅ The rendered 390×844 review keeps the four-way control clear and catches
+  the unsupported-mic explanation escaping into an oversized toolbar tooltip;
+  the tooltip now stays a compact action label while the full message remains
+  in the conversation.
+- ✅ Full release gates remain green: 875 unit tests, 97.74% engine coverage,
+  55 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1500,13 +1524,13 @@ largest count of controls:
    item-level story/video progress; continue with other operations where
    multi-item work can become opaque.
 2. **Conversational phone-first creation:** natural clarification and reference
-   handling for voice now covers selected-object identity, color, size and basic
-   position plus canvas-edge targets. Listening, transcription, results, retry
-   and the identical typed fallback are now visible; continue with relationships
-   between objects, broader multi-turn clarification and repair, literacy-light
-   controls and export beyond the task-prioritized shell/dock, and a faithful
-   safe creation path that does not require a child or low-literacy user to
-   configure an AI provider.
+   handling for voice now covers selected-object identity, color, size, basic
+   position, canvas-edge targets and a bounded missing-direction follow-up.
+   Listening, transcription, results, retry and the identical typed fallback
+   are visible; continue with relationships between objects, broader
+   clarification and repair, literacy-light controls and export beyond the
+   task-prioritized shell/dock, and a faithful safe creation path that does not
+   require a child or low-literacy user to configure an AI provider.
 3. **Professional substrate:** non-destructive masks/adjustments and blend/color
    foundations, then vector paths, typography, grids, constraints and linked
    reusable systems—Design-only, preserving Draw's first-minute simplicity.

@@ -3088,6 +3088,26 @@ textarea:focus-visible,
   font: inherit;
 }
 
+.voice-direction-choices {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.voice-direction-choices .btn {
+  display: grid;
+  min-width: 0;
+  min-height: 52px;
+  padding-inline: 6px;
+  font-size: 12px;
+}
+
+.voice-direction-choices .btn span {
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1;
+}
+
 .voice-retry {
   justify-self: start;
 }

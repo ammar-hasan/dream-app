@@ -1,7 +1,12 @@
 /** Voice-command parser: intents, filler tolerance, color vocabulary. */
 
 import { describe, expect, it } from 'vitest';
-import { COLOR_WORDS, parseVoiceCommand, tokenize } from './voiceCommands';
+import {
+  COLOR_WORDS,
+  parseVoiceCommand,
+  parseVoiceDirectionAnswer,
+  tokenize,
+} from './voiceCommands';
 
 describe('tokenize', () => {
   it('lowercases, drops punctuation and removes filler words', () => {
@@ -49,6 +54,35 @@ describe('parseVoiceCommand — history & document', () => {
       direction: 'center',
     });
     expect(parseVoiceCommand('left')).toBeNull();
+  });
+
+  it('asks for a missing direction and accepts only a contextual answer', () => {
+    expect(parseVoiceCommand('please move it')).toEqual({ kind: 'clarify-selection-move' });
+    expect(parseVoiceDirectionAnswer('left')).toBe('left');
+    expect(parseVoiceDirectionAnswer('please go right')).toBe('right');
+    expect(parseVoiceDirectionAnswer('delete it')).toBeNull();
+    expect(parseVoiceCommand('right')).toBeNull();
+  });
+
+  it('understands direction clarification in every supported locale', () => {
+    expect(parseVoiceCommand('حرّك هذا', 'ar')).toEqual({ kind: 'clarify-selection-move' });
+    expect(parseVoiceDirectionAnswer('اليسار', 'ar')).toBe('left');
+    expect(parseVoiceCommand('این را حرکت بده', 'fa')).toEqual({
+      kind: 'clarify-selection-move',
+    });
+    expect(parseVoiceDirectionAnswer('راست', 'fa')).toBe('right');
+    expect(parseVoiceCommand('移动它', 'zh')).toEqual({ kind: 'clarify-selection-move' });
+    expect(parseVoiceDirectionAnswer('向上', 'zh')).toBe('up');
+    expect(parseVoiceCommand('请移动它一下', 'zh')).toEqual({
+      kind: 'clarify-selection-move',
+    });
+    expect(parseVoiceDirectionAnswer('请向右一下', 'zh')).toBe('right');
+    expect(parseVoiceCommand('mova isso', 'pt')).toEqual({ kind: 'clarify-selection-move' });
+    expect(parseVoiceDirectionAnswer('para baixo', 'pt')).toBe('down');
+    expect(parseVoiceCommand('перемести это', 'ru')).toEqual({
+      kind: 'clarify-selection-move',
+    });
+    expect(parseVoiceDirectionAnswer('вправо', 'ru')).toBe('right');
   });
 
   it('distinguishes canvas-edge placement from incremental movement', () => {

@@ -13,6 +13,8 @@
 
 import type { Color, GameTemplateId, ToolId } from '../engine/types';
 
+export type SelectionDirection = 'left' | 'right' | 'up' | 'down';
+
 export type VoiceCommand =
   | { kind: 'undo' }
   | { kind: 'redo' }
@@ -46,6 +48,8 @@ export type VoiceCommand =
   | { kind: 'duplicate-selection' }
   /** Move the visible selection by a predictable step, or center it on the canvas. */
   | { kind: 'move-selection'; direction: 'left' | 'right' | 'up' | 'down' | 'center' }
+  /** “Move it” needs a direction before anything changes. */
+  | { kind: 'clarify-selection-move' }
   /** Place the visible selection flush with a named canvas edge. */
   | { kind: 'place-selection'; edge: 'left' | 'right' | 'top' | 'bottom' }
   /** Repeat only the immediately preceding successful directional nudge. */
@@ -205,6 +209,8 @@ export interface VoiceVocabulary {
   selectionDeletePhrases: string[];
   selectionDuplicatePhrases: string[];
   selectionMovePhrases: Record<'left' | 'right' | 'up' | 'down' | 'center', string[]>;
+  selectionMoveClarifyPhrases: string[];
+  selectionDirectionAnswers: Record<SelectionDirection, string[]>;
   selectionPlacePhrases: Record<'left' | 'right' | 'top' | 'bottom', string[]>;
   selectionRepeatPhrases: string[];
   selectionReferences: string[];
@@ -298,6 +304,13 @@ const EN_VOCAB: VoiceVocabulary = {
       'put it in the center',
       'put it in the centre',
     ],
+  },
+  selectionMoveClarifyPhrases: ['move it', 'move that', 'move this', 'move selection'],
+  selectionDirectionAnswers: {
+    left: ['left', 'to the left'],
+    right: ['right', 'to the right'],
+    up: ['up', 'upward'],
+    down: ['down', 'downward'],
   },
   selectionPlacePhrases: {
     left: ['put it on the left', 'put that on the left', 'move it to the left edge'],
@@ -421,6 +434,13 @@ const AR_VOCAB: VoiceVocabulary = {
     down: ['حرك هذا للاسفل', 'حرك هذا الي الاسفل', 'حرك التحديد للاسفل'],
     center: ['ضع هذا في المنتصف', 'وسط هذا', 'وسط التحديد'],
   },
+  selectionMoveClarifyPhrases: ['حرك هذا', 'حركها', 'حرك التحديد'],
+  selectionDirectionAnswers: {
+    left: ['يسار', 'اليسار'],
+    right: ['يمين', 'اليمين'],
+    up: ['فوق', 'اعلى', 'الاعلى'],
+    down: ['تحت', 'اسفل', 'الاسفل'],
+  },
   selectionPlacePhrases: {
     left: ['ضع هذا عند الحافة اليسرى', 'ضع هذا علي اليسار'],
     right: ['ضع هذا عند الحافة اليمنى', 'ضع هذا علي اليمين'],
@@ -543,6 +563,13 @@ const FA_VOCAB: VoiceVocabulary = {
     down: ['این را پایین ببر', 'این رو پایین ببر', 'انتخاب را پایین ببر'],
     center: ['این را وسط بگذار', 'این رو وسط بگذار', 'انتخاب را وسط بگذار'],
   },
+  selectionMoveClarifyPhrases: ['این را حرکت بده', 'این رو حرکت بده', 'انتخاب را حرکت بده'],
+  selectionDirectionAnswers: {
+    left: ['چپ', 'به چپ'],
+    right: ['راست', 'به راست'],
+    up: ['بالا', 'به بالا'],
+    down: ['پایین', 'به پایین'],
+  },
   selectionPlacePhrases: {
     left: ['این را کنار چپ بگذار', 'این را در لبه چپ بگذار'],
     right: ['این را کنار راست بگذار', 'این را در لبه راست بگذار'],
@@ -648,6 +675,13 @@ const ZH_VOCAB: VoiceVocabulary = {
     up: ['把这个向上移动', '把它移到上面', '选中内容向上移动'],
     down: ['把这个向下移动', '把它移到下面', '选中内容向下移动'],
     center: ['把这个放到中间', '把它放到中间', '选中内容居中'],
+  },
+  selectionMoveClarifyPhrases: ['移动它', '移动这个', '移动选中内容'],
+  selectionDirectionAnswers: {
+    left: ['左', '左边', '向左'],
+    right: ['右', '右边', '向右'],
+    up: ['上', '上面', '向上'],
+    down: ['下', '下面', '向下'],
   },
   selectionPlacePhrases: {
     left: ['把这个放到左边', '把它移到画布左边'],
@@ -784,6 +818,13 @@ const PT_VOCAB: VoiceVocabulary = {
     up: ['mova isso para cima', 'mover seleção para cima'],
     down: ['mova isso para baixo', 'mover seleção para baixo'],
     center: ['centralize isso', 'coloque isso no centro', 'centralizar seleção'],
+  },
+  selectionMoveClarifyPhrases: ['mova isso', 'mover isso', 'mover seleção'],
+  selectionDirectionAnswers: {
+    left: ['esquerda', 'para a esquerda'],
+    right: ['direita', 'para a direita'],
+    up: ['cima', 'para cima'],
+    down: ['baixo', 'para baixo'],
   },
   selectionPlacePhrases: {
     left: ['coloque isso na borda esquerda', 'coloque isso à esquerda'],
@@ -932,6 +973,13 @@ const RU_VOCAB: VoiceVocabulary = {
     down: ['перемести это вниз', 'сдвинь это вниз', 'перемести выделенное вниз'],
     center: ['помести это в центр', 'выровняй это по центру', 'выделенное по центру'],
   },
+  selectionMoveClarifyPhrases: ['перемести это', 'сдвинь это', 'перемести выделенное'],
+  selectionDirectionAnswers: {
+    left: ['влево', 'налево', 'лево'],
+    right: ['вправо', 'направо', 'право'],
+    up: ['вверх', 'наверх'],
+    down: ['вниз'],
+  },
   selectionPlacePhrases: {
     left: ['помести это у левого края', 'поставь это слева'],
     right: ['помести это у правого края', 'поставь это справа'],
@@ -1004,6 +1052,16 @@ function mergeVocabulary(base: VoiceVocabulary, extra: VoiceVocabulary): VoiceVo
       up: [...base.selectionMovePhrases.up, ...extra.selectionMovePhrases.up],
       down: [...base.selectionMovePhrases.down, ...extra.selectionMovePhrases.down],
       center: [...base.selectionMovePhrases.center, ...extra.selectionMovePhrases.center],
+    },
+    selectionMoveClarifyPhrases: [
+      ...base.selectionMoveClarifyPhrases,
+      ...extra.selectionMoveClarifyPhrases,
+    ],
+    selectionDirectionAnswers: {
+      left: [...base.selectionDirectionAnswers.left, ...extra.selectionDirectionAnswers.left],
+      right: [...base.selectionDirectionAnswers.right, ...extra.selectionDirectionAnswers.right],
+      up: [...base.selectionDirectionAnswers.up, ...extra.selectionDirectionAnswers.up],
+      down: [...base.selectionDirectionAnswers.down, ...extra.selectionDirectionAnswers.down],
     },
     selectionPlacePhrases: {
       left: [...base.selectionPlacePhrases.left, ...extra.selectionPlacePhrases.left],
@@ -1089,11 +1147,42 @@ export function tokenize(
     .filter((word) => word !== '' && !filler.has(word));
 }
 
+/** Remove locale filler while preserving the exact remaining utterance. */
+function exactVoicePhrase(transcript: string, filler: Set<string>, locale: string): string {
+  if (locale === 'zh') {
+    return [...filler]
+      .sort((a, b) => b.length - a.length)
+      .reduce((text, word) => text.replaceAll(word, ''), normalizeArabic(transcript).toLowerCase())
+      .replace(/[^\p{L}\p{N}]+/gu, '');
+  }
+  return tokenize(transcript, filler, locale).join(' ');
+}
+
 function has(tokens: Set<string>, words: Set<string>): boolean {
   for (const token of tokens) {
     if (words.has(token)) return true;
   }
   return false;
+}
+
+/** Parse only a one-word directional answer during an active clarification. */
+export function parseVoiceDirectionAnswer(
+  transcript: string,
+  locale = 'en',
+): SelectionDirection | null {
+  const vocab = vocabularyFor(locale);
+  const answer = exactVoicePhrase(transcript, vocab.filler, locale);
+  if (!answer) return null;
+  for (const direction of ['left', 'right', 'up', 'down'] as const) {
+    if (
+      vocab.selectionDirectionAnswers[direction].some(
+        (phrase) => exactVoicePhrase(phrase, vocab.filler, locale) === answer,
+      )
+    ) {
+      return direction;
+    }
+  }
+  return null;
 }
 
 function colorIn(
@@ -1236,6 +1325,14 @@ export function parseVoiceCommand(transcript: string, locale = 'en'): VoiceComma
     if (hasPhrase(normalized, ...vocab.selectionPlacePhrases[edge])) {
       return { kind: 'place-selection', edge };
     }
+  }
+  const exactSelectionMove = exactVoicePhrase(transcript, vocab.filler, locale);
+  if (
+    vocab.selectionMoveClarifyPhrases.some(
+      (phrase) => exactVoicePhrase(phrase, vocab.filler, locale) === exactSelectionMove,
+    )
+  ) {
+    return { kind: 'clarify-selection-move' };
   }
   const isClearAll = has(tokens, vocab.clear) || hasPhrase(normalized, ...vocab.clearPhrases);
   if (isClearAll) return { kind: 'clear' };

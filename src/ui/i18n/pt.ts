@@ -753,6 +753,12 @@ export const pt: Record<string, string> = {
   'voice.selectionNeeded': 'Selecione algo primeiro e diga apagar isso ou copiar isso.',
   'voice.selectionMoveNeeded':
     'Selecione algo primeiro e diga mova isso para a esquerda ou centralize isso.',
+  'voice.selectionMoveWhichWay': 'Para qual lado — esquerda, direita, cima ou baixo?',
+  'voice.selectionMoveCancelled': 'Certo, não vou mover isso.',
+  'voice.direction.left': 'Esquerda',
+  'voice.direction.right': 'Direita',
+  'voice.direction.up': 'Cima',
+  'voice.direction.down': 'Baixo',
   'voice.selectionMovedLeft': 'Mudei a parte selecionada para a esquerda.',
   'voice.selectionMovedRight': 'Mudei a parte selecionada para a direita.',
   'voice.selectionMovedUp': 'Mudei a parte selecionada para cima.',
@@ -776,7 +782,7 @@ export const pt: Record<string, string> = {
   'voice.narrationNeedsFrames': 'Adicione alguns quadros primeiro, depois conte sua história!',
   'voice.narrationAlready': 'Já estou gravando — diga “parar gravação” quando terminar.',
   'voice.help':
-    'Você pode dizer: pincel, lápis, spray, borracha, preencher, varinha, carimbo, uma cor como vermelho ou azul, maior, menor, mova isso para a esquerda, de novo, centralize isso, coloque isso no topo, apagar isso, copiar isso, espelhamento ligado, espelhamento desligado, desfazer, refazer, limpar, novo quadro, tocar, jogar meu jogo, pré-visualizar meu app, exportar meu app, exportar código real, gravar narração, parar gravação, excluir narração, parar, salvar, e ajuda.',
+    'Você pode dizer: pincel, lápis, spray, borracha, preencher, varinha, carimbo, uma cor como vermelho ou azul, maior, menor, mova isso, mova isso para a esquerda, de novo, centralize isso, coloque isso no topo, apagar isso, copiar isso, espelhamento ligado, espelhamento desligado, desfazer, refazer, limpar, novo quadro, tocar, jogar meu jogo, pré-visualizar meu app, exportar meu app, exportar código real, gravar narração, parar gravação, excluir narração, parar, salvar, e ajuda.',
   'voice.unknown': 'Desculpe, não entendi. Diga “ajuda” para ouvir o que eu posso fazer.',
   'voice.unavailable':
     'Os comandos de voz não estão disponíveis neste navegador. Você ainda pode usar todas as ferramentas por toque, mouse ou teclado.',

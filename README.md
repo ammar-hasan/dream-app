@@ -166,7 +166,9 @@ RTL remain first-class product behavior.
   selection, “duplicate it” makes an offset selected copy, spoken directions
   nudge by 10 px, and “center it” uses the canvas center; every action is
   undoable. “Put it at the top/right/left/bottom edge” aligns the shared bounds
-  to that canvas edge. Immediately after a successful directional nudge,
+  to that canvas edge. An incomplete “move it” asks which way without changing
+  anything, exposes four labelled choices, and accepts the next one-word answer
+  by voice or typing in all six locales. Immediately after a successful directional nudge,
   “again” repeats only that nudge; every interruption clears this ephemeral
   context, and destructive or non-nudge actions are never repeatable. Bare
   colors still choose the drawing color. Missing, locked and raster selections

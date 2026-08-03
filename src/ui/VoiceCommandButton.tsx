@@ -8,7 +8,11 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { isSpeechSupported, startDictation, type DictationHandle } from '../ai/speech';
-import { parseVoiceCommand } from '../ai/voiceCommands';
+import {
+  parseVoiceCommand,
+  parseVoiceDirectionAnswer,
+  type SelectionDirection,
+} from '../ai/voiceCommands';
 import { say } from '../ai/say';
 import { useDreamStore } from '../store/dreamStore';
 import { useUiPrefs } from '../store/uiPrefs';
@@ -100,13 +104,16 @@ export function VoiceCommandButton() {
   const t = useT();
   const [listening, setListening] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [messageRevision, setMessageRevision] = useState(0);
   const [panelOpen, setPanelOpen] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [typedCommand, setTypedCommand] = useState('');
+  const [directionClarification, setDirectionClarification] = useState(false);
   const handleRef = useRef<DictationHandle | null>(null);
   const transcriptRef = useRef('');
   const cancelledRef = useRef(false);
   const recognitionErrorRef = useRef(false);
+  const pendingDirectionRef = useRef(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLElement>(null);
   const commandInputRef = useRef<HTMLInputElement>(null);
@@ -121,6 +128,9 @@ export function VoiceCommandButton() {
     handle?.stop();
     setListening(false);
     setPanelOpen(false);
+    pendingClearRef.current = false;
+    pendingDirectionRef.current = false;
+    setDirectionClarification(false);
     if (restoreFocus) window.requestAnimationFrame(() => buttonRef.current?.focus());
   }, []);
 
@@ -145,13 +155,41 @@ export function VoiceCommandButton() {
   /** Show the feedback and say it aloud when the voice preference is on. */
   const announce = (text: string) => {
     setMessage(text);
+    setMessageRevision((revision) => revision + 1);
     const { voiceFeedback, locale } = useUiPrefs.getState();
     if (voiceFeedback) say(text, { lang: locale });
   };
 
   const runTranscript = (text: string) => {
     setTranscript(text);
-    const command = parseVoiceCommand(text, useUiPrefs.getState().locale);
+    const locale = useUiPrefs.getState().locale;
+    const command = parseVoiceCommand(text, locale);
+
+    if (pendingDirectionRef.current) {
+      const direction = parseVoiceDirectionAnswer(text, locale);
+      if (direction) {
+        pendingDirectionRef.current = false;
+        setDirectionClarification(false);
+        const result = executeVoiceCommand(
+          { kind: 'move-selection', direction },
+          executorStore(announce),
+          () => void saveNow(),
+          executorContextRef.current,
+        );
+        if (result) announce(result.message);
+        return;
+      }
+      if (!command) {
+        announce(t('voice.selectionMoveWhichWay'));
+        return;
+      }
+      pendingDirectionRef.current = false;
+      setDirectionClarification(false);
+      if (command.kind === 'cancel') {
+        announce(t('voice.selectionMoveCancelled'));
+        return;
+      }
+    }
 
     // A pending "clear this layer?" confirmation intercepts yes/no first.
     if (pendingClearRef.current) {
@@ -184,7 +222,15 @@ export function VoiceCommandButton() {
     );
     if (!result) return;
     if (result.awaitConfirm === 'clear') pendingClearRef.current = true;
+    if (result.awaitClarify === 'selection-direction') {
+      pendingDirectionRef.current = true;
+      setDirectionClarification(true);
+    }
     announce(result.message);
+  };
+
+  const chooseDirection = (direction: SelectionDirection) => {
+    runTranscript(t(`voice.direction.${direction}`));
   };
 
   const startListening = () => {
@@ -262,17 +308,13 @@ export function VoiceCommandButton() {
         aria-expanded={panelOpen}
         aria-controls="voice-conversation"
         aria-label={listening ? t('toolbar.stopListening') : t('toolbar.voiceCommands')}
-        data-tooltip={
-          listening
-            ? undefined
-            : t(speechSupported ? 'toolbar.voiceCommandsTitle' : 'voice.unavailable')
-        }
+        data-tooltip={panelOpen || listening ? undefined : t('toolbar.voiceCommandsTitle')}
         onClick={toggle}
       >
         <MicIcon />
       </button>
       {message && !panelOpen && (
-        <span className="voice-message" role="status">
+        <span key={messageRevision} className="voice-message" role="status">
           {message}
         </span>
       )}
@@ -312,7 +354,7 @@ export function VoiceCommandButton() {
           )}
 
           {message && (
-            <p className="voice-conversation-message" role="status">
+            <p key={messageRevision} className="voice-conversation-message" role="status">
               {message}
             </p>
           )}
@@ -343,6 +385,33 @@ export function VoiceCommandButton() {
               </button>
             </div>
           </form>
+
+          {directionClarification && (
+            <div
+              className="voice-direction-choices"
+              role="group"
+              aria-label={t('voice.selectionMoveWhichWay')}
+            >
+              {(
+                [
+                  ['left', '←'],
+                  ['up', '↑'],
+                  ['down', '↓'],
+                  ['right', '→'],
+                ] as const
+              ).map(([direction, arrow]) => (
+                <button
+                  key={direction}
+                  type="button"
+                  className="btn"
+                  onClick={() => chooseDirection(direction)}
+                >
+                  <span aria-hidden="true">{arrow}</span>
+                  {t(`voice.direction.${direction}`)}
+                </button>
+              ))}
+            </div>
+          )}
 
           {speechSupported && (
             <button type="button" className="btn voice-retry" onClick={toggle}>

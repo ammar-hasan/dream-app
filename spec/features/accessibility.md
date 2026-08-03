@@ -93,7 +93,10 @@ attention.
 Recognition listens in the UI language. Every command confirms in a
 programmatically announced status and — when **voice feedback** is on (default
 in kid mode) — out loud. The mic remains visible when recognition is
-unsupported; no browser can turn it into a silent dead control.
+unsupported; no browser can turn it into a silent dead control. Its tooltip
+stays a compact action label while closed and yields to the conversation once
+opened; the full capability explanation belongs inside that surface, where it
+can wrap and be announced.
 
 The parser is forgiving: case-insensitive, ignores filler ("um, can you
 please undo?"), **normalizes Arabic** (diacritics and tatweel stripped,
@@ -121,6 +124,15 @@ requires an editable vector selection. Missing, locked and pixel selections get
 specific guidance; Dream never claims that unchanged pixels were recolored or
 silently changes a hidden setting. Bare directions do not guess at an object or
 change the document.
+With editable artwork selected, an incomplete “move it” request starts one
+bounded clarification: Dream asks whether to move left, right, up or down and
+changes nothing yet. The four directions remain visible as labelled choices,
+and the next one-word spoken or typed direction performs the same 10 px nudge
+as a complete request. An unrecognized answer repeats the question; Cancel
+cancels it; any other understood command replaces it. Closing the conversation
+also forgets it. Missing or locked selections receive their ordinary guidance
+instead of an impossible question. A resolved direction becomes the most recent
+nudge, so the immediately following “again” remains predictable.
 Immediately after a successful directional nudge, “again” or “a little more”
 repeats that same 10 px nudge. The memory lasts for one voice turn only. Any
 other command, failed or empty listen, missing or locked selection, centering or
@@ -148,6 +160,7 @@ duplication, clearing, export or another non-nudge action.
 | mirror on/off    | "mirror on", "mirror off", "symmetry on"                                                                                                               | شغّل التناظر، أطفئ التناظر                                                       | vertical symmetry on / off (mirror phrases never trigger "play")                                 |
 | bigger / smaller | "bigger", "make it bigger", "thicker" / "smaller", "make it smaller", "thinner"                                                                        | أكبر / أصغر                                                                      | selected artwork scales gently about its center; with no selection, brush size ×~1.5 or ÷~1.5    |
 | move / center it | "move it left/right/up/down", "center it"                                                                                                              | حرّك هذا لليسار/اليمين/الأعلى/الأسفل، ضع هذا في المنتصف                          | nudges the selection by 10 px or centers it on the canvas; each is one undoable action           |
+| clarify movement | "move it" → "left/right/up/down"                                                                                                                       | حرّك هذا ← يسار/يمين/أعلى/أسفل                                                   | asks which way without moving, then accepts one spoken, typed or visible direction choice        |
 | place at edge    | "put it at the top", "move it to the right edge"                                                                                                       | ضع هذا عند الحافة العلوية / اليمنى                                               | places the selection's shared bounds flush with that canvas edge as one undoable action          |
 | continue nudge   | "again", "a little more"                                                                                                                               | مرة أخرى، قليلًا بعد                                                             | immediately repeats only the last successful directional 10 px nudge; otherwise refuses safely   |
 | delete / copy it | "delete it", "remove that" / "duplicate it", "copy that"                                                                                               | احذف هذا / انسخ هذا                                                              | deletes only the selection / makes and selects an offset copy; both are undoable                 |
@@ -241,6 +254,10 @@ one tiny cue and continuing along it never repeats the vibration.
 - “Move it left/right/up/down” and “center it” require a visible editable
   selection. Movement uses a predictable 10 px step, centering uses the canvas
   center, every result is one undoable action, and bare directions do nothing.
+- “Move it” with an editable selection asks which direction and makes no edit.
+  An unknown answer asks again; Cancel, closing the conversation or a different
+  valid command clears the question. Missing or locked selection guidance does
+  not start a follow-up.
 - “Put it at the left/right/top/bottom edge” requires a visible editable
   selection and places its shared bounds exactly at that canvas edge as one
   undoable action. It never changes a hidden alignment setting.
@@ -252,5 +269,6 @@ one tiny cue and continuing along it never repeats the vibration.
   Edit rather than receiving false success feedback.
 - A pending "clear?" confirmation is cancelled by any non-yes utterance. A
   command within that correction (such as “no, undo”) then runs normally.
+  Closing the conversation cancels the pending confirmation.
 - Spoken names never fire where synthesis is missing — the UI simply
   stays silent rather than erroring.

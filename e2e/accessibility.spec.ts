@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
-import { bootApp } from './helpers';
+import { bootApp, drawStroke } from './helpers';
 
 async function seriousViolations(page: Page) {
   const result = await new AxeBuilder({ page }).analyze();
@@ -96,11 +96,50 @@ test('voice conversation and typed fallback have no serious automated violations
     });
   });
   await bootApp(page);
-  await page.getByRole('button', { name: 'Voice commands' }).click();
+  await drawStroke(page);
+  await page.getByRole('tab', { name: 'Design' }).click();
+  await page.getByRole('button', { name: 'Select', exact: true }).click();
+  const canvas = page.locator('.viewport-canvas');
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('viewport canvas has no box');
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(page.locator('.design-panel')).toContainText('1 object selected');
+
+  const voiceButton = page.getByRole('button', { name: 'Voice commands' });
+  await expect(voiceButton).toHaveAttribute('data-tooltip', /Talk to Dream/);
+  await voiceButton.click();
+  await expect(voiceButton).not.toHaveAttribute('data-tooltip', /.+/);
   const conversation = page.getByRole('dialog', { name: 'Talk to Dream' });
   expect(await seriousViolations(page)).toEqual([]);
-  await conversation.getByRole('textbox', { name: 'Say it or type it' }).fill('undo');
+  await conversation.getByRole('textbox', { name: 'Say it or type it' }).fill('move it');
   await conversation.getByRole('button', { name: 'Do it' }).click();
+  await expect(
+    conversation.getByRole('group', { name: 'Which way — left, right, up or down?' }),
+  ).toBeVisible();
+  expect(await seriousViolations(page)).toEqual([]);
+
+  const commandInput = conversation.getByRole('textbox', { name: 'Say it or type it' });
+  await commandInput.fill('somewhere nice');
+  await conversation.getByRole('button', { name: 'Do it' }).click();
+  await expect(conversation.getByRole('status')).toContainText('Which way');
+  await expect(conversation.getByRole('button', { name: 'Right' })).toBeVisible();
+
+  await commandInput.fill('cancel');
+  await conversation.getByRole('button', { name: 'Do it' }).click();
+  await expect(conversation.getByRole('status')).toContainText('I won’t move it.');
+  await expect(conversation.getByRole('button', { name: 'Right' })).toHaveCount(0);
+
+  await commandInput.fill('move it');
+  await conversation.getByRole('button', { name: 'Do it' }).click();
+  await commandInput.fill('help');
+  await conversation.getByRole('button', { name: 'Do it' }).click();
+  await expect(conversation.getByRole('status')).toContainText('You can say:');
+  await expect(conversation.getByRole('button', { name: 'Right' })).toHaveCount(0);
+
+  await commandInput.fill('move it');
+  await conversation.getByRole('button', { name: 'Do it' }).click();
+  await conversation.getByRole('button', { name: 'Right' }).click();
+  await expect(conversation.getByRole('status')).toContainText('Moved the selected part right.');
   expect(await seriousViolations(page)).toEqual([]);
 });
 

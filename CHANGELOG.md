@@ -7,6 +7,15 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Guided voice movement** (slice 67): with editable artwork selected, “move
+  it” now asks which direction and changes nothing until the person answers
+  left, right, up or down. The question exposes four touch/keyboard choices and
+  accepts the same one-word answer by speech or typing in all six locales;
+  unknown answers repeat the question, Cancel cancels, and another valid
+  command replaces it safely. A rendered phone audit also keeps the unavailable
+  mic explanation inside the conversation instead of clipping it into a long
+  toolbar tooltip.
+
 - **Visible, repairable voice conversation** (slice 66): the toolbar mic now
   opens a phone-safe surface with a live transcript, listening waveform,
   interpreted phrase, result, Stop and Speak again. Unsupported recognition,

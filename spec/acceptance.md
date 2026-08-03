@@ -663,11 +663,21 @@ holds.
       presents what Dream heard beside a programmatically announced result.
       WHEN recognition is unavailable, permission is refused or no phrase is
       heard THEN the surface explains the exact condition and accepts a typed
-      command through the same intent rules. Speak again and Stop remain direct;
-      Escape closes and restores focus to the microphone. WHEN a story request
-      opens its reviewed journey THEN the conversation closes so only that
-      journey holds attention. Reduced motion removes waveform and entrance
-      timing without removing any state label or transcript.
+      command through the same intent rules; the mic tooltip remains a compact
+      action label rather than carrying that full explanation. Speak again and
+      Stop remain direct; Escape closes and restores focus to the microphone.
+      WHEN a story request opens its reviewed journey THEN the conversation
+      closes so only that journey holds attention. Reduced motion removes
+      waveform and entrance timing without removing any state label or
+      transcript.
+177.  GIVEN editable selected artwork WHEN a localized voice turn means “move
+      it” without a direction THEN Dream changes nothing, asks left, right, up
+      or down, and exposes all four as labelled touch, mouse and keyboard
+      choices. WHEN the next spoken, typed or chosen answer is one localized
+      direction THEN one undoable 10 px nudge runs and the immediately following
+      “again” may repeat it. An unknown answer repeats the question; Cancel or
+      closing cancels it; another understood command replaces it. Missing or
+      locked selections receive truthful guidance without opening a follow-up.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

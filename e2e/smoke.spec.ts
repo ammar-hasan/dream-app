@@ -485,7 +485,8 @@ test('voice resolves natural “it” actions to the visible selection', async (
     const transcripts = [
       'make it red',
       'make it bigger',
-      'move it right',
+      'move it',
+      'right',
       'again',
       'center it',
       'put it at the top',
@@ -586,7 +587,18 @@ test('voice resolves natural “it” actions to the visible selection', async (
   const beforeMove = await redCenter();
 
   await page.getByRole('button', { name: 'Voice commands' }).click();
+  const conversation = page.getByRole('dialog', { name: 'Talk to Dream' });
+  await expect(conversation.getByRole('status')).toContainText(
+    'Which way — left, right, up or down?',
+  );
+  await expect(
+    conversation.getByRole('group', { name: 'Which way — left, right, up or down?' }),
+  ).toBeVisible();
+  expect(await redCenter()).toBeCloseTo(beforeMove, 0);
+
+  await page.getByRole('button', { name: 'Voice commands' }).click();
   await expect(page.getByRole('status')).toContainText('Moved the selected part right.');
+  await expect(conversation.getByRole('button', { name: 'Right' })).toHaveCount(0);
   await expect.poll(() => redCenter()).toBeGreaterThan(beforeMove + 5);
   const afterFirstMove = await redCenter();
 
