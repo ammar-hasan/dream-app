@@ -927,3 +927,25 @@ feature.
 - Acceptance met: switch to 简体中文, paste experiment data into a recognized
   plot, use an unspaced Chinese command/story/game request and keep the same
   offline, recoverable outcomes and English fallback commands.
+
+## Slice 37 — Complete Brazilian Portuguese journey ✅
+
+Persona: Maria, Brazilian agentic programmer — move between visual creation,
+portable project files and code delivery in her own language.
+
+- ✅ Português (Brasil) covers every product string with exact key and
+  interpolation parity, persistent LTR switching and Brazilian Portuguese
+  recognition/speech.
+- ✅ Brazilian commands cover the complete tool, color, recovery, animation,
+  game, app, code-export and narration surface while English remains available.
+- ✅ Portuguese sequence words plan local story moments; Portuguese game
+  descriptions choose templates, settings, one-to-five lives and named-layer
+  roles offline.
+- ✅ End-to-end manual review corrected literal art language, Portuguese sample
+  data and the unsafe “cast layers” → “scale layers” draft before registration.
+  Non-default locales remain isolated from the production entry chunk.
+- ✅ Focused unit tests and a production browser journey reach portable-project
+  and real-code export actions in Portuguese rather than stopping at Settings.
+- Acceptance met: switch to Português (Brasil), reach both `.dream` and real
+  code delivery, use Portuguese command/story/game language and retain the same
+  private, offline and English-fallback behavior.

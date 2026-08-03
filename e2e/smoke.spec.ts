@@ -467,6 +467,20 @@ test('Simplified Chinese is complete, LTR and reaches the science workflow', asy
   await expect(plot.getByRole('button', { name: '插入图表' })).toBeEnabled();
 });
 
+test('Brazilian Portuguese reaches portable project and real-code delivery', async ({ page }) => {
+  await bootApp(page);
+  await page.getByRole('button', { name: 'Settings' }).click();
+  await page.locator('.settings-popover select').selectOption('pt');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'pt');
+  await page.getByRole('button', { name: 'Animar' }).click();
+  await page.getByRole('button', { name: 'Exportar' }).click();
+
+  const dialog = page.getByRole('dialog', { name: 'Exportar' });
+  await expect(dialog.getByRole('button', { name: 'Projeto Dream (.dream)' })).toBeVisible();
+  await expect(dialog.getByRole('button', { name: 'Código real (IA) (.html)' })).toBeVisible();
+});
+
 test('the dark theme toggle flips data-theme', async ({ page }) => {
   await bootApp(page);
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');

@@ -421,3 +421,50 @@ describe('parseVoiceCommand — Simplified Chinese vocabulary (locale "zh")', ()
     expect(parseVoiceCommand('今天天气怎么样', 'zh')).toBeNull();
   });
 });
+
+describe('parseVoiceCommand — Brazilian Portuguese vocabulary (locale "pt")', () => {
+  it('parses recovery, confirmation and creation with polite filler', () => {
+    expect(parseVoiceCommand('por favor, desfaça', 'pt')).toEqual({ kind: 'undo' });
+    expect(parseVoiceCommand('refazer', 'pt')).toEqual({ kind: 'redo' });
+    expect(parseVoiceCommand('limpar tudo', 'pt')).toEqual({ kind: 'clear' });
+    expect(parseVoiceCommand('sim', 'pt')).toEqual({ kind: 'confirm' });
+    expect(parseVoiceCommand('não', 'pt')).toEqual({ kind: 'cancel' });
+    expect(parseVoiceCommand('adicionar quadro', 'pt')).toEqual({ kind: 'new-frame' });
+  });
+
+  it('parses tools, colors, sizing and symmetry', () => {
+    expect(parseVoiceCommand('use o lápis', 'pt')).toEqual({ kind: 'tool', tool: 'pencil' });
+    expect(parseVoiceCommand('preencher vermelho', 'pt')).toEqual({
+      kind: 'fill-color',
+      color: COLOR_WORDS.red,
+      name: 'vermelho',
+    });
+    expect(parseVoiceCommand('pincel maior', 'pt')).toEqual({ kind: 'bigger' });
+    expect(parseVoiceCommand('desligar espelhamento', 'pt')).toEqual({
+      kind: 'mirror',
+      on: false,
+    });
+  });
+
+  it('keeps games, apps, code and narration as distinct outcomes', () => {
+    expect(parseVoiceCommand('jogar labirinto', 'pt')).toEqual({
+      kind: 'play-game',
+      template: 'maze',
+    });
+    expect(parseVoiceCommand('pré-visualizar meu app', 'pt')).toEqual({ kind: 'preview-app' });
+    expect(parseVoiceCommand('exportar meu app', 'pt')).toEqual({ kind: 'export-app' });
+    expect(parseVoiceCommand('exportar código real', 'pt')).toEqual({ kind: 'export-code' });
+    expect(parseVoiceCommand('gravar narração', 'pt')).toEqual({ kind: 'record-narration' });
+    expect(parseVoiceCommand('parar gravação', 'pt')).toEqual({ kind: 'stop-recording' });
+    expect(parseVoiceCommand('excluir narração', 'pt')).toEqual({ kind: 'delete-narration' });
+  });
+
+  it('opens a Portuguese storyboard with its subject intact and keeps English available', () => {
+    expect(parseVoiceCommand('crie uma história sobre a lua e a raposa', 'pt')).toEqual({
+      kind: 'storyboard',
+      prompt: 'a lua e a raposa',
+    });
+    expect(parseVoiceCommand('undo', 'pt')).toEqual({ kind: 'undo' });
+    expect(parseVoiceCommand('qual é a previsão do tempo', 'pt')).toBeNull();
+  });
+});

@@ -134,5 +134,6 @@ never move, crop or stretch the artwork beneath them.
 - Arabic carries the same friendly register (تراجع!، تمام!، أحسنت), never
   stiff formal translation. Persian is concise, conversational Iranian
   Persian. Simplified Chinese uses concise, natural Mainland wording rather
-  than English-shaped sentences. All strings in every locale follow the parity rule
+  than English-shaped sentences. Brazilian Portuguese is conversational and
+  uses familiar Brazilian product language. All strings in every locale follow the parity rule
   (`features/internationalization.md`).

@@ -26,7 +26,7 @@ function splitBeats(story: string): string[] {
   const sentences = story.split(/[\n.!?？。！؟؛;]+/u);
   return sentences.flatMap((sentence) =>
     sentence.split(
-      /\s*(?:,\s*(?:and|then)\s+|\band then\b|\bthen\b|\bnext\b|\bfinally\b|\bafter that\b|،?\s*ثم\s+|،?\s*بعد ذلك\s+|،?\s*(?:واخيرا|وأخيرا)\s*|،?\s*بعدش\s+|،?\s*بعد از آن\s+|،?\s*سپس\s+|،?\s*در پایان\s*|，?\s*(?:然后|接着|随后|之后|最后)\s*)/giu,
+      /\s*(?:,\s*(?:and|then)\s+|\band then\b|\bthen\b|\bnext\b|\bfinally\b|\bafter that\b|،?\s*ثم\s+|،?\s*بعد ذلك\s+|،?\s*(?:واخيرا|وأخيرا)\s*|،?\s*بعدش\s+|،?\s*بعد از آن\s+|،?\s*سپس\s+|،?\s*در پایان\s*|，?\s*(?:然后|接着|随后|之后|最后)\s*|,?\s*(?:e então|depois|em seguida|por fim|finalmente)\s+)/giu,
     ),
   );
 }
@@ -55,7 +55,9 @@ export function planStoryboard(prompt: string, locale = 'en'): StoryboardPlan | 
           ? [`شروع: ${story}`, `لحظه بعد: ${story}`]
           : locale === 'zh'
             ? [`开头：${story}`, `接下来：${story}`]
-            : [`The beginning: ${story}`, `The next moment: ${story}`];
+            : locale === 'pt'
+              ? [`O começo: ${story}`, `O próximo momento: ${story}`]
+              : [`The beginning: ${story}`, `The next moment: ${story}`];
   }
   return {
     story,

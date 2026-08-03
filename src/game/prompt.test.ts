@@ -52,6 +52,23 @@ describe('planGameFromPrompt', () => {
     );
   });
 
+  it('understands a Brazilian Portuguese game request and named-layer roles', () => {
+    const portugueseLayers = [
+      { id: 'foguete', name: 'Foguete' },
+      { id: 'nuvens', name: 'Nuvens' },
+    ];
+    expect(
+      planGameFromPrompt(
+        'Faça o Foguete voar devagar por portões e Nuvens com três escudos',
+        portugueseLayers,
+      ),
+    ).toEqual({
+      template: 'flappy',
+      settings: { fallSpeed: 110, lives: 3 },
+      cast: { hero: 'foguete', obstacle: 'nuvens' },
+    });
+  });
+
   it('chooses the platformer for run-and-jump language', () => {
     expect(
       planGameFromPrompt('Cat should run and jump over Rocks to reach the flag', layers),

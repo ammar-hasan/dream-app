@@ -31,6 +31,11 @@ const TEMPLATE_TERMS: Record<GameTemplateId, readonly string[]> = {
     '收集',
     '躲避',
     '掉落',
+    'pegar',
+    'apanhar',
+    'coletar',
+    'desviar',
+    'caindo',
   ],
   flappy: [
     'flap',
@@ -51,8 +56,28 @@ const TEMPLATE_TERMS: Record<GameTemplateId, readonly string[]> = {
     '翅膀',
     '管道',
     '闸门',
+    'voar',
+    'voando',
+    'pássaro',
+    'portão',
+    'portões',
+    'cano',
   ],
-  maze: ['maze', 'labyrinth', 'exit', 'explore', 'متاهة', 'مخرج', 'استكشف', '迷宫', '出口', '探索'],
+  maze: [
+    'maze',
+    'labyrinth',
+    'exit',
+    'explore',
+    'متاهة',
+    'مخرج',
+    'استكشف',
+    '迷宫',
+    '出口',
+    '探索',
+    'labirinto',
+    'saída',
+    'explorar',
+  ],
   platformer: [
     'platform',
     'platformer',
@@ -67,6 +92,11 @@ const TEMPLATE_TERMS: Record<GameTemplateId, readonly string[]> = {
     '跑跳',
     '跳过',
     '旗帜',
+    'plataforma',
+    'plataformas',
+    'correr e pular',
+    'pule',
+    'bandeira',
   ],
 };
 
@@ -95,6 +125,11 @@ const ROLE_TERMS: Record<CastRole, readonly string[]> = {
     '接球者',
     '猫',
     '火箭',
+    'herói',
+    'jogador',
+    'pegador',
+    'gato',
+    'foguete',
   ],
   good: [
     'good',
@@ -110,6 +145,10 @@ const ROLE_TERMS: Record<CastRole, readonly string[]> = {
     '金币',
     '苹果',
     '奖励',
+    'estrela',
+    'moeda',
+    'maçã',
+    'prêmio',
   ],
   bad: [
     'bad',
@@ -125,6 +164,10 @@ const ROLE_TERMS: Record<CastRole, readonly string[]> = {
     '炸弹',
     '敌人',
     '尖刺',
+    'pedra',
+    'bomba',
+    'inimigo',
+    'espinho',
   ],
   obstacle: [
     'obstacle',
@@ -138,6 +181,10 @@ const ROLE_TERMS: Record<CastRole, readonly string[]> = {
     '闸门',
     '管道',
     '云朵',
+    'obstáculo',
+    'portão',
+    'cano',
+    'nuvem',
   ],
   background: [
     'background',
@@ -150,6 +197,9 @@ const ROLE_TERMS: Record<CastRole, readonly string[]> = {
     '背景',
     '场景',
     '天空',
+    'fundo',
+    'cenário',
+    'céu',
   ],
 };
 
@@ -165,6 +215,10 @@ const EASY_TERMS = [
   '温和',
   '轻松',
   '给孩子',
+  'fácil',
+  'tranquilo',
+  'calmo',
+  'para criança',
 ];
 const HARD_TERMS = [
   'hard',
@@ -177,11 +231,45 @@ const HARD_TERMS = [
   '困难',
   '挑战',
   '激烈',
+  'difícil',
+  'desafiador',
+  'intenso',
 ];
-const FAST_TERMS = ['fast', 'quick', 'speedy', 'سريع', '快速', '快一点'];
-const SLOW_TERMS = ['slow', 'relaxed', 'بطيء', 'بهدوء', '慢速', '缓慢', '慢一点'];
-const BUSY_TERMS = ['busy', 'lots', 'many', 'often', 'كثير', 'متكرر', '很多', '频繁'];
-const SPARSE_TERMS = ['few', 'rare', 'spaced out', 'قليل', 'متباعد', '少量', '稀少'];
+const FAST_TERMS = ['fast', 'quick', 'speedy', 'سريع', '快速', '快一点', 'rápido', 'depressa'];
+const SLOW_TERMS = [
+  'slow',
+  'relaxed',
+  'بطيء',
+  'بهدوء',
+  '慢速',
+  '缓慢',
+  '慢一点',
+  'devagar',
+  'lento',
+];
+const BUSY_TERMS = [
+  'busy',
+  'lots',
+  'many',
+  'often',
+  'كثير',
+  'متكرر',
+  '很多',
+  '频繁',
+  'muitos',
+  'frequente',
+];
+const SPARSE_TERMS = [
+  'few',
+  'rare',
+  'spaced out',
+  'قليل',
+  'متباعد',
+  '少量',
+  '稀少',
+  'poucos',
+  'raro',
+];
 
 function normalize(value: string): string {
   return value
@@ -239,9 +327,17 @@ function settingsFromPrompt(text: string): Partial<GameSettings> {
     三: 3,
     四: 4,
     五: 5,
+    um: 1,
+    uma: 1,
+    dois: 2,
+    duas: 2,
+    três: 3,
+    tres: 3,
+    quatro: 4,
+    cinco: 5,
   };
   const livesPattern =
-    /(?:\b([1-9])\b|\b(one|two|three|four|five|واحد|اثنان|ثلاثة|اربع|خمسة)\b|([一二三四五]))\s*(?:lives?|shields?|hearts?|حياة|محاولات|دروع|条命|生命|护盾|红心)/u;
+    /(?:\b([1-9])\b|\b(one|two|three|four|five|واحد|اثنان|ثلاثة|اربع|خمسة|um|uma|dois|duas|três|tres|quatro|cinco)\b|([一二三四五]))\s*(?:lives?|shields?|hearts?|حياة|محاولات|دروع|条命|生命|护盾|红心|vidas?|escudos?|corações?|coracoes?)/u;
   const lives = text.match(livesPattern);
   if (lives) {
     settings.lives = lives[1] ? Number(lives[1]) : numberWords[lives[2] ?? lives[3] ?? ''];

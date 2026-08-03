@@ -60,7 +60,7 @@ above.
 | `dream:kid-mode`                | `'1'` / `'0'`                                                                                                                                                    |
 | `dream:speak-tool-names`        | `'1'` / `'0'` (defaults to the kid-mode value)                                                                                                                   |
 | `dream:voice-feedback`          | `'1'` / `'0'` (defaults to the kid-mode value)                                                                                                                   |
-| `dream:locale`                  | locale id, e.g. `'en'`, `'ar'`, `'fa'`, `'zh'` (default `'en'`)                                                                                                  |
+| `dream:locale`                  | locale id, e.g. `'en'`, `'ar'`, `'fa'`, `'zh'`, `'pt'` (default `'en'`)                                                                                          |
 | `dream:theme`                   | `'light'` / `'dark'`; absent = follow the OS preference                                                                                                          |
 | `dream:comfort-mode`            | `'1'` / `'0'`                                                                                                                                                    |
 | `dream:recent-colors`           | JSON array of hex colors, newest first, max 8                                                                                                                    |

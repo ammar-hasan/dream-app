@@ -334,8 +334,8 @@ holds.
       response-format option is sent, and the returned picture fills Dream's
       exact canvas dimensions; a separately configured compatible endpoint
       continues to receive its requested model and canvas size.
-114.  GIVEN an English, Arabic, Persian or Simplified Chinese story WHEN it is
-      planned THEN two to six numbered moments appear locally without an AI
+114.  GIVEN an English, Arabic, Persian, Simplified Chinese or Brazilian
+      Portuguese story WHEN it is planned THEN two to six numbered moments appear locally without an AI
       request or document mutation, and each moment can be edited, heard aloud,
       added, removed or regenerated from revised story words before
       confirmation; Little Dreamer dictation plans immediately and its
@@ -467,6 +467,26 @@ holds.
       difficulty, speed, quantity, lives or Chinese-named layers THEN the
       visible template, settings and cast update deterministically without a
       network request.
+146.  GIVEN Português (Brasil) is chosen in Settings WHEN the workspace
+      updates THEN every product string has a non-empty Brazilian Portuguese
+      value, the document language becomes `pt`, layout remains left-to-right,
+      and the choice persists without reload.
+147.  GIVEN the Brazilian Portuguese UI WHEN dictation, spoken labels or the
+      global microphone is used THEN recognition and speech request Brazilian
+      Portuguese and all feedback is localized where the browser supports it.
+148.  GIVEN a Portuguese command such as “por favor, desfaça”, “preencher
+      vermelho”, “desligar espelhamento”, “jogar labirinto”, “pré-visualizar
+      meu app”, “exportar código real” or “parar gravação” WHEN it is heard
+      THEN the matching recovery, creation, game, delivery or narration action
+      occurs without adjacent-intent collisions; English commands still work.
+149.  GIVEN a Brazilian Portuguese story WHEN sequence language such as
+      “depois”, “em seguida” or “por fim” is used THEN two to six editable
+      moments are planned locally; a single idea receives natural Portuguese
+      beginning/next labels.
+150.  GIVEN a Brazilian Portuguese game description WHEN it names a supported
+      game, difficulty, speed, quantity, lives or Portuguese-named layers THEN
+      the visible template, settings and cast update deterministically without
+      a network request.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 
@@ -490,9 +510,9 @@ holds.
    grouped line plot → annotate it with a reversible-reaction connector,
    chemical subscripts and symbols → export a scalable SVG → duplicate frames
    to animate the result → link explanatory screens into an app.
-8. **Maria (32):** export `.dream` → agent reads it, adds a layer with a shape
-   and text, renders a PNG, exports the app HTML via the dream-mcp tools →
-   re-import the `.dream` unchanged elsewhere.
+8. **Maria (32):** switch to Português (Brasil) → export `.dream` → agent reads
+   it, adds a layer with a shape and text, renders a PNG, exports the app HTML
+   via the dream-mcp tools → re-import the `.dream` unchanged elsewhere.
 9. **Aleksandr (25):** keyboard-only: tool keys, marquee, snap-align,
    Cmd+D, nudge, group — a full layout without touching the mouse.
 10. **Ahmed (42):** draw a scene per frame → record narration → add readable

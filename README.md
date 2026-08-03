@@ -164,12 +164,14 @@ RTL remain first-class product behavior.
   فریم جدید، پیش‌نمایش برنامه، ضبط روایت، آبی، آینه روشن، ذخیره…) with
   Iranian Persian recognition and Arabic-keyboard yeh/kaf normalization;
   简体中文 adds natural unspaced Mandarin commands (撤销、填充红色、关闭镜像、
-  玩迷宫、预览应用、停止录音…) and Mainland Mandarin recognition. English
-  commands keep working in every additional language.
+  玩迷宫、预览应用、停止录音…) and Mainland Mandarin recognition. Português
+  (Brasil) adds Brazilian commands, story/game language and `pt-BR` speech.
+  English commands keep working in every additional language.
 - **Languages & RTL** — every UI string lives in a string table
   and renders through `t(key)`. The settings gear switches among English,
-  العربية, فارسی and 简体中文 at runtime (persisted); Arabic and Persian flip
-  the whole shell to `dir="rtl"` while Chinese remains LTR. The layout uses
+  العربية, فارسی, 简体中文 and Português (Brasil) at runtime (persisted); Arabic
+  and Persian flip the whole shell to `dir="rtl"` while Chinese and Portuguese
+  remain LTR. The layout uses
   logical positioning, so mirrored panels, rails and Settings remain visible.
 
 The **settings gear** in the toolbar consolidates all of it: Little Dreamer
@@ -527,8 +529,8 @@ All four share the same casting magic, controls, juice and sounds:
   Clouds, nice and slow.” Dream chooses a template, tunes easy/hard,
   fast/slow, many/few and lives/shields language, and casts layers whose names
   you mention. Type or use the feature-detected mic; English, Arabic and
-  Simplified Chinese work fully offline with no AI key or free try. The visible
-  picker/settings show what it understood before you press Play.
+  Simplified Chinese and Brazilian Portuguese work fully offline with no AI key
+  or free try. The visible picker/settings show what it understood before Play.
 - **Casting is the magic** — your own drawings become the game pieces. The
   cast panel assigns a layer to each role the template needs (Hero, plus
   Good/Bad Things, Obstacle or Background depending on the template). Every
@@ -810,7 +812,7 @@ restart button bottom-end)
   pixels), selection-bbox edit regions, speech feature detection with a
   mocked SpeechRecognition, speech-synthesis feature detection (`say.ts`),
   and the voice-command parser (every intent, filler tolerance, the full
-  color vocabulary, Arabic, Persian and Simplified Chinese locale vocabularies
+  color vocabulary, Arabic, Persian, Simplified Chinese and Brazilian Portuguese locale vocabularies
   — script normalization/unspaced Chinese matching, mirror-phrase precedence,
   English unaffected — unknown input → null)
 - Accessibility tests: the voice executor against a fake store (each command
@@ -819,7 +821,7 @@ restart button bottom-end)
   independent toggles, theme + comfort + recent-colors persistence,
   localStorage), the comfort-mode data-attribute effect on the root element,
   and the i18n string table (interpolation, English/key fallbacks, exact
-  en/ar/fa/zh parity, RTL and regional speech-language mapping)
+  en/ar/fa/zh/pt parity, RTL and regional speech-language mapping)
 - Stamp & starter-scene tests: engine op counts, determinism (same inputs →
   same drawing), stamp bounds within the size box, scene bounds within the
   canvas, outline-only scenes; store integration (click-to-place as ONE
@@ -868,7 +870,7 @@ after `npx playwright install`).
   canvas pixels, undo, Design-mode panels, Dream AI generation onto a new
   layer, table-to-grouped-plot creation, scientific connector/text creation
   plus downloaded SVG inspection, kid mode, Arabic RTL, Persian calligraphy
-  RTL, complete Chinese science UI, dark theme. Every test is independent (fresh
+  RTL, complete Chinese science UI, Brazilian Portuguese export UI, dark theme. Every test is independent (fresh
   browser context → empty localStorage/IndexedDB).
 - `e2e/visual.spec.ts` — one full-page screenshot baseline of the welcome
   state (`e2e/visual.spec.ts-snapshots/`), committed as the CSS-regression

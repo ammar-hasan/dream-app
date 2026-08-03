@@ -34,8 +34,8 @@ Jumper**.
 
 The cast panel begins with a short **Describe your game** request plus the
 same feature-detected dictation mic as other prompt boxes. It works fully
-offline in English, Arabic and Simplified Chinese and uses only rules Dream can
-actually run:
+offline in English, Arabic, Simplified Chinese and Brazilian Portuguese and
+uses only rules Dream can actually run:
 
 1. The request chooses Catch!, Flappy Dream, Maze Runner or Dream Jumper from
    words such as catch/collect/dodge, fly/flap/gates, maze/explore/exit, or

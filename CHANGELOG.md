@@ -7,6 +7,16 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Complete Brazilian Portuguese journey** (slice 37): Português (Brasil)
+  covers every product surface with exact key/placeholder parity, persistent
+  LTR switching and `pt-BR` speech. Brazilian commands cover creation,
+  recovery, games, app/code delivery and narration while English stays
+  available; Portuguese sequence language plans stories locally, and offline
+  game descriptions understand templates, settings, lives and named-layer
+  roles. Manual review corrected literal art terms and an unsafe translation
+  of game casting before browser validation reached Maria's project and code
+  export path.
+
 - **Complete Simplified Chinese journey** (slice 36): 简体中文 now covers the
   entire product with exact key and placeholder parity, persistent instant LTR
   switching and Mainland Mandarin speech selection. Natural unspaced Chinese

@@ -554,6 +554,134 @@ const ZH_VOCAB: VoiceVocabulary = {
   storyboardPhrases: ['制作一个故事', '制作故事', '创作一个故事', '制作一个动画', '制作动画'],
 };
 
+/** Brazilian Portuguese additions, merged into the English base. */
+const PT_VOCAB: VoiceVocabulary = {
+  filler: new Set([
+    'por',
+    'favor',
+    'pode',
+    'você',
+    'voce',
+    'agora',
+    'dream',
+    'quero',
+    'eu',
+    'meu',
+    'minha',
+    'para',
+    'com',
+    'use',
+    'escolha',
+  ]),
+  colors: {
+    vermelho: COLOR_WORDS.red,
+    laranja: COLOR_WORDS.orange,
+    amarelo: COLOR_WORDS.yellow,
+    verde: COLOR_WORDS.green,
+    turquesa: COLOR_WORDS.teal,
+    celeste: COLOR_WORDS.sky,
+    azul: COLOR_WORDS.blue,
+    roxo: COLOR_WORDS.purple,
+    violeta: COLOR_WORDS.violet,
+    rosa: COLOR_WORDS.pink,
+    marrom: COLOR_WORDS.brown,
+    preto: COLOR_WORDS.black,
+    branco: COLOR_WORDS.white,
+    cinza: COLOR_WORDS.gray,
+    ciano: COLOR_WORDS.cyan,
+    magenta: COLOR_WORDS.magenta,
+    dourado: COLOR_WORDS.gold,
+  },
+  tools: {
+    pincel: 'brush',
+    lápis: 'pencil',
+    lapis: 'pencil',
+    borracha: 'eraser',
+    spray: 'spray',
+    aerógrafo: 'spray',
+    linha: 'line',
+    retângulo: 'rectangle',
+    retangulo: 'rectangle',
+    quadrado: 'rectangle',
+    elipse: 'ellipse',
+    círculo: 'ellipse',
+    circulo: 'ellipse',
+    preencher: 'fill',
+    balde: 'fill',
+    varinha: 'wand',
+    laço: 'lasso',
+    laco: 'lasso',
+    carimbo: 'stamp',
+    'conta-gotas': 'eyedropper',
+    conta: 'eyedropper',
+    texto: 'text',
+  },
+  yes: new Set(['sim', 'claro', 'confirmar', 'confirmo', 'certo']),
+  no: new Set(['não', 'nao', 'cancelar', 'cancela', 'deixa']),
+  bigger: new Set(['maior', 'aumentar', 'aumenta', 'grosso', 'grossa']),
+  smaller: new Set(['menor', 'diminuir', 'diminui', 'fino', 'fina']),
+  clear: new Set(['limpar', 'limpe']),
+  play: new Set(['tocar', 'reproduzir', 'animar', 'jogar']),
+  stop: new Set(['parar', 'pare', 'pausar', 'pause']),
+  undo: new Set(['desfazer', 'desfaça', 'desfaca', 'voltar']),
+  redo: new Set(['refazer', 'refaça', 'refaca']),
+  help: new Set(['ajuda', 'comandos', 'opções', 'opcoes']),
+  save: new Set(['salvar', 'salve', 'guardar']),
+  game: new Set(['jogo', 'jogos']),
+  templates: {
+    catch: new Set(['pega', 'pegar', 'capturar']),
+    flappy: new Set(['flappy', 'voar', 'voando', 'pássaro', 'passaro']),
+    maze: new Set(['labirinto']),
+    platformer: new Set(['plataforma', 'plataformas', 'pular', 'saltador']),
+  },
+  app: new Set(['app', 'aplicativo', 'protótipo', 'prototipo']),
+  appPreview: new Set([
+    'pré-visualizar',
+    'pre-visualizar',
+    'visualizar',
+    'testar',
+    'abrir',
+    'mostrar',
+  ]),
+  appExport: new Set(['exportar', 'baixar', 'compartilhar', 'enviar']),
+  code: new Set(['código', 'codigo', 'html']),
+  mirror: new Set(['espelho', 'espelhamento', 'simetria']),
+  clearPhrases: ['limpar tudo', 'apagar tudo', 'começar de novo', 'limpar a tela'],
+  newFramePhrases: ['novo quadro', 'adicionar quadro', 'outro quadro', 'próximo quadro'],
+  mirrorOnPhrases: ['ligar espelhamento', 'espelhamento ligado', 'ligar simetria'],
+  mirrorOffPhrases: ['desligar espelhamento', 'espelhamento desligado', 'desligar simetria'],
+  codePhrases: [
+    'código real',
+    'codigo real',
+    'exportar código',
+    'exportar codigo',
+    'transformar em código',
+  ],
+  narrationRecordPhrases: [
+    'gravar narração',
+    'gravar minha voz',
+    'começar a gravar',
+    'narrar a história',
+  ],
+  narrationStopPhrases: ['parar gravação', 'parar de gravar', 'terminar gravação'],
+  narrationDeletePhrases: [
+    'excluir narração',
+    'apagar narração',
+    'excluir gravação',
+    'apagar minha voz',
+  ],
+  storyboardPhrases: [
+    'crie uma história sobre',
+    'criar uma história sobre',
+    'faça uma história sobre',
+    'crie uma história',
+    'criar uma história',
+    'crie uma animação sobre',
+    'criar uma animação sobre',
+    'faça uma animação',
+  ],
+};
+
 function union<T>(a: Set<T>, b: Set<T>): Set<T> {
   return new Set([...a, ...b]);
 }
@@ -603,6 +731,7 @@ const LOCALE_VOCABULARIES: Record<string, VoiceVocabulary> = {
   ar: mergeVocabulary(EN_VOCAB, AR_VOCAB),
   fa: mergeVocabulary(EN_VOCAB, FA_VOCAB),
   zh: mergeVocabulary(EN_VOCAB, ZH_VOCAB),
+  pt: mergeVocabulary(EN_VOCAB, PT_VOCAB),
 };
 
 function vocabularyTerms(vocab: VoiceVocabulary): string[] {
@@ -720,7 +849,10 @@ function storyboardRequest(
     const prompt = normalized
       .slice(index + phrase.length)
       .trim()
-      .replace(/^(?:about|where|with|of|عن|حول|فيها|درباره|که|با|关于|讲述|内容是)\s*/u, '')
+      .replace(
+        /^(?:about|where|with|of|عن|حول|فيها|درباره|که|با|关于|讲述|内容是|sobre|com|em que)\s*/u,
+        '',
+      )
       .trim();
     return prompt ? { matched: true, prompt } : { matched: true };
   }

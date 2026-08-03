@@ -97,8 +97,8 @@ all keys belong to the game.
 
 ## Voice
 
-The complete voice-intent table — every command with English, Arabic, Persian
-and Simplified Chinese phrases, precedence rules and the color vocabulary — is in
+The complete voice-intent table — every command with English, Arabic, Persian,
+Simplified Chinese and Brazilian Portuguese phrases, precedence rules and the color vocabulary — is in
 `features/accessibility.md` §Voice commands.
 
 ## The journeys

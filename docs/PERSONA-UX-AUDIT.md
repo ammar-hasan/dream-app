@@ -16,8 +16,8 @@ not merely the presence of a named control.
 - **Persona readiness: 7 of 10 fully ready, 3 partially ready.** Dream already
   gives every persona a credible path, but the universal “anyone” promise is
   stricter than a feature checklist. The largest gaps are broader professional
-  art/design depth, Portuguese/Russian language reach and a publicly
-  installable agent surface.
+  art/design depth, Russian language reach and a publicly installable agent
+  surface.
 - **Principal UX verdict: strong product architecture, incomplete universal
   usability.** Progressive disclosure, local-first trust and universal undo are
   excellent foundations. The phone timeline and presenter privacy now follow
@@ -29,25 +29,25 @@ not merely the presence of a named control.
 
 The audit covered the entire living spec (vision, concepts, interaction map,
 all feature areas, visual identity, integrations, all data contracts and all
-145 acceptance criteria), the product roadmap/research backlog, the automated
+150 acceptance criteria), the product roadmap/research backlog, the automated
 test inventory, and rendered desktop and phone states. A persona passes only
 when their intended outcome is realistically achievable end to end with a
 suitable input method and usable output—not when an adjacent feature exists.
 
 ## Persona readiness
 
-| Persona       | What works now                                                                                                                                                     | Strict gap                                                                                                                                                                               | Verdict   |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| Zainab, 5     | Little Dreamer mode, large visual tools, spoken names, starter scenes, four gentle games, and spoken-story → reviewed, read-aloud animation                        | No blocking gap for her stated cute-animation-and-game outcome: dictation plans automatically, actions speak their names and one confirmation creates the complete recoverable story     | **Ready** |
-| Victor, 85    | Comfort mode, stronger contrast, 44 px targets, plain drawing, undo, autosave/reopen and reduced motion                                                            | No blocking outcome gap for his stated goal; the adult toolbar remains dense, but Draw plus comfort mode provides a complete imagination-to-saved-canvas journey                         | **Ready** |
-| Ali, 30       | Stylus pressure, layers, image import, filters, crop/resize, masks through selection, generative editing, lossless PNG and JPEG quality                            | Professional art depth remains thin: no tilt, brush library, blend modes, non-destructive masks/adjustments or color-management workflow                                                 | Partial   |
-| Fatima, 21    | Complete Persian RTL UI, Iranian Persian speech/commands/story planning, a directional broad calligraphy nib, stylus pressure, symmetry and Persian-script text    | No blocking gap for her stated calligraphy-exploration outcome: mouse, touch or pen can make authentic thick/thin marks, mirrored work remains one-step recoverable and PNG preserves it | **Ready** |
-| George, 45    | Spoken labels, forgiving English voice, story-to-reviewed-animation, read-aloud moments, narration, saving and games on touch devices                              | No blocking gap for his stated spoken-animation outcome. On a phone he sees one timeline job at a time and can create, review, play, narrate and save without assembling frames by hand  | **Ready** |
-| Sara, 15      | Design mode, selection, snapping, align/distribute, groups, reusable components, honest scalable SVG, PNG/JPEG and private prototype links                         | No blocking gap for her stated freelance-logo outcome: she can construct, reuse, align and deliver a genuinely scalable logo; PDF and brand-export presets would make delivery smoother  | **Ready** |
-| Zǐxuān, 28    | Complete Simplified Chinese UI/voice/story/game language; native data plots, scientific notation/connectors, precise layout, scalable SVG, animation and app links | No blocking gap for his stated science-image/animation/app outcome: he can create and deliver the complete journey in Chinese; structure drawing and statistics remain specialist depth  | **Ready** |
-| Maria, 32     | Portable `.dream`, stable engine surface, local MCP reading/rendering/export plus layer/shape/text authoring, deterministic app/code exports                       | The MCP package is registry-ready but not publicly installable; agent editing lacks strokes, raster import, layer management, links, components and AI edits                             | Partial   |
-| Aleksandr, 25 | Keyboard shortcuts, marquee/lasso, snapping, align/distribute, grouping, components, layers and reusable assets                                                    | Productivity stops short of a broad professional design tool: no vector paths, symbols/linked components, constraints, batch export, grids or extensibility                              | Partial   |
-| Ahmed, 42     | Draw-to-animation, narration, shaped/trimmed WebM or native MP4, burned-in captions, presentations, private links and offline app files                            | No blocking gap for his stated draw → animate → social-video outcome; direct platform publishing could shorten delivery but is not required to produce and share the finished video      | **Ready** |
+| Persona       | What works now                                                                                                                                                              | Strict gap                                                                                                                                                                               | Verdict   |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| Zainab, 5     | Little Dreamer mode, large visual tools, spoken names, starter scenes, four gentle games, and spoken-story → reviewed, read-aloud animation                                 | No blocking gap for her stated cute-animation-and-game outcome: dictation plans automatically, actions speak their names and one confirmation creates the complete recoverable story     | **Ready** |
+| Victor, 85    | Comfort mode, stronger contrast, 44 px targets, plain drawing, undo, autosave/reopen and reduced motion                                                                     | No blocking outcome gap for his stated goal; the adult toolbar remains dense, but Draw plus comfort mode provides a complete imagination-to-saved-canvas journey                         | **Ready** |
+| Ali, 30       | Stylus pressure, layers, image import, filters, crop/resize, masks through selection, generative editing, lossless PNG and JPEG quality                                     | Professional art depth remains thin: no tilt, brush library, blend modes, non-destructive masks/adjustments or color-management workflow                                                 | Partial   |
+| Fatima, 21    | Complete Persian RTL UI, Iranian Persian speech/commands/story planning, a directional broad calligraphy nib, stylus pressure, symmetry and Persian-script text             | No blocking gap for her stated calligraphy-exploration outcome: mouse, touch or pen can make authentic thick/thin marks, mirrored work remains one-step recoverable and PNG preserves it | **Ready** |
+| George, 45    | Spoken labels, forgiving English voice, story-to-reviewed-animation, read-aloud moments, narration, saving and games on touch devices                                       | No blocking gap for his stated spoken-animation outcome. On a phone he sees one timeline job at a time and can create, review, play, narrate and save without assembling frames by hand  | **Ready** |
+| Sara, 15      | Design mode, selection, snapping, align/distribute, groups, reusable components, honest scalable SVG, PNG/JPEG and private prototype links                                  | No blocking gap for her stated freelance-logo outcome: she can construct, reuse, align and deliver a genuinely scalable logo; PDF and brand-export presets would make delivery smoother  | **Ready** |
+| Zǐxuān, 28    | Complete Simplified Chinese UI/voice/story/game language; native data plots, scientific notation/connectors, precise layout, scalable SVG, animation and app links          | No blocking gap for his stated science-image/animation/app outcome: he can create and deliver the complete journey in Chinese; structure drawing and statistics remain specialist depth  | **Ready** |
+| Maria, 32     | Complete Brazilian Portuguese UI/voice/story/game language; portable `.dream`, stable engine surface, local MCP reading/rendering/export and deterministic app/code exports | The MCP package is registry-ready but not publicly installable; agent editing lacks strokes, raster import, layer management, links, components and AI edits                             | Partial   |
+| Aleksandr, 25 | Keyboard shortcuts, marquee/lasso, snapping, align/distribute, grouping, components, layers and reusable assets                                                             | Productivity stops short of a broad professional design tool: no vector paths, symbols/linked components, constraints, batch export, grids or extensibility                              | Partial   |
+| Ahmed, 42     | Draw-to-animation, narration, shaped/trimmed WebM or native MP4, burned-in captions, presentations, private links and offline app files                                     | No blocking gap for his stated draw → animate → social-video outcome; direct platform publishing could shorten delivery but is not required to produce and share the finished video      | **Ready** |
 
 ## Principal UX review
 
@@ -117,6 +117,10 @@ suitable input method and usable output—not when an adjacent feature exists.
     natural unspaced commands, plans stories and games locally, and reaches the
     scientific plot journey in a real browser. English remains an additive
     recovery vocabulary instead of replacing Mandarin.
+16. **Professional localization must preserve concepts.** The Brazilian
+    Portuguese review caught “cast layers” mistranslated as “scale layers” and
+    replaced literal art vocabulary before it reached users. The final journey
+    covers project/code delivery, voice, stories and games—not just labels.
 
 ### What does not yet fully serve the purpose
 
@@ -145,8 +149,8 @@ suitable input method and usable output—not when an adjacent feature exists.
 
 ## Recommended order
 
-1. Add persona-relevant Portuguese and Russian next, preserving the same
-   full-table, voice-aware bar established by Persian and Simplified Chinese.
+1. Add persona-relevant Russian next, preserving the same full-table,
+   voice-aware bar established by Persian, Simplified Chinese and Portuguese.
 2. Publish the prepared MCP package only with explicit approval, then deepen
    authoring tools in the order real agent workflows require.
 3. Add focused professional depth—brush presets and batch/brand delivery—only

@@ -136,6 +136,14 @@ Persian: قرمز، نارنجی، زرد، سبز، فیروزه‌ای، آس�
 صورتی، قهوه‌ای، مشکی/سیاه، سفید، خاکستری، طلایی.
 Simplified Chinese: 红色、橙色、黄色、绿色、青绿色、天蓝色、蓝色、紫色、
 粉色、棕色、黑色、白色、灰色、金色.
+Brazilian Portuguese provides the same complete surface with phrases such as
+desfazer / refazer, limpar, novo quadro, criar uma história sobre…, tocar /
+parar, jogar labirinto, pré-visualizar meu app, exportar meu app, código real,
+gravar narração / parar gravação / excluir narração, pincel / lápis / borracha /
+preencher / varinha / carimbo / texto, ligar / desligar espelhamento, maior /
+menor, salvar, ajuda and sim / não. Its color words include vermelho, laranja,
+amarelo, verde, turquesa, azul, roxo/violeta, rosa, marrom, preto, branco,
+cinza, ciano, magenta and dourado.
 
 ### Precedence rules (the parser's decision order)
 

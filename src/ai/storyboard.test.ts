@@ -48,6 +48,16 @@ describe('planStoryboard', () => {
     ]);
   });
 
+  it('splits Brazilian Portuguese sequence language without requiring a provider', () => {
+    expect(
+      planStoryboard('A lua acorda, depois encontra uma raposa. Por fim elas dançam', 'pt')?.scenes,
+    ).toEqual([
+      { description: 'A lua acorda' },
+      { description: 'encontra uma raposa' },
+      { description: 'elas dançam' },
+    ]);
+  });
+
   it('turns one idea into a two-frame beginning and next moment', () => {
     expect(planStoryboard('A sleepy fox under the moon')?.scenes).toEqual([
       { description: 'The beginning: A sleepy fox under the moon' },
@@ -64,6 +74,10 @@ describe('planStoryboard', () => {
     expect(planStoryboard('月光下的小狐狸', 'zh')?.scenes).toEqual([
       { description: '开头：月光下的小狐狸' },
       { description: '接下来：月光下的小狐狸' },
+    ]);
+    expect(planStoryboard('Uma raposa sob a lua', 'pt')?.scenes).toEqual([
+      { description: 'O começo: Uma raposa sob a lua' },
+      { description: 'O próximo momento: Uma raposa sob a lua' },
     ]);
   });
 
