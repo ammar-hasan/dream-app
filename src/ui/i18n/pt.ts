@@ -679,6 +679,8 @@ export const pt: Record<string, string> = {
   'settings.themeHint': 'Um estúdio à meia‑noite para sonhar tarde da noite',
   'settings.comfort': 'Modo conforto',
   'settings.comfortHint': 'Texto e botões maiores, contraste mais forte',
+  'settings.haptics': 'Feedback tátil',
+  'settings.hapticsHint': 'Vibrações curtas para alvos e recusas em dispositivos compatíveis',
   'settings.language': 'Idioma',
   'settings.install': 'Instalar Dream',
   'settings.installHint': 'Mantenha o Dream neste dispositivo — também funciona offline',

@@ -36,6 +36,7 @@ import { playNarration } from './narration';
 import { TextOverlay } from './TextOverlay';
 import { useT } from './i18n';
 import { DreamMark } from './icons';
+import { pulseHaptic } from './haptics';
 
 /** Accent used for all selection chrome, matching --accent in app.css. */
 const ACCENT = '#6d7cff';
@@ -88,6 +89,7 @@ export function CanvasViewport() {
   const [selectHover, setSelectHover] = useState<SelectHover>(null);
   const [zoomingOut, setZoomingOut] = useState(false);
   const [dropFeedback, setDropFeedback] = useState<DropFeedback>(null);
+  const dropFeedbackRef = useRef<DropFeedback>(null);
 
   const doc = useDreamStore((s) => s.doc);
   const activeLayerId = useDreamStore((s) => s.activeLayerId);
@@ -112,6 +114,7 @@ export function CanvasViewport() {
   const playing = useDreamStore((s) => s.playing);
   const playbackFrame = useDreamStore((s) => s.playbackFrame);
   const kidMode = useUiPrefs((s) => s.kidMode);
+  const haptics = useUiPrefs((s) => s.haptics);
   const skinCanvasRef = useRef<HTMLCanvasElement | null>(null);
   // Incremental compositor: one bitmap per layer, re-rendered only when the
   // layer's ops change — stroke previews, pan and zoom cost one drawImage
@@ -780,13 +783,22 @@ export function CanvasViewport() {
     e.preventDefault();
     const kind = dropKind(e.dataTransfer);
     e.dataTransfer.dropEffect = kind === 'invalid' ? 'none' : 'copy';
-    setDropFeedback((current) => (current === kind ? current : kind));
+    if (dropFeedbackRef.current !== kind) {
+      dropFeedbackRef.current = kind;
+      setDropFeedback(kind);
+      pulseHaptic(kind === 'invalid' ? 'refusal' : 'target', haptics);
+    }
+  };
+
+  const clearDropFeedback = () => {
+    dropFeedbackRef.current = null;
+    setDropFeedback(null);
   };
 
   const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const kind = dropKind(e.dataTransfer);
-    setDropFeedback(null);
+    clearDropFeedback();
     if (kind === 'invalid') return;
     const componentId = e.dataTransfer.getData('application/x-dream-component');
     if (componentId) {
@@ -815,7 +827,7 @@ export function CanvasViewport() {
       onDragEnter={onDragOver}
       onDragOver={onDragOver}
       onDragLeave={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDropFeedback(null);
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) clearDropFeedback();
       }}
       onDrop={onDrop}
     >

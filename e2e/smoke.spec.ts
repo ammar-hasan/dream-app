@@ -115,7 +115,19 @@ test('canvas pointers preview the object and explain direct-manipulation state',
 });
 
 test('canvas drag targets distinguish components, images and invalid content', async ({ page }) => {
+  await page.addInitScript(() => {
+    const target = window as Window & { __dreamHaptics?: Array<number | number[]> };
+    target.__dreamHaptics = [];
+    Object.defineProperty(navigator, 'vibrate', {
+      configurable: true,
+      value: (pattern: number | number[]) => {
+        target.__dreamHaptics?.push(pattern);
+        return true;
+      },
+    });
+  });
   await bootApp(page);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   const viewport = page.locator('.viewport');
   const dispatchDrag = (kind: 'component' | 'image' | 'invalid') =>
     viewport.evaluate((element, dragKind) => {
@@ -143,11 +155,44 @@ test('canvas drag targets distinguish components, images and invalid content', a
   await dispatchDrag('invalid');
   await expect(viewport).toHaveAttribute('data-drop-state', 'invalid');
   await expect(viewport.getByRole('status')).toHaveText('Drop an image or a Dream component here');
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => (window as Window & { __dreamHaptics?: Array<number | number[]> }).__dreamHaptics,
+      ),
+    )
+    .toEqual([8, 8, [8, 28, 8]]);
 
   await viewport.evaluate((element) => {
     element.dispatchEvent(new DragEvent('dragleave', { bubbles: true, relatedTarget: null }));
   });
   await expect(viewport).not.toHaveAttribute('data-drop-state');
+
+  await page.getByRole('button', { name: 'Settings', exact: true }).click();
+  const haptics = page.getByRole('checkbox', { name: /Touch feedback/ });
+  await haptics.uncheck();
+  await dispatchDrag('component');
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => (window as Window & { __dreamHaptics?: Array<number | number[]> }).__dreamHaptics,
+      ),
+    )
+    .toEqual([8, 8, [8, 28, 8]]);
+
+  await viewport.evaluate((element) => {
+    element.dispatchEvent(new DragEvent('dragleave', { bubbles: true, relatedTarget: null }));
+  });
+  await haptics.check();
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await dispatchDrag('invalid');
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => (window as Window & { __dreamHaptics?: Array<number | number[]> }).__dreamHaptics,
+      ),
+    )
+    .toEqual([8, 8, [8, 28, 8]]);
 });
 
 test('tooltips escape the scrolling toolbar and tool rail', async ({ page }) => {

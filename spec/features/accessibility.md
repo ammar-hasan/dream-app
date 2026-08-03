@@ -186,8 +186,10 @@ include красный, оранжевый, жёлтый, зелёный, бир
 ## The settings gear
 
 One menu consolidates it all: Little Dreamer mode, Speak tool names, Voice
-feedback, Dark mode, Comfort mode, Language, and — when the browser offers
-it — Install Dream.
+feedback, Dark mode, Comfort mode, Touch feedback, Language, and — when the
+browser offers it — Install Dream. Touch feedback defaults on but does nothing
+on unsupported hardware; people can turn it off, and reduced-motion preference
+keeps it silent. Every tactile cue repeats an already-visible interaction state.
 
 ## Edge cases
 

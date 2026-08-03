@@ -665,6 +665,8 @@ export const en: Record<string, string> = {
   'settings.themeHint': 'A midnight studio for late-night dreaming',
   'settings.comfort': 'Comfort mode',
   'settings.comfortHint': 'Bigger text and buttons, stronger contrast',
+  'settings.haptics': 'Touch feedback',
+  'settings.hapticsHint': 'Tiny vibrations for drop targets and refusals on supported devices',
   'settings.language': 'Language',
   'settings.install': 'Install Dream',
   'settings.installHint': 'Keep Dream on this device — it works offline too',

@@ -625,6 +625,8 @@ export const ru: Record<string, string> = {
   'settings.themeHint': 'Тёмная студия для творчества ночью',
   'settings.comfort': 'Комфортный режим',
   'settings.comfortHint': 'Крупнее текст и кнопки, контрастнее интерфейс',
+  'settings.haptics': 'Тактильный отклик',
+  'settings.hapticsHint': 'Короткая вибрация для целей и отказов на поддерживаемых устройствах',
   'settings.language': 'Язык',
   'settings.install': 'Установить Dream',
   'settings.installHint': 'Оставьте Dream на устройстве — работает офлайн',

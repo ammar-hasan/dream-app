@@ -63,6 +63,7 @@ above.
 | `dream:locale`                  | locale id, e.g. `'en'`, `'ar'`, `'fa'`, `'zh'`, `'pt'`, `'ru'` (default `'en'`)                                                                                  |
 | `dream:theme`                   | `'light'` / `'dark'`; absent = follow the OS preference                                                                                                          |
 | `dream:comfort-mode`            | `'1'` / `'0'`                                                                                                                                                    |
+| `dream:haptics`                 | `'1'` / `'0'` (defaults on; has no effect on devices without tactile feedback)                                                                                   |
 | `dream:recent-colors`           | JSON array of hex colors, newest first, max 8                                                                                                                    |
 | `dream:last-doc-id`             | document id; written on every autosave                                                                                                                           |
 | `dream:hint-dismissed`          | `'1'`                                                                                                                                                            |

@@ -222,10 +222,11 @@ is a refusal to confuse breadth with completion.
    reject late results. Story creation and video export have useful step counts;
    provider tests, project loading and code generation still need the same
    progress/cancel contract and meaningful partial-state placeholders.
-9. **Tactile feedback is absent.** On supported touch devices, sparse optional
-   haptics could reinforce snapping, a successful drop, destructive refusal and
-   game collisions. They must remain causal, never continuous while drawing,
-   and always accompany visible feedback.
+9. **Tactile feedback now has a sparse foundation.** On supported touch devices,
+   optional short cues reinforce the first visible valid drop target and a
+   visible refusal, remain silent under reduced motion and never buzz while
+   drawing. Snapping, destructive refusal and game collisions are not yet
+   covered and must follow the same causal, redundant contract.
 10. **Professional outcomes need professional substrate, not isolated tools.**
     Non-destructive masks/adjustments, vector paths, typography/color systems,
     publication preflight and richer agent schemas unlock several personas at

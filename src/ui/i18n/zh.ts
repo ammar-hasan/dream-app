@@ -647,6 +647,8 @@ export const zh: Record<string, string> = {
   'settings.themeHint': '为深夜创作准备的星夜工作室',
   'settings.comfort': '舒适模式',
   'settings.comfortHint': '更大的文字与按钮、更强的对比度',
+  'settings.haptics': '触觉反馈',
+  'settings.hapticsHint': '在支持的设备上为拖放目标和拒绝操作提供短促振动',
   'settings.language': '语言',
   'settings.install': '安装 Dream',
   'settings.installHint': '将 Dream 保存在此设备上 — 也能离线使用',

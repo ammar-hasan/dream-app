@@ -658,6 +658,8 @@ export const ar: Record<string, string> = {
   'settings.themeHint': 'مرسم منتصف الليل للأحلام المتأخرة',
   'settings.comfort': 'وضع الراحة',
   'settings.comfortHint': 'نص وأزرار أكبر وتباين أعلى',
+  'settings.haptics': 'ردود فعل لمسية',
+  'settings.hapticsHint': 'اهتزازات قصيرة لأهداف الإفلات والرفض على الأجهزة المدعومة',
   'settings.language': 'اللغة',
   'settings.install': 'ثبّت دريم',
   'settings.installHint': 'احتفظ بدريم على هذا الجهاز — يعمل دون اتصال أيضًا',

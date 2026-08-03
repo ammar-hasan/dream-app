@@ -12,6 +12,7 @@ beforeEach(() => {
     locale: 'en',
     theme: 'light',
     comfortMode: false,
+    haptics: true,
     recentColors: [],
   });
 });
@@ -73,6 +74,15 @@ describe('uiPrefs store', () => {
 
     useUiPrefs.getState().setComfortMode(false);
     expect(localStorage.getItem('dream:comfort-mode')).toBe('0');
+  });
+
+  it('keeps sparse haptics optional and persists the choice', () => {
+    expect(useUiPrefs.getState().haptics).toBe(true);
+    useUiPrefs.getState().setHaptics(false);
+    expect(useUiPrefs.getState().haptics).toBe(false);
+    expect(localStorage.getItem('dream:haptics')).toBe('0');
+    useUiPrefs.getState().setHaptics(true);
+    expect(localStorage.getItem('dream:haptics')).toBe('1');
   });
 
   it('remembers recent colors, newest first, deduped and capped at 8', () => {

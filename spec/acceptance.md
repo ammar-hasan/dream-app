@@ -565,6 +565,12 @@ holds.
       Cancel is chosen THEN the panel becomes ready, confirms nothing changed,
       asks the connected service to stop, and discards any result that arrives
       later without changing artwork or undo history.
+166.  GIVEN Touch feedback is on and supported WHEN a dragged image or Dream
+      component first becomes a valid named canvas target THEN one short tactile
+      cue reinforces that visible target; WHEN unsupported content first becomes
+      a named refusal THEN a distinct double cue reinforces the visible refusal.
+      Repeated drag events, drawing, unsupported hardware, the off setting and
+      reduced motion produce no tactile cue and never change document content.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

@@ -7,6 +7,12 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Sparse touch feedback** (slice 49): supported devices now give one short
+  tactile cue for the first visible valid canvas drop target and a distinct
+  double cue for a visible refusal. The setting defaults on, is optional,
+  stays silent under reduced motion or on unsupported hardware, and never
+  vibrates continuously while drawing.
+
 - **Natural voice corrections** (slice 48): yes/no now acts as an answer only
   when the whole meaningful utterance is an answer. “No, undo that” reaches
   Undo and “yes, make it red” reaches the color action instead of being

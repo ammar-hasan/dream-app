@@ -125,6 +125,10 @@ Text `#0f141f` / `#ffffff`, dim text `#454d61` / `#ccd4e8`, borders
 8. A drag entering the canvas gets immediate valid/invalid target emphasis and
    a short result label. The feedback disappears on leave or drop and never
    relies on color alone.
+9. On supported hardware, a short tactile cue may reinforce the first named
+   valid drop target and a distinct double cue may reinforce refusal. Tactile
+   feedback is optional, never runs continuously while drawing, never replaces
+   the visible state, and stays silent when reduced motion is requested.
 
 ## Video captions
 

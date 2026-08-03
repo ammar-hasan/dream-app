@@ -632,6 +632,9 @@ export const fa: Record<string, string> = {
   'settings.themeHint': 'استودیویی در نیمه‌شب برای خیال‌پردازی‌های شبانه',
   'settings.comfort': 'حالت راحتی',
   'settings.comfortHint': 'متن و دکمه‌های بزرگ‌تر، کنتراست قوی‌تر',
+  'settings.haptics': 'بازخورد لمسی',
+  'settings.hapticsHint':
+    'لرزش‌های کوتاه برای هدف‌های رها کردن و رد شدن در دستگاه‌های پشتیبانی‌شده',
   'settings.language': 'زبان',
   'settings.install': 'نصب Dream',
   'settings.installHint': 'Dream را روی این دستگاه نگه دارید — به صورت آفلاین هم کار می‌کند',

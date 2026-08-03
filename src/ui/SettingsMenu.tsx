@@ -35,6 +35,7 @@ export function SettingsMenu() {
   const voiceFeedback = useUiPrefs((s) => s.voiceFeedback);
   const theme = useUiPrefs((s) => s.theme);
   const comfortMode = useUiPrefs((s) => s.comfortMode);
+  const haptics = useUiPrefs((s) => s.haptics);
   const locale = useUiPrefs((s) => s.locale);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installDismissed, setInstallDismissed] = useState(readInstallDismissed);
@@ -146,6 +147,18 @@ export function SettingsMenu() {
             <span className="settings-item-text">
               <strong>{t('settings.comfort')}</strong>
               <small>{t('settings.comfortHint')}</small>
+            </span>
+          </label>
+
+          <label className="settings-item checkbox-field">
+            <input
+              type="checkbox"
+              checked={haptics}
+              onChange={(e) => useUiPrefs.getState().setHaptics(e.target.checked)}
+            />
+            <span className="settings-item-text">
+              <strong>{t('settings.haptics')}</strong>
+              <small>{t('settings.hapticsHint')}</small>
             </span>
           </label>
 

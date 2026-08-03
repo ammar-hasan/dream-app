@@ -17,6 +17,7 @@ const VOICE_FEEDBACK_KEY = 'dream:voice-feedback';
 const LOCALE_KEY = 'dream:locale';
 const THEME_KEY = 'dream:theme';
 const COMFORT_KEY = 'dream:comfort-mode';
+const HAPTICS_KEY = 'dream:haptics';
 const RECENT_COLORS_KEY = 'dream:recent-colors';
 const MAX_RECENT_COLORS = 8;
 
@@ -34,6 +35,8 @@ export interface UiPrefs {
   theme: Theme;
   /** Senior-friendly mode: larger UI text/targets and stronger contrast. */
   comfortMode: boolean;
+  /** Sparse tactile cues on supported hardware; visual feedback remains primary. */
+  haptics: boolean;
   /** Most-recently-used colors, newest first (for the options panel row). */
   recentColors: string[];
 
@@ -43,6 +46,7 @@ export interface UiPrefs {
   setLocale(locale: string): void;
   setTheme(theme: Theme): void;
   setComfortMode(on: boolean): void;
+  setHaptics(on: boolean): void;
   rememberColor(color: string): void;
 }
 
@@ -51,6 +55,14 @@ function readFlag(key: string): boolean {
     return globalThis.localStorage?.getItem(key) === '1';
   } catch {
     return false;
+  }
+}
+
+function readDefaultOnFlag(key: string): boolean {
+  try {
+    return globalThis.localStorage?.getItem(key) !== '0';
+  } catch {
+    return true;
   }
 }
 
@@ -103,6 +115,7 @@ export const useUiPrefs = create<UiPrefs>()((set) => {
     locale: readLocale(),
     theme: readTheme(),
     comfortMode: readFlag(COMFORT_KEY),
+    haptics: readDefaultOnFlag(HAPTICS_KEY),
     recentColors: readRecentColors(),
 
     setKidMode: (on) => {
@@ -135,6 +148,11 @@ export const useUiPrefs = create<UiPrefs>()((set) => {
     setComfortMode: (on) => {
       set({ comfortMode: on });
       write(COMFORT_KEY, on ? '1' : '0');
+    },
+
+    setHaptics: (on) => {
+      set({ haptics: on });
+      write(HAPTICS_KEY, on ? '1' : '0');
     },
 
     rememberColor: (color) => {

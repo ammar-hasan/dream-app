@@ -184,7 +184,8 @@ RTL remain first-class product behavior.
   logical positioning, so mirrored panels, rails and Settings remain visible.
 
 The **settings gear** in the toolbar consolidates all of it: Little Dreamer
-mode, speak tool names, voice feedback, the dark-mode toggle, comfort mode
+mode, speak tool names, voice feedback, the dark-mode toggle, comfort mode,
+optional touch feedback on supported hardware,
 and the language picker.
 
 ### Adding a locale

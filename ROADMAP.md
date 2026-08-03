@@ -1160,6 +1160,24 @@ having a leading yes/no silently consume the command that follows it.
 - ✅ Full release gates remain green: 841 unit tests, 97.74% engine coverage,
   46 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 49 — Sparse tactile interaction cues ✅
+
+Persona need: let touch-device creators feel a decisive interaction boundary
+without turning every brush movement into noise or making touch feedback the
+only way to understand what happened.
+
+- ✅ The first visible valid canvas drop target gets one short tactile cue on
+  supported hardware; the visible invalid target gets a distinct double cue.
+- ✅ Repeated drag events do not repeat a cue, drawing never vibrates, and the
+  named canvas state remains the primary feedback in every case.
+- ✅ Touch feedback has a plain-language setting, defaults on, persists locally
+  and becomes a harmless no-op on unsupported hardware.
+- ✅ Reduced-motion preference and the off setting both keep tactile output
+  silent; focused unit and production-browser coverage prove patterns,
+  suppression and the user control.
+- ✅ Full release gates remain green: 845 unit tests, 97.74% engine coverage,
+  46 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
