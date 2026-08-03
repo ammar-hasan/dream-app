@@ -422,6 +422,8 @@ export interface DreamStore {
   setSnapping(enabled: boolean): void;
   /** Arrow-key nudge; one undoable command per call. */
   nudgeSelection(dx: number, dy: number): void;
+  /** Uniformly scale the selection about its center; one undoable command. */
+  scaleSelection(factor: number): void;
   deleteSelection(): void;
   /** Duplicate with a small offset; the clones become the selection. */
   duplicateSelection(): void;
@@ -1722,6 +1724,23 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       mutateSelection('Move selection', (ops, ids) => {
         const wanted = new Set(ids);
         return ops.map((op) => (wanted.has(op.id) ? translateOperation(op, dx, dy) : op));
+      });
+    },
+
+    scaleSelection: (factor) => {
+      if (!Number.isFinite(factor) || factor <= 0 || factor === 1) return;
+      const layer = activeLayer();
+      const { selection } = get();
+      if (!layer || layer.locked || selection.length === 0) return;
+      const bounds = selectionUnionBounds(layer.operations, selection);
+      if (!bounds) return;
+      const center = {
+        x: bounds.x + bounds.width / 2,
+        y: bounds.y + bounds.height / 2,
+      };
+      mutateSelection('Scale selection', (ops, ids) => {
+        const wanted = new Set(ids);
+        return ops.map((op) => (wanted.has(op.id) ? scaleOperationAbout(op, center, factor) : op));
       });
     },
 

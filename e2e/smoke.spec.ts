@@ -286,6 +286,63 @@ test('a spoken story request opens a planned storyboard', async ({ page }) => {
   await expect(dialog).toContainText(/moon/i);
 });
 
+test('voice resolves “make it bigger” to the visible selection', async ({ page }) => {
+  await page.addInitScript(() => {
+    class FakeRecognition {
+      lang = '';
+      interimResults = false;
+      continuous = false;
+      onresult: ((event: unknown) => void) | null = null;
+      onerror: ((event: unknown) => void) | null = null;
+      onend: (() => void) | null = null;
+
+      start() {
+        setTimeout(() => {
+          const result = { isFinal: true, 0: { transcript: 'make it bigger' } };
+          this.onresult?.({ resultIndex: 0, results: { 0: result, length: 1 } });
+          this.onend?.();
+        }, 0);
+      }
+
+      stop() {
+        this.onend?.();
+      }
+    }
+    Object.defineProperty(globalThis, 'SpeechRecognition', {
+      configurable: true,
+      value: FakeRecognition,
+    });
+    Object.defineProperty(globalThis, 'webkitSpeechRecognition', {
+      configurable: true,
+      value: FakeRecognition,
+    });
+  });
+
+  await bootApp(page);
+  await page.keyboard.press('r');
+  const canvas = page.locator('.viewport-canvas');
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('canvas has no bounds');
+  const from = { x: box.x + box.width * 0.4, y: box.y + box.height * 0.4 };
+  const to = { x: box.x + box.width * 0.55, y: box.y + box.height * 0.55 };
+  await page.mouse.move(from.x, from.y);
+  await page.mouse.down();
+  await page.mouse.move(to.x, to.y);
+  await page.mouse.up();
+
+  await page.getByRole('tab', { name: 'Design' }).click();
+  await page.keyboard.press('v');
+  await page.mouse.click((from.x + to.x) / 2, (from.y + to.y) / 2);
+  const before = await nonWhitePixels(page);
+
+  await page.getByRole('button', { name: 'Voice commands' }).click();
+  await expect(page.getByRole('status')).toContainText('Made the selected part bigger.');
+  await expect.poll(() => nonWhitePixels(page)).toBeGreaterThan(before);
+
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(() => nonWhitePixels(page)).toBeLessThanOrEqual(before);
+});
+
 test('tabular science data becomes a grouped scalable plot in one undo', async ({ page }) => {
   await bootApp(page);
   const before = await nonWhitePixels(page);

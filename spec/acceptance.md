@@ -231,7 +231,12 @@ holds.
     playback.
 79. GIVEN "fill red" THEN the color becomes red `#ef4444` and the fill
     tool activates.
-80. GIVEN "bigger" at size 8 THEN the size becomes 12; at 64 it stays 64.
+80. GIVEN no selection WHEN "bigger" is spoken at brush size 8 THEN the size
+    becomes 12; at 64 it stays 64. GIVEN selected unlocked artwork WHEN "make
+    it bigger" or "make it smaller" is spoken THEN the selection scales by one
+    gentle step about its shared center as one undoable change and the spoken
+    status names the selection; a locked selection changes neither art nor
+    brush and says why.
 81. GIVEN Arabic selected THEN the whole shell mirrors to RTL instantly
     without reload, and every string has an Arabic value (no English
     leakage, no missing keys).

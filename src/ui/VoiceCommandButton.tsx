@@ -35,6 +35,8 @@ function executorStore(announceDone?: (message: string) => void): VoiceExecutorS
     canRedo: s.canRedo,
     settings: s.settings,
     activeLayerHasContent: !!layer && layer.operations.length > 0,
+    selectionCount: s.selection.length,
+    selectionTransformable: s.selection.length > 0 && !!layer && !layer.locked,
     undo: s.undo,
     redo: s.redo,
     clearLayer: s.clearLayer,
@@ -60,6 +62,7 @@ function executorStore(announceDone?: (message: string) => void): VoiceExecutorS
     setTool: s.setTool,
     setColor: s.setColor,
     setSize: s.setSize,
+    scaleSelection: s.scaleSelection,
     setSymmetry: s.setSymmetry,
     narrationRecording: sharedNarrationRecorder().state === 'recording',
     // Async: the mic permission prompt resolves later; a denial is announced

@@ -18,6 +18,8 @@ function makeStore(overrides: Partial<VoiceExecutorStore> = {}) {
     canRedo: false,
     settings: { size: 8 },
     activeLayerHasContent: true,
+    selectionCount: 0,
+    selectionTransformable: false,
     undo: vi.fn(),
     redo: vi.fn(),
     clearLayer: vi.fn(),
@@ -36,6 +38,7 @@ function makeStore(overrides: Partial<VoiceExecutorStore> = {}) {
     setTool: vi.fn(),
     setColor: vi.fn(),
     setSize: vi.fn(),
+    scaleSelection: vi.fn(),
     setSymmetry: vi.fn(),
     narrationRecording: false,
     startNarration: vi.fn(),
@@ -258,6 +261,23 @@ describe('executeVoiceCommand', () => {
     const tiny = makeStore({ settings: { size: 2 } });
     executeVoiceCommand({ kind: 'smaller' }, tiny, () => {});
     expect(tiny.setSize).toHaveBeenCalledWith(1);
+  });
+
+  it('bigger/smaller resolve “it” to selected artwork and respect a locked layer', () => {
+    const selected = makeStore({ selectionCount: 2, selectionTransformable: true });
+    expect(executeVoiceCommand({ kind: 'bigger' }, selected, () => {})?.message).toBe(
+      'Made the selected part bigger.',
+    );
+    expect(selected.scaleSelection).toHaveBeenCalledWith(1.15);
+    expect(selected.setSize).not.toHaveBeenCalled();
+
+    executeVoiceCommand({ kind: 'smaller' }, selected, () => {});
+    expect(selected.scaleSelection).toHaveBeenLastCalledWith(1 / 1.15);
+
+    const locked = makeStore({ selectionCount: 1, selectionTransformable: false });
+    expect(executeVoiceCommand({ kind: 'bigger' }, locked, () => {})?.message).toMatch(/locked/i);
+    expect(locked.scaleSelection).not.toHaveBeenCalled();
+    expect(locked.setSize).not.toHaveBeenCalled();
   });
 
   it('save triggers the save callback; help speaks the command list', () => {

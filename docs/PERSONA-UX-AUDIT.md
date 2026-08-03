@@ -208,9 +208,10 @@ is a refusal to confuse breadth with completion.
    Small numeric tables now become publication-shaped native plots, but Dream
    deliberately does not run statistical tests, infer missing values, import
    specialist project files or draw chemical structures from notation.
-6. **Voice is broad but not yet conversational.** Natural phrasing works around
-   a bounded intent grammar; multi-turn clarification, reference resolution
-   (“make it bigger”), correction and offline recognition are not present.
+6. **Voice has its first contextual reference, but is not yet conversational.**
+   Natural “make it bigger/smaller” now resolves “it” to visible selected
+   artwork and preserves brush meaning otherwise. Broader references, multi-turn
+   clarification and correction, and offline recognition are not present.
 7. **Direct manipulation now has a foundation, not full depth.** Predictive hit
    chrome, contextual cursors, open/closed-hand drags, named drop targets and
    post-component-drop selection are coherent. Drag ghosts, keyboard-equivalent

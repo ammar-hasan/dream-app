@@ -7,6 +7,13 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Voice selection reference** (slice 47): “make it bigger/smaller” now
+  understands visible selected artwork as “it,” scales it about its shared
+  center in one undoable step, and names the result. With no selection it keeps
+  the familiar brush-size behavior; locked selections are refused truthfully.
+  Contextual feedback is localized in all six languages and covered at the
+  selection and voice-executor boundaries.
+
 - **Truthful AI progress and cancellation** (slice 46): Create, Edit and
   Feedback now show staged, action-specific indeterminate progress instead of
   only changing a button label. Cancel returns immediately, forwards an abort

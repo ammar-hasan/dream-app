@@ -37,6 +37,10 @@ Link tools, the Design panel, the Links panel and the Components panel.
   pixel content (images, fills) rotates in **90° steps** — those have no
   arbitrary-angle form.
 - **Nudge:** arrow keys move the selection 1 px; Shift = 10 px.
+- **Spoken size:** while anything is selected, “make it bigger” or “make it
+  smaller” understands “it” as the selected artwork and scales the group gently
+  about its shared center. Each request is one undoable step; a locked selection
+  is refused rather than silently changing the brush.
 - **Duplicate** (Cmd/Ctrl+D), **delete** (Del/Backspace), **bring
   forward / send backward** (within the layer), **group** (Cmd/Ctrl+G) and
   **ungroup** (Cmd/Ctrl+Shift+G) — all undoable.

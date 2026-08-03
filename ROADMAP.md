@@ -1124,6 +1124,24 @@ in control when generation is slower than a direct manipulation.
 - ✅ Full release gates remain green: 839 unit tests, 97.74% engine coverage,
   45 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 47 — Voice understands the selected “it” ✅
+
+Persona need: let Zainab and George speak about the thing they can already see
+instead of learning that every phrase controls a hidden tool setting.
+
+- ✅ With artwork selected, “make it bigger” and “make it smaller” resolve “it”
+  to the selection, scale the complete group about its shared center and name
+  that result in spoken/visible feedback.
+- ✅ With no selection, the established brush-size behavior remains exact. A
+  locked selection gets a truthful refusal and never falls through to changing
+  the brush.
+- ✅ Selection scaling is one undoable document action and works across every
+  selectable object type through the same transformation contract as handles.
+- ✅ Contextual feedback is localized in all six languages; focused store and
+  voice-executor tests cover scaling, undo, reference choice and lock refusal.
+- ✅ Full release gates remain green: 841 unit tests, 97.74% engine coverage,
+  46 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1134,9 +1152,10 @@ largest count of controls:
    established; continue with drag ghosts and extend the same progress contract
    to provider tests, project loading and code generation.
 2. **Conversational phone-first creation:** natural clarification and reference
-   handling for voice, a task-prioritized mobile shell, and a faithful safe
-   creation path that does not require a child or low-literacy user to configure
-   an AI provider.
+   handling for voice now has a selected-object foundation; continue with more
+   referents and corrections, a task-prioritized mobile shell, and a faithful
+   safe creation path that does not require a child or low-literacy user to
+   configure an AI provider.
 3. **Professional substrate:** non-destructive masks/adjustments and blend/color
    foundations, then vector paths, typography, grids, constraints and linked
    reusable systems—Design-only, preserving Draw's first-minute simplicity.

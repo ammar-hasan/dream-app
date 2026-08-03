@@ -18,6 +18,9 @@ export interface VoiceExecutorStore {
   settings: { size: number };
   /** True when the active layer has anything worth clearing. */
   activeLayerHasContent: boolean;
+  /** Current Design selection and whether its layer permits transforms. */
+  selectionCount: number;
+  selectionTransformable: boolean;
   undo(): void;
   redo(): void;
   clearLayer(): void;
@@ -41,6 +44,7 @@ export interface VoiceExecutorStore {
   setTool(tool: ToolId): void;
   setColor(color: Color): void;
   setSize(size: number): void;
+  scaleSelection(factor: number): void;
   setSymmetry(mode: SymmetryMode): void;
   /** True while a narration take is being recorded. */
   narrationRecording: boolean;
@@ -192,10 +196,20 @@ export function executeVoiceCommand(
       };
 
     case 'bigger':
+      if (store.selectionCount > 0) {
+        if (!store.selectionTransformable) return { message: t('voice.selectionLocked') };
+        store.scaleSelection(1.15);
+        return { message: t('voice.selectionBigger') };
+      }
       store.setSize(bigger(store.settings.size));
       return { message: t('voice.bigger') };
 
     case 'smaller':
+      if (store.selectionCount > 0) {
+        if (!store.selectionTransformable) return { message: t('voice.selectionLocked') };
+        store.scaleSelection(1 / 1.15);
+        return { message: t('voice.selectionSmaller') };
+      }
       store.setSize(smaller(store.settings.size));
       return { message: t('voice.smaller') };
 

@@ -225,6 +225,21 @@ describe('selection actions', () => {
     expect((store().doc.layers[0].operations[0] as ShapeOp).from).toEqual({ x: 10, y: 10 });
   });
 
+  it('scales around the selection center and is undoable', () => {
+    drawRect();
+    enterDesign();
+    store().setSelection([store().doc.layers[0].operations[0].id]);
+    store().scaleSelection(2);
+    const scaled = store().doc.layers[0].operations[0] as ShapeOp;
+    expect(scaled.from).toEqual({ x: 0, y: 0 });
+    expect(scaled.to).toEqual({ x: 40, y: 40 });
+    expect(scaled.size).toBe(4);
+    store().undo();
+    const restored = store().doc.layers[0].operations[0] as ShapeOp;
+    expect(restored.from).toEqual({ x: 10, y: 10 });
+    expect(restored.to).toEqual({ x: 30, y: 30 });
+  });
+
   it('delete removes the ops, undo restores them', () => {
     drawRect();
     drawStroke();

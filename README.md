@@ -155,6 +155,9 @@ RTL remain first-class product behavior.
   minimal store interface. Every command confirms in the status area and,
   when **voice feedback** is on, out loud. Without SpeechRecognition the mic
   remains visible and explains the touch, mouse and keyboard alternatives.
+  Visible selection supplies context: “make it bigger/smaller” scales selected
+  artwork about its shared center as one undoable action; without a selection
+  it keeps changing brush size, and a locked selection is refused truthfully.
   The vocabulary is **per-locale**: with
   the UI in Arabic the parser also understands Arabic commands (تراجع،
   إعادة، امسح، إطار جديد، شغّل، أوقف، فرشاة، ممحاة، طابع، العب لعبتي،
