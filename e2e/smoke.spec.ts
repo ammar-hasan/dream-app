@@ -142,6 +142,52 @@ test('canvas pointers preview the object and explain direct-manipulation state',
   await page.keyboard.up('Alt');
 });
 
+test('selection snapping gives one visible and tactile detent per guide', async ({ page }) => {
+  await page.addInitScript(() => {
+    const target = window as Window & { __dreamHaptics?: Array<number | number[]> };
+    target.__dreamHaptics = [];
+    Object.defineProperty(navigator, 'vibrate', {
+      configurable: true,
+      value: (pattern: number | number[]) => {
+        target.__dreamHaptics?.push(pattern);
+        return true;
+      },
+    });
+  });
+  await bootApp(page);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await drawStroke(page);
+  await page.getByRole('tab', { name: 'Design' }).click();
+  await page.getByRole('button', { name: 'Select', exact: true }).click();
+
+  const canvas = page.locator('.viewport-canvas');
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('viewport canvas has no box');
+  const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  await page.mouse.click(center.x, center.y);
+
+  await page.mouse.move(center.x, center.y);
+  const pointerX = Number((await page.locator('.status-pointer').textContent())?.split(',')[0]);
+  const documentWidth = Number(
+    (await page.locator('.status-item').nth(1).textContent())?.split('×')[0],
+  );
+  const centerGuideDelta = documentWidth / 2 - pointerX;
+  await page.mouse.down();
+  await page.mouse.move(center.x + centerGuideDelta, center.y);
+  await page.mouse.move(center.x + centerGuideDelta + 1, center.y);
+  await expect(page.locator('.snap-feedback')).toHaveText('Snapped');
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => (window as Window & { __dreamHaptics?: Array<number | number[]> }).__dreamHaptics,
+      ),
+    )
+    .toEqual([5]);
+
+  await page.mouse.up();
+  await expect(page.locator('.snap-feedback')).toHaveCount(0);
+});
+
 test('canvas drag targets distinguish components, images and invalid content', async ({ page }) => {
   await page.addInitScript(() => {
     const target = window as Window & { __dreamHaptics?: Array<number | number[]> };

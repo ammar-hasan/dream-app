@@ -1407,6 +1407,22 @@ Persona need: let a child or low-literacy creator refine placement naturally—
 - ✅ Full release gates remain green: 871 unit tests, 97.74% engine coverage,
   51 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 63 — Selection snapping feels decisive ✅
+
+Persona need: let a precise mouse, pen or touch creator feel and see the exact
+alignment boundary without watching coordinates or receiving constant noise.
+
+- ✅ A compact pointer-side confirmation reinforces the existing exact accent
+  guide while a dragged selection is snapped.
+- ✅ Entering a new guide produces one tiny optional tactile detent on supported
+  hardware; repeated movement along the same guide stays silent.
+- ✅ The existing Touch feedback setting, unsupported-hardware behavior and
+  reduced-motion preference keep tactile output optional and harmless.
+- ✅ A production-browser journey proves the visible confirmation, one-detent
+  boundary and cleanup after release.
+- ✅ Full release gates remain green: 871 unit tests, 97.74% engine coverage,
+  52 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the

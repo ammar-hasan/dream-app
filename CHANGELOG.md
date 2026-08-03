@@ -7,6 +7,11 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Decisive selection snapping** (slice 63): selection drags now pair their
+  exact guide lines with a compact pointer-side confirmation and one optional
+  tactile detent when entering a new guide. Continuing along the same guide is
+  silent, and reduced-motion, disabled or unsupported setups remain unchanged.
+
 - **Safe spoken continuation** (slice 62): immediately after a successful
   directional nudge, “again” or “a little more” repeats that same 10 px move in
   all six locales. The ephemeral context clears on every interruption, failure

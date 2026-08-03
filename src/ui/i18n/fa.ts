@@ -150,6 +150,7 @@ export const fa: Record<string, string> = {
   'font.persian': 'خط فارسی',
   'design.title': 'طراحی',
   'design.snap': 'چسباندن به بوم و اشیاء',
+  'design.snapped': 'تراز شد',
   'design.selectedOne':
     '{count} شیء انتخاب شده — بکشید برای جابجایی، دستگیره‌های گوشه برای تغییر اندازه، دستگیره بالایی برای چرخش.',
   'design.selectedMany':
@@ -654,7 +655,7 @@ export const fa: Record<string, string> = {
   'settings.comfortHint': 'متن و دکمه‌های بزرگ‌تر، کنتراست قوی‌تر',
   'settings.haptics': 'بازخورد لمسی',
   'settings.hapticsHint':
-    'لرزش‌های کوتاه برای هدف‌های رها کردن، گام‌های چرخش و رد شدن در دستگاه‌های پشتیبانی‌شده',
+    'لرزش‌های کوتاه برای تراز، هدف‌های رها کردن، گام‌های چرخش و رد شدن در دستگاه‌های پشتیبانی‌شده',
   'settings.language': 'زبان',
   'settings.install': 'نصب Dream',
   'settings.installHint': 'Dream را روی این دستگاه نگه دارید — به صورت آفلاین هم کار می‌کند',

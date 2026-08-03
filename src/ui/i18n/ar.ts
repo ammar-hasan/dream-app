@@ -157,6 +157,7 @@ export const ar: Record<string, string> = {
   // --- Design panel ----------------------------------------------------------
   'design.title': 'تصميم',
   'design.snap': 'المحاذاة التلقائية للوحة والعناصر',
+  'design.snapped': 'تمت المحاذاة',
   'design.selectedOne':
     '{count} عنصر محدد — اسحب للنقل، ومقابض الزوايا للتكبير، والمقبض العلوي للتدوير.',
   'design.selectedMany':
@@ -681,7 +682,8 @@ export const ar: Record<string, string> = {
   'settings.comfort': 'وضع الراحة',
   'settings.comfortHint': 'نص وأزرار أكبر وتباين أعلى',
   'settings.haptics': 'ردود فعل لمسية',
-  'settings.hapticsHint': 'اهتزازات قصيرة لأهداف الإفلات ونقاط الدوران والرفض على الأجهزة المدعومة',
+  'settings.hapticsHint':
+    'اهتزازات قصيرة للمحاذاة وأهداف الإفلات ونقاط الدوران والرفض على الأجهزة المدعومة',
   'settings.language': 'اللغة',
   'settings.install': 'ثبّت دريم',
   'settings.installHint': 'احتفظ بدريم على هذا الجهاز — يعمل دون اتصال أيضًا',

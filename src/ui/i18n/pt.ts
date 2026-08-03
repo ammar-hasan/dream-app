@@ -160,6 +160,7 @@ export const pt: Record<string, string> = {
   // --- Design panel ----------------------------------------------------------
   'design.title': 'Design',
   'design.snap': 'Encaixar na tela e objetos',
+  'design.snapped': 'Alinhado',
   'design.selectedOne':
     '{count} objeto selecionado — arraste para mover, alças de canto para escalar, alça superior para girar.',
   'design.selectedMany':
@@ -703,7 +704,7 @@ export const pt: Record<string, string> = {
   'settings.comfortHint': 'Texto e botões maiores, contraste mais forte',
   'settings.haptics': 'Feedback tátil',
   'settings.hapticsHint':
-    'Vibrações curtas para alvos, encaixes de rotação e recusas em dispositivos compatíveis',
+    'Vibrações curtas para alinhamento, alvos, encaixes de rotação e recusas em dispositivos compatíveis',
   'settings.language': 'Idioma',
   'settings.install': 'Instalar Dream',
   'settings.installHint': 'Mantenha o Dream neste dispositivo — também funciona offline',

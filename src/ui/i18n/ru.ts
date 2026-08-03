@@ -148,6 +148,7 @@ export const ru: Record<string, string> = {
   'font.persian': 'Персидский шрифт',
   'design.title': 'Дизайн',
   'design.snap': 'Привязка к холсту и объектам',
+  'design.snapped': 'Привязано',
   'design.selectedOne':
     'Выбран объект ({count}) — тяните для перемещения, угловые ручки — масштабировать, верхняя — повернуть.',
   'design.selectedMany':
@@ -647,7 +648,7 @@ export const ru: Record<string, string> = {
   'settings.comfortHint': 'Крупнее текст и кнопки, контрастнее интерфейс',
   'settings.haptics': 'Тактильный отклик',
   'settings.hapticsHint':
-    'Короткая вибрация для целей, шагов вращения и отказов на поддерживаемых устройствах',
+    'Короткая вибрация для привязки, целей, шагов вращения и отказов на поддерживаемых устройствах',
   'settings.language': 'Язык',
   'settings.install': 'Установить Dream',
   'settings.installHint': 'Оставьте Dream на устройстве — работает офлайн',

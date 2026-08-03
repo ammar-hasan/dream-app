@@ -156,15 +156,25 @@ Modern interaction craft should make state legible rather than add spectacle:
   interaction rather than remain a static cursor per tool.
   (https://developer.apple.com/design/human-interface-guidelines/pointing-devices)
 - **Motion is brief, causal and cancellable.** It follows the gesture, explains
-  state, never delays frequent work and collapses under reduced motion.
-  (https://developer.apple.com/design/human-interface-guidelines/motion)
+  state, never delays frequent work and collapses under reduced motion. Current
+  professional systems cluster frequent hover/press feedback around 50–220 ms
+  and reserve longer motion for larger spatial transitions.
+  (https://developer.apple.com/design/human-interface-guidelines/motion ·
+  https://spectrum.adobe.com/page/motion/ ·
+  https://atlassian.design/foundations/motion)
 - **Loading shows something immediately.** Use determinate progress when the
   work is countable, indeterminate activity when it is not, allow unrelated
-  work where safe, and never leave a blank or apparently frozen surface.
-  (https://developer.apple.com/design/human-interface-guidelines/loading)
+  work where safe, and never leave a blank or apparently frozen surface. For
+  multi-item content, reveal finished items and leave item-level placeholders
+  or progress only where work remains instead of holding the complete result.
+  (https://developer.apple.com/design/human-interface-guidelines/progress-indicators ·
+  https://spectrum.adobe.com/page/progress-bar/ ·
+  https://spectrum.adobe.com/page/cards/)
 - **Haptics are sparse, optional and redundant.** A short pulse may reinforce a
   snap, successful drop or game collision on supported hardware, but must match
-  visible/audio feedback and must never buzz continuously while drawing.
+  visible/audio feedback and must never buzz continuously while drawing. Shape
+  alignment is specifically suited to a discrete detent; repeated motion along
+  the same guide is not a new event.
   (https://developer.apple.com/design/human-interface-guidelines/playing-haptics)
 
 ## 3. Trend watch

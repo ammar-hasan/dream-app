@@ -75,7 +75,10 @@ holds.
 27. GIVEN a lasso loop around a small object inside a big one THEN only
     the small object selects (center-in-loop rule).
 28. GIVEN a selection dragged near the canvas center THEN it snaps at
-    6 px with a visible guide line; the snap toggle disables this.
+    6 px with a visible guide line and compact pointer-side confirmation; the
+    snap toggle disables this. GIVEN Touch feedback is on and supported THEN
+    entering a new guide produces one tiny tactile detent, while repeated moves
+    along the same guide, the off setting and reduced motion stay silent.
 29. GIVEN a selection of a stroke WHEN rotated via the top handle THEN any
     angle is possible and Shift snaps to 15°; a selection containing an image
     rotates in 90° steps only. DURING rotation THEN a pointer-adjacent readout

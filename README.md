@@ -472,8 +472,10 @@ pro workspace — the mode is persisted per project.
   pointer-side badge reports the effective angle and constraint, with optional
   tactile detents at snapped boundaries.
 - **Snapping**: while dragging, the selection snaps to the canvas center and
-  edges and to other objects' edges/centers, with thin accent guide lines.
-  Toggle it in the Design panel (on by default).
+  edges and to other objects' edges/centers, with thin accent guide lines and a
+  compact pointer-side confirmation. Entering a new guide adds one optional
+  tactile detent on supported devices; moving along it stays quiet. Toggle
+  snapping in the Design panel (on by default).
 - **Group / ungroup**: groups are a `groupId` on ops, not a scene graph —
   grouped objects select and transform as one unit.
 - **Reorder, duplicate, delete, nudge**: bring forward / send backward within

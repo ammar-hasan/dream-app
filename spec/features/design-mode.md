@@ -72,8 +72,11 @@ selection snaps — within **6 px** (at 100% zoom, scaled with zoom) — to:
 - the canvas edges and canvas center lines, and
 - every other object's edges and centers,
 
-with thin accent guide lines showing what it snapped to. The closest
-candidate per axis wins.
+with thin accent guide lines showing what it snapped to and a compact
+pointer-side confirmation while the guide is active. The closest candidate per
+axis wins. With Touch feedback on, entering a new guide produces one tiny
+tactile detent on supported devices; repeated movement along that same guide
+stays silent.
 
 ## Align & distribute
 

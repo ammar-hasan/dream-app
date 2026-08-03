@@ -220,8 +220,9 @@ is a refusal to confuse breadth with completion.
    chrome, contextual cursors, open/closed-hand drags, named drop targets and
    post-component-drop selection, compact pointer ghosts and exact-scale
    component placement previews, a named keyboard/pointer Insert alternative
-   and angle/constraint feedback during rotation are coherent. Multi-item
-   progress remains.
+   and angle/constraint feedback during rotation are coherent. Selection snaps
+   now combine the existing exact guide with compact pointer-side and optional
+   tactile confirmation. Multi-item progress remains.
 8. **Long-work control has begun, but is not yet consistent.** Create, Edit,
    Feedback and provider connection tests now show honest staged activity,
    allow immediate cancellation and reject late results. Story creation and
@@ -236,9 +237,10 @@ is a refusal to confuse breadth with completion.
    operation can safely expose partial output.
 9. **Tactile feedback now has a sparse foundation.** On supported touch devices,
    optional short cues reinforce the first visible valid drop target and a
-   visible refusal, remain silent under reduced motion and never buzz while
-   drawing. Snapping, destructive refusal and game collisions are not yet
-   covered and must follow the same causal, redundant contract.
+   visible refusal, rotation steps and newly entered selection guides, remain
+   silent under reduced motion and never buzz while drawing or continuing along
+   one guide. Destructive refusal and game collisions are not yet covered and
+   must follow the same causal, redundant contract.
 10. **Professional outcomes need professional substrate, not isolated tools.**
     Non-destructive masks/adjustments, vector paths, typography/color systems,
     publication preflight and richer agent schemas unlock several personas at

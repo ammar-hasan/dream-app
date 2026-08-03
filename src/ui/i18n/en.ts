@@ -158,6 +158,7 @@ export const en: Record<string, string> = {
   // --- Design panel ----------------------------------------------------------
   'design.title': 'Design',
   'design.snap': 'Snap to canvas & objects',
+  'design.snapped': 'Snapped',
   'design.selectedOne':
     '{count} object selected — drag to move, corner handles to scale, top handle to rotate.',
   'design.selectedMany':
@@ -687,7 +688,7 @@ export const en: Record<string, string> = {
   'settings.comfortHint': 'Bigger text and buttons, stronger contrast',
   'settings.haptics': 'Touch feedback',
   'settings.hapticsHint':
-    'Tiny vibrations for drop targets, rotation detents and refusals on supported devices',
+    'Tiny vibrations for alignment snaps, drop targets, rotation detents and refusals on supported devices',
   'settings.language': 'Language',
   'settings.install': 'Install Dream',
   'settings.installHint': 'Keep Dream on this device — it works offline too',
