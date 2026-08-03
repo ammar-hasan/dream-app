@@ -7,6 +7,16 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Complete Russian journey** (slice 38): Русский covers every product
+  surface with exact key/placeholder parity, persistent LTR switching and
+  `ru-RU` speech. Russian commands cover creation, recovery, games, app/code
+  delivery and narration while English remains available; common color case
+  forms work naturally, Russian sequence language plans stories locally, and
+  offline game descriptions understand templates, settings, lives and named
+  layers. Long translated labels also prompted a toolbar correction that keeps
+  Story, AI, voice, recovery and Settings anchored. A browser proof reaches
+  Aleksandr's keyboard-first Design workflow.
+
 - **Complete Brazilian Portuguese journey** (slice 37): Português (Brasil)
   covers every product surface with exact key/placeholder parity, persistent
   LTR switching and `pt-BR` speech. Brazilian commands cover creation,

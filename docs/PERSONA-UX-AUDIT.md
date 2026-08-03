@@ -16,8 +16,7 @@ not merely the presence of a named control.
 - **Persona readiness: 7 of 10 fully ready, 3 partially ready.** Dream already
   gives every persona a credible path, but the universal “anyone” promise is
   stricter than a feature checklist. The largest gaps are broader professional
-  art/design depth, Russian language reach and a publicly installable agent
-  surface.
+  art/design depth and a publicly installable agent surface.
 - **Principal UX verdict: strong product architecture, incomplete universal
   usability.** Progressive disclosure, local-first trust and universal undo are
   excellent foundations. The phone timeline and presenter privacy now follow
@@ -29,7 +28,7 @@ not merely the presence of a named control.
 
 The audit covered the entire living spec (vision, concepts, interaction map,
 all feature areas, visual identity, integrations, all data contracts and all
-150 acceptance criteria), the product roadmap/research backlog, the automated
+155 acceptance criteria), the product roadmap/research backlog, the automated
 test inventory, and rendered desktop and phone states. A persona passes only
 when their intended outcome is realistically achievable end to end with a
 suitable input method and usable output—not when an adjacent feature exists.
@@ -46,7 +45,7 @@ suitable input method and usable output—not when an adjacent feature exists.
 | Sara, 15      | Design mode, selection, snapping, align/distribute, groups, reusable components, honest scalable SVG, PNG/JPEG and private prototype links                                  | No blocking gap for her stated freelance-logo outcome: she can construct, reuse, align and deliver a genuinely scalable logo; PDF and brand-export presets would make delivery smoother  | **Ready** |
 | Zǐxuān, 28    | Complete Simplified Chinese UI/voice/story/game language; native data plots, scientific notation/connectors, precise layout, scalable SVG, animation and app links          | No blocking gap for his stated science-image/animation/app outcome: he can create and deliver the complete journey in Chinese; structure drawing and statistics remain specialist depth  | **Ready** |
 | Maria, 32     | Complete Brazilian Portuguese UI/voice/story/game language; portable `.dream`, stable engine surface, local MCP reading/rendering/export and deterministic app/code exports | The MCP package is registry-ready but not publicly installable; agent editing lacks strokes, raster import, layer management, links, components and AI edits                             | Partial   |
-| Aleksandr, 25 | Keyboard shortcuts, marquee/lasso, snapping, align/distribute, grouping, components, layers and reusable assets                                                             | Productivity stops short of a broad professional design tool: no vector paths, symbols/linked components, constraints, batch export, grids or extensibility                              | Partial   |
+| Aleksandr, 25 | Complete Russian UI/voice/story/game language; keyboard shortcuts, marquee/lasso, snapping, align/distribute, grouping, components, layers and reusable assets              | Productivity stops short of a broad professional design tool: no vector paths, symbols/linked components, constraints, batch export, grids or extensibility                              | Partial   |
 | Ahmed, 42     | Draw-to-animation, narration, shaped/trimmed WebM or native MP4, burned-in captions, presentations, private links and offline app files                                     | No blocking gap for his stated draw → animate → social-video outcome; direct platform publishing could shorten delivery but is not required to produce and share the finished video      | **Ready** |
 
 ## Principal UX review
@@ -121,6 +120,14 @@ suitable input method and usable output—not when an adjacent feature exists.
     Portuguese review caught “cast layers” mistranslated as “scale layers” and
     replaced literal art vocabulary before it reached users. The final journey
     covers project/code delivery, voice, stories and games—not just labels.
+17. **Localized productivity includes input habits.** Russian reaches Design
+    with its familiar vocabulary and keeps mode-aware keyboard shortcuts
+    working unchanged. Common case forms are accepted in spoken commands, so
+    localization does not force unnatural keyword grammar.
+18. **Long labels must not hide recovery.** The rendered Russian workspace
+    exposed that a single scrolling toolbar could push Undo and Settings out of
+    view. File and creation actions now scroll in their own region while Story,
+    AI, voice, recovery, Little Dreamer and Settings stay anchored.
 
 ### What does not yet fully serve the purpose
 
@@ -149,12 +156,12 @@ suitable input method and usable output—not when an adjacent feature exists.
 
 ## Recommended order
 
-1. Add persona-relevant Russian next, preserving the same full-table,
-   voice-aware bar established by Persian, Simplified Chinese and Portuguese.
+1. Add focused professional depth—brush presets and batch/brand delivery—only
+   where Ali or Aleksandr's real workflows justify the complexity.
 2. Publish the prepared MCP package only with explicit approval, then deepen
    authoring tools in the order real agent workflows require.
-3. Add focused professional depth—brush presets and batch/brand delivery—only
-   where Ali or Aleksandr's real workflows justify the complexity.
+3. Validate the now-complete language journeys with native speakers and test
+   the highest-risk screen-reader and switch-control paths with real users.
 
 This audit is a release decision aid, not part of the product specification.
 It may name current implementation evidence and future options; the living spec

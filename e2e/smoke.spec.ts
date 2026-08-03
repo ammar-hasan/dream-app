@@ -481,6 +481,31 @@ test('Brazilian Portuguese reaches portable project and real-code delivery', asy
   await expect(dialog.getByRole('button', { name: 'Código real (IA) (.html)' })).toBeVisible();
 });
 
+test('Russian reaches the keyboard-first design workflow', async ({ page }) => {
+  await bootApp(page);
+  await page.getByRole('button', { name: 'Settings' }).click();
+  await page.locator('.settings-popover select').selectOption('ru');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ru');
+  await expect(page.getByRole('button', { name: 'История' })).toBeInViewport();
+  await expect(page.getByRole('button', { name: 'Отменить', exact: true })).toBeInViewport();
+  await expect(page.getByRole('button', { name: 'Режим «Маленький мечтатель»' })).toBeInViewport();
+  await expect(page.getByRole('button', { name: 'Настройки' })).toBeInViewport();
+  await page.getByRole('tab', { name: 'Дизайн' }).click();
+  await expect(page.getByRole('heading', { name: 'Компоненты' })).toBeVisible();
+
+  await page.keyboard.press('r');
+  await expect(page.getByRole('button', { name: 'Прямоугольник' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await page.keyboard.press('v');
+  await expect(page.getByRole('button', { name: 'Выделение' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+});
+
 test('the dark theme toggle flips data-theme', async ({ page }) => {
   await bootApp(page);
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');

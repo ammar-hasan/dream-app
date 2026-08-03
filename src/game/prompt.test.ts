@@ -69,6 +69,23 @@ describe('planGameFromPrompt', () => {
     });
   });
 
+  it('understands a Russian game request and named-layer roles', () => {
+    const russianLayers = [
+      { id: 'rocket-ru', name: 'Ракета' },
+      { id: 'clouds-ru', name: 'Облака' },
+    ];
+    expect(
+      planGameFromPrompt(
+        'Пусть Ракета медленно летит через ворота и Облака, три щита',
+        russianLayers,
+      ),
+    ).toEqual({
+      template: 'flappy',
+      settings: { fallSpeed: 110, lives: 3 },
+      cast: { hero: 'rocket-ru', obstacle: 'clouds-ru' },
+    });
+  });
+
   it('chooses the platformer for run-and-jump language', () => {
     expect(
       planGameFromPrompt('Cat should run and jump over Rocks to reach the flag', layers),

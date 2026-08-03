@@ -79,7 +79,8 @@ The parser is forgiving: case-insensitive, ignores filler ("um, can you
 please undo?"), **normalizes Arabic** (diacritics and tatweel stripped,
 alef forms unified), and normalizes Arabic-keyboard yeh/kaf variants in
 Persian. Simplified Chinese matches complete terms inside naturally unspaced
-Mandarin utterances. **English commands always work** under every additional
+Mandarin utterances. Russian recognizes common case forms used with colors and
+game lives. **English commands always work** under every additional
 language because each locale vocabulary merges into the English base. Unknown
 input gets a kind local-language fallback and changes nothing.
 
@@ -144,6 +145,16 @@ preencher / varinha / carimbo / texto, ligar / desligar espelhamento, maior /
 menor, salvar, ajuda and sim / não. Its color words include vermelho, laranja,
 amarelo, verde, turquesa, azul, roxo/violeta, rosa, marrom, preto, branco,
 cinza, ciano, magenta and dourado.
+
+Russian provides the same complete surface with phrases such as отменить /
+повторить, очистить всё, новый кадр, создай историю про…, воспроизвести /
+остановить, играть в лабиринт, показать приложение, экспортировать приложение,
+настоящий код, записать озвучку / остановить запись / удалить озвучку, кисть /
+карандаш / ластик / заливка / палочка / штамп / текст, включить / выключить
+отражение, больше / меньше, сохранить, помощь and да / нет. Its color words
+include красный, оранжевый, жёлтый, зелёный, бирюзовый, голубой, синий,
+фиолетовый, розовый, коричневый, чёрный, белый, серый, циан, пурпурный and
+золотой; common instrumental forms work in fill commands.
 
 ### Precedence rules (the parser's decision order)
 

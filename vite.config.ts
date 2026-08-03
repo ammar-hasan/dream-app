@@ -49,7 +49,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (/\/src\/ui\/i18n\/(?:ar|fa|zh|pt)\.ts$/.test(id)) {
+          if (/\/src\/ui\/i18n\/(?:ar|fa|zh|pt|ru)\.ts$/.test(id)) {
             return 'locales';
           }
         },

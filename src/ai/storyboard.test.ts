@@ -58,6 +58,16 @@ describe('planStoryboard', () => {
     ]);
   });
 
+  it('splits Russian sequence language without requiring a provider', () => {
+    expect(
+      planStoryboard('Луна просыпается, затем встречает лису. Наконец они танцуют', 'ru')?.scenes,
+    ).toEqual([
+      { description: 'Луна просыпается' },
+      { description: 'встречает лису' },
+      { description: 'они танцуют' },
+    ]);
+  });
+
   it('turns one idea into a two-frame beginning and next moment', () => {
     expect(planStoryboard('A sleepy fox under the moon')?.scenes).toEqual([
       { description: 'The beginning: A sleepy fox under the moon' },
@@ -78,6 +88,10 @@ describe('planStoryboard', () => {
     expect(planStoryboard('Uma raposa sob a lua', 'pt')?.scenes).toEqual([
       { description: 'O começo: Uma raposa sob a lua' },
       { description: 'O próximo momento: Uma raposa sob a lua' },
+    ]);
+    expect(planStoryboard('Лиса под луной', 'ru')?.scenes).toEqual([
+      { description: 'Начало: Лиса под луной' },
+      { description: 'Следующий момент: Лиса под луной' },
     ]);
   });
 

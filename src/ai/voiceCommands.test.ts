@@ -468,3 +468,63 @@ describe('parseVoiceCommand — Brazilian Portuguese vocabulary (locale "pt")', 
     expect(parseVoiceCommand('qual é a previsão do tempo', 'pt')).toBeNull();
   });
 });
+
+describe('parseVoiceCommand — Russian vocabulary (locale "ru")', () => {
+  it('parses recovery, confirmation and creation with polite filler', () => {
+    expect(parseVoiceCommand('пожалуйста, отменить', 'ru')).toEqual({ kind: 'undo' });
+    expect(parseVoiceCommand('повторить', 'ru')).toEqual({ kind: 'redo' });
+    expect(parseVoiceCommand('очистить всё', 'ru')).toEqual({ kind: 'clear' });
+    expect(parseVoiceCommand('да', 'ru')).toEqual({ kind: 'confirm' });
+    expect(parseVoiceCommand('нет', 'ru')).toEqual({ kind: 'cancel' });
+    expect(parseVoiceCommand('добавить кадр', 'ru')).toEqual({ kind: 'new-frame' });
+  });
+
+  it('parses tools, inflected colors, sizing and symmetry', () => {
+    expect(parseVoiceCommand('используй карандаш', 'ru')).toEqual({
+      kind: 'tool',
+      tool: 'pencil',
+    });
+    expect(parseVoiceCommand('заливка красным', 'ru')).toEqual({
+      kind: 'fill-color',
+      color: COLOR_WORDS.red,
+      name: 'красным',
+    });
+    expect(parseVoiceCommand('кисть больше', 'ru')).toEqual({ kind: 'bigger' });
+    expect(parseVoiceCommand('выключить отражение', 'ru')).toEqual({
+      kind: 'mirror',
+      on: false,
+    });
+  });
+
+  it('keeps games, apps, code and narration as distinct outcomes', () => {
+    expect(parseVoiceCommand('играть в лабиринт', 'ru')).toEqual({
+      kind: 'play-game',
+      template: 'maze',
+    });
+    expect(parseVoiceCommand('показать моё приложение', 'ru')).toEqual({ kind: 'preview-app' });
+    expect(parseVoiceCommand('экспортировать приложение', 'ru')).toEqual({
+      kind: 'export-app',
+    });
+    expect(parseVoiceCommand('экспортировать настоящий код', 'ru')).toEqual({
+      kind: 'export-code',
+    });
+    expect(parseVoiceCommand('записать озвучку', 'ru')).toEqual({
+      kind: 'record-narration',
+    });
+    expect(parseVoiceCommand('остановить запись', 'ru')).toEqual({
+      kind: 'stop-recording',
+    });
+    expect(parseVoiceCommand('удалить озвучку', 'ru')).toEqual({
+      kind: 'delete-narration',
+    });
+  });
+
+  it('opens a Russian storyboard with its subject intact and keeps English available', () => {
+    expect(parseVoiceCommand('создай историю про луну и лису', 'ru')).toEqual({
+      kind: 'storyboard',
+      prompt: 'луну и лису',
+    });
+    expect(parseVoiceCommand('undo', 'ru')).toEqual({ kind: 'undo' });
+    expect(parseVoiceCommand('какая сегодня погода', 'ru')).toBeNull();
+  });
+});

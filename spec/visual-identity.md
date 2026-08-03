@@ -94,8 +94,10 @@ Text `#0f141f` / `#ffffff`, dim text `#454d61` / `#ccd4e8`, borders
 - Layout constants: side panel 280 px; dialogs max 480 px wide with 24 px
   padding; toolbar padding 8×16 px. At desktop widths the side panel and all
   of its form controls remain inside the viewport; when the toolbar needs more
-  room, only the toolbar scrolls horizontally — the canvas and panel never
-  create page-level horizontal overflow.
+  room, only its file/creation region scrolls horizontally while recovery and
+  Settings stay anchored — the canvas and panel never create page-level
+  horizontal overflow. At phone width, the whole toolbar scrolls as one row so
+  its fixed controls never overlap creation actions.
 
 ## Motion principles
 
@@ -135,5 +137,6 @@ never move, crop or stretch the artwork beneath them.
   stiff formal translation. Persian is concise, conversational Iranian
   Persian. Simplified Chinese uses concise, natural Mainland wording rather
   than English-shaped sentences. Brazilian Portuguese is conversational and
-  uses familiar Brazilian product language. All strings in every locale follow the parity rule
+  uses familiar Brazilian product language. Russian uses concise, familiar
+  product and design language. All strings in every locale follow the parity rule
   (`features/internationalization.md`).

@@ -949,3 +949,25 @@ portable project files and code delivery in her own language.
 - Acceptance met: switch to Português (Brasil), reach both `.dream` and real
   code delivery, use Portuguese command/story/game language and retain the same
   private, offline and English-fallback behavior.
+
+## Slice 38 — Complete Russian journey ✅
+
+Persona: Aleksandr, Russian graphics and product designer — use Dream's
+productivity surface in his own language without losing keyboard speed.
+
+- ✅ Русский covers every product string with exact key and interpolation
+  parity, persistent LTR switching and Russian recognition/speech.
+- ✅ Russian commands cover the complete tool, color, recovery, animation,
+  game, app, code-export and narration surface while English remains available.
+  Common instrumental color forms work in natural fill commands.
+- ✅ Russian sequence words plan local story moments; Russian game descriptions
+  choose templates, settings, one-to-five lives and named-layer roles offline.
+- ✅ End-to-end manual review replaced literal or awkward art/product wording,
+  corrected plot grammar and preserved game casting as role assignment.
+  Non-default locales remain isolated from the production entry chunk.
+- ✅ Focused unit tests and a production browser journey reach Design and prove
+  mode-aware keyboard tool switching in Russian rather than stopping at Settings.
+  Long translated labels can scroll without hiding Story, recovery or Settings.
+- Acceptance met: switch to Русский, enter Design, use keyboard-first tools,
+  issue Russian command/story/game language and retain the same offline,
+  recoverable outcomes and English fallback.

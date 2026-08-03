@@ -167,83 +167,88 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
 
   return (
     <header className="toolbar">
-      <div className="toolbar-group">
-        <DreamMark className="app-mark" />
-        <span className="app-title">{t('app.title')}</span>
-        <span className="doc-name" title={docName}>
-          {docName}
-          {isDirty ? ' •' : ''}
-        </span>
-      </div>
-
-      <div className="toolbar-group">
-        <button className="btn" onClick={onNew}>
-          {t('toolbar.new')}
-        </button>
-        <button className="btn" onClick={onOpen}>
-          {t('toolbar.open')}
-        </button>
-        <button className="btn" onClick={() => void saveNow()}>
-          {t('toolbar.save')}
-        </button>
-        <button className="btn" onClick={() => fileInputRef.current?.click()}>
-          {t('toolbar.import')}
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          multiple
-          hidden
-          onChange={(e) => {
-            void importImageFiles(e.target.files ?? []);
-            e.target.value = '';
-          }}
-        />
-        <button className="btn" onClick={onResize}>
-          {t('toolbar.resize')}
-        </button>
-        <button className="btn" onClick={onExport}>
-          {t('toolbar.export')}
-        </button>
-      </div>
-
-      <div className="toolbar-group">
-        <div
-          className="mode-switch"
-          role="tablist"
-          aria-label={t('toolbar.mode')}
-          ref={modeSwitchRef}
-        >
-          {thumb && thumb.w > 0 && (
-            <span
-              className="mode-thumb"
-              style={{ insetInlineStart: thumb.x, width: thumb.w }}
-              aria-hidden="true"
-            />
-          )}
-          {MODES.map((m) => (
-            <button
-              key={m}
-              type="button"
-              role="tab"
-              aria-selected={mode === m}
-              className={`mode-tab${mode === m ? ' active' : ''}`}
-              onClick={() => useDreamStore.getState().setMode(m)}
-            >
-              {t(`toolbar.${m}`)}
-            </button>
-          ))}
+      <div className="toolbar-scroll">
+        <div className="toolbar-group">
+          <DreamMark className="app-mark" />
+          <span className="app-title">{t('app.title')}</span>
+          <span className="doc-name" title={docName}>
+            {docName}
+            {isDirty ? ' •' : ''}
+          </span>
         </div>
-        <button
-          type="button"
-          className={`btn${animated ? ' primary' : ''}`}
-          aria-pressed={animated}
-          data-tooltip={t('toolbar.animateTitle')}
-          onClick={() => useDreamStore.getState().toggleAnimation()}
-        >
-          {t('toolbar.animate')}
-        </button>
+
+        <div className="toolbar-group">
+          <button className="btn" onClick={onNew}>
+            {t('toolbar.new')}
+          </button>
+          <button className="btn" onClick={onOpen}>
+            {t('toolbar.open')}
+          </button>
+          <button className="btn" onClick={() => void saveNow()}>
+            {t('toolbar.save')}
+          </button>
+          <button className="btn" onClick={() => fileInputRef.current?.click()}>
+            {t('toolbar.import')}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            hidden
+            onChange={(e) => {
+              void importImageFiles(e.target.files ?? []);
+              e.target.value = '';
+            }}
+          />
+          <button className="btn" onClick={onResize}>
+            {t('toolbar.resize')}
+          </button>
+          <button className="btn" onClick={onExport}>
+            {t('toolbar.export')}
+          </button>
+        </div>
+
+        <div className="toolbar-group">
+          <div
+            className="mode-switch"
+            role="tablist"
+            aria-label={t('toolbar.mode')}
+            ref={modeSwitchRef}
+          >
+            {thumb && thumb.w > 0 && (
+              <span
+                className="mode-thumb"
+                style={{ insetInlineStart: thumb.x, width: thumb.w }}
+                aria-hidden="true"
+              />
+            )}
+            {MODES.map((m) => (
+              <button
+                key={m}
+                type="button"
+                role="tab"
+                aria-selected={mode === m}
+                className={`mode-tab${mode === m ? ' active' : ''}`}
+                onClick={() => useDreamStore.getState().setMode(m)}
+              >
+                {t(`toolbar.${m}`)}
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            className={`btn${animated ? ' primary' : ''}`}
+            aria-pressed={animated}
+            data-tooltip={t('toolbar.animateTitle')}
+            onClick={() => useDreamStore.getState().toggleAnimation()}
+          >
+            {t('toolbar.animate')}
+          </button>
+        </div>
+      </div>
+
+      <div className="toolbar-group">
         <button
           type="button"
           className="btn"

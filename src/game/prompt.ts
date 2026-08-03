@@ -36,6 +36,11 @@ const TEMPLATE_TERMS: Record<GameTemplateId, readonly string[]> = {
     'coletar',
     'desviar',
     'caindo',
+    'ловить',
+    'поймать',
+    'собирать',
+    'избегать',
+    'падающий',
   ],
   flappy: [
     'flap',
@@ -62,6 +67,13 @@ const TEMPLATE_TERMS: Record<GameTemplateId, readonly string[]> = {
     'portão',
     'portões',
     'cano',
+    'летать',
+    'летит',
+    'полёт',
+    'полет',
+    'птица',
+    'ворота',
+    'труба',
   ],
   maze: [
     'maze',
@@ -77,6 +89,9 @@ const TEMPLATE_TERMS: Record<GameTemplateId, readonly string[]> = {
     'labirinto',
     'saída',
     'explorar',
+    'лабиринт',
+    'выход',
+    'исследовать',
   ],
   platformer: [
     'platform',
@@ -97,6 +112,11 @@ const TEMPLATE_TERMS: Record<GameTemplateId, readonly string[]> = {
     'correr e pular',
     'pule',
     'bandeira',
+    'платформа',
+    'платформер',
+    'бежать и прыгать',
+    'прыгнуть',
+    'флаг',
   ],
 };
 
@@ -130,6 +150,13 @@ const ROLE_TERMS: Record<CastRole, readonly string[]> = {
     'pegador',
     'gato',
     'foguete',
+    'герой',
+    'игрок',
+    'ловец',
+    'корзина',
+    'кот',
+    'ракета',
+    'птица',
   ],
   good: [
     'good',
@@ -149,6 +176,10 @@ const ROLE_TERMS: Record<CastRole, readonly string[]> = {
     'moeda',
     'maçã',
     'prêmio',
+    'звезда',
+    'монета',
+    'яблоко',
+    'приз',
   ],
   bad: [
     'bad',
@@ -168,6 +199,10 @@ const ROLE_TERMS: Record<CastRole, readonly string[]> = {
     'bomba',
     'inimigo',
     'espinho',
+    'камень',
+    'бомба',
+    'враг',
+    'шип',
   ],
   obstacle: [
     'obstacle',
@@ -185,6 +220,11 @@ const ROLE_TERMS: Record<CastRole, readonly string[]> = {
     'portão',
     'cano',
     'nuvem',
+    'препятствие',
+    'ворота',
+    'труба',
+    'облако',
+    'облака',
   ],
   background: [
     'background',
@@ -200,6 +240,9 @@ const ROLE_TERMS: Record<CastRole, readonly string[]> = {
     'fundo',
     'cenário',
     'céu',
+    'фон',
+    'сцена',
+    'небо',
   ],
 };
 
@@ -219,6 +262,12 @@ const EASY_TERMS = [
   'tranquilo',
   'calmo',
   'para criança',
+  'лёгкий',
+  'легкий',
+  'простой',
+  'спокойный',
+  'для ребёнка',
+  'для ребенка',
 ];
 const HARD_TERMS = [
   'hard',
@@ -234,8 +283,24 @@ const HARD_TERMS = [
   'difícil',
   'desafiador',
   'intenso',
+  'сложный',
+  'трудный',
+  'испытание',
+  'напряжённый',
+  'напряженный',
 ];
-const FAST_TERMS = ['fast', 'quick', 'speedy', 'سريع', '快速', '快一点', 'rápido', 'depressa'];
+const FAST_TERMS = [
+  'fast',
+  'quick',
+  'speedy',
+  'سريع',
+  '快速',
+  '快一点',
+  'rápido',
+  'depressa',
+  'быстрый',
+  'быстро',
+];
 const SLOW_TERMS = [
   'slow',
   'relaxed',
@@ -246,6 +311,9 @@ const SLOW_TERMS = [
   '慢一点',
   'devagar',
   'lento',
+  'медленно',
+  'медленный',
+  'неспешно',
 ];
 const BUSY_TERMS = [
   'busy',
@@ -258,6 +326,8 @@ const BUSY_TERMS = [
   '频繁',
   'muitos',
   'frequente',
+  'много',
+  'часто',
 ];
 const SPARSE_TERMS = [
   'few',
@@ -269,6 +339,8 @@ const SPARSE_TERMS = [
   '稀少',
   'poucos',
   'raro',
+  'мало',
+  'редко',
 ];
 
 function normalize(value: string): string {
@@ -335,9 +407,16 @@ function settingsFromPrompt(text: string): Partial<GameSettings> {
     tres: 3,
     quatro: 4,
     cinco: 5,
+    один: 1,
+    одна: 1,
+    два: 2,
+    две: 2,
+    три: 3,
+    четыре: 4,
+    пять: 5,
   };
   const livesPattern =
-    /(?:\b([1-9])\b|\b(one|two|three|four|five|واحد|اثنان|ثلاثة|اربع|خمسة|um|uma|dois|duas|três|tres|quatro|cinco)\b|([一二三四五]))\s*(?:lives?|shields?|hearts?|حياة|محاولات|دروع|条命|生命|护盾|红心|vidas?|escudos?|corações?|coracoes?)/u;
+    /(?:\b([1-9])\b|(?:^|\s)(one|two|three|four|five|واحد|اثنان|ثلاثة|اربع|خمسة|um|uma|dois|duas|três|tres|quatro|cinco|один|одна|два|две|три|четыре|пять)(?=\s)|([一二三四五]))\s*(?:lives?|shields?|hearts?|حياة|محاولات|دروع|条命|生命|护盾|红心|vidas?|escudos?|corações?|coracoes?|жизнь|жизни|жизней|щит|щита|щитов|сердце|сердца|сердец)/u;
   const lives = text.match(livesPattern);
   if (lives) {
     settings.lives = lives[1] ? Number(lives[1]) : numberWords[lives[2] ?? lives[3] ?? ''];

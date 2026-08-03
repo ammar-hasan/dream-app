@@ -12,6 +12,7 @@ product — including voice — works in any language, including right-to-left.
 | `fa` | فارسی              | right-to-left |
 | `zh` | 简体中文           | left-to-right |
 | `pt` | Português (Brasil) | left-to-right |
+| `ru` | Русский            | left-to-right |
 
 Default: `en`. The settings gear switches language **instantly at runtime**
 (no reload); the choice persists per user.
@@ -45,8 +46,8 @@ Default: `en`. The settings gear switches language **instantly at runtime**
 ## Voice and speech across locales
 
 - The voice-command vocabulary is **per-locale** (see the full intent table
-  in `accessibility.md`): Arabic, Persian, Simplified Chinese and Brazilian
-  Portuguese commands work in their matching UI — and **English keeps
+  in `accessibility.md`): Arabic, Persian, Simplified Chinese, Brazilian
+  Portuguese and Russian commands work in their matching UI — and **English keeps
   working** because every additional vocabulary merges into the English base.
 - Arabic transcripts are normalized before matching: diacritics and
   tatweel stripped, alef variants unified.
@@ -57,6 +58,8 @@ Default: `en`. The settings gear switches language **instantly at runtime**
   word at a time.
 - Brazilian Portuguese recognition requests the Brazilian regional language;
   its command, story and game vocabulary uses familiar Brazilian phrasing.
+- Russian recognition requests the Russian regional language; common case
+  forms and familiar Russian design terms work naturally in commands.
 - Speech recognition listens in the UI language for canvas commands.
 - Spoken tool names and voice feedback speak in the UI language.
 
@@ -71,3 +74,5 @@ Simplified Chinese uses familiar Mainland product language, compact labels and
 natural encouragement rather than translated English sentence structure.
 Brazilian Portuguese uses conversational `você`, familiar product terms and
 Brazilian phrasing rather than European forms.
+Russian uses concise, contemporary product and design language rather than
+literal English-shaped wording.

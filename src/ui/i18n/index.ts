@@ -14,8 +14,9 @@ import { ar } from './ar';
 import { fa } from './fa';
 import { zh } from './zh';
 import { pt } from './pt';
+import { ru } from './ru';
 
-export type Locale = 'en' | 'ar' | 'fa' | 'zh' | 'pt';
+export type Locale = 'en' | 'ar' | 'fa' | 'zh' | 'pt' | 'ru';
 
 /** Shown in the settings language picker; `dir` drives the root `dir` attr. */
 export const LOCALES: { id: Locale; label: string; dir: 'ltr' | 'rtl' }[] = [
@@ -24,9 +25,10 @@ export const LOCALES: { id: Locale; label: string; dir: 'ltr' | 'rtl' }[] = [
   { id: 'fa', label: 'فارسی', dir: 'rtl' },
   { id: 'zh', label: '简体中文', dir: 'ltr' },
   { id: 'pt', label: 'Português (Brasil)', dir: 'ltr' },
+  { id: 'ru', label: 'Русский', dir: 'ltr' },
 ];
 
-const DICTIONARIES: Record<Locale, Record<string, string>> = { en, ar, fa, zh, pt };
+const DICTIONARIES: Record<Locale, Record<string, string>> = { en, ar, fa, zh, pt, ru };
 
 export const DEFAULT_LOCALE: Locale = 'en';
 
@@ -44,6 +46,7 @@ export function speechLanguage(locale: string): string {
   if (locale === 'fa') return 'fa-IR';
   if (locale === 'zh') return 'zh-CN';
   if (locale === 'pt') return 'pt-BR';
+  if (locale === 'ru') return 'ru-RU';
   return 'en-US';
 }
 

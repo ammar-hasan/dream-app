@@ -251,15 +251,25 @@ body {
   display: flex;
   align-items: center;
   min-width: 0;
-  overflow-x: auto;
+  overflow: hidden;
   gap: 20px;
   padding: 8px 16px;
   background: var(--panel);
   border-bottom: 1px solid var(--border);
 }
 
+.toolbar-scroll {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+  overflow-x: auto;
+  gap: 20px;
+}
+
 .toolbar-group {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: 8px;
 }
@@ -301,6 +311,10 @@ body {
     padding-inline: 10px;
   }
 
+  .toolbar:not(.kid-toolbar) .toolbar-scroll {
+    gap: 10px;
+  }
+
   .toolbar:not(.kid-toolbar) .toolbar-group {
     gap: 6px;
   }
@@ -323,6 +337,16 @@ body {
 
   .toolbar:not(.kid-toolbar) .mode-tab {
     padding-inline: 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  .toolbar:not(.kid-toolbar) {
+    overflow-x: auto;
+  }
+
+  .toolbar:not(.kid-toolbar) .toolbar-scroll {
+    display: contents;
   }
 }
 

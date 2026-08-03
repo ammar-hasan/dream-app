@@ -34,13 +34,16 @@ together on screen.
   fit), +.
 - At ordinary 1280 px laptop width, spacing and brand text compact before any
   action disappears: Story, AI, voice, Undo, Redo, Little Dreamer and Settings
-  all remain visible. Very narrow windows may scroll the toolbar horizontally.
+  all remain visible. When translated labels need more room, file and creation
+  actions scroll inside their own toolbar region while recovery and Settings
+  stay anchored and reachable.
 - Narrow windows (under ~860 px) drop the side panel.
 - On phone-width adult layouts, the bottom timeline keeps frames and their
   add/duplicate/reorder/delete actions visible while an **Animate / Slides /
   App** choice reveals only that job's controls. App offers linking before any
-  links exist and preview afterward. The top toolbar remains horizontally
-  scrollable so no command is silently removed. Little Dreamer keeps its
+  links exist and preview afterward. The entire top toolbar remains
+  horizontally scrollable so no command is silently removed or overlapped.
+  Little Dreamer keeps its
   reading-light animation controls without the job choice.
 
 ## Mode × audience matrix
@@ -98,7 +101,7 @@ all keys belong to the game.
 ## Voice
 
 The complete voice-intent table — every command with English, Arabic, Persian,
-Simplified Chinese and Brazilian Portuguese phrases, precedence rules and the color vocabulary — is in
+Simplified Chinese, Brazilian Portuguese and Russian phrases, precedence rules and the color vocabulary — is in
 `features/accessibility.md` §Voice commands.
 
 ## The journeys

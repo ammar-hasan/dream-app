@@ -334,8 +334,8 @@ holds.
       response-format option is sent, and the returned picture fills Dream's
       exact canvas dimensions; a separately configured compatible endpoint
       continues to receive its requested model and canvas size.
-114.  GIVEN an English, Arabic, Persian, Simplified Chinese or Brazilian
-      Portuguese story WHEN it is planned THEN two to six numbered moments appear locally without an AI
+114.  GIVEN an English, Arabic, Persian, Simplified Chinese, Brazilian
+      Portuguese or Russian story WHEN it is planned THEN two to six numbered moments appear locally without an AI
       request or document mutation, and each moment can be edited, heard aloud,
       added, removed or regenerated from revised story words before
       confirmation; Little Dreamer dictation plans immediately and its
@@ -487,6 +487,26 @@ holds.
       game, difficulty, speed, quantity, lives or Portuguese-named layers THEN
       the visible template, settings and cast update deterministically without
       a network request.
+151.  GIVEN Русский is chosen in Settings WHEN the workspace updates THEN
+      every product string has a non-empty Russian value, the document language
+      becomes `ru`, layout remains left-to-right, and the choice persists
+      without reload.
+152.  GIVEN the Russian UI WHEN dictation, spoken labels or the global microphone
+      is used THEN recognition and speech request Russian for Russia and all
+      feedback is localized where the browser supports it.
+153.  GIVEN a Russian command such as “пожалуйста, отменить”, “заливка
+      красным”, “выключить отражение”, “играть в лабиринт”, “показать моё
+      приложение”, “экспортировать настоящий код” or “остановить запись” WHEN
+      it is heard THEN the matching recovery, creation, game, delivery or
+      narration action occurs without adjacent-intent collisions; English
+      commands still work.
+154.  GIVEN a Russian story WHEN sequence language such as “затем”, “потом” or
+      “наконец” is used THEN two to six editable moments are planned locally; a
+      single idea receives natural Russian beginning/next labels.
+155.  GIVEN a Russian game description WHEN it names a supported game,
+      difficulty, speed, quantity, lives or Russian-named layers THEN the
+      visible template, settings and cast update deterministically without a
+      network request.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 
@@ -513,8 +533,8 @@ holds.
 8. **Maria (32):** switch to Português (Brasil) → export `.dream` → agent reads
    it, adds a layer with a shape and text, renders a PNG, exports the app HTML
    via the dream-mcp tools → re-import the `.dream` unchanged elsewhere.
-9. **Aleksandr (25):** keyboard-only: tool keys, marquee, snap-align,
-   Cmd+D, nudge, group — a full layout without touching the mouse.
+9. **Aleksandr (25):** switch to Русский → keyboard-only: tool keys, marquee,
+   snap-align, Cmd+D, nudge, group — a full layout without touching the mouse.
 10. **Ahmed (42):** draw a scene per frame → record narration → add readable
     frame captions → export a vertical 9:16 WebM or native MP4 → the complete
     artwork, voice and captions play on a friend's phone.

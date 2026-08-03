@@ -8,6 +8,7 @@ import { ar } from './ar';
 import { fa } from './fa';
 import { zh } from './zh';
 import { pt } from './pt';
+import { ru } from './ru';
 
 afterEach(() => {
   useUiPrefs.getState().setLocale('en');
@@ -15,13 +16,13 @@ afterEach(() => {
 
 describe('dictionaries', () => {
   it('every locale covers exactly the English keys', () => {
-    for (const dictionary of [ar, fa, zh, pt]) {
+    for (const dictionary of [ar, fa, zh, pt, ru]) {
       expect(Object.keys(dictionary).sort()).toEqual(Object.keys(en).sort());
     }
   });
 
   it('has no empty translations', () => {
-    for (const dict of [en, ar, fa, zh, pt]) {
+    for (const dict of [en, ar, fa, zh, pt, ru]) {
       for (const value of Object.values(dict)) {
         expect(value.trim().length).toBeGreaterThan(0);
       }
@@ -29,7 +30,7 @@ describe('dictionaries', () => {
   });
 
   it('preserves every interpolation placeholder in every locale', () => {
-    for (const dictionary of [ar, fa, zh, pt]) {
+    for (const dictionary of [ar, fa, zh, pt, ru]) {
       for (const [key, source] of Object.entries(en)) {
         const sourceVars = [...source.matchAll(/\{[^}]+\}/g)].map((match) => match[0]).sort();
         const translatedVars = [...dictionary[key].matchAll(/\{[^}]+\}/g)]
@@ -67,6 +68,7 @@ describe('locale registry', () => {
     expect(isLocale('fa')).toBe(true);
     expect(isLocale('zh')).toBe(true);
     expect(isLocale('pt')).toBe(true);
+    expect(isLocale('ru')).toBe(true);
     expect(isLocale('fr')).toBe(false);
   });
 
@@ -76,6 +78,7 @@ describe('locale registry', () => {
     expect(isRtl('en')).toBe(false);
     expect(isRtl('zh')).toBe(false);
     expect(isRtl('pt')).toBe(false);
+    expect(isRtl('ru')).toBe(false);
     expect(LOCALES.find((l) => l.id === 'ar')?.dir).toBe('rtl');
     expect(LOCALES.find((l) => l.id === 'fa')?.dir).toBe('rtl');
     expect(LOCALES.find((l) => l.id === DEFAULT_LOCALE)?.dir).toBe('ltr');
@@ -87,6 +90,7 @@ describe('locale registry', () => {
     expect(speechLanguage('fa')).toBe('fa-IR');
     expect(speechLanguage('zh')).toBe('zh-CN');
     expect(speechLanguage('pt')).toBe('pt-BR');
+    expect(speechLanguage('ru')).toBe('ru-RU');
   });
 });
 
@@ -104,5 +108,8 @@ describe('t()', () => {
     useUiPrefs.getState().setLocale('pt');
     expect(t('toolbar.save')).toBe('Salvar');
     expect(t('export.codeLabel')).toBe('Código real (IA) (.html)');
+    useUiPrefs.getState().setLocale('ru');
+    expect(t('toolbar.save')).toBe('Сохранить');
+    expect(t('export.dreamLabel')).toBe('Проект Dream (.dream)');
   });
 });
