@@ -569,6 +569,12 @@ export const zh: Record<string, string> = {
   'export.svgNote': '可缩放的形状、笔触、连线与文字，适用于图表、标识和印刷品。',
   'export.svgUnavailable':
     '此画布包含可见像素内容或擦除效果。请隐藏或移除像素层以导出 SVG，或使用 PNG 保持原样。',
+  'export.brandLabel': '品牌资源包 (.zip)',
+  'export.brandNote':
+    '一个 ZIP，包含原始尺寸、长边 1024 像素和 512 像素的 PNG，以及真正可缩放的 SVG。每个文件都保留当前画布。',
+  'export.brandNoteRaster':
+    '一个 ZIP，包含原始尺寸、长边 1024 像素和 512 像素的 PNG。可见像素内容或擦除效果无法保持真正可缩放，因此不包含 SVG。',
+  'export.brandProgress': '正在打包品牌文件…',
   'export.appLabel': '互动应用 (.html)',
   'export.appNote':
     '一个自包含的 HTML 文件：你的帧作为屏幕，链接作为可点按热点。任意地方打开均可离线使用。',

@@ -11,6 +11,7 @@ import { canExportSvg } from '../engine/svgExport';
 import { useDreamStore } from '../store/dreamStore';
 import { exportImage } from './exportImage';
 import { exportSvg } from './exportSvg';
+import { exportBrandPack } from './brandPack';
 import { exportAppHtml } from './exportApp';
 import { exportRealCodeHtml } from './exportRealCode';
 import { downloadDreamFile } from './dreamFile';
@@ -27,7 +28,7 @@ import {
 import { useT } from './i18n';
 
 type Format =
-  'png' | 'jpeg' | 'svg' | 'webm' | 'mp4' | 'sprite' | 'app' | 'share' | 'code' | 'dream';
+  'png' | 'jpeg' | 'svg' | 'brand' | 'webm' | 'mp4' | 'sprite' | 'app' | 'share' | 'code' | 'dream';
 
 export function ExportDialog({ onClose }: { onClose: () => void }) {
   const t = useT();
@@ -103,6 +104,18 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
       }
       return;
     }
+    if (format === 'brand') {
+      setError(null);
+      setProgress(t('export.brandProgress'));
+      try {
+        await exportBrandPack(doc);
+        onClose();
+      } catch {
+        setProgress(null);
+        setError(t('export.failed'));
+      }
+      return;
+    }
     if (format === 'sprite') {
       exportSpriteSheet(doc);
       onClose();
@@ -151,6 +164,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
     { id: 'png', label: 'PNG' },
     { id: 'jpeg', label: 'JPEG' },
     { id: 'svg', label: 'SVG' },
+    { id: 'brand', label: t('export.brandLabel') },
     ...(animated
       ? [
           { id: 'webm' as const, label: t('export.webmLabel') },
@@ -331,6 +345,12 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
 
         {format === 'svg' && (
           <p className="dialog-note">{t(svgReady ? 'export.svgNote' : 'export.svgUnavailable')}</p>
+        )}
+
+        {format === 'brand' && (
+          <p className="dialog-note">
+            {t(svgReady ? 'export.brandNote' : 'export.brandNoteRaster')}
+          </p>
         )}
 
         {format === 'app' && <p className="dialog-note">{t('export.appNote')}</p>}

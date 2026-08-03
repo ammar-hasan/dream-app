@@ -582,6 +582,12 @@ export const en: Record<string, string> = {
   'export.svgNote': 'Scalable shapes, strokes, connectors and text for diagrams, logos and print.',
   'export.svgUnavailable':
     'This canvas has visible pixel content or erasing. Hide or remove it for SVG, or use PNG to keep exactly what you see.',
+  'export.brandLabel': 'Brand pack (.zip)',
+  'export.brandNote':
+    'One ZIP with source-size, 1024 px and 512 px long-edge PNGs, plus a real scalable SVG. Every file preserves the active canvas.',
+  'export.brandNoteRaster':
+    'One ZIP with source-size, 1024 px and 512 px long-edge PNGs. SVG is omitted because visible pixel content or erasing cannot stay genuinely scalable.',
+  'export.brandProgress': 'Packing brand files…',
   'export.appLabel': 'Interactive app (.html)',
   'export.appNote':
     'One self-contained HTML file: your frames as screens, your links as tappable hotspots. Opens anywhere, works offline.',

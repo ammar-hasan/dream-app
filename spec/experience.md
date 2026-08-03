@@ -124,6 +124,16 @@ Simplified Chinese, Brazilian Portuguese and Russian phrases, precedence rules a
    message to all frames; Export saves the captions and burns them into the
    movie.
 
+### Design → brand delivery
+
+1. Create a logo or other client asset on the canvas.
+2. Open Export and choose **Brand pack**.
+3. Dream states that the one ZIP contains the source-size, 1024 px and 512 px
+   long-edge PNGs and, when truthful, a scalable SVG.
+4. Export downloads the complete named pack without resizing or otherwise
+   changing the working document. Pixel content merely omits SVG; it never
+   prevents the raster delivery.
+
 ### Tell a story → reviewed animation
 
 1. Choose **Story** or say “make a story about…”; in Little Dreamer mode tap

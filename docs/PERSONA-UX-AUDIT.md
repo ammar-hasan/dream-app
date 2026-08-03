@@ -28,7 +28,7 @@ not merely the presence of a named control.
 
 The audit covered the entire living spec (vision, concepts, interaction map,
 all feature areas, visual identity, integrations, all data contracts and all
-156 acceptance criteria), the product roadmap/research backlog, the automated
+157 acceptance criteria), the product roadmap/research backlog, the automated
 test inventory, and rendered desktop and phone states. A persona passes only
 when their intended outcome is realistically achievable end to end with a
 suitable input method and usable output—not when an adjacent feature exists.
@@ -42,10 +42,10 @@ suitable input method and usable output—not when an adjacent feature exists.
 | Ali, 30       | Four transparent brush presets, stylus pressure, layers, image import, filters, crop/resize, selection masks, generative editing and lossless PNG/JPEG                      | Professional art depth remains thin: no tilt, custom brush engine, blend modes, non-destructive masks/adjustments or color-management workflow                                           | Partial   |
 | Fatima, 21    | Complete Persian RTL UI, Iranian Persian speech/commands/story planning, a directional broad calligraphy nib, stylus pressure, symmetry and Persian-script text             | No blocking gap for her stated calligraphy-exploration outcome: mouse, touch or pen can make authentic thick/thin marks, mirrored work remains one-step recoverable and PNG preserves it | **Ready** |
 | George, 45    | Spoken labels, forgiving English voice, story-to-reviewed-animation, read-aloud moments, narration, saving and games on touch devices                                       | No blocking gap for his stated spoken-animation outcome. On a phone he sees one timeline job at a time and can create, review, play, narrate and save without assembling frames by hand  | **Ready** |
-| Sara, 15      | Design mode, selection, snapping, align/distribute, groups, reusable components, honest scalable SVG, PNG/JPEG and private prototype links                                  | No blocking gap for her stated freelance-logo outcome: she can construct, reuse, align and deliver a genuinely scalable logo; PDF and brand-export presets would make delivery smoother  | **Ready** |
+| Sara, 15      | Design mode, selection, snapping, align/distribute, groups, reusable components, honest SVG and one-ZIP multi-size brand delivery                                           | No blocking gap for her stated freelance-logo outcome: she can construct, reuse, align and hand off source/large/small PNGs plus scalable SVG in one action; PDF remains optional depth  | **Ready** |
 | Zǐxuān, 28    | Complete Simplified Chinese UI/voice/story/game language; native data plots, scientific notation/connectors, precise layout, scalable SVG, animation and app links          | No blocking gap for his stated science-image/animation/app outcome: he can create and deliver the complete journey in Chinese; structure drawing and statistics remain specialist depth  | **Ready** |
 | Maria, 32     | Complete Brazilian Portuguese UI/voice/story/game language; portable `.dream`, stable engine surface, local MCP reading/rendering/export and deterministic app/code exports | The MCP package is registry-ready but not publicly installable; agent editing lacks strokes, raster import, layer management, links, components and AI edits                             | Partial   |
-| Aleksandr, 25 | Complete Russian UI/voice/story/game language; keyboard shortcuts, marquee/lasso, snapping, align/distribute, grouping, components, layers and reusable assets              | Productivity stops short of a broad professional design tool: no vector paths, symbols/linked components, constraints, batch export, grids or extensibility                              | Partial   |
+| Aleksandr, 25 | Complete Russian UI/voice/story/game language; keyboard shortcuts, selection/layout tools, components, layers, reusable assets and one-ZIP batch delivery                   | Productivity stops short of a broad professional design tool: no vector paths, symbols/linked components, constraints, grids or extensibility                                            | Partial   |
 | Ahmed, 42     | Draw-to-animation, narration, shaped/trimmed WebM or native MP4, burned-in captions, presentations, private links and offline app files                                     | No blocking gap for his stated draw → animate → social-video outcome; direct platform publishing could shorten delivery but is not required to produce and share the finished video      | **Ready** |
 
 ## Principal UX review
@@ -132,6 +132,10 @@ suitable input method and usable output—not when an adjacent feature exists.
     change the same visible size, opacity and tip controls users already know.
     Manual adjustment clears the selected state, so convenience never becomes
     hidden state or a second brush system.
+20. **Delivery should be task-sized and truthful.** A client handoff is one
+    named ZIP rather than several browser-blockable downloads. Exact raster
+    sizes are stated before export, aspect and appearance remain intact, and
+    SVG joins only when it is genuinely scalable.
 
 ### What does not yet fully serve the purpose
 
@@ -160,12 +164,12 @@ suitable input method and usable output—not when an adjacent feature exists.
 
 ## Recommended order
 
-1. Add batch/brand delivery where Sara or Aleksandr's real workflows justify
-   the complexity.
-2. Publish the prepared MCP package only with explicit approval, then deepen
+1. Publish the prepared MCP package only with explicit approval, then deepen
    authoring tools in the order real agent workflows require.
-3. Validate the now-complete language journeys with native speakers and test
+2. Validate the now-complete language journeys with native speakers and test
    the highest-risk screen-reader and switch-control paths with real users.
+3. Add further professional depth only where repeated persona workflows justify
+   its cost in first-minute simplicity.
 
 This audit is a release decision aid, not part of the product specification.
 It may name current implementation evidence and future options; the living spec

@@ -97,8 +97,16 @@ itself as generative.
   strokes, spray, shapes, connector ends and text from the active canvas or
   frame. Layer and mark opacity, authored dimensions and document name are
   preserved. Filename `{name}.svg`.
+- **Brand pack** — one `{safe-name}-brand-pack.zip` containing the active
+  canvas as `{safe-name}-source.png`, plus aspect-preserving PNGs whose long
+  edges are exactly 1024 px and 512 px. A genuinely scalable
+  `{safe-name}.svg` joins the pack whenever the visible artwork qualifies for
+  ordinary SVG export. Unsafe filename characters become hyphens.
 - PNG and JPEG flatten the document background plus every visible layer,
   bottom to top — exactly what the canvas shows.
+- Every brand-pack PNG preserves that same visible composition; resizing is
+  export-only and never changes the document. Pixel or eraser content omits
+  only the SVG member rather than blocking the complete pack.
 - SVG is offered only when every visible mark can remain genuinely scalable.
   A visible imported or generated pixel image, baked flood fill, baked image
   adjustment or eraser mark disables its Export action and explains that PNG

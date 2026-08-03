@@ -226,10 +226,11 @@ and the language picker.
 - New document dialog (presets + custom size + background color)
 - Autosave to IndexedDB (imported images included), open/delete saved projects,
   export flattened PNG or JPEG (with quality setting), export genuinely
-  scalable visible strokes/shapes/connectors/text as SVG, and portable `.dream`
-  project files (Export dialog downloads one; the Open dialog opens them, with
-  drag-and-drop). SVG is disabled with a plain PNG fallback when visible pixel
-  or eraser content cannot remain vector.
+  scalable visible strokes/shapes/connectors/text as SVG, export one brand-pack
+  ZIP with source-size/1024/512 PNGs plus SVG when truthful, and portable
+  `.dream` project files (Export dialog downloads one; the Open dialog opens
+  them, with drag-and-drop). SVG is disabled with a plain PNG fallback when
+  visible pixel or eraser content cannot remain vector.
 - Elegant splash while the last document restores; a welcome card (logo +
   "Pick a brush and start dreaming") that dismisses when creation begins
 - Light & dark themes with a full design-token system; styled tooltips with

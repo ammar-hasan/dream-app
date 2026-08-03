@@ -7,6 +7,12 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **One-click brand delivery** (slice 40): Export can now produce one safely
+  named ZIP containing source-size, 1024 px and 512 px long-edge PNGs plus a
+  real SVG whenever the active canvas is genuinely scalable. The pack preserves
+  aspect, visible appearance and the working document, and is localized in all
+  six languages.
+
 - **Focused professional brush presets** (slice 39): Brush now offers Fine
   ink, Soft marker, Bold paint and Calligraphy as compact one-click starting
   points. Each sets the visible size, opacity and tip together, remains fully

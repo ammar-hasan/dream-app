@@ -512,6 +512,11 @@ holds.
       visible together, only the matching preset is selected, manual adjustment
       clears that selection, existing marks stay unchanged, and future marks
       use the new settings.
+157.  GIVEN any active canvas WHEN Brand pack is exported THEN one safely named
+      ZIP contains exact source-size, 1024 px and 512 px long-edge PNGs with the
+      same aspect and visible composition; a real SVG is included exactly when
+      visible content is genuinely scalable, and the working document is
+      unchanged.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 
@@ -530,7 +535,8 @@ holds.
    home" → hear and confirm the planned moments → the complete animation plays
    → "record narration" → tell it aloud → "stop recording" → "save".
 6. **Sara (15):** Design mode → draw logo elements → align/distribute →
-   save as component → new project → insert the component → export SVG.
+   save as component → new project → insert the component → export one brand
+   pack with source, large, small and truthful scalable logo files.
 7. **Zǐxuān (28):** switch to 简体中文 → paste experiment data → insert a
    grouped line plot → annotate it with a reversible-reaction connector,
    chemical subscripts and symbols → export a scalable SVG → duplicate frames

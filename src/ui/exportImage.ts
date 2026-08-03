@@ -9,13 +9,24 @@ export interface ExportOptions {
   quality?: number;
 }
 
-export function exportImage(doc: DreamDocument, options: ExportOptions): void {
+export function renderImageCanvas(
+  doc: DreamDocument,
+  width = doc.width,
+  height = doc.height,
+): HTMLCanvasElement | null {
   const canvas = document.createElement('canvas');
-  canvas.width = doc.width;
-  canvas.height = doc.height;
+  canvas.width = width;
+  canvas.height = height;
   const ctx = canvas.getContext('2d');
-  if (!ctx) return;
+  if (!ctx) return null;
+  ctx.scale(width / doc.width, height / doc.height);
   renderDocument(doc, ctx);
+  return canvas;
+}
+
+export function exportImage(doc: DreamDocument, options: ExportOptions): void {
+  const canvas = renderImageCanvas(doc);
+  if (!canvas) return;
   const mime = options.format === 'jpeg' ? 'image/jpeg' : 'image/png';
   const link = document.createElement('a');
   link.href = canvas.toDataURL(mime, options.quality);

@@ -593,6 +593,12 @@ export const pt: Record<string, string> = {
     'Formas escaláveis, traços, conectores e texto para diagramas, logos e impressão.',
   'export.svgUnavailable':
     'Esta tela tem conteúdo em pixels visível ou apagamentos. Oculte ou remova para SVG, ou use PNG para manter exatamente o que você vê.',
+  'export.brandLabel': 'Pacote de marca (.zip)',
+  'export.brandNote':
+    'Um ZIP com PNG no tamanho original e com lado maior de 1024 px e 512 px, além de um SVG realmente escalável. Cada arquivo preserva a tela ativa.',
+  'export.brandNoteRaster':
+    'Um ZIP com PNG no tamanho original e com lado maior de 1024 px e 512 px. O SVG é omitido porque pixels visíveis ou apagamentos não podem permanecer realmente escaláveis.',
+  'export.brandProgress': 'Empacotando arquivos da marca…',
   'export.appLabel': 'App interativo (.html)',
   'export.appNote':
     'Um único arquivo HTML auto‑contido: suas telas como telas, seus links como áreas tocáveis. Abre em qualquer lugar, funciona offline.',

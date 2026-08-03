@@ -985,3 +985,20 @@ turning Draw into a brush-engine cockpit.
   the document history remain untouched.
 - Acceptance met: choose any preset, see its exact settings, adjust it freely
   and draw with the resulting ordinary, portable stroke.
+
+## Slice 40 — One-click brand delivery ✅
+
+Persona need: let Sara hand a logo to a client, and Aleksandr repeat a common
+multi-size delivery, without exporting and renaming every file separately.
+
+- ✅ Brand pack downloads one safely named ZIP with the active canvas at its
+  source size and at exact 1024 px and 512 px long edges, preserving aspect.
+- ✅ A real scalable SVG joins only when every visible mark remains vector-safe;
+  raster or eraser content omits SVG while all three PNG deliveries still work.
+- ✅ Output generation changes no source pixels, dimensions, layers or history.
+  The focused choice and its truthful fallback are localized in all six
+  languages.
+- ✅ Deterministic ZIP/CRC, sizing and filename tests plus a production-browser
+  download proof inspect the archive, PNG dimensions and SVG payload.
+- Acceptance met: create a logo, choose Brand pack once, receive the complete
+  portable delivery and keep editing the unchanged source document.

@@ -397,6 +397,57 @@ test('scientific connectors and labels export as real scalable SVG', async ({ pa
   await expect(fallback.getByRole('button', { name: 'Export' })).toBeEnabled();
 });
 
+test('brand delivery downloads one truthful multi-size ZIP', async ({ page }) => {
+  await bootApp(page);
+  await drawStroke(page);
+  await page.getByRole('button', { name: 'Export' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Export' });
+  await dialog.getByRole('button', { name: 'Brand pack (.zip)' }).click();
+  await expect(dialog).toContainText('source-size, 1024 px and 512 px long-edge PNGs');
+  await expect(dialog).toContainText('real scalable SVG');
+
+  const downloadPromise = page.waitForEvent('download');
+  await dialog.getByRole('button', { name: 'Export' }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe('Untitled-brand-pack.zip');
+  const path = await download.path();
+  expect(path).not.toBeNull();
+  const zip = await readFile(path!);
+
+  const entry = (name: string) => {
+    const nameBytes = Buffer.from(name);
+    const nameOffset = zip.indexOf(nameBytes);
+    expect(nameOffset).toBeGreaterThanOrEqual(30);
+    const headerOffset = nameOffset - 30;
+    expect(zip.readUInt32LE(headerOffset)).toBe(0x04034b50);
+    const size = zip.readUInt32LE(headerOffset + 18);
+    const extraLength = zip.readUInt16LE(headerOffset + 28);
+    const dataOffset = nameOffset + nameBytes.length + extraLength;
+    return zip.subarray(dataOffset, dataOffset + size);
+  };
+
+  const source = entry('Untitled-source.png');
+  const large = entry('Untitled-1024.png');
+  const small = entry('Untitled-512.png');
+  expect(source.subarray(0, 8)).toEqual(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
+  expect(source.readUInt32BE(16)).toBe(1024);
+  expect(source.readUInt32BE(20)).toBe(768);
+  expect(large.readUInt32BE(16)).toBe(1024);
+  expect(large.readUInt32BE(20)).toBe(768);
+  expect(small.readUInt32BE(16)).toBe(512);
+  expect(small.readUInt32BE(20)).toBe(384);
+  expect(entry('Untitled.svg').toString('utf8')).toContain('<svg');
+  await expect(page.locator('.status-bar')).toContainText('1024 × 768');
+
+  await page.getByRole('button', { name: 'Eraser', exact: true }).click();
+  await drawStroke(page);
+  await page.getByRole('button', { name: 'Export' }).click();
+  const rasterDialog = page.getByRole('dialog', { name: 'Export' });
+  await rasterDialog.getByRole('button', { name: 'Brand pack (.zip)' }).click();
+  await expect(rasterDialog).toContainText('SVG is omitted');
+  await expect(rasterDialog.getByRole('button', { name: 'Export' })).toBeEnabled();
+});
+
 test('social video export saves synchronized captions as one undoable edit', async ({ page }) => {
   await bootApp(page);
   await page.getByRole('button', { name: /^Animate/ }).click();
