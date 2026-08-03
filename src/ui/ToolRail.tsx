@@ -7,6 +7,7 @@
  * button says its name aloud when "speak tool names" is on.
  */
 
+import { useEffect, useRef, useState, type RefObject } from 'react';
 import { useDreamStore } from '../store/dreamStore';
 import { useUiPrefs } from '../store/uiPrefs';
 import type { Color, ToolId } from '../engine/types';
@@ -15,6 +16,7 @@ import { useSpeakName } from './useSpeakName';
 import {
   BrushIcon,
   CropIcon,
+  ChevronUpIcon,
   EllipseIcon,
   EraserIcon,
   EyedropperIcon,
@@ -32,6 +34,7 @@ import {
   TextIcon,
   WandIcon,
   ZoomIcon,
+  GearIcon,
 } from './icons';
 
 interface ToolDef {
@@ -66,6 +69,9 @@ const TOOLS: ToolDef[] = [
   { id: 'pan', key: 'pan', shortcut: ['H', 'H'], Icon: PanIcon },
   { id: 'zoom', key: 'zoom', shortcut: ['Z', 'Z'], Icon: ZoomIcon },
 ];
+
+const PHONE_DRAW_TOOLS: ToolId[] = ['brush', 'pencil', 'eraser', 'text'];
+const PHONE_DESIGN_TOOLS: ToolId[] = ['select', 'move', 'text', 'brush'];
 
 /** Kid mode: the essentials, in the order a child reaches for them. */
 export const KID_TOOLS: ToolId[] = [
@@ -103,7 +109,12 @@ const KID_SIZES: { size: number; key: string; dot: number }[] = [
   { size: 32, key: 'kid.sizeBig', dot: 26 },
 ];
 
-export function ToolRail() {
+interface ToolRailProps {
+  onOpenPhoneControls?: () => void;
+  phoneControlsButtonRef?: RefObject<HTMLButtonElement>;
+}
+
+export function ToolRail({ onOpenPhoneControls, phoneControlsButtonRef }: ToolRailProps = {}) {
   const t = useT();
   const speakName = useSpeakName();
   const activeTool = useDreamStore((s) => s.tool);
@@ -111,32 +122,136 @@ export function ToolRail() {
   const settings = useDreamStore((s) => s.settings);
   const setTool = useDreamStore((s) => s.setTool);
   const kidMode = useUiPrefs((s) => s.kidMode);
+  const phoneRailRef = useRef<HTMLElement>(null);
+  const allToolsButtonRef = useRef<HTMLButtonElement>(null);
+  const [phoneLayout, setPhoneLayout] = useState(
+    () => globalThis.matchMedia?.('(max-width: 600px)').matches ?? globalThis.innerWidth <= 600,
+  );
+  const [allToolsOpen, setAllToolsOpen] = useState(false);
+
+  useEffect(() => {
+    const query = globalThis.matchMedia?.('(max-width: 600px)');
+    const update = () => setPhoneLayout(query?.matches ?? globalThis.innerWidth <= 600);
+    update();
+    if (query) query.addEventListener('change', update);
+    else window.addEventListener('resize', update);
+    return () => {
+      if (query) query.removeEventListener('change', update);
+      else window.removeEventListener('resize', update);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!allToolsOpen) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (!phoneRailRef.current?.contains(event.target as Node)) setAllToolsOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      setAllToolsOpen(false);
+      allToolsButtonRef.current?.focus();
+    };
+    window.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [allToolsOpen]);
+
+  useEffect(() => {
+    setAllToolsOpen(false);
+  }, [mode, phoneLayout]);
 
   const tools = kidMode
     ? TOOLS.filter((tool) => KID_TOOLS.includes(tool.id))
     : TOOLS.filter((tool) => !tool.designOnly || mode === 'design');
 
+  const renderTool = ({ id, key, shortcut, Icon }: ToolDef, closeAfter = false) => {
+    const label = t(`tools.${key}`);
+    return (
+      <button
+        key={id}
+        type="button"
+        className={`tool-btn${activeTool === id ? ' active' : ''}`}
+        data-tooltip={kidMode ? undefined : `${label} (${shortcut[mode === 'design' ? 1 : 0]})`}
+        aria-label={label}
+        aria-pressed={activeTool === id}
+        onPointerEnter={() => speakName(label)}
+        onFocus={() => speakName(label)}
+        onClick={() => {
+          if (closeAfter) setAllToolsOpen(false);
+          setTool(id);
+        }}
+      >
+        <Icon />
+        {!kidMode && <span className="tool-btn-label">{label}</span>}
+      </button>
+    );
+  };
+
+  if (phoneLayout && !kidMode) {
+    const preferred = mode === 'design' ? PHONE_DESIGN_TOOLS : PHONE_DRAW_TOOLS;
+    const primaryIds = [...new Set([activeTool, ...preferred])]
+      .filter((id) => tools.some((tool) => tool.id === id))
+      .slice(0, 4);
+    const primaryTools = primaryIds.flatMap((id) => {
+      const tool = tools.find((candidate) => candidate.id === id);
+      return tool ? [tool] : [];
+    });
+
+    return (
+      <nav
+        ref={phoneRailRef}
+        className="tool-rail phone-tool-dock"
+        aria-label={t('tools.railLabel')}
+      >
+        {primaryTools.map((tool) => renderTool(tool))}
+        <button
+          ref={phoneControlsButtonRef}
+          type="button"
+          className="tool-btn phone-controls-button"
+          aria-label={t('tools.controls')}
+          data-tooltip={t('tools.controls')}
+          onClick={() => {
+            setAllToolsOpen(false);
+            onOpenPhoneControls?.();
+          }}
+        >
+          <GearIcon />
+          <span className="tool-btn-label">{t('tools.controls')}</span>
+        </button>
+        <button
+          ref={allToolsButtonRef}
+          type="button"
+          className={`tool-btn phone-all-tools-button${allToolsOpen ? ' active' : ''}`}
+          aria-label={t('tools.allTools')}
+          aria-expanded={allToolsOpen}
+          aria-controls="phone-all-tools"
+          data-tooltip={t('tools.allTools')}
+          onClick={() => setAllToolsOpen((open) => !open)}
+        >
+          <ChevronUpIcon />
+          <span className="tool-btn-label">{t('tools.allTools')}</span>
+        </button>
+        {allToolsOpen && (
+          <div
+            id="phone-all-tools"
+            className="phone-all-tools"
+            role="group"
+            aria-label={t('tools.allTools')}
+          >
+            <strong className="phone-all-tools-title">{t('tools.allTools')}</strong>
+            {tools.map((tool) => renderTool(tool, true))}
+          </div>
+        )}
+      </nav>
+    );
+  }
+
   return (
     <nav className={`tool-rail${kidMode ? ' kid-rail' : ''}`} aria-label={t('tools.railLabel')}>
-      {tools.map(({ id, key, shortcut, Icon }) => {
-        const label = t(`tools.${key}`);
-        return (
-          <button
-            key={id}
-            type="button"
-            className={`tool-btn${activeTool === id ? ' active' : ''}`}
-            data-tooltip={kidMode ? undefined : `${label} (${shortcut[mode === 'design' ? 1 : 0]})`}
-            aria-label={label}
-            aria-pressed={activeTool === id}
-            onPointerEnter={() => speakName(label)}
-            onFocus={() => speakName(label)}
-            onClick={() => setTool(id)}
-          >
-            <Icon />
-            {!kidMode && <span className="tool-btn-label">{label}</span>}
-          </button>
-        );
-      })}
+      {tools.map((tool) => renderTool(tool))}
 
       {kidMode && (
         <>

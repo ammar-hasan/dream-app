@@ -1119,6 +1119,64 @@ test('phone toolbar keeps creation, recovery and workspaces visible without scro
   ).toBe(true);
 });
 
+test('phone editing dock keeps selection, every tool and every panel one task away', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await bootApp(page);
+
+  const dock = page.locator('.phone-tool-dock');
+  for (const name of ['Brush', 'Pencil', 'Eraser', 'Text', 'Controls', 'All tools']) {
+    await expect(dock.getByRole('button', { name })).toBeVisible();
+  }
+  const dockMetrics = await dock.evaluate((element) => ({
+    clientWidth: element.clientWidth,
+    scrollWidth: element.scrollWidth,
+  }));
+  expect(dockMetrics.scrollWidth).toBeLessThanOrEqual(dockMetrics.clientWidth);
+
+  const allToolsButton = dock.getByRole('button', { name: 'All tools' });
+  await allToolsButton.click();
+  const allTools = dock.getByRole('group', { name: 'All tools' });
+  await expect(allTools).toBeVisible();
+  await expect(allTools.getByRole('button')).toHaveCount(16);
+  await allTools.getByRole('button', { name: 'Spray' }).click();
+  await expect(allTools).toHaveCount(0);
+  await expect(dock.getByRole('button', { name: 'Spray' })).toHaveAttribute('aria-pressed', 'true');
+  await drawStroke(page);
+
+  const controlsButton = dock.getByRole('button', { name: 'Controls' });
+  await controlsButton.click();
+  let controls = page.getByRole('dialog', { name: 'Controls' });
+  await expect(controls.getByRole('region', { name: 'Options' })).toBeVisible();
+  await expect(controls.getByRole('region', { name: 'Adjust' })).toBeVisible();
+  await expect(controls.getByRole('region', { name: 'Layers' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(controls).toHaveCount(0);
+  await expect(controlsButton).toBeFocused();
+
+  await page.getByRole('tab', { name: 'Design' }).click();
+  const select = dock.getByRole('button', { name: 'Select' });
+  await expect(select).toBeVisible();
+  await select.click();
+  await expect(select).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'More actions' }).click();
+  await page
+    .getByRole('group', { name: 'More actions' })
+    .getByRole('button', { name: 'Animate' })
+    .click();
+  await dock.getByRole('button', { name: 'Controls' }).click();
+  controls = page.getByRole('dialog', { name: 'Controls' });
+  for (const name of ['Design', 'Links', 'Components', 'Options', 'Adjust', 'Layers']) {
+    await expect(controls.getByRole('region', { name })).toBeVisible();
+  }
+  await page.keyboard.press('Escape');
+
+  await page.getByRole('button', { name: 'AI helper' }).click();
+  controls = page.getByRole('dialog', { name: 'Controls' });
+  await expect(controls.getByRole('region', { name: 'AI helper' })).toBeVisible();
+});
+
 test('phone timeline keeps frames visible while focusing one task at a time', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await bootApp(page);

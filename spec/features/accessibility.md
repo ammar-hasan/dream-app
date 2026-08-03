@@ -63,6 +63,11 @@ mode and RTL):
   disclosed More tray remain at least 44 px in comfort mode. The shell does not
   require horizontal scrolling, and the four named workspaces stay visible for
   orientation.
+- The adult phone tool dock never scrolls horizontally. Its current and common
+  tools, Controls and All tools are named buttons; disclosed tools and editing
+  panels have visible headings. Escape closes either sheet and returns focus to
+  the button that opened it. All dock targets remain at least 44 px in comfort
+  mode, and the complete path mirrors logically in RTL.
 
 ## Spoken tool names
 

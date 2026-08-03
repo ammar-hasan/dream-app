@@ -35,6 +35,8 @@ export const ru: Record<string, string> = {
   'toolbar.settings': 'Настройки',
   'toolbar.moreActions': 'Другие действия',
   'tools.railLabel': 'Инструменты',
+  'tools.allTools': 'Все инструменты',
+  'tools.controls': 'Управление',
   'tools.select': 'Выделение',
   'tools.move': 'Перемещение',
   'tools.brush': 'Кисть',

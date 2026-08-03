@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useKeyboardShortcuts } from './ui/useKeyboardShortcuts';
 import { useAutosave, useRestoreLastDocument } from './ui/usePersistence';
 import { useImagePaste } from './ui/useImagePaste';
@@ -59,6 +59,9 @@ const PlayPanel = lazy(async () => {
 export default function App({ initialShareError = false }: { initialShareError?: boolean }) {
   const t = useT();
   const [dialog, setDialog] = useState<Dialog>(null);
+  const [phoneControlsOpen, setPhoneControlsOpen] = useState(false);
+  const phoneControlsButtonRef = useRef<HTMLButtonElement>(null);
+  const phoneControlsCloseRef = useRef<HTMLButtonElement>(null);
   // Splash: shown until the last-document restore settles, then fades out.
   const [splash, setSplash] = useState<'show' | 'fade' | 'gone'>('show');
   const mode = useDreamStore((s) => s.mode);
@@ -75,6 +78,49 @@ export default function App({ initialShareError = false }: { initialShareError?:
   useAutosave();
   useRestoreLastDocument(useCallback(() => setSplash('fade'), []));
   useImagePaste();
+
+  const closePhoneControls = useCallback((restoreFocus = true) => {
+    setPhoneControlsOpen(false);
+    if (useDreamStore.getState().aiPanelOpen) useDreamStore.getState().toggleAiPanel();
+    if (restoreFocus) window.requestAnimationFrame(() => phoneControlsButtonRef.current?.focus());
+  }, []);
+
+  useEffect(() => {
+    if (!phoneControlsOpen) return;
+    phoneControlsCloseRef.current?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closePhoneControls();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [closePhoneControls, phoneControlsOpen]);
+
+  useEffect(() => {
+    const phone =
+      globalThis.matchMedia?.('(max-width: 600px)').matches ?? globalThis.innerWidth <= 600;
+    if (aiPanelOpen && phone) setPhoneControlsOpen(true);
+  }, [aiPanelOpen]);
+
+  useEffect(() => {
+    const phone =
+      globalThis.matchMedia?.('(max-width: 600px)').matches ?? globalThis.innerWidth <= 600;
+    if (!phone) return;
+    setPhoneControlsOpen(false);
+    if (useDreamStore.getState().aiPanelOpen) useDreamStore.getState().toggleAiPanel();
+  }, [kidMode, mode]);
+
+  useEffect(() => {
+    const query = globalThis.matchMedia?.('(max-width: 600px)');
+    const onChange = () => {
+      if (!(query?.matches ?? globalThis.innerWidth <= 600)) setPhoneControlsOpen(false);
+    };
+    if (query) query.addEventListener('change', onChange);
+    else window.addEventListener('resize', onChange);
+    return () => {
+      if (query) query.removeEventListener('change', onChange);
+      else window.removeEventListener('resize', onChange);
+    };
+  }, []);
 
   // Language direction follows the locale (RTL locales mirror the whole shell).
   useEffect(() => {
@@ -125,7 +171,12 @@ export default function App({ initialShareError = false }: { initialShareError?:
         onExport={() => setDialog('export')}
       />
       <div className="app-body">
-        {mode !== 'play' && <ToolRail />}
+        {mode !== 'play' && (
+          <ToolRail
+            onOpenPhoneControls={() => setPhoneControlsOpen(true)}
+            phoneControlsButtonRef={phoneControlsButtonRef}
+          />
+        )}
         {mode === 'play' ? (
           <Suspense fallback={null}>
             <PlayView />
@@ -136,31 +187,57 @@ export default function App({ initialShareError = false }: { initialShareError?:
         {kidMode ? (
           mode !== 'play' && <KidPanel />
         ) : (
-          <aside className="side-panel">
-            {aiPanelOpen && (
-              <Suspense fallback={null}>
-                <AiPanel />
-              </Suspense>
+          <>
+            {phoneControlsOpen && (
+              <button
+                type="button"
+                className="phone-controls-scrim"
+                aria-label={t('common.close')}
+                onClick={() => closePhoneControls()}
+              />
             )}
-            {mode === 'design' && (
-              <>
-                <DesignPanel />
-                <HotspotsPanel />
-                <ComponentsPanel />
-              </>
-            )}
-            {mode === 'play' ? (
-              <Suspense fallback={null}>
-                <PlayPanel />
-              </Suspense>
-            ) : (
-              <>
-                <ToolOptionsPanel />
-                <AdjustPanel />
-                <LayersPanel />
-              </>
-            )}
-          </aside>
+            <aside
+              className={`side-panel${phoneControlsOpen ? ' phone-controls-open' : ''}`}
+              role={phoneControlsOpen ? 'dialog' : undefined}
+              aria-modal={phoneControlsOpen ? true : undefined}
+              aria-label={phoneControlsOpen ? t('tools.controls') : undefined}
+            >
+              <div className="phone-controls-header">
+                <strong>{t('tools.controls')}</strong>
+                <button
+                  ref={phoneControlsCloseRef}
+                  type="button"
+                  className="btn"
+                  onClick={() => closePhoneControls()}
+                >
+                  {t('common.close')}
+                </button>
+              </div>
+              {aiPanelOpen && (
+                <Suspense fallback={null}>
+                  <AiPanel />
+                </Suspense>
+              )}
+              {mode === 'design' && (
+                <>
+                  <DesignPanel />
+                  <HotspotsPanel />
+                  <ComponentsPanel />
+                </>
+              )}
+              {mode === 'play' ? (
+                <Suspense fallback={null}>
+                  <PlayPanel />
+                </Suspense>
+              ) : (
+                <>
+                  <ToolOptionsPanel />
+                  <AdjustPanel />
+                  <LayersPanel />
+                </>
+              )}
+            </aside>
+          </>
         )}
       </div>
       <TimelineBar />

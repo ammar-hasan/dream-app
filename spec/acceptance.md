@@ -646,6 +646,17 @@ holds.
       choosing an action closes it, while Escape closes it and restores focus
       to More. Comfort mode keeps its controls at least 44 px and RTL mirrors
       placement without changing the logical action order.
+175.  GIVEN adult Draw at 390 px width WHEN Dream opens THEN the full-width
+      canvas sits above a non-scrolling six-place dock containing the current
+      tool, common Draw tools, Controls and All tools. WHEN All tools opens THEN
+      every Draw-eligible tool is present in a labelled viewport-contained grid;
+      choosing one closes the grid and keeps that current tool in the dock.
+      GIVEN Design WHEN the dock updates THEN Select is directly visible. WHEN
+      Controls opens THEN Options, Layers and every currently applicable
+      editing/Design panel are available in one labelled sheet; tapping AI opens
+      the same sheet with Dream AI visible. Escape closes either sheet and
+      restores focus to its trigger; comfort targets remain at least 44 px and
+      RTL preserves the logical path.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

@@ -40,6 +40,8 @@ export const en: Record<string, string> = {
 
   // --- Tools ---------------------------------------------------------------
   'tools.railLabel': 'Tools',
+  'tools.allTools': 'All tools',
+  'tools.controls': 'Controls',
   'tools.select': 'Select',
   'tools.move': 'Move',
   'tools.brush': 'Brush',

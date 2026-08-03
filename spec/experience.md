@@ -32,6 +32,14 @@ together on screen.
   contract names panel and timeline controls. Tooltips float beyond scrolling
   toolbar, rail, panel and timeline boundaries rather than being clipped by
   them; native browser tooltip bubbles are not used.
+- On an adult phone, tools move into a six-place bottom dock so the canvas gets
+  the full width. The current tool remains visible beside the mode's common
+  tools; **All tools** reveals the complete eligible set in a labelled grid.
+  **Select** is always in the Design dock. **Controls** opens the complete
+  Options, Adjust and Layers stack plus Design, Links and Components where
+  applicable; tapping AI opens that same sheet directly at Dream AI. Both
+  sheets close on Escape and return focus to their trigger. Little Dreamer's
+  larger reading-light rail is unchanged.
 - **Right panel:** tool options, plus per mode (matrix below).
 - **Bottom:** the timeline bar (when frames exist) and the status bar
   (pointer x,y · document size · active tool · zoom %).

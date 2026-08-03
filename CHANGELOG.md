@@ -7,6 +7,13 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **One-handed phone editing dock** (slice 65): adult phone creation now uses a
+  six-place bottom dock that keeps the active/common tools, Controls and All
+  tools visible without horizontal scrolling. Select is direct in Design; the
+  complete tool set and every applicable editing panel—including the visible AI
+  destination—open in labelled, keyboard-safe sheets with localized RTL and
+  comfort behavior.
+
 - **Task-first phone toolbar** (slice 64): the adult 390 px shell now keeps
   Story, AI, voice, Undo, Settings and all four workspaces visible without
   sideways scrolling. A labelled, keyboard-safe More tray contains every

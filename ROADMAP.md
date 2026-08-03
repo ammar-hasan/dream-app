@@ -1442,6 +1442,31 @@ sideways.
 - ✅ Full release gates remain green: 871 unit tests, 97.74% engine coverage,
   53 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 65 — Phone editing keeps depth without the desktop rail ✅
+
+Persona need: let George create one-handed on his new phone and let any phone
+creator find Select, every tool and advanced control without sacrificing canvas
+width or knowing that a desktop sidebar exists.
+
+- ✅ Adult Draw and Design use a non-scrolling six-place bottom dock. The active
+  tool stays visible beside mode-priority tools, Controls and All tools; Design
+  always keeps Select direct.
+- ✅ All tools opens the complete mode-eligible palette in a labelled grid and
+  keeps a newly selected tool in the dock. Controls restores Options, Adjust,
+  Layers, Design, Links and Components as each becomes applicable.
+- ✅ The visible phone AI action now opens a visible Dream AI panel inside the
+  same controls sheet instead of toggling a hidden desktop sidebar.
+- ✅ Sheets are viewport-contained, scrim-backed and transform/opacity-only;
+  selection closes the tool grid, while Escape closes either surface and
+  returns focus. Six locales, RTL, reduced motion and comfort targets remain
+  first-class.
+- ✅ Production-browser coverage proves the 390 px no-scroll dock, all 16 Draw
+  tools, sticky active tool, direct Design selection, conditional panels, AI
+  destination, focus recovery and serious accessibility scan. Rendered dock,
+  tool-grid and controls-sheet states were inspected directly.
+- ✅ Full release gates remain green: 871 unit tests, 97.74% engine coverage,
+  54 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1455,10 +1480,10 @@ largest count of controls:
 2. **Conversational phone-first creation:** natural clarification and reference
    handling for voice now covers selected-object identity, color, size and basic
    position plus canvas-edge targets; continue with relationships between
-   objects, broader multi-turn clarification and repair, simpler phone editing
-   and export beyond the task-prioritized shell, and a faithful safe creation
-   path that does not require a child or low-literacy user to configure an AI
-   provider.
+   objects, broader multi-turn clarification and repair, literacy-light controls
+   and export beyond the task-prioritized shell/dock, and a faithful safe
+   creation path that does not require a child or low-literacy user to configure
+   an AI provider.
 3. **Professional substrate:** non-destructive masks/adjustments and blend/color
    foundations, then vector paths, typography, grids, constraints and linked
    reusable systems—Design-only, preserving Draw's first-minute simplicity.

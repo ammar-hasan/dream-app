@@ -39,6 +39,8 @@ export const ar: Record<string, string> = {
 
   // --- Tools ---------------------------------------------------------------
   'tools.railLabel': 'الأدوات',
+  'tools.allTools': 'كل الأدوات',
+  'tools.controls': 'عناصر التحكم',
   'tools.select': 'تحديد',
   'tools.move': 'نقل',
   'tools.brush': 'فرشاة',

@@ -38,6 +38,8 @@ export const zh: Record<string, string> = {
 
   // --- Tools ---------------------------------------------------------------
   'tools.railLabel': '工具',
+  'tools.allTools': '所有工具',
+  'tools.controls': '控件',
   'tools.select': '选择',
   'tools.move': '移动',
   'tools.brush': '画笔',

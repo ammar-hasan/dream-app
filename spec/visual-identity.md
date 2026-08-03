@@ -100,7 +100,11 @@ Text `#0f141f` / `#ffffff`, dim text `#454d61` / `#ccd4e8`, borders
   compact icon row for the highest-frequency creation and recovery intents,
   then a full-width four-workspace switch. Secondary actions open in a
   viewport-contained two-column tray; the toolbar itself never scrolls or
-  overlaps the canvas.
+  overlaps the canvas. Adult creation tools form a labelled six-place bottom
+  dock: four current/common tools, Controls and All tools. The full tool grid
+  rises from the dock; the editing-control sheet floats above a calm scrim.
+  Both enter with a brief transform/opacity response and keep the artwork
+  visible as context rather than permanently consuming canvas width.
 
 ## Motion principles
 

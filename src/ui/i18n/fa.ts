@@ -37,6 +37,8 @@ export const fa: Record<string, string> = {
   'toolbar.settings': 'تنظیمات',
   'toolbar.moreActions': 'کارهای بیشتر',
   'tools.railLabel': 'ابزارها',
+  'tools.allTools': 'همه ابزارها',
+  'tools.controls': 'کنترل‌ها',
   'tools.select': 'انتخاب',
   'tools.move': 'جابجایی',
   'tools.brush': 'قلم‌مو',

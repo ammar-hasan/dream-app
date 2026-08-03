@@ -149,7 +149,9 @@ Modern interaction craft should make state legible rather than add spectacle:
   navigation/workspace choices visible for orientation, label disclosed menu
   actions clearly, and order frequent actions first. Dream therefore keeps its
   four workspaces plus Story/AI/voice/recovery visible and discloses file and
-  setup actions in one labelled tray.
+  setup actions in one labelled tray. The same reachability principle moves
+  adult phone tools to a bottom dock, while complete tools and panels remain
+  one labelled disclosure away instead of disappearing with the desktop rail.
   (https://developer.apple.com/design/human-interface-guidelines/designing-for-ios ·
   https://developer.apple.com/design/human-interface-guidelines/toolbars ·
   https://developer.apple.com/design/human-interface-guidelines/menus)

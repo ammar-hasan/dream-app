@@ -85,6 +85,9 @@ test('voice-first storyboard planning has no serious automated violations', asyn
 test('phone timeline task views have no serious automated violations', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await bootApp(page);
+  await page.getByRole('button', { name: 'Controls' }).click();
+  expect(await seriousViolations(page)).toEqual([]);
+  await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'More actions' }).click();
   const moreActions = page.getByRole('group', { name: 'More actions' });
   expect(await seriousViolations(page)).toEqual([]);

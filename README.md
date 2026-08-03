@@ -282,6 +282,12 @@ play button, everything called "frames".
   New/Open/Save/Import/Resize/Export, Animate, Redo and Little Dreamer live in a
   labelled two-column More tray that closes after use or Escape and preserves
   44 px comfort targets.
+- **Phone editing dock**: adult Draw and Design use a stable six-place bottom
+  dock instead of spending canvas width on a desktop rail. The active tool stays
+  visible, Select is direct in Design, All tools exposes the complete set, and
+  Controls restores Options, Adjust, Layers, Design, Links and Components in a
+  dismissible sheet. Tapping AI opens its real panel there instead of a hidden
+  desktop sidebar.
 - **Story to animation**: choose Story, tap Little Dreamer's large “Tell a
   story!”, or say “make a story about…” / «اصنع لي قصة عن…». Dream locally
   plans two to six numbered moments before touching the canvas. Edit, add,

@@ -39,6 +39,8 @@ export const pt: Record<string, string> = {
 
   // --- Tools ---------------------------------------------------------------
   'tools.railLabel': 'Ferramentas',
+  'tools.allTools': 'Todas as ferramentas',
+  'tools.controls': 'Controles',
   'tools.select': 'Selecionar',
   'tools.move': 'Mover',
   'tools.brush': 'Pincel',
