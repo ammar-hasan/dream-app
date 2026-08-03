@@ -55,6 +55,13 @@ const FONT_CHOICES = [
   },
 ];
 
+const BRUSH_PRESETS = [
+  { key: 'options.brushPreset.ink', size: 4, opacity: 1, style: 'round' },
+  { key: 'options.brushPreset.marker', size: 18, opacity: 0.55, style: 'round' },
+  { key: 'options.brushPreset.paint', size: 32, opacity: 0.85, style: 'round' },
+  { key: 'options.brushPreset.calligraphy', size: 16, opacity: 1, style: 'calligraphy' },
+] as const;
+
 export function ToolOptionsPanel() {
   const t = useT();
   const tool = useDreamStore((s) => s.tool);
@@ -160,19 +167,47 @@ export function ToolOptionsPanel() {
       )}
 
       {tool === 'brush' && (
-        <label className="option-row">
-          <span className="option-label">{t('options.brushStyle')}</span>
-          <select
-            value={settings.brushStyle}
-            onChange={(e) =>
-              setBrushStyle(e.target.value === 'calligraphy' ? 'calligraphy' : 'round')
-            }
-            className="font-select"
-          >
-            <option value="round">{t('options.brushRound')}</option>
-            <option value="calligraphy">{t('options.brushCalligraphy')}</option>
-          </select>
-        </label>
+        <>
+          <div className="option-row brush-presets-row">
+            <span className="option-label">{t('options.brushPresets')}</span>
+            <div className="brush-presets" role="group" aria-label={t('options.brushPresets')}>
+              {BRUSH_PRESETS.map((preset) => {
+                const active =
+                  settings.size === preset.size &&
+                  settings.opacity === preset.opacity &&
+                  settings.brushStyle === preset.style;
+                return (
+                  <button
+                    key={preset.key}
+                    type="button"
+                    className={`btn brush-preset${active ? ' active' : ''}`}
+                    aria-pressed={active}
+                    onClick={() => {
+                      setSize(preset.size);
+                      setOpacity(preset.opacity);
+                      setBrushStyle(preset.style);
+                    }}
+                  >
+                    {t(preset.key)}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <label className="option-row">
+            <span className="option-label">{t('options.brushStyle')}</span>
+            <select
+              value={settings.brushStyle}
+              onChange={(e) =>
+                setBrushStyle(e.target.value === 'calligraphy' ? 'calligraphy' : 'round')
+              }
+              className="font-select"
+            >
+              <option value="round">{t('options.brushRound')}</option>
+              <option value="calligraphy">{t('options.brushCalligraphy')}</option>
+            </select>
+          </label>
+        </>
       )}
 
       {tool === 'line' && (

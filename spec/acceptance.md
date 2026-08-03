@@ -507,6 +507,11 @@ holds.
       difficulty, speed, quantity, lives or Russian-named layers THEN the
       visible template, settings and cast update deterministically without a
       network request.
+156.  GIVEN Brush is active WHEN Fine ink, Soft marker, Bold paint or
+      Calligraphy is chosen THEN its documented size, opacity and tip become
+      visible together, only the matching preset is selected, manual adjustment
+      clears that selection, existing marks stay unchanged, and future marks
+      use the new settings.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 
@@ -516,7 +521,7 @@ holds.
    the rocket catches stars.
 2. **Victor (85):** comfort mode on → everything bigger and calmer →
    draw → undo → save → reopen tomorrow: the drawing is there.
-3. **Ali (30):** stylus pressure strokes → layers → import a photo →
+3. **Ali (30):** choose a brush preset → stylus pressure strokes → layers → import a photo →
    Vintage preset → crop → export JPEG q92.
 4. **Fatima (21):** Persian UI → full RTL → choose the Calligraphy nib →
    draw thick/thin lettering with mirror symmetry on → add Persian-script

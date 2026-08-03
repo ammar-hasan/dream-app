@@ -158,6 +158,7 @@ presenter, Zǐxuān the student, Ali/Fatima the hobbyists). Score: impact
 | 18  | ~~Complete Simplified Chinese UI, unspaced voice commands, story planning and offline game language~~ ✅ shipped (slice 36)                   | Zǐxuān                | 5      | M      |
 | 19  | ~~Complete Brazilian Portuguese UI, voice commands, story planning and offline game language~~ ✅ shipped (slice 37)                          | Maria                 | 4      | M      |
 | 20  | ~~Complete Russian UI, voice commands, story planning and offline game language~~ ✅ shipped (slice 38)                                       | Aleksandr             | 4      | M      |
+| 21  | ~~Compact brush presets that expose rather than hide their size, opacity and tip~~ ✅ shipped (slice 39)                                      | Ali, Aleksandr        | 4      | S      |
 
 Deliberately deferred: **general vector-path editing** (slice 34 exports
 genuinely scalable native marks without introducing a second editing medium), **real-time

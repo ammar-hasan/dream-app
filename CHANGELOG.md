@@ -7,6 +7,11 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Focused professional brush presets** (slice 39): Brush now offers Fine
+  ink, Soft marker, Bold paint and Calligraphy as compact one-click starting
+  points. Each sets the visible size, opacity and tip together, remains fully
+  editable, never changes existing marks and is localized in all six languages.
+
 - **Complete Russian journey** (slice 38): Русский covers every product
   surface with exact key/placeholder parity, persistent LTR switching and
   `ru-RU` speech. Russian commands cover creation, recovery, games, app/code

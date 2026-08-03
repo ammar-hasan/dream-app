@@ -971,3 +971,17 @@ productivity surface in his own language without losing keyboard speed.
 - Acceptance met: switch to Русский, enter Design, use keyboard-first tools,
   issue Russian command/story/game language and retain the same offline,
   recoverable outcomes and English fallback.
+
+## Slice 39 — Focused professional brush presets ✅
+
+Persona need: give Ali and Aleksandr fast, repeatable mark-making without
+turning Draw into a brush-engine cockpit.
+
+- ✅ Fine ink, Soft marker, Bold paint and Calligraphy each set size, opacity
+  and tip together from one compact, localized control.
+- ✅ The underlying controls remain visible and editable; a manual change
+  clears the active preset instead of creating hidden state.
+- ✅ Presets are session-only and affect future marks only. Existing art and
+  the document history remain untouched.
+- Acceptance met: choose any preset, see its exact settings, adjust it freely
+  and draw with the resulting ordinary, portable stroke.

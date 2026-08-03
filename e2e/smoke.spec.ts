@@ -20,6 +20,18 @@ test('a brush stroke paints pixels onto the canvas', async ({ page }) => {
   await expect(page.locator('.hint-card')).toHaveCount(0);
 });
 
+test('brush presets expose their complete editable settings', async ({ page }) => {
+  await bootApp(page);
+  const marker = page.getByRole('button', { name: 'Soft marker' });
+  await marker.click();
+  await expect(marker).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.tool-options')).toContainText('18px');
+  await expect(page.locator('.tool-options')).toContainText('55%');
+
+  await page.locator('.tool-options input[type="range"]').first().fill('19');
+  await expect(marker).toHaveAttribute('aria-pressed', 'false');
+});
+
 test('undo removes the stroke', async ({ page }) => {
   await bootApp(page);
   const before = await nonWhitePixels(page);

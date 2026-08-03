@@ -35,6 +35,14 @@ Switching tips changes only future marks. Every calligraphy gesture remains
 one ordinary undoable stroke and reproduces identically in previews, saved
 projects and exports.
 
+Four compact presets set the complete future-brush feel in one action:
+**Fine ink** (4 px, fully opaque, round), **Soft marker** (18 px, 55%, round),
+**Bold paint** (32 px, 85%, round) and **Calligraphy** (16 px, fully opaque,
+broad nib). The exact size, opacity and tip remain visible and independently
+editable; changing any of them simply clears the preset's selected state.
+Presets never rewrite existing marks and are session-only like the controls
+they combine.
+
 ### Pencil (P)
 
 Hard, always fully opaque round stroke, regardless of the opacity setting.

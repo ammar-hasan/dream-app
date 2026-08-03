@@ -195,7 +195,8 @@ and the language picker.
 - Brush, pencil, eraser with adjustable size, color (palette + custom + a
   recent-colors row) and opacity — with per-point pen pressure on a stylus;
   Brush also offers a fixed-angle Calligraphy nib for directional thick/thin
-  marks using mouse, touch or pen
+  marks using mouse, touch or pen, plus Fine ink, Soft marker, Bold paint and
+  Calligraphy presets that set the visible size, opacity and tip together
 - Spray (airbrush) with a density slider; deterministic per-stroke seeds
 - Line, rectangle and ellipse tools with Shift-to-constrain (45° lines,
   squares, circles), plain/arrow/two-way line ends, and an optional fill-shapes

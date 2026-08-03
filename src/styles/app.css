@@ -1023,6 +1023,33 @@ body {
   accent-color: var(--accent);
 }
 
+.brush-presets-row {
+  align-items: stretch;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.brush-presets-row .option-label {
+  flex-basis: auto;
+}
+
+.brush-presets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.brush-preset {
+  min-width: 0;
+  padding-inline: 8px;
+}
+
+.brush-preset.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
 /* Adjust panel: transform/preset/action button rows */
 
 .transform-actions,

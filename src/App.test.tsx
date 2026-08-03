@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { act, cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import App from './App';
 import { useDreamStore } from './store/dreamStore';
 import { useUiPrefs } from './store/uiPrefs';
@@ -25,6 +25,30 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: 'Rocket' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Under the sea' })).toBeInTheDocument();
     act(() => useDreamStore.getState().setTool('brush'));
+  });
+
+  it('applies complete brush presets and marks the active choice', () => {
+    render(<App />);
+    const marker = screen.getByRole('button', { name: 'Soft marker' });
+    fireEvent.click(marker);
+    expect(useDreamStore.getState().settings).toMatchObject({
+      size: 18,
+      opacity: 0.55,
+      brushStyle: 'round',
+    });
+    expect(marker).toHaveAttribute('aria-pressed', 'true');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Calligraphy' }));
+    expect(useDreamStore.getState().settings).toMatchObject({
+      size: 16,
+      opacity: 1,
+      brushStyle: 'calligraphy',
+    });
+    act(() => {
+      useDreamStore.getState().setSize(8);
+      useDreamStore.getState().setOpacity(1);
+      useDreamStore.getState().setBrushStyle('round');
+    });
   });
 
   it('reflects comfort mode on the root element as a data attribute', () => {
