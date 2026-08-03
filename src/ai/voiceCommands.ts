@@ -5,7 +5,7 @@
  * understand parses to null and the caller says so kindly.
  *
  * The parser is a dumb keyword matcher over per-locale vocabulary tables:
- * English is the base and other locales (Arabic so far) merge their words in
+ * English is the base and other locales merge their words in
  * alongside it — English commands keep working no matter the UI language.
  * Arabic transcripts are normalized first (diacritics/tatweel stripped, alef
  * forms unified) so "شغّل" and "شغل" match the same word.
@@ -367,6 +367,110 @@ const AR_VOCAB: VoiceVocabulary = {
   ],
 };
 
+/** Persian additions (فارسی), merged into English like the Arabic table. */
+const FA_VOCAB: VoiceVocabulary = {
+  filler: new Set([
+    'لطفا',
+    'لطفاً',
+    'میشه',
+    'میشود',
+    'می',
+    'شه',
+    'شود',
+    'خواهش',
+    'میکنم',
+    'کنم',
+    'الان',
+    'برام',
+    'برای',
+    'من',
+    'رو',
+    'را',
+  ]),
+  colors: {
+    قرمز: COLOR_WORDS.red,
+    نارنجی: COLOR_WORDS.orange,
+    زرد: COLOR_WORDS.yellow,
+    سبز: COLOR_WORDS.green,
+    فیروزه‌ای: COLOR_WORDS.teal,
+    فیروزه: COLOR_WORDS.teal,
+    آسمانی: COLOR_WORDS.sky,
+    آبی: COLOR_WORDS.blue,
+    بنفش: COLOR_WORDS.purple,
+    صورتی: COLOR_WORDS.pink,
+    قهوه‌ای: COLOR_WORDS.brown,
+    قهوه: COLOR_WORDS.brown,
+    مشکی: COLOR_WORDS.black,
+    سیاه: COLOR_WORDS.black,
+    سفید: COLOR_WORDS.white,
+    خاکستری: COLOR_WORDS.gray,
+    طلایی: COLOR_WORDS.gold,
+  },
+  tools: {
+    قلم: 'brush',
+    قلمو: 'brush',
+    برس: 'brush',
+    مداد: 'pencil',
+    پاک‌کن: 'eraser',
+    پاکن: 'eraser',
+    اسپری: 'spray',
+    خط: 'line',
+    مستطیل: 'rectangle',
+    مربع: 'rectangle',
+    بیضی: 'ellipse',
+    دایره: 'ellipse',
+    سطل: 'fill',
+    پرکن: 'fill',
+    عصا: 'wand',
+    جادو: 'wand',
+    لاسو: 'lasso',
+    مهر: 'stamp',
+    برچسب: 'stamp',
+    قطره‌چکان: 'eyedropper',
+    قطره: 'eyedropper',
+    متن: 'text',
+    نوشته: 'text',
+  },
+  yes: new Set(['بله', 'آره', 'اره', 'حتما', 'حتماً', 'باشه', 'تایید']),
+  no: new Set(['نه', 'خیر', 'لغو', 'بیخیال']),
+  bigger: new Set(['بزرگتر', 'بزرگ‌تر', 'ضخیمتر', 'ضخیم‌تر', 'بزرگ']),
+  smaller: new Set(['کوچکتر', 'کوچک‌تر', 'نازکتر', 'نازک‌تر', 'کوچک']),
+  clear: new Set(['پاک', 'تمیز']),
+  play: new Set(['پخش', 'اجرا', 'حرکت']),
+  stop: new Set(['توقف', 'بایست', 'نگه‌دار', 'مکث']),
+  undo: new Set(['واگرد', 'برگرد', 'برگشت']),
+  redo: new Set(['بازانجام', 'دوباره']),
+  help: new Set(['راهنما', 'کمک', 'دستورها']),
+  save: new Set(['ذخیره', 'سیو']),
+  game: new Set(['بازی', 'بازیم']),
+  templates: {
+    catch: new Set(['گرفتن', 'بگیر', 'شکار']),
+    flappy: new Set(['پرواز', 'پرنده', 'فلپی']),
+    maze: new Set(['هزارتو', 'ماز']),
+    platformer: new Set(['سکوبازی', 'پرش', 'جامپر']),
+  },
+  app: new Set(['اپ', 'برنامه', 'نمونه']),
+  appPreview: new Set(['پیش‌نمایش', 'پیشنمایش', 'پیش', 'نمایش', 'امتحان', 'باز', 'نشان']),
+  appExport: new Set(['خروجی', 'دانلود', 'اشتراک', 'بفرست']),
+  code: new Set(['کد', 'اچ‌تی‌ام‌ال', 'html']),
+  mirror: new Set(['آینه', 'قرینه', 'تقارن']),
+  clearPhrases: ['همه را پاک کن', 'همه رو پاک کن', 'از اول شروع کن', 'بوم را پاک کن'],
+  newFramePhrases: ['فریم جدید', 'فریم اضافه کن', 'یک فریم دیگر', 'فریم بعدی'],
+  mirrorOnPhrases: ['آینه روشن', 'تقارن روشن', 'قرینه کن', 'آینه را روشن کن'],
+  mirrorOffPhrases: ['آینه خاموش', 'تقارن خاموش', 'قرینه را بردار', 'آینه را خاموش کن'],
+  codePhrases: ['کد واقعی', 'خروجی کد', 'به کد تبدیل کن', 'واقعیش کن'],
+  narrationRecordPhrases: ['ضبط روایت', 'صدام را ضبط کن', 'صدام رو ضبط کن', 'داستان را ضبط کن'],
+  narrationStopPhrases: ['ضبط را متوقف کن', 'ضبط رو متوقف کن', 'پایان ضبط'],
+  narrationDeletePhrases: ['روایت را پاک کن', 'صدا را پاک کن', 'ضبط را حذف کن'],
+  storyboardPhrases: [
+    'یک داستان درباره',
+    'داستانی درباره',
+    'داستان بساز',
+    'یک انیمیشن درباره',
+    'انیمیشن بساز',
+  ],
+};
+
 function union<T>(a: Set<T>, b: Set<T>): Set<T> {
   return new Set([...a, ...b]);
 }
@@ -414,6 +518,7 @@ function mergeVocabulary(base: VoiceVocabulary, extra: VoiceVocabulary): VoiceVo
 
 const LOCALE_VOCABULARIES: Record<string, VoiceVocabulary> = {
   ar: mergeVocabulary(EN_VOCAB, AR_VOCAB),
+  fa: mergeVocabulary(EN_VOCAB, FA_VOCAB),
 };
 
 /** The vocabulary for a UI locale; unknown locales get plain English. */
@@ -433,9 +538,23 @@ export function normalizeArabic(text: string): string {
     .replace(/ى/g, 'ي');
 }
 
+/** Persian speech engines sometimes return Arabic yeh/kaf; unify them. */
+export function normalizePersian(text: string): string {
+  return text
+    .replace(/[ً-ْٰـ]/g, '')
+    .replace(/[أإٱ]/g, 'ا')
+    .replace(/[يى]/g, 'ی')
+    .replace(/ك/g, 'ک');
+}
+
 /** Tokenize: lowercase, normalize Arabic, drop punctuation, remove filler. */
-export function tokenize(transcript: string, filler: Set<string> = FILLER_WORDS): string[] {
-  return normalizeArabic(transcript.toLowerCase())
+export function tokenize(
+  transcript: string,
+  filler: Set<string> = FILLER_WORDS,
+  locale = 'en',
+): string[] {
+  return (locale === 'fa' ? normalizePersian(transcript) : normalizeArabic(transcript))
+    .toLowerCase()
     .replace(/[^\p{L}\p{N}' ]+/gu, ' ')
     .split(/\s+/)
     .filter((word) => word !== '' && !filler.has(word));
@@ -492,7 +611,7 @@ function storyboardRequest(
     const prompt = normalized
       .slice(index + phrase.length)
       .trim()
-      .replace(/^(?:about|where|with|of|عن|حول|فيها)\s+/u, '')
+      .replace(/^(?:about|where|with|of|عن|حول|فيها|درباره|که|با)\s+/u, '')
       .trim();
     return prompt ? { matched: true, prompt } : { matched: true };
   }
@@ -509,10 +628,11 @@ export function parseVoiceCommand(transcript: string, locale = 'en'): VoiceComma
   const vocab = vocabularyFor(locale);
   // Arabic marks are stripped BEFORE punctuation removal — a shadda is a
   // Unicode mark and would otherwise turn into a word-breaking space.
-  const normalized = normalizeArabic(transcript.toLowerCase())
+  const normalized = (locale === 'fa' ? normalizePersian(transcript) : normalizeArabic(transcript))
+    .toLowerCase()
     .replace(/[^\p{L}\p{N}' ]+/gu, ' ')
     .trim();
-  const tokens = new Set(tokenize(transcript, vocab.filler));
+  const tokens = new Set(tokenize(transcript, vocab.filler, locale));
   if (tokens.size === 0) return null;
 
   // Confirmations are tiny sentences ("yes", "no thanks") — match them first,

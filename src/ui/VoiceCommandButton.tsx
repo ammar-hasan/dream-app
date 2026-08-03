@@ -12,7 +12,7 @@ import { parseVoiceCommand } from '../ai/voiceCommands';
 import { say } from '../ai/say';
 import { useDreamStore } from '../store/dreamStore';
 import { useUiPrefs } from '../store/uiPrefs';
-import { t, useT } from './i18n';
+import { speechLanguage, t, useT } from './i18n';
 import {
   cancelClear,
   confirmClear,
@@ -138,7 +138,7 @@ export function VoiceCommandButton() {
           if (text) runTranscript(text);
         },
       },
-      { lang: useUiPrefs.getState().locale },
+      { lang: speechLanguage(useUiPrefs.getState().locale) },
     );
     if (handle) {
       handleRef.current = handle;

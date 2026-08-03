@@ -151,6 +151,7 @@ presenter, Zǐxuān the student, Ali/Fatima the hobbyists). Score: impact
 | 12  | ~~Voice-to-storyboard animation with visible bilingual confirmation~~ ✅ shipped (slice 28)                                                   | Zainab, George        | 5      | M      |
 | 13  | ~~Phone timeline task focus for animation, slides and apps~~ ✅ shipped (slice 30)                                                            | George, Ahmed, Sara   | 4      | S      |
 | 14  | ~~Non-destructive frame-range trimming with synchronized narration~~ ✅ shipped (slice 32)                                                    | Ahmed                 | 4      | S      |
+| 15  | ~~Persian-first RTL, voice, calligraphy nib and script typography~~ ✅ shipped (slice 33)                                                     | Fatima                | 5      | M      |
 
 Deliberately deferred: **vector/SVG editing** (different medium — Recraft and
 Excalidraw own it; raster-first keeps Dream simple), **real-time

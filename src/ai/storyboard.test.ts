@@ -30,6 +30,16 @@ describe('planStoryboard', () => {
     ]);
   });
 
+  it('splits Persian sequence language without requiring a provider', () => {
+    expect(
+      planStoryboard('ماه بیدار می‌شود، سپس روباهی را می‌بیند، بعدش می‌رقصند', 'fa')?.scenes,
+    ).toEqual([
+      { description: 'ماه بیدار می‌شود' },
+      { description: 'روباهی را می‌بیند' },
+      { description: 'می‌رقصند' },
+    ]);
+  });
+
   it('turns one idea into a two-frame beginning and next moment', () => {
     expect(planStoryboard('A sleepy fox under the moon')?.scenes).toEqual([
       { description: 'The beginning: A sleepy fox under the moon' },
@@ -38,6 +48,10 @@ describe('planStoryboard', () => {
     expect(planStoryboard('قطة صغيرة في الحديقة', 'ar')?.scenes).toEqual([
       { description: 'البداية: قطة صغيرة في الحديقة' },
       { description: 'اللحظة التالية: قطة صغيرة في الحديقة' },
+    ]);
+    expect(planStoryboard('روباهی زیر ماه', 'fa')?.scenes).toEqual([
+      { description: 'شروع: روباهی زیر ماه' },
+      { description: 'لحظه بعد: روباهی زیر ماه' },
     ]);
   });
 

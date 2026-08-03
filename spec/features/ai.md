@@ -115,7 +115,7 @@ nicely balanced."
 ### Story to animation
 
 **Story** is the assistant's fifth capability and lives beside Animate rather
-than inside the panel. One English or Arabic story is planned locally into two
+than inside the panel. One English, Arabic or Persian story is planned locally into two
 to six editable moments before any provider call or document change. Each
 reviewed moment can be read aloud; the user explicitly confirms before the
 active image-capable provider paints the sequence. The provider is reminded of

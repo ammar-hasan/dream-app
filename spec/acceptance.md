@@ -334,7 +334,7 @@ holds.
       response-format option is sent, and the returned picture fills Dream's
       exact canvas dimensions; a separately configured compatible endpoint
       continues to receive its requested model and canvas size.
-114.  GIVEN an English or Arabic story WHEN it is planned THEN two to six
+114.  GIVEN an English, Arabic or Persian story WHEN it is planned THEN two to six
       numbered moments appear locally without an AI request or document
       mutation, and each moment can be edited, heard aloud, added, removed or
       regenerated from revised story words before confirmation; Little
@@ -395,6 +395,25 @@ holds.
 127.  GIVEN captions are edited while a video range is trimmed WHEN Export is
       pressed THEN caption edits remain one undoable document change exactly as
       before; trimming itself adds no history entry.
+128.  GIVEN Persian is chosen in Settings WHEN the workspace updates THEN every
+      product string has a non-empty Persian value, the shell changes to `fa`
+      and right-to-left without reload, the choice persists per user, and the
+      Settings controls remain completely inside the viewport.
+129.  GIVEN the Persian UI WHEN dictation or the global microphone is used THEN
+      recognition listens in Iranian Persian; Persian commands cover the same
+      creation, recovery, delivery and narration intents as English and Arabic,
+      Persian story sequence words create local moments, Arabic-keyboard
+      yeh/kaf variants match, and English commands still work.
+130.  GIVEN the Brush's Calligraphy nib WHEN a mouse, touch or pen gesture runs
+      along versus across its fixed 45° edge THEN the first mark is thin and the
+      second broad; pen pressure further modulates the result, the live preview
+      matches the committed mark, and one Undo removes the whole gesture.
+131.  GIVEN the Text tool WHEN Persian script is selected THEN Persian text
+      prefers an installed Nastaliq or Arabic-script face, remains editable
+      until committed, and appears consistently in the canvas and exports.
+132.  GIVEN Settings is open WHEN an automated accessibility scan inspects its
+      form controls in either writing direction THEN they form one correctly
+      labeled control group with no serious or critical violation.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 
@@ -406,8 +425,9 @@ holds.
    draw → undo → save → reopen tomorrow: the drawing is there.
 3. **Ali (30):** stylus pressure strokes → layers → import a photo →
    Vintage preset → crop → export JPEG q92.
-4. **Fatima (21):** Arabic UI → full RTL → draw calligraphy with mirror
-   symmetry on → one undo removes the whole bloom.
+4. **Fatima (21):** Persian UI → full RTL → choose the Calligraphy nib →
+   draw thick/thin lettering with mirror symmetry on → add Persian-script
+   text → one undo removes the whole mirrored bloom.
 5. **George (45):** voice-first: "make an animation with a red bird that finds
    home" → hear and confirm the planned moments → the complete animation plays
    → "record narration" → tell it aloud → "stop recording" → "save".

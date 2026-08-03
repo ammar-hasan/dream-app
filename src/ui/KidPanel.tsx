@@ -4,12 +4,17 @@
  * drawing has frames. No layers, no design panels, nothing to get lost in.
  */
 
+import { lazy, Suspense } from 'react';
 import { useDreamStore } from '../store/dreamStore';
 import { useT } from './i18n';
 import { useSpeakName } from './useSpeakName';
-import { AiPanel } from './AiPanel';
 import { StampPicker } from './StampPicker';
 import { PauseIcon, PlayIcon, RedoIcon, SparkleIcon, StoryIcon, UndoIcon } from './icons';
+
+const AiPanel = lazy(async () => {
+  const module = await import('./AiPanel');
+  return { default: module.AiPanel };
+});
 
 export function KidPanel() {
   const t = useT();
@@ -94,7 +99,11 @@ export function KidPanel() {
 
       {tool === 'stamp' && <StampPicker kid />}
 
-      {aiPanelOpen && <AiPanel kid />}
+      {aiPanelOpen && (
+        <Suspense fallback={null}>
+          <AiPanel kid />
+        </Suspense>
+      )}
     </aside>
   );
 }

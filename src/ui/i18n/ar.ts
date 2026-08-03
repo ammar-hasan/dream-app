@@ -133,6 +133,9 @@ export const ar: Record<string, string> = {
   'options.colorSwatch': 'اللون {color}',
   'options.customColor': 'لون مخصص',
   'options.size': 'الحجم',
+  'options.brushStyle': 'رأس الفرشاة',
+  'options.brushRound': 'دائري',
+  'options.brushCalligraphy': 'سنّ الخط',
   'options.opacity': 'الشفافية',
   'options.font': 'الخط',
   'options.textSize': 'حجم النص',
@@ -140,12 +143,13 @@ export const ar: Record<string, string> = {
   'font.serif': 'مزخرف',
   'font.mono': 'أحادي',
   'font.handwritten': 'بخط اليد',
+  'font.persian': 'خط فارسي',
 
   // --- Design panel ----------------------------------------------------------
   'design.title': 'تصميم',
   'design.snap': 'المحاذاة التلقائية للوحة والعناصر',
   'design.selectedOne':
-    'عنصر واحد محدد — اسحب للنقل، ومقابض الزوايا للتكبير، والمقبض العلوي للتدوير.',
+    '{count} عنصر محدد — اسحب للنقل، ومقابض الزوايا للتكبير، والمقبض العلوي للتدوير.',
   'design.selectedMany':
     '{count} عناصر محددة — اسحب للنقل، ومقابض الزوايا للتكبير، والمقبض العلوي للتدوير.',
   'design.group': 'تجميع',
@@ -397,7 +401,7 @@ export const ar: Record<string, string> = {
   'ai.title': 'حُلم الذكي',
   'ai.close': 'إغلاق مساعد الذكاء الاصطناعي',
   'ai.triesLeft': '{count} محاولة مجانية متبقية اليوم',
-  'ai.triesLeftOne': 'محاولة مجانية واحدة متبقية اليوم',
+  'ai.triesLeftOne': '{count} محاولة مجانية متبقية اليوم',
   'ai.tabs': 'أدوات الذكاء الاصطناعي',
   'ai.create': 'إنشاء',
   'ai.edit': 'تعديل',

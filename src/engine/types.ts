@@ -344,6 +344,8 @@ export interface Component {
 export interface ToolSettings {
   color: Color;
   size: number;
+  /** Brush tip: round is uniform; calligraphy is a fixed 45-degree broad nib. */
+  brushStyle: 'round' | 'calligraphy';
   /** 0..1 */
   opacity: number;
   fontSize: number;

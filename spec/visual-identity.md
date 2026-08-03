@@ -132,5 +132,6 @@ never move, crop or stretch the artwork beneath them.
   layer.", "Took that back!", "All clear!", "Honestly? This is looking
   lovely. Keep going!"
 - Arabic carries the same friendly register (تراجع!، تمام!، أحسنت), never
-  stiff formal translation. All strings in both locales — the parity rule
+  stiff formal translation. Persian is concise, conversational Iranian
+  Persian. All strings in every locale follow the parity rule
   (`features/internationalization.md`).

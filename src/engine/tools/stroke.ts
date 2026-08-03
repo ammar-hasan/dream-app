@@ -23,6 +23,27 @@ export function pressureWidth(pressure: number): number {
   return Math.min(1, Math.max(0.1, pressure));
 }
 
+/**
+ * Width multipliers for a fixed 45-degree broad nib. A stroke parallel to
+ * the nib's long edge is thin; one crossing it is broad. Optional pressure
+ * continues to modulate that directional width.
+ */
+export function calligraphyWidths(
+  points: readonly { x: number; y: number }[],
+  pressures: readonly number[] | null,
+): number[] {
+  return points.map((point, index) => {
+    const before = points[Math.max(0, index - 1)] ?? point;
+    const after = points[Math.min(points.length - 1, index + 1)] ?? point;
+    const dx = after.x - before.x;
+    const dy = after.y - before.y;
+    const direction = dx === 0 && dy === 0 ? Math.PI * 0.75 : Math.atan2(dy, dx);
+    const directional = 0.18 + 0.82 * Math.abs(Math.sin(direction - Math.PI / 4));
+    const pressure = pressures?.[index] ?? 1;
+    return Math.max(0.1, Math.min(1, directional * pressure));
+  });
+}
+
 function toOp(tool: StrokeOp['tool'], state: StrokeState, settings: ToolSettings): StrokeOp | null {
   if (state.points.length === 0) return null;
   // Duplicate a single tap so the round cap paints a visible dot.
@@ -38,9 +59,12 @@ function toOp(tool: StrokeOp['tool'], state: StrokeState, settings: ToolSettings
     // Pencil and eraser are always fully opaque; brush and spray honor opacity.
     opacity: tool === 'brush' || tool === 'spray' ? settings.opacity : 1,
   };
-  if (state.widths) {
-    op.widths =
-      single && state.widths.length === 1 ? [state.widths[0], state.widths[0]] : [...state.widths];
+  const widths =
+    tool === 'brush' && settings.brushStyle === 'calligraphy'
+      ? calligraphyWidths(state.points, state.widths)
+      : state.widths;
+  if (widths) {
+    op.widths = single && widths.length === 1 ? [widths[0], widths[0]] : [...widths];
   }
   if (tool === 'spray') {
     op.seed = state.seed;

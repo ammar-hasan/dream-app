@@ -1,6 +1,6 @@
 /**
  * Voice/text story → small, confirmable storyboard plan. Planning is local,
- * deterministic and bilingual; providers only paint the beats the user has
+ * deterministic and localized; providers only paint the beats the user has
  * reviewed. Nothing in this module touches the DOM or document store.
  */
 
@@ -26,7 +26,7 @@ function splitBeats(story: string): string[] {
   const sentences = story.split(/[\n.!?؟؛;]+/u);
   return sentences.flatMap((sentence) =>
     sentence.split(
-      /\s*(?:,\s*(?:and|then)\s+|\band then\b|\bthen\b|\bnext\b|\bfinally\b|\bafter that\b|،?\s*ثم\s+|،?\s*بعد ذلك\s+|،?\s*(?:واخيرا|وأخيرا)\s*)/giu,
+      /\s*(?:,\s*(?:and|then)\s+|\band then\b|\bthen\b|\bnext\b|\bfinally\b|\bafter that\b|،?\s*ثم\s+|،?\s*بعد ذلك\s+|،?\s*(?:واخيرا|وأخيرا)\s*|،?\s*بعدش\s+|،?\s*بعد از آن\s+|،?\s*سپس\s+|،?\s*در پایان\s*)/giu,
     ),
   );
 }
@@ -51,7 +51,9 @@ export function planStoryboard(prompt: string, locale = 'en'): StoryboardPlan | 
     beats =
       locale === 'ar'
         ? [`البداية: ${story}`, `اللحظة التالية: ${story}`]
-        : [`The beginning: ${story}`, `The next moment: ${story}`];
+        : locale === 'fa'
+          ? [`شروع: ${story}`, `لحظه بعد: ${story}`]
+          : [`The beginning: ${story}`, `The next moment: ${story}`];
   }
   return {
     story,

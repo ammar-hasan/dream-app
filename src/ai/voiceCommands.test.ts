@@ -346,3 +346,37 @@ describe('parseVoiceCommand — Arabic vocabulary (locale "ar")', () => {
     expect(parseVoiceCommand('ما حالة الطقس اليوم', 'ar')).toBeNull();
   });
 });
+
+describe('parseVoiceCommand — Persian vocabulary (locale "fa")', () => {
+  it('parses core creation, recovery and calligraphy-adjacent tools', () => {
+    expect(parseVoiceCommand('لطفاً واگرد', 'fa')).toEqual({ kind: 'undo' });
+    expect(parseVoiceCommand('قلم مو', 'fa')).toEqual({ kind: 'tool', tool: 'brush' });
+    expect(parseVoiceCommand('پاک کن', 'fa')).toEqual({ kind: 'clear' });
+    expect(parseVoiceCommand('فریم جدید', 'fa')).toEqual({ kind: 'new-frame' });
+    expect(parseVoiceCommand('ذخیره', 'fa')).toEqual({ kind: 'save' });
+  });
+
+  it('parses colors, app delivery and narration without intent collisions', () => {
+    expect(parseVoiceCommand('سطل آبی', 'fa')).toEqual({
+      kind: 'fill-color',
+      color: COLOR_WORDS.blue,
+      name: 'آبی',
+    });
+    expect(parseVoiceCommand('پیش نمایش برنامه', 'fa')).toEqual({ kind: 'preview-app' });
+    expect(parseVoiceCommand('خروجی برنامه', 'fa')).toEqual({ kind: 'export-app' });
+    expect(parseVoiceCommand('ضبط را حذف کن', 'fa')).toEqual({ kind: 'delete-narration' });
+    expect(parseVoiceCommand('ضبط را متوقف کن', 'fa')).toEqual({ kind: 'stop-recording' });
+  });
+
+  it('opens a Persian storyboard with the spoken subject intact', () => {
+    expect(parseVoiceCommand('یک داستان درباره ماه و روباه', 'fa')).toEqual({
+      kind: 'storyboard',
+      prompt: 'ماه و روباه',
+    });
+    expect(parseVoiceCommand('undo', 'fa')).toEqual({ kind: 'undo' });
+  });
+
+  it('normalizes Arabic keyboard variants commonly found in Persian text', () => {
+    expect(parseVoiceCommand('ذخيره', 'fa')).toEqual({ kind: 'save' });
+  });
+});

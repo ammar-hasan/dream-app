@@ -14,6 +14,7 @@ beforeEach(() => {
   store().newDocument({ width: 100, height: 80, name: 'Test' });
   store().setSymmetry('off');
   store().setFillShapes(false);
+  store().setBrushStyle('round');
 });
 
 function drawStroke(from = { x: 1, y: 1 }, to = { x: 10, y: 10 }) {
@@ -82,6 +83,17 @@ describe('pressure sensitivity', () => {
     drawStroke();
     const op = store().doc.layers[0].operations[0] as StrokeOp;
     expect(op.widths).toBeUndefined();
+  });
+});
+
+describe('calligraphy brush', () => {
+  it('commits directional widths as one normal undoable stroke', () => {
+    store().setBrushStyle('calligraphy');
+    drawStroke({ x: 5, y: 25 }, { x: 25, y: 5 });
+    const op = store().doc.layers[0].operations[0] as StrokeOp;
+    expect(op.widths?.every((width) => width > 0.9)).toBe(true);
+    store().undo();
+    expect(store().doc.layers[0].operations).toHaveLength(0);
   });
 });
 

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { isSpeechSupported, startDictation, type DictationHandle } from '../ai/speech';
 import { useUiPrefs } from '../store/uiPrefs';
-import { useT } from './i18n';
+import { speechLanguage, useT } from './i18n';
 import { MicIcon } from './icons';
 
 export function DictateButton({
@@ -37,7 +37,7 @@ export function DictateButton({
           setListening(false);
         },
       },
-      { lang: locale === 'ar' ? 'ar-SA' : 'en-US' },
+      { lang: speechLanguage(locale) },
     );
     if (next) {
       setHandle(next);

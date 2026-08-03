@@ -68,7 +68,7 @@ the complete timeline visible together.
 **Story** in the adult toolbar and **Tell a story!** in Little Dreamer mode
 turn one spoken or typed idea into a small, reviewable flipbook:
 
-1. The user tells a story in English or Arabic. Speech recognition fills the
+1. The user tells a story in English, Arabic or Persian. Speech recognition fills the
    same story box where the device supports it; the control simply hides where
    it does not. In Little Dreamer mode, finishing dictation immediately shows
    the plan without requiring a second, reading-dependent action.

@@ -7,6 +7,19 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Persian calligraphy path** (slice 33): فارسی joins English and Arabic as a
+  complete parity-checked RTL interface with Iranian Persian recognition,
+  spoken feedback, canvas commands and local storyboard sequencing. The Brush
+  adds a fixed-angle broad Calligraphy nib whose direction creates authentic
+  thick/thin rhythm with mouse or touch and combines with stylus pressure; the
+  Text tool adds a Persian-script font stack. A rendered principal-UX pass also
+  found and fixed the Settings popover being clipped after an RTL switch and
+  corrected its form semantics; locale parity now guards interpolation
+  placeholders too, correcting two older Arabic count messages. AI, story,
+  export, presentation and game
+  surfaces now load on demand, keeping the production entry bundle at 472.84 kB
+  after the third full language table.
+
 - **Synchronized video trimming** (slice 32): WebM and MP4 export now offer an
   inclusive Start frame / End frame range with live duration and range-based
   progress. Only the delivery is trimmed; source frames, order, captions and

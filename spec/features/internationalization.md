@@ -9,6 +9,7 @@ product — including voice — works in any language, including right-to-left.
 | ---- | ------- | ------------- |
 | `en` | English | left-to-right |
 | `ar` | العربية | right-to-left |
+| `fa` | فارسی   | right-to-left |
 
 Default: `en`. The settings gear switches language **instantly at runtime**
 (no reload); the choice persists per user.
@@ -27,7 +28,7 @@ Default: `en`. The settings gear switches language **instantly at runtime**
 5. **Adding a locale** means translating the full table and registering id,
    label and direction — nothing else in the product changes.
 
-## RTL (Arabic)
+## RTL (Arabic and Persian)
 
 1. Choosing an RTL locale flips the whole shell: the root direction
    attribute becomes `rtl` and the language attribute follows.
@@ -42,17 +43,20 @@ Default: `en`. The settings gear switches language **instantly at runtime**
 ## Voice and speech across locales
 
 - The voice-command vocabulary is **per-locale** (see the full intent table
-  in `accessibility.md`): with the UI in Arabic, Arabic commands work —
-  and **English keeps working** (the Arabic vocabulary merges into the
-  English base).
+  in `accessibility.md`): Arabic and Persian commands work in their matching
+  UI — and **English keeps working** because every additional vocabulary
+  merges into the English base.
 - Arabic transcripts are normalized before matching: diacritics and
   tatweel stripped, alef variants unified.
+- Persian transcripts normalize Arabic keyboard variants of yeh and kaf;
+  recognition requests Iranian Persian.
 - Speech recognition listens in the UI language for canvas commands.
 - Spoken tool names and voice feedback speak in the UI language.
 
-## Tone in both locales
+## Tone in every locale
 
 Copy is warm, plain and encouraging in every locale (see
 `../visual-identity.md` §Tone of voice). Arabic copy uses the same
 friendly register — "تراجع!" for "Took that back!", not a literal or
-formal translation.
+formal translation. Persian copy uses concise, conversational Iranian
+Persian rather than Arabic wording or stiff word-for-word translation.

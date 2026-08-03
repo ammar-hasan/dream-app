@@ -358,6 +358,23 @@ test('switching to Arabic mirrors the shell (RTL)', async ({ page }) => {
   await expect(page.locator('.app-title').first()).toHaveText('حُلم');
 });
 
+test('Persian RTL includes a real calligraphy drawing path', async ({ page }) => {
+  await bootApp(page);
+  await page.getByRole('button', { name: 'Settings' }).click();
+  await page.locator('.settings-popover select').selectOption('fa');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'fa');
+  await expect(page.locator('.app-title').first()).toHaveText('Dream');
+  await expect(page.locator('.settings-popover')).toBeInViewport();
+
+  const nib = page.getByRole('combobox', { name: 'نوک قلم‌مو' });
+  await nib.selectOption('calligraphy');
+  await expect(nib).toHaveValue('calligraphy');
+  const before = await nonWhitePixels(page);
+  await drawStroke(page);
+  expect(await nonWhitePixels(page)).toBeGreaterThan(before + 100);
+});
+
 test('the dark theme toggle flips data-theme', async ({ page }) => {
   await bootApp(page);
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');

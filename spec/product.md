@@ -48,7 +48,8 @@ honor every one.
    reorder and every stroke) is always undoable.
 4. **Ages 5 to 95, literacy optional.** Kid mode (giant icon-only tools,
    bright named palette, spoken tool names), comfort mode (bigger text and
-   targets, stronger contrast), and full voice control (English + Arabic)
+   targets, stronger contrast), and full voice control (English + Arabic +
+   Persian)
    are first-class, per-user preferences — never per document.
 5. **Local-first and private.** Documents, preferences, and the component
    library live on the device. The app works fully offline. AI API keys are

@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { brushTool, createStrokeTool, eraserTool, pencilTool, sprayTool } from './stroke';
+import {
+  brushTool,
+  calligraphyWidths,
+  createStrokeTool,
+  eraserTool,
+  pencilTool,
+  sprayTool,
+} from './stroke';
 import { DEFAULT_SETTINGS } from './types';
 import type { StrokeOp } from '../types';
 
@@ -110,6 +117,47 @@ describe('pressure sensitivity', () => {
     brushTool.update(state, { point: { x: 5, y: 0 }, shiftKey: false }, settings);
     const op = brushTool.commit(state, settings) as StrokeOp;
     expect(op.widths).toEqual([0.5, 0.5]);
+  });
+});
+
+describe('calligraphy nib', () => {
+  it('makes strokes parallel to the nib thin and crossing strokes broad', () => {
+    const thin = calligraphyWidths(
+      [
+        { x: 0, y: 0 },
+        { x: 10, y: 10 },
+      ],
+      null,
+    );
+    const broad = calligraphyWidths(
+      [
+        { x: 0, y: 10 },
+        { x: 10, y: 0 },
+      ],
+      null,
+    );
+    expect(thin[0]).toBeCloseTo(0.18);
+    expect(broad[0]).toBeCloseTo(1);
+  });
+
+  it('bakes directional widths for mouse input and combines stylus pressure', () => {
+    const nib = { ...settings, brushStyle: 'calligraphy' as const };
+    const state = brushTool.begin({ point: { x: 0, y: 10 }, shiftKey: false, pressure: 0.5 }, nib);
+    brushTool.update(state, { point: { x: 10, y: 0 }, shiftKey: false, pressure: 0.8 }, nib);
+    const op = brushTool.commit(state, nib) as StrokeOp;
+    expect(op.widths?.[0]).toBeCloseTo(0.5);
+    expect(op.widths?.[1]).toBeCloseTo(0.8);
+
+    const mouse = brushTool.begin({ point: { x: 0, y: 0 }, shiftKey: false }, nib);
+    brushTool.update(mouse, { point: { x: 10, y: 10 }, shiftKey: false }, nib);
+    expect((brushTool.commit(mouse, nib) as StrokeOp).widths?.[0]).toBeCloseTo(0.18);
+  });
+
+  it('leaves non-brush tools round even when the calligraphy setting is selected', () => {
+    const nib = { ...settings, brushStyle: 'calligraphy' as const };
+    const state = pencilTool.begin({ point: { x: 0, y: 0 }, shiftKey: false }, nib);
+    pencilTool.update(state, { point: { x: 10, y: 10 }, shiftKey: false }, nib);
+    expect((pencilTool.commit(state, nib) as StrokeOp).widths).toBeUndefined();
   });
 });
 

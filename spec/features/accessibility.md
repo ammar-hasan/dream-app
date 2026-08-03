@@ -76,10 +76,11 @@ confirms in the status area and — when **voice feedback** is on (default in
 kid mode) — out loud.
 
 The parser is forgiving: case-insensitive, ignores filler ("um, can you
-please undo?"), and **normalizes Arabic** (diacritics and tatweel stripped,
-alef forms unified). **English commands always work**, even under the
-Arabic UI (the Arabic vocabulary merges in). Unknown input gets "Sorry, I
-didn't understand. Say 'help'…" and changes nothing.
+please undo?"), **normalizes Arabic** (diacritics and tatweel stripped,
+alef forms unified), and normalizes Arabic-keyboard yeh/kaf variants in
+Persian. **English commands always work**, even under Arabic or Persian,
+because each locale vocabulary merges into the English base. Unknown input
+gets a kind local-language fallback and changes nothing.
 
 ### The complete intent table
 
@@ -105,6 +106,14 @@ didn't understand. Say 'help'…" and changes nothing.
 | help             | "help", "commands"                                                                                                                                     | مساعدة، أوامر                                                                    | speaks the full command list                                                                     |
 | confirm / cancel | "yes", "yeah" / "no", "cancel"                                                                                                                         | نعم / لا، ألغِ                                                                   | answers the clear confirmation (only as ≤2-word utterances)                                      |
 
+Persian provides the same complete intent surface. Canonical phrases include
+واگرد / بازانجام, پاک کن, فریم جدید, یک داستان درباره…, پخش / توقف,
+بازی من, پیش‌نمایش برنامه, خروجی برنامه, کد واقعی, ضبط روایت / پایان ضبط /
+ضبط را حذف کن, قلم‌مو / مداد / پاک‌کن / سطل / عصا / مهر / متن, آینه روشن /
+آینه خاموش, بزرگ‌تر / کوچک‌تر, ذخیره, راهنما and بله / نه. Persian color
+names cover the same palette, and a fill-tool phrase plus a color performs
+both choices in one command.
+
 ### The color vocabulary (22 words)
 
 red `#ef4444`, orange `#f97316`, yellow `#facc15`, green `#22c55e`,
@@ -114,6 +123,8 @@ gray/grey `#6b7280`, cyan `#06b6d4`, magenta `#d946ef`, gold `#eab308`,
 lime `#84cc16`, navy `#1e3a8a`, peach `#fdba74`, lavender `#c4b5fd`.
 Arabic: أحمر، برتقالي، أصفر، أخضر، فيروزي، سماوي، أزرق، بنفسجي،
 وردي/زهري، بني، أسود، أبيض، رمادي، ذهبي.
+Persian: قرمز، نارنجی، زرد، سبز، فیروزه‌ای، آسمانی، آبی، بنفش،
+صورتی، قهوه‌ای، مشکی/سیاه، سفید، خاکستری، طلایی.
 
 ### Precedence rules (the parser's decision order)
 

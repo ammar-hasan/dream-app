@@ -22,8 +22,18 @@ feels immediate on a 5-year-old's tablet and a pro's pen display alike.
 
 ### Brush (B)
 
-Soft, opacity-aware round stroke. Honors the opacity setting. With a
-stylus, width responds to pen pressure (see below).
+Two session-only tips share the same Brush tool and opacity:
+
+- **Round** (default): a uniform round stroke. With a stylus, width responds
+  to pen pressure (see below).
+- **Calligraphy nib:** a fixed 45° broad nib. Marks travelling along the nib
+  edge are thin; marks crossing it are broad, so mouse and touch gestures
+  gain calligraphic thick/thin rhythm without special hardware. Stylus
+  pressure multiplies that directional width rather than replacing it.
+
+Switching tips changes only future marks. Every calligraphy gesture remains
+one ordinary undoable stroke and reproduces identically in previews, saved
+projects and exports.
 
 ### Pencil (P)
 
@@ -99,8 +109,11 @@ color (transparency ignored).
 ### Text (T)
 
 Click to place an anchor, type, and commit. Committed text is trimmed;
-empty text commits nothing. Font size default 24 px; four named font
-choices: Sans, Serif, Mono, Handwritten. Esc cancels an in-progress text.
+empty text commits nothing. Font size default 24 px; five named font
+choices: Sans, Serif, Mono, Handwritten and Persian script. The Persian
+choice prefers an installed Nastaliq or Arabic-script text face and falls
+back to a broadly available script-capable face. Esc cancels an in-progress
+text.
 
 ### Stamp (N)
 

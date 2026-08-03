@@ -85,3 +85,11 @@ test('phone timeline task views have no serious automated violations', async ({ 
   await tasks.getByRole('button', { name: 'App' }).click();
   expect(await seriousViolations(page)).toEqual([]);
 });
+
+test('Persian calligraphy controls have no serious automated violations', async ({ page }) => {
+  await bootApp(page);
+  await page.getByRole('button', { name: 'Settings' }).click();
+  await page.locator('.settings-popover select').selectOption('fa');
+  await page.getByRole('combobox', { name: 'نوک قلم‌مو' }).selectOption('calligraphy');
+  expect(await seriousViolations(page)).toEqual([]);
+});

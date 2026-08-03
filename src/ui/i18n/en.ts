@@ -134,6 +134,9 @@ export const en: Record<string, string> = {
   'options.colorSwatch': 'Color {color}',
   'options.customColor': 'Custom color',
   'options.size': 'Size',
+  'options.brushStyle': 'Brush tip',
+  'options.brushRound': 'Round',
+  'options.brushCalligraphy': 'Calligraphy nib',
   'options.opacity': 'Opacity',
   'options.font': 'Font',
   'options.textSize': 'Text size',
@@ -141,6 +144,7 @@ export const en: Record<string, string> = {
   'font.serif': 'Serif',
   'font.mono': 'Mono',
   'font.handwritten': 'Handwritten',
+  'font.persian': 'Persian script',
 
   // --- Design panel ----------------------------------------------------------
   'design.title': 'Design',

@@ -15,18 +15,14 @@ import { ComponentsPanel } from './ui/ComponentsPanel';
 import { HotspotsPanel } from './ui/HotspotsPanel';
 import { LinkDialog } from './ui/LinkDialog';
 import { AdjustPanel } from './ui/AdjustPanel';
-import { AiPanel } from './ui/AiPanel';
 import { KidPanel } from './ui/KidPanel';
 import { LayersPanel } from './ui/LayersPanel';
 import { StatusBar } from './ui/StatusBar';
 import { TimelineBar } from './ui/TimelineBar';
-import { PlayView } from './ui/PlayView';
-import { PlayPanel } from './ui/PlayPanel';
 import { NewDocumentDialog } from './ui/NewDocumentDialog';
 import { OpenDialog } from './ui/OpenDialog';
 import { ResizeDialog } from './ui/ResizeDialog';
 import { UpdateToast } from './ui/UpdateToast';
-import { StoryboardDialog } from './ui/StoryboardDialog';
 
 type Dialog = 'new' | 'open' | 'resize' | 'export' | null;
 
@@ -38,6 +34,26 @@ const PresentView = lazy(async () => {
 const ExportDialog = lazy(async () => {
   const module = await import('./ui/ExportDialog');
   return { default: module.ExportDialog };
+});
+
+const AiPanel = lazy(async () => {
+  const module = await import('./ui/AiPanel');
+  return { default: module.AiPanel };
+});
+
+const StoryboardDialog = lazy(async () => {
+  const module = await import('./ui/StoryboardDialog');
+  return { default: module.StoryboardDialog };
+});
+
+const PlayView = lazy(async () => {
+  const module = await import('./ui/PlayView');
+  return { default: module.PlayView };
+});
+
+const PlayPanel = lazy(async () => {
+  const module = await import('./ui/PlayPanel');
+  return { default: module.PlayPanel };
 });
 
 export default function App({ initialShareError = false }: { initialShareError?: boolean }) {
@@ -60,7 +76,7 @@ export default function App({ initialShareError = false }: { initialShareError?:
   useRestoreLastDocument(useCallback(() => setSplash('fade'), []));
   useImagePaste();
 
-  // Language direction follows the locale (Arabic mirrors the whole shell).
+  // Language direction follows the locale (RTL locales mirror the whole shell).
   useEffect(() => {
     document.documentElement.dir = isRtl(locale) ? 'rtl' : 'ltr';
     document.documentElement.lang = locale;
@@ -110,12 +126,22 @@ export default function App({ initialShareError = false }: { initialShareError?:
       />
       <div className="app-body">
         {mode !== 'play' && <ToolRail />}
-        {mode === 'play' ? <PlayView /> : <CanvasViewport />}
+        {mode === 'play' ? (
+          <Suspense fallback={null}>
+            <PlayView />
+          </Suspense>
+        ) : (
+          <CanvasViewport />
+        )}
         {kidMode ? (
           mode !== 'play' && <KidPanel />
         ) : (
           <aside className="side-panel">
-            {aiPanelOpen && <AiPanel />}
+            {aiPanelOpen && (
+              <Suspense fallback={null}>
+                <AiPanel />
+              </Suspense>
+            )}
             {mode === 'design' && (
               <>
                 <DesignPanel />
@@ -124,7 +150,9 @@ export default function App({ initialShareError = false }: { initialShareError?:
               </>
             )}
             {mode === 'play' ? (
-              <PlayPanel />
+              <Suspense fallback={null}>
+                <PlayPanel />
+              </Suspense>
             ) : (
               <>
                 <ToolOptionsPanel />
@@ -147,11 +175,13 @@ export default function App({ initialShareError = false }: { initialShareError?:
       )}
       {pendingHotspot && <LinkDialog />}
       {storyboardOpen && (
-        <StoryboardDialog
-          key={storyboardPrompt}
-          initialPrompt={storyboardPrompt}
-          onClose={() => useDreamStore.getState().closeStoryboard()}
-        />
+        <Suspense fallback={null}>
+          <StoryboardDialog
+            key={storyboardPrompt}
+            initialPrompt={storyboardPrompt}
+            onClose={() => useDreamStore.getState().closeStoryboard()}
+          />
+        </Suspense>
       )}
       <UpdateToast />
       {splash !== 'gone' && (

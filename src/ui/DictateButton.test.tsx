@@ -52,4 +52,13 @@ describe('DictateButton', () => {
     fireEvent.click(button);
     expect(recognition.stopped).toBe(true);
   });
+
+  it('asks speech recognition for Iranian Persian', () => {
+    speechGlobal.webkitSpeechRecognition = FakeRecognition;
+    useUiPrefs.getState().setLocale('fa');
+    render(<DictateButton onText={() => {}} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'بگو' }));
+    expect(FakeRecognition.instance?.lang).toBe('fa-IR');
+  });
 });

@@ -81,7 +81,6 @@ export function SettingsMenu() {
         className={`btn icon-btn${open ? ' primary' : ''}`}
         aria-label={t('toolbar.settings')}
         aria-expanded={open}
-        aria-haspopup="menu"
         data-tooltip={kidMode ? undefined : t('toolbar.settings')}
         onClick={() => setOpen(!open)}
       >
@@ -89,7 +88,7 @@ export function SettingsMenu() {
       </button>
 
       {open && (
-        <div className="settings-popover" role="menu" aria-label={t('settings.title')}>
+        <div className="settings-popover" role="group" aria-label={t('settings.title')}>
           <label className="settings-item checkbox-field">
             <input
               type="checkbox"

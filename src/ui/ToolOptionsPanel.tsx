@@ -49,6 +49,10 @@ const FONT_CHOICES = [
   { key: 'font.serif', value: 'Georgia, serif' },
   { key: 'font.mono', value: 'ui-monospace, monospace' },
   { key: 'font.handwritten', value: 'cursive' },
+  {
+    key: 'font.persian',
+    value: '"Noto Nastaliq Urdu", "Noto Naskh Arabic", Tahoma, serif',
+  },
 ];
 
 export function ToolOptionsPanel() {
@@ -58,6 +62,7 @@ export function ToolOptionsPanel() {
   const cropDraft = useDreamStore((s) => s.cropDraft);
   const setColor = useDreamStore((s) => s.setColor);
   const setSize = useDreamStore((s) => s.setSize);
+  const setBrushStyle = useDreamStore((s) => s.setBrushStyle);
   const setOpacity = useDreamStore((s) => s.setOpacity);
   const setFontSize = useDreamStore((s) => s.setFontSize);
   const setFontFamily = useDreamStore((s) => s.setFontFamily);
@@ -150,6 +155,22 @@ export function ToolOptionsPanel() {
             onChange={(e) => setSize(Number(e.target.value))}
           />
           <span className="option-value">{settings.size}px</span>
+        </label>
+      )}
+
+      {tool === 'brush' && (
+        <label className="option-row">
+          <span className="option-label">{t('options.brushStyle')}</span>
+          <select
+            value={settings.brushStyle}
+            onChange={(e) =>
+              setBrushStyle(e.target.value === 'calligraphy' ? 'calligraphy' : 'round')
+            }
+            className="font-select"
+          >
+            <option value="round">{t('options.brushRound')}</option>
+            <option value="calligraphy">{t('options.brushCalligraphy')}</option>
+          </select>
         </label>
       )}
 

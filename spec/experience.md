@@ -97,7 +97,7 @@ all keys belong to the game.
 
 ## Voice
 
-The complete voice-intent table — every command with English and Arabic
+The complete voice-intent table — every command with English, Arabic and Persian
 phrases, precedence rules and the color vocabulary — is in
 `features/accessibility.md` §Voice commands.
 

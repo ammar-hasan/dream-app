@@ -160,12 +160,15 @@ RTL remain first-class product behavior.
   أحمر/أزرق/أخضر/أصفر/أسود/أبيض، أكبر/أصغر…) — the Arabic words merge into
   the English table (which always keeps working), transcripts are
   normalized for diacritics and alef forms, and recognition switches to
-  Arabic too.
+  Arabic too. فارسی provides the same intent surface (واگرد، قلم‌مو، پاک‌کن،
+  فریم جدید، پیش‌نمایش برنامه، ضبط روایت، آبی، آینه روشن، ذخیره…) with
+  Iranian Persian recognition and Arabic-keyboard yeh/kaf normalization;
+  English commands keep working in both RTL languages.
 - **Languages & RTL** — every UI string lives in a string table
-  (`ui/i18n/en.ts`, `ui/i18n/ar.ts`) and renders through `t(key)`. The
-  settings gear switches language at runtime (persisted); Arabic flips the
-  whole shell to `dir="rtl"` (the layout uses CSS logical properties, so
-  panels and rails mirror).
+  and renders through `t(key)`. The settings gear switches among English,
+  العربية and فارسی at runtime (persisted); Arabic and Persian flip the whole
+  shell to `dir="rtl"` (the layout uses logical positioning, so panels,
+  rails and the Settings popover mirror without leaving the viewport).
 
 The **settings gear** in the toolbar consolidates all of it: Little Dreamer
 mode, speak tool names, voice feedback, the dark-mode toggle, comfort mode
@@ -184,13 +187,16 @@ and the language picker.
 ## What works today
 
 - Brush, pencil, eraser with adjustable size, color (palette + custom + a
-  recent-colors row) and opacity — with per-point pen pressure on a stylus
+  recent-colors row) and opacity — with per-point pen pressure on a stylus;
+  Brush also offers a fixed-angle Calligraphy nib for directional thick/thin
+  marks using mouse, touch or pen
 - Spray (airbrush) with a density slider; deterministic per-stroke seeds
 - Line, rectangle and ellipse tools with Shift-to-constrain (45° lines, squares, circles)
   and an optional fill-shapes mode (filled with the current color)
 - Mirror symmetry (vertical / horizontal / quad) with live mirrored preview
 - Flood fill (bucket), magic wand (move / delete / copy-to-layer a region),
-  eyedropper color picker, and a click-to-type text tool
+  eyedropper color picker, and a click-to-type text tool with a Persian-script
+  Nastaliq/Naskh-aware font choice
 - Stamp tool: twelve built-in cute stamps at S/M/L plus three coloring-book
   starter scenes, all procedurally generated (no assets), one undo per stamp
 - Comfort mode: a senior-friendly settings toggle — larger text/targets and
@@ -375,6 +381,11 @@ tool rail and the options panel (Little Dreamer mode stays untouched).
   multipliers ride on the stroke op (`widths`) and the renderer interpolates
   between points. Mouse and touch strokes carry no `widths` and render
   exactly as before.
+- **Calligraphy nib** — the Brush's second tip fixes a broad edge at 45°:
+  gestures along it run thin and gestures crossing it run broad. That rhythm
+  works without a stylus; pen pressure multiplies it when available. The
+  resulting per-point widths are ordinary deterministic stroke data, so one
+  Undo removes the gesture and every preview/export agrees.
 - **Filled shapes** — the "Fill shapes" toggle fills rectangles and
   ellipses with the current color (no outline — the simpler, prettier
   option; the outline tools behave as always when it's off).
@@ -785,7 +796,7 @@ restart button bottom-end)
   pixels), selection-bbox edit regions, speech feature detection with a
   mocked SpeechRecognition, speech-synthesis feature detection (`say.ts`),
   and the voice-command parser (every intent, filler tolerance, the full
-  color vocabulary, the Arabic vocabulary under locale "ar" — diacritic
+  color vocabulary, Arabic and Persian locale vocabularies — script
   normalization, mirror-phrase precedence, English unaffected — unknown
   input → null)
 - Accessibility tests: the voice executor against a fake store (each command
@@ -793,8 +804,8 @@ restart button bottom-end)
   localized messages), the UI-prefs store (kid-mode voice defaults,
   independent toggles, theme + comfort + recent-colors persistence,
   localStorage), the comfort-mode data-attribute effect on the root element,
-  and the i18n string table (interpolation, English/key fallbacks, en↔ar
-  parity, RTL flag)
+  and the i18n string table (interpolation, English/key fallbacks, exact
+  en/ar/fa parity, RTL and regional speech-language mapping)
 - Stamp & starter-scene tests: engine op counts, determinism (same inputs →
   same drawing), stamp bounds within the size box, scene bounds within the
   canvas, outline-only scenes; store integration (click-to-place as ONE
@@ -840,7 +851,7 @@ after `npx playwright install`).
 
 - `e2e/smoke.spec.ts` — boot/welcome, brush stroke verified by reading real
   canvas pixels, undo, Design-mode panels, Dream AI generation onto a new
-  layer, kid mode, Arabic RTL, dark theme. Every test is independent (fresh
+  layer, kid mode, Arabic RTL, Persian calligraphy RTL, dark theme. Every test is independent (fresh
   browser context → empty localStorage/IndexedDB).
 - `e2e/visual.spec.ts` — one full-page screenshot baseline of the welcome
   state (`e2e/visual.spec.ts-snapshots/`), committed as the CSS-regression

@@ -830,3 +830,28 @@ creator's animation or desynchronizing its recorded story.
   493.45 kB after the new controls.
 - Acceptance met: trim a two-frame captioned video to frame 2, export it, keep
   both source frames, and undo the caption batch without a trim edit.
+
+## Slice 33 — Persian calligraphy path ✅
+
+Persona: Fatima, Iranian calligraphy explorer — create in her own language
+with a mark that behaves like a broad nib rather than a renamed round brush.
+
+- ✅ فارسی is a complete, parity-checked RTL interface with warm Iranian
+  Persian copy, persistent instant switching and an in-viewport Settings path.
+- ✅ Dictation requests Iranian Persian; the global microphone covers the same
+  tool, color, recovery, animation, app, code, game and narration intents as
+  the earlier languages while English remains available. Persian sequence
+  words plan local story moments before any provider is called.
+- ✅ The Brush offers Round or a fixed 45° Calligraphy nib. Direction creates
+  thin and broad strokes for mouse and touch; pen pressure multiplies that
+  shape, and the baked widths stay deterministic and undo as one gesture.
+- ✅ Text adds a Persian-script choice that prefers installed Nastaliq/Naskh
+  faces and keeps an offline-capable fallback.
+- ✅ A production rendered review corrected clipped RTL Settings placement and
+  invalid menu semantics. Browser interaction and serious/critical
+  accessibility checks cover the Persian Settings-to-calligraphy journey.
+- ✅ Large conditional surfaces load only when entered, leaving the production
+  entry bundle at 472.84 kB despite the third complete language table.
+- Acceptance met: switch to فارسی, keep Settings visible, choose the
+  Calligraphy nib, paint a real directional mark, use Persian script text and
+  issue Persian voice/story commands without losing English recovery commands.
