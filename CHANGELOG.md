@@ -7,6 +7,15 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Native scientific data plots** (slice 35): Design mode can turn a small
+  labeled CSV or TSV table into a line, scatter or grouped-bar figure. Parsing
+  is bounded and explicit, with quoted labels, row/series confirmation and
+  non-destructive errors. Rounded axes, readable ticks, a quiet grid, title and
+  color-keyed legend are generated as ordinary grouped marks on one new layer,
+  so the figure moves, scales, saves, animates, exports as real SVG and undoes
+  exactly like the rest of Dream. The focused dialog is loaded only when used
+  and starts with a valid example rather than an empty technical form.
+
 - **Scientific connectors and scalable delivery** (slice 34): the Line tool
   now draws plain, arrow-ended or two-way connectors, and the Text tool offers
   caret-aware subscripts, superscripts, arrows and common science symbols.

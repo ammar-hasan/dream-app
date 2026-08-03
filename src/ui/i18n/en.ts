@@ -177,6 +177,28 @@ export const en: Record<string, string> = {
   'design.distributeH': 'Distribute horizontally',
   'design.distributeV': 'Distribute vertically',
 
+  // --- Data plots -------------------------------------------------------------
+  'plot.open': 'Plot data…',
+  'plot.title': 'Create data plot',
+  'plot.intro': 'Paste a small CSV or TSV table. Dream turns it into grouped, scalable marks.',
+  'plot.kind': 'Plot type',
+  'plot.kind.line': 'Line',
+  'plot.kind.scatter': 'Scatter',
+  'plot.kind.bar': 'Bar',
+  'plot.figureTitle': 'Figure title',
+  'plot.figureTitlePlaceholder': 'Optional title',
+  'plot.data': 'Table data',
+  'plot.sampleData': 'Time,Signal\n0,1\n1,2.5\n2,4\n3,3.2',
+  'plot.ready': '{rows} rows · {series} series ready',
+  'plot.hint': 'First row: labels. Then 2–200 numeric rows and up to 4 measured series.',
+  'plot.error.empty': 'Paste a table to begin.',
+  'plot.error.columns': 'Use one header row and 2–5 comma- or tab-separated columns.',
+  'plot.error.rows': 'Add at least 2 numeric data rows below the header.',
+  'plot.error.number': 'Every data cell must be a number.',
+  'plot.error.too-many': 'Keep the plot to 200 data rows or fewer.',
+  'plot.layerName': 'Data plot',
+  'plot.insert': 'Insert plot',
+
   // --- Components panel -------------------------------------------------------
   'components.title': 'Components',
   'components.create': 'Create component from selection',

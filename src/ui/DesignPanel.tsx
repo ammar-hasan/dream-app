@@ -4,6 +4,7 @@
  * Rendered only in Design mode; Draw mode stays clutter-free.
  */
 
+import { lazy, Suspense, useState } from 'react';
 import { useDreamStore } from '../store/dreamStore';
 import type { AlignMode } from '../engine/selection';
 import { useT } from './i18n';
@@ -17,12 +18,18 @@ const ALIGN_BUTTONS: { mode: AlignMode; glyph: string; key: string }[] = [
   { mode: 'bottom', glyph: '⤓', key: 'design.alignBottom' },
 ];
 
+const DataPlotDialog = lazy(async () => {
+  const module = await import('./DataPlotDialog');
+  return { default: module.DataPlotDialog };
+});
+
 export function DesignPanel() {
   const t = useT();
   const selection = useDreamStore((s) => s.selection);
   const snapping = useDreamStore((s) => s.snappingEnabled);
   const store = useDreamStore.getState;
   const count = selection.length;
+  const [plotOpen, setPlotOpen] = useState(false);
 
   return (
     <section className="panel design-panel" aria-label={t('design.title')}>
@@ -36,6 +43,10 @@ export function DesignPanel() {
         />
         <span>{t('design.snap')}</span>
       </label>
+
+      <button type="button" className="btn" onClick={() => setPlotOpen(true)}>
+        {t('plot.open')}
+      </button>
 
       {count > 0 && (
         <>
@@ -125,6 +136,11 @@ export function DesignPanel() {
             </div>
           )}
         </>
+      )}
+      {plotOpen && (
+        <Suspense fallback={null}>
+          <DataPlotDialog onClose={() => setPlotOpen(false)} />
+        </Suspense>
       )}
     </section>
   );

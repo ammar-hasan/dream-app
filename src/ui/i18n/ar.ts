@@ -176,6 +176,28 @@ export const ar: Record<string, string> = {
   'design.distributeH': 'توزيع أفقي',
   'design.distributeV': 'توزيع عمودي',
 
+  // --- مخططات البيانات -------------------------------------------------------
+  'plot.open': 'ارسم البيانات…',
+  'plot.title': 'إنشاء مخطط بيانات',
+  'plot.intro': 'ألصق جدول CSV أو TSV صغيرًا. يحوّله حُلم إلى علامات مجمّعة وقابلة للتكبير.',
+  'plot.kind': 'نوع المخطط',
+  'plot.kind.line': 'خطي',
+  'plot.kind.scatter': 'مبعثر',
+  'plot.kind.bar': 'أعمدة',
+  'plot.figureTitle': 'عنوان الشكل',
+  'plot.figureTitlePlaceholder': 'عنوان اختياري',
+  'plot.data': 'بيانات الجدول',
+  'plot.sampleData': 'الزمن,الإشارة\n0,1\n1,2.5\n2,4\n3,3.2',
+  'plot.ready': '{rows} صفوف · {series} سلاسل جاهزة',
+  'plot.hint': 'الصف الأول للتسميات، ثم 2–200 صف رقمي وحتى 4 سلاسل مقاسة.',
+  'plot.error.empty': 'ألصق جدولًا للبدء.',
+  'plot.error.columns': 'استخدم صف عناوين واحدًا و2–5 أعمدة مفصولة بفواصل أو علامات تبويب.',
+  'plot.error.rows': 'أضف صفين رقميين على الأقل تحت العناوين.',
+  'plot.error.number': 'يجب أن تكون كل خلية بيانات رقمًا.',
+  'plot.error.too-many': 'اجعل المخطط 200 صف بيانات أو أقل.',
+  'plot.layerName': 'مخطط بيانات',
+  'plot.insert': 'إدراج المخطط',
+
   // --- Components panel -------------------------------------------------------
   'components.title': 'المكوّنات',
   'components.create': 'إنشاء مكوّن من التحديد',

@@ -339,3 +339,40 @@ describe('components', () => {
     expect(store().createComponentFromSelection('  ')).toBeNull();
   });
 });
+
+describe('data plots', () => {
+  it('inserts grouped marks as one selected layer and undoes the complete plot', () => {
+    const operations: ShapeOp[] = [
+      {
+        kind: 'shape',
+        id: 'plot-axis',
+        groupId: 'plot-1',
+        shape: 'line',
+        from: { x: 10, y: 60 },
+        to: { x: 90, y: 60 },
+        color: '#111111',
+        size: 2,
+        opacity: 1,
+      },
+      {
+        kind: 'shape',
+        id: 'plot-point',
+        groupId: 'plot-1',
+        shape: 'ellipse',
+        from: { x: 30, y: 20 },
+        to: { x: 36, y: 26 },
+        color: '#2563eb',
+        size: 1,
+        opacity: 1,
+        fill: true,
+      },
+    ];
+
+    store().insertDataPlot('Experiment', operations);
+    expect(store().doc.layers).toHaveLength(2);
+    expect(store().doc.layers[1].name).toBe('Experiment');
+    expect(store().selection).toEqual([]);
+    store().undo();
+    expect(store().doc.layers).toHaveLength(1);
+  });
+});

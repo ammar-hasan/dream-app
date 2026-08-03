@@ -164,6 +164,18 @@ phrases, precedence rules and the color vocabulary — is in
    presenter material are absent. If the visuals exceed the safe link size,
    Dream points back to the Interactive app file.
 
+### Data → scientific figure
+
+1. Switch to **Design** and choose **Plot data…**.
+2. Paste a labeled CSV or tab-separated table, choose Line, Scatter or Bar, and
+   optionally title the figure.
+3. Check the recognized row/series count, then **Insert plot**.
+4. Dream adds one clean grouped figure on its own layer: rounded axes, grid,
+   color-keyed legend and the exact accepted values.
+5. Click any plot mark to move or scale the complete plot, annotate it with
+   connectors and scientific text, then export a genuinely scalable SVG. One
+   Undo removes the insertion.
+
 ### BYOK setup
 
 1. Open the AI panel (sparkle or A) → Settings. 2. Choose "My own AI",

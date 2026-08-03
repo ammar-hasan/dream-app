@@ -44,6 +44,36 @@ test('switching to Design mode reveals the design panels', async ({ page }) => {
   await expect(page.locator('.components-panel')).toBeVisible();
 });
 
+test('tabular science data becomes a grouped scalable plot in one undo', async ({ page }) => {
+  await bootApp(page);
+  const before = await nonWhitePixels(page);
+  await page.getByRole('tab', { name: 'Design' }).click();
+  await page.getByRole('button', { name: 'Plot data…' }).click();
+  const plot = page.getByRole('dialog', { name: 'Create data plot' });
+  await expect(plot).toContainText('4 rows · 1 series ready');
+  await plot.getByLabel('Figure title').fill('Reaction rate');
+  await plot.getByRole('button', { name: 'Insert plot' }).click();
+
+  await expect(page.locator('.layer-list > li')).toHaveCount(2);
+  await expect(page.locator('.layer-list')).toContainText('Data plot');
+  await expect.poll(() => nonWhitePixels(page)).toBeGreaterThan(before + 2_000);
+
+  await page.getByRole('button', { name: 'Export' }).click();
+  const exportDialog = page.getByRole('dialog', { name: 'Export' });
+  await exportDialog.getByRole('button', { name: 'SVG' }).click();
+  const downloadPromise = page.waitForEvent('download');
+  await exportDialog.getByRole('button', { name: 'Export' }).click();
+  const download = await downloadPromise;
+  const path = await download.path();
+  expect(path).not.toBeNull();
+  const svg = await readFile(path!, 'utf8');
+  expect(svg).toContain('Reaction rate');
+  expect(svg).toContain('<ellipse');
+
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(page.locator('.layer-list > li')).toHaveCount(1);
+});
+
 test('Dream AI generates a new layer from a prompt', async ({ page }) => {
   await bootApp(page);
   await page.getByRole('button', { name: 'AI helper', exact: true }).click();

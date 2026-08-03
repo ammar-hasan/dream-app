@@ -435,6 +435,11 @@ pro workspace — the mode is persisted per project.
   the layer, Cmd/Ctrl+D duplicate, Del delete, arrow keys nudge (Shift = 10px).
 - **Align & distribute**: with a multi-selection the Design panel offers align
   left/center/right/top/middle/bottom and horizontal/vertical distribute.
+- **Data plots**: paste a small labeled CSV or TSV table and insert a line,
+  scatter or grouped-bar figure with rounded numeric axes, grid, ticks, title
+  and color-keyed legend. The complete plot is one grouped native-mark layer,
+  not an opaque chart: move/scale it, annotate it, animate it, save it, export
+  it as SVG, or remove it with one Undo. Invalid data never touches the canvas.
 - **Components**: save any selection as a named component in the cross-project
   library (IndexedDB). The Components panel shows live thumbnails; double-click
   inserts at the canvas center, or drag onto the canvas to drop under the
@@ -674,6 +679,7 @@ src/
     projectFile.ts   The .dream file format: JSON envelope + raster patches as
                      base64 PNG data URLs, via an injectable RasterCodec
     svgExport.ts     Truthful scalable export for visible vector-safe content
+    dataPlot.ts      Bounded CSV/TSV parsing + native grouped plot generation
     layerCache.ts    Incremental compositor: per-layer bitmap cache (reference-
                      equality invalidation, LRU cap, eraser-aware snapshot
                      fallback, oversized-document bypass)
@@ -793,7 +799,8 @@ restart button bottom-end)
   500-op document vs. re-issuing every op, per-layer invalidation, LRU +
   memory caps, eraser snapshot fallback), renderer
   (against a recording mock 2D context — no canvas package needed), connector
-  arrowhead geometry and truthful SVG generation/fallback classification
+  arrowhead geometry, bounded table parsing/native plot construction and
+  truthful SVG generation/fallback classification
 - AI tests: provider registry + key/settings persistence, OpenAI-compatible
   request construction with a mocked fetch, capability degradation, the daily
   free-tier counter (date rollover via fake timers), the feedback rule engine
@@ -857,8 +864,9 @@ after `npx playwright install`).
 
 - `e2e/smoke.spec.ts` — boot/welcome, brush stroke verified by reading real
   canvas pixels, undo, Design-mode panels, Dream AI generation onto a new
-  layer, scientific connector/text creation plus downloaded SVG inspection,
-  kid mode, Arabic RTL, Persian calligraphy RTL, dark theme. Every test is independent (fresh
+  layer, table-to-grouped-plot creation, scientific connector/text creation
+  plus downloaded SVG inspection, kid mode, Arabic RTL, Persian calligraphy
+  RTL, dark theme. Every test is independent (fresh
   browser context → empty localStorage/IndexedDB).
 - `e2e/visual.spec.ts` — one full-page screenshot baseline of the welcome
   state (`e2e/visual.spec.ts-snapshots/`), committed as the CSS-regression

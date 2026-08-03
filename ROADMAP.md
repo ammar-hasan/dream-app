@@ -878,3 +878,25 @@ logo without flattening genuinely scalable work into pixels.
 - Acceptance met: author a reversible-reaction connector, replace `2` with `₂`
   at the text caret, download a real scalable SVG containing both, and receive
   an honest fallback if the visible work cannot remain vector.
+
+## Slice 35 — Native scientific data plots ✅
+
+Persona need: let Zǐxuān turn a small experiment table into a figure inside the
+same canvas where he diagrams, annotates, animates and explains the science.
+
+- ✅ Plot data accepts a labeled CSV or TSV table with 2–200 numeric rows, one
+  horizontal variable and up to four measured series. Quoted labels work;
+  blank, uneven, non-numeric and oversized input is explained without mutation.
+- ✅ Line, scatter and grouped-bar choices share automatically rounded axes,
+  readable ticks, a quiet grid, title, horizontal label and a genuinely
+  color-keyed legend. Bars include zero; line/scatter preserve numeric spacing.
+- ✅ The dialog begins with a valid example and reports parsed rows/series
+  before Insert, keeping the path learnable without a spreadsheet or manual.
+- ✅ A plot is one new layer made entirely of grouped native marks. It selects
+  and transforms as one figure, remains editable through Dream's existing
+  operations, saves unchanged, animates, exports as real SVG and undoes once.
+- ✅ The parser/geometry remain framework-free and dependency-free; focused
+  unit, store, browser, downloaded-SVG, accessibility and rendered UX checks
+  cover both the input and the publication-shaped result.
+- Acceptance met: paste a two-series reaction dataset, insert a clean line
+  figure, move it as one group, export it as SVG and remove it with one Undo.

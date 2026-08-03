@@ -74,6 +74,32 @@ group. No nesting, no containers.
    instances; editing an instance never touches the component. (The simple
    model — no linked masters.)
 
+## Data plots
+
+**Plot data…** turns a small pasted table into a line, scatter or grouped-bar
+figure without introducing a spreadsheet mode.
+
+1. Input is comma- or tab-separated text with one header row, one numeric
+   horizontal-axis column, one to four numeric measured-series columns, and
+   2–200 data rows. Quoted comma-separated labels and doubled quote characters
+   are accepted. Blank, non-numeric, uneven or oversized data stays in the
+   dialog with a plain corrective message and never changes the document.
+2. The dialog starts with a valid five-line example, offers an optional figure
+   title and reports the recognized row and series counts before Insert.
+3. Every plot has arrow-ended axes, automatically rounded numeric ranges,
+   readable tick labels, light grid lines, the first-column label on the
+   horizontal axis, and a color-keyed series legend. The first series uses the
+   current color; later series use consistent blue, red, green and violet
+   accents so comparisons remain visible.
+4. Line plots join samples in table order and mark every sample; scatter plots
+   show only samples; bar plots group measured series at each horizontal value
+   and always include zero on the vertical scale.
+5. Insert creates one new active layer centered with breathing room on the
+   canvas. Its axes, grid, labels and data marks are ordinary scalable objects
+   sharing one group, so a later click selects and transforms the complete
+   figure. The insert is one undoable change, exports truthfully as SVG and can
+   be animated or linked like any other art.
+
 ## The Link tool (U)
 
 App-mode's hotspot creation tool lives in Design mode — full rules in
@@ -88,3 +114,5 @@ App-mode's hotspot creation tool lives in Design mode — full rules in
 - Transform handles stay a constant screen size at any zoom.
 - A marquee that starts on an object moves that object instead of starting
   a rubber band — click empty canvas to marquee.
+- Plotting never performs statistical analysis, excludes outliers or guesses
+  missing values; it visualizes exactly the accepted numeric table.

@@ -27,6 +27,15 @@ test('core creation modes have no serious automated accessibility violations', a
   expect(await seriousViolations(page)).toEqual([]);
 });
 
+test('data plot creation has no serious automated accessibility violations', async ({ page }) => {
+  await bootApp(page);
+  await page.getByRole('tab', { name: 'Design' }).click();
+  await page.getByRole('button', { name: 'Plot data…' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Create data plot' });
+  await expect(dialog.getByRole('button', { name: 'Insert plot' })).toBeEnabled();
+  expect(await seriousViolations(page)).toEqual([]);
+});
+
 test('slide settings and Presenter view have no serious automated violations', async ({ page }) => {
   await bootApp(page);
   await page.getByRole('button', { name: /^Animate/ }).click();

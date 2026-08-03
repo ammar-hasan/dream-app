@@ -432,6 +432,22 @@ holds.
       marks WHEN SVG is selected THEN Dream explains why scalable export is
       unavailable and disables only that Export action while PNG remains a
       working fallback; hiding all unsupported content makes SVG available.
+137.  GIVEN comma- or tab-separated data with one header, a numeric horizontal
+      column, one to four numeric measured series and 2–200 rows WHEN it is
+      pasted into Plot data THEN quoted labels are decoded and the recognized
+      row/series counts appear before any document change.
+138.  GIVEN empty, uneven, non-numeric, unclosed-quote, over-five-column or
+      over-200-row plot input WHEN it is reviewed THEN a corrective message
+      names the constraint, Insert remains disabled and the document/history
+      stay untouched.
+139.  GIVEN valid data WHEN Line, Scatter or Bar is inserted THEN the figure
+      uses rounded numeric axes, labeled ticks, a light grid and color-keyed
+      legend; Line joins and marks samples, Scatter marks without joining, and
+      grouped Bar includes a zero baseline.
+140.  GIVEN an inserted plot WHEN any member is later selected, transformed,
+      saved, animated or exported as SVG THEN its title, axes, grid, labels,
+      series and data marks behave as one scalable group on one new layer; one
+      Undo removes the complete insertion.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 
@@ -451,10 +467,10 @@ holds.
    → "record narration" → tell it aloud → "stop recording" → "save".
 6. **Sara (15):** Design mode → draw logo elements → align/distribute →
    save as component → new project → insert the component → export SVG.
-7. **Zǐxuān (28):** draw a reversible-reaction connector → label it with
-   chemical subscripts, superscripts and symbols → export a scalable SVG →
-   duplicate frames to animate the reaction → link explanatory screens into
-   an app.
+7. **Zǐxuān (28):** paste experiment data → insert a grouped line plot →
+   annotate it with a reversible-reaction connector, chemical subscripts and
+   symbols → export a scalable SVG → duplicate frames to animate the result →
+   link explanatory screens into an app.
 8. **Maria (32):** export `.dream` → agent reads it, adds a layer with a shape
    and text, renders a PNG, exports the app HTML via the dream-mcp tools →
    re-import the `.dream` unchanged elsewhere.

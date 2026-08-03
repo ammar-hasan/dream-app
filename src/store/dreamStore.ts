@@ -435,6 +435,8 @@ export interface DreamStore {
   createComponentFromSelection(name: string): Component | null;
   /** Insert a component as a new layer (centered unless `at` is given). */
   insertComponentInstance(component: Component, at?: Point): void;
+  /** Insert a generated data plot as one grouped, undoable layer. */
+  insertDataPlot(name: string, operations: Operation[]): void;
   /** Move the selection so its bounding box is centered on the canvas. */
   centerSelection(): void;
 
@@ -1779,6 +1781,15 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       const layer = createLayer(component.name, ops);
       execute(addLayerCommand(layer));
       set({ activeLayerId: layer.id, selection: ops.map((op) => op.id) });
+    },
+
+    insertDataPlot: (name, operations) => {
+      const trimmed = name.trim();
+      if (trimmed === '' || operations.length === 0) return;
+      const layer = createLayer(trimmed, operations);
+      execute(addLayerCommand(layer));
+      set({ activeLayerId: layer.id, selection: [] });
+      get().dismissHint();
     },
 
     centerSelection: () => {
