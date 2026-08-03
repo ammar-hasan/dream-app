@@ -223,8 +223,10 @@ is a refusal to confuse breadth with completion.
    allow immediate cancellation and reject late results. Story creation and
    video export have useful step counts, while Real Code now names preparation,
    writing and verification, allows immediate cancellation and rejects late
-   downloads. Project loading still needs the same progress/cancel contract and
-   meaningful partial-state placeholders.
+   downloads. Saved and portable project opening now names reading, restoration
+   and a longer wait, allows immediate cancellation, preserves current work and
+   rejects late loads. Meaningful partial-state placeholders remain future work
+   where an operation can safely expose partial output.
 9. **Tactile feedback now has a sparse foundation.** On supported touch devices,
    optional short cues reinforce the first visible valid drop target and a
    visible refusal, remain silent under reduced motion and never buzz while

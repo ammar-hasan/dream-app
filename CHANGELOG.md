@@ -7,6 +7,11 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Safe cancellable project opening** (slice 53): saved projects and `.dream`
+  imports now show reading/restoration/patient-waiting stages and an accessible
+  indeterminate loader. Cancel returns immediately, preserves current work and
+  refuses a late result from replacing it.
+
 - **Cancellable Real Code** (slice 52): code export now names preparation,
   provider writing, offline verification and patient-waiting stages with an
   indeterminate loader. Cancel returns the dialog to ready, forwards request

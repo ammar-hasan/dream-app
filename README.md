@@ -626,9 +626,10 @@ A `.dream` file is UTF-8 JSON with a tiny envelope around the document:
 
 In the app: **Export → Dream project (.dream)** downloads one, and the Open
 dialog opens `.dream` files (button or drag-and-drop) next to the IndexedDB
-library. Encode/decode is pure and codec-agnostic in
-`src/engine/projectFile.ts` — the browser plugs in a canvas codec
-(`src/ui/dreamFile.ts`), Node plugs in `@napi-rs/canvas`.
+library. Large opens name reading and restoration, remain cancellable and never
+replace current work with a late result after cancellation. Encode/decode is
+pure and codec-agnostic in `src/engine/projectFile.ts` — the browser plugs in a
+canvas codec (`src/ui/dreamFile.ts`), Node plugs in `@napi-rs/canvas`.
 
 ### The MCP server (dream-mcp)
 

@@ -589,6 +589,11 @@ holds.
       cancels THEN the dialog becomes ready immediately, asks the request to
       stop, confirms no file downloaded and prevents a late reply from starting
       a download.
+170.  GIVEN a saved project or `.dream` file is still opening WHEN its exact
+      completion cannot be measured THEN Dream names reading, restoration and a
+      patient longer wait with an indeterminate loader; WHEN the creator cancels
+      THEN the dialog becomes ready immediately, the current project remains
+      exact and a late result cannot replace it.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

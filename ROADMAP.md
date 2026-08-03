@@ -1232,6 +1232,23 @@ after they said stop.
 - ✅ Full release gates remain green: 854 unit tests, 97.74% engine coverage,
   48 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 53 — Project opening protects current work ✅
+
+Persona need: let a creator open a large saved or portable project without
+wondering whether Dream froze or risking an unwanted late switch away from the
+work already on screen.
+
+- ✅ Opening names reading, image/layer/frame restoration and a patient longer
+  wait with an accessible indeterminate loader rather than a fake percentage.
+- ✅ Project, delete, file-picker and backdrop actions cannot race an active
+  open; the visible Cancel action returns the dialog to ready immediately.
+- ✅ Cancellation preserves the current project and rejects a late saved-project
+  or file result before it can change the canvas or last-project pointer.
+- ✅ Focused component coverage proves immediate cancellation, locked competing
+  actions, late-result rejection and a plain saved-project failure path.
+- ✅ Full release gates remain green: 856 unit tests, 97.74% engine coverage,
+  48 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1239,8 +1256,9 @@ largest count of controls:
 
 1. **Direct-manipulation foundation:** cursor semantics, hover/hit feedback,
    valid/invalid targets, post-drop selection and cancellable AI progress are
-   established, including provider checks and code generation; continue with
-   drag ghosts and extend the same progress contract to project loading.
+   established, including provider checks, code generation and project opening;
+   continue with drag ghosts, keyboard-equivalent placement cues and richer
+   rotation affordance.
 2. **Conversational phone-first creation:** natural clarification and reference
    handling for voice now has a selected-object foundation; continue with more
    referents and corrections, a task-prioritized mobile shell, and a faithful

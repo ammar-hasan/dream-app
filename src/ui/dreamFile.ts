@@ -44,6 +44,20 @@ export function dreamFileName(docName: string): string {
   return `${docName.trim() || 'dream'}.dream`;
 }
 
+export type DreamFileReadStage = 'reading' | 'restoring';
+
+export interface DreamFileReadOptions {
+  signal?: AbortSignal;
+  onProgress?: (stage: DreamFileReadStage) => void;
+}
+
+function throwIfCancelled(signal?: AbortSignal): void {
+  if (!signal?.aborted) return;
+  const error = new Error('Project opening cancelled');
+  error.name = 'AbortError';
+  throw error;
+}
+
 /** Serialize the document as a `.dream` file and trigger a download. */
 export async function downloadDreamFile(doc: DreamDocument): Promise<void> {
   const text = await encodeProject(doc, browserRasterCodec);
@@ -51,6 +65,16 @@ export async function downloadDreamFile(doc: DreamDocument): Promise<void> {
 }
 
 /** Parse a `.dream` file picked or dropped by the user. Throws on bad input. */
-export async function readDreamFile(file: File): Promise<DreamDocument> {
-  return decodeProject(await file.text(), browserRasterCodec);
+export async function readDreamFile(
+  file: File,
+  options: DreamFileReadOptions = {},
+): Promise<DreamDocument> {
+  throwIfCancelled(options.signal);
+  options.onProgress?.('reading');
+  const text = await file.text();
+  throwIfCancelled(options.signal);
+  options.onProgress?.('restoring');
+  const doc = await decodeProject(text, browserRasterCodec);
+  throwIfCancelled(options.signal);
+  return doc;
 }

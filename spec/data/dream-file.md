@@ -68,4 +68,8 @@ exactly. Vector content (strokes, shapes, text) is always exact.
 - **Export → Dream project (.dream)** downloads `{name}.dream`.
 - **The Open dialog** opens `.dream` files via a file picker or by
   drag-and-drop onto the dialog, alongside the on-device library; a broken
-  file shows a plain-language error and changes nothing.
+  file shows a plain-language error and changes nothing. Opening names file
+  reading, image/layer/frame restoration and a longer wait with an
+  indeterminate loader. Cancel returns the dialog to ready immediately,
+  preserves the current project exactly and prevents a late file or saved
+  project from replacing it.
