@@ -137,30 +137,31 @@ Victor the senior user, Maria the teacher, Ahmed the developer, Sara the
 presenter, Zǐxuān the student, Ali/Fatima the hobbyists). Score: impact
 1–5; Effort: S/M/L.
 
-| #   | Feature                                                                                                                                       | Personas              | Impact | Effort |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- | ------ | ------ |
-| 1   | ~~AI "make real" code export — turn an app-mode drawing into runnable code~~ ✅ shipped (slice 18)                                            | Maria, Ahmed, Sara    | 5      | M      |
-| 2   | ~~More game templates + conversational game generation~~ ✅ shipped (slices 22–23)                                                            | Zainab, George        | 5      | M      |
-| 3   | ~~Stamps, stickers, and coloring-page starters~~ ✅ shipped (slice 16)                                                                        | Zainab, George        | 4      | S      |
-| 4   | ~~Voice narration recording for animations and Present mode~~ ✅ shipped (slice 19)                                                           | Zainab, Ahmed, Victor | 4      | M      |
-| 5   | ~~Generative fill / inpainting via BYOK providers~~ ✅ shipped (slice 20)                                                                     | Ali, Fatima, Sara     | 4      | M      |
-| 6   | ~~Localized voice-command vocabularies, Arabic-first~~ ✅ shipped (slice 16)                                                                  | Zainab, George, Ahmed | 4      | S      |
-| 7   | ~~Senior comfort toggle (larger UI, higher contrast, slower animations)~~ ✅ shipped (slice 16)                                               | Victor                | 4      | S      |
-| 8   | Publish dream-mcp to MCP registries + add more tools — authoring tools and registry package ready (slice 21); public publish pending approval | Maria                 | 4      | S      |
-| 9   | ~~Slide transitions, timing, notes and a private Presenter window~~ ✅ shipped (slices 24 + 29)                                               | Sara, Zǐxuān, Victor  | 3      | M      |
-| 10  | ~~Social video shapes and frame captions~~ ✅ shipped (slice 27)                                                                              | Ahmed                 | 4      | M      |
-| 11  | ~~Shareable prototype via URL (compressed viewer state, no backend)~~ ✅ shipped (slice 31)                                                   | Ahmed, Sara, Zǐxuān   | 3      | L      |
-| 12  | ~~Voice-to-storyboard animation with visible bilingual confirmation~~ ✅ shipped (slice 28)                                                   | Zainab, George        | 5      | M      |
-| 13  | ~~Phone timeline task focus for animation, slides and apps~~ ✅ shipped (slice 30)                                                            | George, Ahmed, Sara   | 4      | S      |
-| 14  | ~~Non-destructive frame-range trimming with synchronized narration~~ ✅ shipped (slice 32)                                                    | Ahmed                 | 4      | S      |
-| 15  | ~~Persian-first RTL, voice, calligraphy nib and script typography~~ ✅ shipped (slice 33)                                                     | Fatima                | 5      | M      |
-| 16  | ~~Scientific connectors, notation and truthful scalable SVG delivery~~ ✅ shipped (slice 34)                                                  | Zǐxuān, Sara          | 5      | M      |
-| 17  | ~~Paste CSV/TSV into grouped native line, scatter or bar plots~~ ✅ shipped (slice 35)                                                        | Zǐxuān                | 5      | M      |
-| 18  | ~~Complete Simplified Chinese UI, unspaced voice commands, story planning and offline game language~~ ✅ shipped (slice 36)                   | Zǐxuān                | 5      | M      |
-| 19  | ~~Complete Brazilian Portuguese UI, voice commands, story planning and offline game language~~ ✅ shipped (slice 37)                          | Maria                 | 4      | M      |
-| 20  | ~~Complete Russian UI, voice commands, story planning and offline game language~~ ✅ shipped (slice 38)                                       | Aleksandr             | 4      | M      |
-| 21  | ~~Compact brush presets that expose rather than hide their size, opacity and tip~~ ✅ shipped (slice 39)                                      | Ali, Aleksandr        | 4      | S      |
-| 22  | ~~One-click brand pack with exact multi-size PNGs and truthful optional SVG~~ ✅ shipped (slice 40)                                           | Sara, Aleksandr       | 4      | S      |
+| #   | Feature                                                                                                                                                   | Personas              | Impact | Effort |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- | ------ | ------ |
+| 1   | ~~AI "make real" code export — turn an app-mode drawing into runnable code~~ ✅ shipped (slice 18)                                                        | Maria, Ahmed, Sara    | 5      | M      |
+| 2   | ~~More game templates + conversational game generation~~ ✅ shipped (slices 22–23)                                                                        | Zainab, George        | 5      | M      |
+| 3   | ~~Stamps, stickers, and coloring-page starters~~ ✅ shipped (slice 16)                                                                                    | Zainab, George        | 4      | S      |
+| 4   | ~~Voice narration recording for animations and Present mode~~ ✅ shipped (slice 19)                                                                       | Zainab, Ahmed, Victor | 4      | M      |
+| 5   | ~~Generative fill / inpainting via BYOK providers~~ ✅ shipped (slice 20)                                                                                 | Ali, Fatima, Sara     | 4      | M      |
+| 6   | ~~Localized voice-command vocabularies, Arabic-first~~ ✅ shipped (slice 16)                                                                              | Zainab, George, Ahmed | 4      | S      |
+| 7   | ~~Senior comfort toggle (larger UI, higher contrast, slower animations)~~ ✅ shipped (slice 16)                                                           | Victor                | 4      | S      |
+| 8   | Publish dream-mcp to MCP registries + add more tools — authoring/layer tools and registry package ready (slices 21 + 41); public publish pending approval | Maria                 | 4      | S      |
+| 9   | ~~Slide transitions, timing, notes and a private Presenter window~~ ✅ shipped (slices 24 + 29)                                                           | Sara, Zǐxuān, Victor  | 3      | M      |
+| 10  | ~~Social video shapes and frame captions~~ ✅ shipped (slice 27)                                                                                          | Ahmed                 | 4      | M      |
+| 11  | ~~Shareable prototype via URL (compressed viewer state, no backend)~~ ✅ shipped (slice 31)                                                               | Ahmed, Sara, Zǐxuān   | 3      | L      |
+| 12  | ~~Voice-to-storyboard animation with visible bilingual confirmation~~ ✅ shipped (slice 28)                                                               | Zainab, George        | 5      | M      |
+| 13  | ~~Phone timeline task focus for animation, slides and apps~~ ✅ shipped (slice 30)                                                                        | George, Ahmed, Sara   | 4      | S      |
+| 14  | ~~Non-destructive frame-range trimming with synchronized narration~~ ✅ shipped (slice 32)                                                                | Ahmed                 | 4      | S      |
+| 15  | ~~Persian-first RTL, voice, calligraphy nib and script typography~~ ✅ shipped (slice 33)                                                                 | Fatima                | 5      | M      |
+| 16  | ~~Scientific connectors, notation and truthful scalable SVG delivery~~ ✅ shipped (slice 34)                                                              | Zǐxuān, Sara          | 5      | M      |
+| 17  | ~~Paste CSV/TSV into grouped native line, scatter or bar plots~~ ✅ shipped (slice 35)                                                                    | Zǐxuān                | 5      | M      |
+| 18  | ~~Complete Simplified Chinese UI, unspaced voice commands, story planning and offline game language~~ ✅ shipped (slice 36)                               | Zǐxuān                | 5      | M      |
+| 19  | ~~Complete Brazilian Portuguese UI, voice commands, story planning and offline game language~~ ✅ shipped (slice 37)                                      | Maria                 | 4      | M      |
+| 20  | ~~Complete Russian UI, voice commands, story planning and offline game language~~ ✅ shipped (slice 38)                                                   | Aleksandr             | 4      | M      |
+| 21  | ~~Compact brush presets that expose rather than hide their size, opacity and tip~~ ✅ shipped (slice 39)                                                  | Ali, Aleksandr        | 4      | S      |
+| 22  | ~~One-click brand pack with exact multi-size PNGs and truthful optional SVG~~ ✅ shipped (slice 40)                                                       | Sara, Aleksandr       | 4      | S      |
+| 23  | ~~Agent-safe layer rename/configure/reorder/removal through dream-mcp~~ ✅ shipped (slice 41)                                                             | Maria                 | 4      | S      |
 
 Deliberately deferred: **general vector-path editing** (slice 34 exports
 genuinely scalable native marks without introducing a second editing medium), **real-time

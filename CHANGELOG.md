@@ -7,6 +7,11 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Agent-safe layer management** (slice 41): dream-mcp agents can now rename,
+  show/hide, set opacity, lock/unlock, reorder and remove layers in the active
+  frame. Id/name targeting, animated stack mirroring, invalid-value errors and
+  final-layer protection are covered by real-file tests and the live demo.
+
 - **One-click brand delivery** (slice 40): Export can now produce one safely
   named ZIP containing source-size, 1024 px and 512 px long-edge PNGs plus a
   real SVG whenever the active canvas is genuinely scalable. The pack preserves

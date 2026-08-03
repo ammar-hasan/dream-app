@@ -19,6 +19,8 @@ byte-compatible with the browser app, and vice versa.
 | `dream.create_project` | Create a new `.dream` file: `path`, `width`, `height`, optional `background`, `name`.                                            |
 | `dream.list_layers`    | Layer stack(s): id, name, visibility, opacity, lock, op count — plus a per-frame breakdown for animated documents.               |
 | `dream.add_layer`      | Add a new top layer to the active frame, with an optional `name`.                                                                |
+| `dream.update_layer`   | Rename, show/hide, set opacity, lock/unlock or move a layer to a zero-based stack index.                                         |
+| `dream.remove_layer`   | Remove a layer by id or name from the active frame; refuses to remove the final layer.                                           |
 | `dream.add_text`       | Append a text op: `text`, `x`, `y`, optional `size`, `color`, `fontFamily`, `layer` (id or name; default: top layer).            |
 | `dream.add_shape`      | Append a line/rectangle/ellipse with endpoints, optional size/color/opacity/fill, and an optional target `layer`.                |
 | `dream.render_png`     | Flatten the document (or one `frame` index) to a PNG file.                                                                       |
@@ -73,8 +75,9 @@ args = ["/absolute/path/to/dream-app/mcp-server/dist/mcp-server/src/index.js"]
 node examples/demo.mjs
 ```
 
-creates a project in a tmp dir, adds a layer, draws a rectangle, adds text,
-reads the summary and renders a PNG — the exact functions the MCP tools call.
+creates a project in a tmp dir, adds/renames a layer, safely removes a scratch
+layer, draws a rectangle, adds text, reads the summary and renders a PNG — the
+exact functions the MCP tools call.
 
 ## Registry publication
 
@@ -110,8 +113,9 @@ The npm package must be public before the Registry will accept its metadata.
 - Canvas codecs premultiply alpha: a PNG round-trip of _semi-transparent_
   raster pixels is lossy by a rounding step (true of every canvas, browsers
   included). Opaque pixels round-trip exactly.
-- `dream.add_layer`, `dream.add_text`, and `dream.add_shape` target the active
-  frame; a layer can be addressed by id or name where supported.
+- Layer authoring targets the active frame; update/remove preserve its mirrored
+  active stack, a layer can be addressed by id or name, and the final layer is
+  never removable.
 - `dream.export_app` needs an animated document (frames are the screens);
   documents without frames get a clear error.
 - Rendering uses the headless skia build — text uses the fonts bundled with

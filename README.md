@@ -607,8 +607,9 @@ library. Encode/decode is pure and codec-agnostic in
 `mcp-server/` is a standalone Node package (not part of the webapp build)
 exposing `.dream` files to agents over stdio MCP: `dream.read_project`,
 `dream.create_project`, `dream.list_layers`, `dream.add_layer`,
-`dream.add_text`, `dream.add_shape`, `dream.render_png` (real PNGs via
-`@napi-rs/canvas`) and `dream.export_app`.
+`dream.update_layer`, `dream.remove_layer`, `dream.add_text`,
+`dream.add_shape`, `dream.render_png` (real PNGs via `@napi-rs/canvas`) and
+`dream.export_app`.
 Setup and client config (Claude Code, Codex) are in
 [`mcp-server/README.md`](mcp-server/README.md); `npm run check:mcp` from the
 repo root installs, builds and tests it. The repo also ships a root

@@ -85,6 +85,46 @@ const TOOLS: Tool[] = [
     },
   },
   {
+    name: 'dream.update_layer',
+    description:
+      'Rename, show/hide, set opacity, lock/unlock or reorder a layer in the active frame of a .dream project.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: string('Path to the .dream file'),
+        layer: string('Target layer id or name'),
+        name: optional(string('New non-empty layer name')),
+        visible: optional({ type: 'boolean', description: 'Whether the layer is visible' }),
+        opacity: optional({
+          type: 'number',
+          minimum: 0,
+          maximum: 1,
+          description: 'Layer opacity from 0 to 1',
+        }),
+        locked: optional({ type: 'boolean', description: 'Whether the layer is locked' }),
+        index: optional({
+          type: 'integer',
+          minimum: 0,
+          description: 'New zero-based stack index; 0 is the bottom',
+        }),
+      },
+      required: ['path', 'layer'],
+    },
+  },
+  {
+    name: 'dream.remove_layer',
+    description:
+      'Remove a layer by id or name from the active frame. Refuses to remove the last layer.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: string('Path to the .dream file'),
+        layer: string('Target layer id or name'),
+      },
+      required: ['path', 'layer'],
+    },
+  },
+  {
     name: 'dream.add_text',
     description:
       'Add a text operation to a layer of a .dream project (default: top layer of the active frame).',
@@ -189,6 +229,16 @@ const argsSchema = {
   }),
   'dream.list_layers': z.object({ path: z.string() }),
   'dream.add_layer': z.object({ path: z.string(), name: z.string().optional() }),
+  'dream.update_layer': z.object({
+    path: z.string(),
+    layer: z.string(),
+    name: z.string().optional(),
+    visible: z.boolean().optional(),
+    opacity: z.number().optional(),
+    locked: z.boolean().optional(),
+    index: z.number().optional(),
+  }),
+  'dream.remove_layer': z.object({ path: z.string(), layer: z.string() }),
   'dream.add_text': z.object({
     path: z.string(),
     text: z.string(),
@@ -243,6 +293,14 @@ async function callTool(name: ToolName, args: unknown): Promise<CallToolResult> 
     case 'dream.add_layer': {
       const { path, ...options } = argsSchema[name].parse(args);
       return asJson(await tools.addLayer(path, options));
+    }
+    case 'dream.update_layer': {
+      const { path, ...options } = argsSchema[name].parse(args);
+      return asJson(await tools.updateLayer(path, options));
+    }
+    case 'dream.remove_layer': {
+      const { path, layer } = argsSchema[name].parse(args);
+      return asJson(await tools.removeLayer(path, layer));
     }
     case 'dream.add_text': {
       const { path, ...options } = argsSchema[name].parse(args);

@@ -26,8 +26,10 @@ import {
   listLayers,
   loadProject,
   readProject,
+  removeLayer,
   renderPng,
   saveProject,
+  updateLayer,
 } from './tools';
 
 let dir: string;
@@ -152,6 +154,97 @@ describe('dream-mcp tools', () => {
       activeFrame?.layers.map((layer) => layer.id),
     );
     expect(doc.layers.at(-1)).toMatchObject({ name: 'Frame artwork' });
+  });
+
+  it('update_layer configures and reorders a layer by id or name', async () => {
+    const managedPath = join(dir, 'managed.dream');
+    await createProject(managedPath, { width: 40, height: 30 });
+    const added = await addLayer(managedPath, { name: 'Agent draft' });
+
+    const updated = await updateLayer(managedPath, {
+      layer: added.layerId,
+      name: 'Client logo',
+      visible: false,
+      opacity: 0.4,
+      locked: true,
+      index: 0,
+    });
+    expect(updated).toMatchObject({
+      id: added.layerId,
+      name: 'Client logo',
+      visible: false,
+      opacity: 0.4,
+      locked: true,
+      index: 0,
+      frameId: null,
+    });
+    expect((await listLayers(managedPath)).layers.map((layer) => layer.name)).toEqual([
+      'Client logo',
+      'Layer 1',
+    ]);
+
+    await updateLayer(managedPath, { layer: 'Client logo', name: 'Approved logo' });
+    expect((await listLayers(managedPath)).layers[0]?.name).toBe('Approved logo');
+  });
+
+  it('update_layer validates its target, properties and index', async () => {
+    const managedPath = join(dir, 'managed-errors.dream');
+    await createProject(managedPath, { width: 40, height: 30 });
+    await expect(updateLayer(managedPath, { layer: 'missing', name: 'Nope' })).rejects.toThrow(
+      'No layer with id or name "missing"',
+    );
+    await expect(updateLayer(managedPath, { layer: 'Layer 1' })).rejects.toThrow(
+      'at least one layer property',
+    );
+    await expect(updateLayer(managedPath, { layer: 'Layer 1', name: '  ' })).rejects.toThrow(
+      'must not be empty',
+    );
+    await expect(updateLayer(managedPath, { layer: 'Layer 1', opacity: 2 })).rejects.toThrow(
+      'between 0 and 1',
+    );
+    await expect(updateLayer(managedPath, { layer: 'Layer 1', index: 1 })).rejects.toThrow(
+      'integer from 0 to 0',
+    );
+  });
+
+  it('remove_layer removes by id and name but preserves the final layer', async () => {
+    const managedPath = join(dir, 'removed.dream');
+    await createProject(managedPath, { width: 40, height: 30 });
+    const byId = await addLayer(managedPath, { name: 'Delete by id' });
+    await addLayer(managedPath, { name: 'Delete by name' });
+
+    await expect(removeLayer(managedPath, 'missing')).rejects.toThrow(
+      'No layer with id or name "missing"',
+    );
+    expect(await removeLayer(managedPath, byId.layerId)).toMatchObject({
+      layerId: byId.layerId,
+      layerName: 'Delete by id',
+      remainingLayers: 2,
+    });
+    expect(await removeLayer(managedPath, 'Delete by name')).toMatchObject({
+      layerName: 'Delete by name',
+      remainingLayers: 1,
+    });
+    await expect(removeLayer(managedPath, 'Layer 1')).rejects.toThrow('last layer');
+  });
+
+  it('layer management preserves the animated active-frame mirror', async () => {
+    const animatedPath = join(dir, 'animated-manage.dream');
+    await createProject(animatedPath, { width: 40, height: 30 });
+    await saveProject(animatedPath, enableAnimation(await loadProject(animatedPath)));
+    const added = await addLayer(animatedPath, { name: 'Frame draft' });
+
+    await updateLayer(animatedPath, { layer: added.layerId, name: 'Frame final', index: 0 });
+    let doc = await loadProject(animatedPath);
+    let activeFrame = doc.frames?.find((frame) => frame.id === doc.activeFrameId);
+    expect(doc.layers).toEqual(activeFrame?.layers);
+    expect(doc.layers[0]).toMatchObject({ id: added.layerId, name: 'Frame final' });
+
+    await removeLayer(animatedPath, added.layerId);
+    doc = await loadProject(animatedPath);
+    activeFrame = doc.frames?.find((frame) => frame.id === doc.activeFrameId);
+    expect(doc.layers).toEqual(activeFrame?.layers);
+    expect(doc.layers).toHaveLength(1);
   });
 
   it('add_shape appends a normalized shape to a named layer', async () => {

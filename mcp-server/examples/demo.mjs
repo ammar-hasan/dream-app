@@ -15,7 +15,9 @@ import {
   addText,
   createProject,
   readProject,
+  removeLayer,
   renderPng,
+  updateLayer,
 } from '../dist/mcp-server/src/tools.js';
 
 const dir = await mkdtemp(join(tmpdir(), 'dream-mcp-demo-'));
@@ -32,9 +34,17 @@ console.log(
 );
 
 console.log('\n2) dream.add_layer');
-console.log(await addLayer(project, { name: 'Agent artwork' }));
+const artwork = await addLayer(project, { name: 'Agent draft' });
+console.log(artwork);
 
-console.log('\n3) dream.add_shape');
+console.log('\n3) dream.update_layer');
+console.log(await updateLayer(project, { layer: artwork.layerId, name: 'Agent artwork' }));
+
+console.log('\n4) dream.remove_layer');
+const scratch = await addLayer(project, { name: 'Scratch' });
+console.log(await removeLayer(project, scratch.layerId));
+
+console.log('\n5) dream.add_shape');
 console.log(
   await addShape(project, {
     shape: 'rectangle',
@@ -48,7 +58,7 @@ console.log(
   }),
 );
 
-console.log('\n4) dream.add_text');
+console.log('\n6) dream.add_text');
 console.log(
   await addText(project, {
     text: 'Made by an agent via MCP',
@@ -60,10 +70,10 @@ console.log(
   }),
 );
 
-console.log('\n5) dream.read_project');
+console.log('\n7) dream.read_project');
 console.log(await readProject(project));
 
-console.log('\n6) dream.render_png');
+console.log('\n8) dream.render_png');
 console.log(await renderPng(project, join(dir, 'hello-agent.png')));
 
 console.log(`\nDemo artifacts in ${dir}`);

@@ -163,9 +163,10 @@ Conventions for anyone (human or agent) working on Dream.
   over `.dream` files. Thin protocol wiring (`src/index.ts`) over pure tool
   cores (`src/tools.ts`, tested in tmp dirs) + the Node raster codec/frame
   renderer (`src/nodeCodec.ts`, `@napi-rs/canvas`). Compiles the engine in
-  from `src/engine`; its read/create/layer/shape/text/render/export surface is
-  described by registry metadata in `server.json`; never imported by the
-  webapp; gated by `check:mcp` and its own CI job.
+  from `src/engine`; its read/create, add/update/remove-layer,
+  shape/text/render/export surface is described by registry metadata in
+  `server.json`; never imported by the webapp; gated by `check:mcp` and its own
+  CI job.
 - `spec/` — the living product spec (rule 12): product vision, concepts,
   data contracts (`data/`), one file per feature area (`features/`),
   experience map, visual identity, integrations and the acceptance

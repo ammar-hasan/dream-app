@@ -17,6 +17,9 @@ import {
   createLayer,
   genId,
   insertLayer,
+  moveLayer,
+  removeLayerById,
+  updateLayerProps,
 } from '../../src/engine/document';
 import { hotspotTargetIndex } from '../../src/engine/hotspots';
 import { decodeProject, encodeProject } from '../../src/engine/projectFile';
@@ -200,6 +203,105 @@ export async function addLayer(
     layerName: layer.name,
     index,
     frameId: doc.activeFrameId ?? null,
+  };
+}
+
+export interface UpdateLayerOptions {
+  /** Layer id or name in the active frame. */
+  layer: string;
+  name?: string;
+  visible?: boolean;
+  opacity?: number;
+  locked?: boolean;
+  /** New zero-based stack index; 0 is the bottom. */
+  index?: number;
+}
+
+export interface UpdateLayerResult extends LayerInfo {
+  index: number;
+  frameId: string | null;
+}
+
+/** dream.update_layer — configure or reorder one layer in the active frame. */
+export async function updateLayer(
+  projectPath: string,
+  options: UpdateLayerOptions,
+): Promise<UpdateLayerResult> {
+  const doc = await loadProject(projectPath);
+  const layer = doc.layers.find(
+    (candidate) => candidate.id === options.layer || candidate.name === options.layer,
+  );
+  if (!layer) throw new Error(`No layer with id or name "${options.layer}" in the active frame`);
+
+  const hasUpdate =
+    options.name !== undefined ||
+    options.visible !== undefined ||
+    options.opacity !== undefined ||
+    options.locked !== undefined ||
+    options.index !== undefined;
+  if (!hasUpdate) throw new Error('Provide at least one layer property to update');
+
+  const patch: Partial<Pick<Layer, 'name' | 'visible' | 'opacity' | 'locked'>> = {};
+  if (options.name !== undefined) {
+    const name = options.name.trim();
+    if (!name) throw new Error('layer name must not be empty');
+    patch.name = name;
+  }
+  if (options.visible !== undefined) patch.visible = options.visible;
+  if (options.locked !== undefined) patch.locked = options.locked;
+  if (options.opacity !== undefined) {
+    if (!Number.isFinite(options.opacity) || options.opacity < 0 || options.opacity > 1) {
+      throw new Error('opacity must be between 0 and 1');
+    }
+    patch.opacity = options.opacity;
+  }
+  if (
+    options.index !== undefined &&
+    (!Number.isInteger(options.index) || options.index < 0 || options.index >= doc.layers.length)
+  ) {
+    throw new Error(`index must be an integer from 0 to ${doc.layers.length - 1}`);
+  }
+
+  let updated = Object.keys(patch).length > 0 ? updateLayerProps(doc, layer.id, patch) : doc;
+  if (options.index !== undefined) updated = moveLayer(updated, layer.id, options.index);
+  await saveProject(projectPath, updated);
+  const result = updated.layers.find((candidate) => candidate.id === layer.id)!;
+  return {
+    ...layerInfo(result),
+    index: updated.layers.findIndex((candidate) => candidate.id === layer.id),
+    frameId: updated.activeFrameId ?? null,
+  };
+}
+
+export interface RemoveLayerResult {
+  layerId: string;
+  layerName: string;
+  index: number;
+  remainingLayers: number;
+  frameId: string | null;
+}
+
+/** dream.remove_layer — remove a non-final layer from the active frame. */
+export async function removeLayer(
+  projectPath: string,
+  layerSelector: string,
+): Promise<RemoveLayerResult> {
+  const doc = await loadProject(projectPath);
+  const index = doc.layers.findIndex(
+    (layer) => layer.id === layerSelector || layer.name === layerSelector,
+  );
+  const layer = doc.layers[index];
+  if (!layer) throw new Error(`No layer with id or name "${layerSelector}" in the active frame`);
+  if (doc.layers.length <= 1) throw new Error('Cannot remove the last layer in a frame');
+
+  const updated = removeLayerById(doc, layer.id);
+  await saveProject(projectPath, updated);
+  return {
+    layerId: layer.id,
+    layerName: layer.name,
+    index,
+    remainingLayers: updated.layers.length,
+    frameId: updated.activeFrameId ?? null,
   };
 }
 

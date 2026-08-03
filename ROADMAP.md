@@ -348,8 +348,9 @@ MCP in her development flow and APIs in her applications.
   package (own package.json/tsconfig; not part of the webapp build, root
   `npm run check` never touches it; `npm run check:mcp` and a separate CI job
   cover it). Tools: `dream.read_project`, `dream.create_project`,
-  `dream.list_layers`, `dream.add_layer`, `dream.add_text`,
-  `dream.add_shape`, `dream.render_png`, `dream.export_app`. The server
+  `dream.list_layers`, `dream.add_layer`, `dream.update_layer`,
+  `dream.remove_layer`, `dream.add_text`, `dream.add_shape`,
+  `dream.render_png`, `dream.export_app`. The server
   compiles the REAL engine in from
   `src/engine` (no reimplementation); rendering and PNG payloads run on
   `@napi-rs/canvas`. Tool cores are pure functions over the file system
@@ -369,8 +370,7 @@ MCP in her development flow and APIs in her applications.
   exactly.
 - Future: remote MCP (HTTP transport), websocket collaboration on a shared
   document, a plugin API (custom tools/panels), more MCP tools (freehand
-  strokes, raster import, full layer management, component library access,
-  AI edits).
+  strokes, raster import, component library access, AI edits).
 
 ## Slice 16 — Research quick wins: stamps, comfort mode, Arabic voice ✅
 
@@ -606,7 +606,7 @@ registry without performing a public release automatically.
 - ✅ The example round-trip now creates a project, adds a layer, draws a shape,
   adds text, reads the summary and renders the real PNG. Unit tests cover
   normalization, invalid input, layer targeting and animated write-through;
-  the live MCP handshake exposes all eight tools.
+  the live MCP handshake exposes all eight tools shipped in that slice.
 - ✅ Registry-ready package identity and metadata: the publishable npm package
   is `@ammar-hasan/dream-mcp`, with the matching registry identity
   `io.github.ammar-hasan/dream-mcp`, MIT license, scoped public publish config,
@@ -1002,3 +1002,26 @@ multi-size delivery, without exporting and renaming every file separately.
   download proof inspect the archive, PNG dimensions and SVG payload.
 - Acceptance met: create a logo, choose Brand pack once, receive the complete
   portable delivery and keep editing the unchanged source document.
+
+## Slice 41 — Agent-safe layer management ✅
+
+Persona need: let Maria's agent correct and organize a `.dream` layer stack,
+not merely append more content whenever a draft changes.
+
+- ✅ `dream.update_layer` targets a layer by id or name and can rename,
+  show/hide, set opacity, lock/unlock and move it to an exact zero-based stack
+  index in the active frame.
+- ✅ `dream.remove_layer` removes by id or name but refuses the final layer, so
+  every frame remains structurally valid. Unknown targets and invalid values
+  fail without writing a partial result.
+- ✅ Both operations preserve the active-frame mirror in animated documents and
+  return stable layer/index/frame facts for the agent's next decision.
+- ✅ The standalone package tests real `.dream` files for both addressing modes,
+  validation, ordering, deletion and animated write-through; its demo and live
+  MCP surface exercise the shipped tools.
+- ✅ The completed remove-layer agent eval advanced to the next missing
+  freehand-stroke authoring task, so its deterministic grader still fails the
+  current tree honestly.
+- Acceptance met locally: create a project, add a draft and scratch layer,
+  configure/reorder the draft, remove the scratch layer, reopen/render the same
+  project and retain one protected base layer.

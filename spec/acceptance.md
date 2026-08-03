@@ -517,6 +517,11 @@ holds.
       same aspect and visible composition; a real SVG is included exactly when
       visible content is genuinely scalable, and the working document is
       unchanged.
+158.  GIVEN an agent targets a layer by id or name WHEN it updates that layer's
+      name, visibility, opacity, lock or stack index, or removes it, THEN the
+      active frame and its mirrored stack persist the exact result; an unknown
+      layer, invalid value or attempt to remove the final layer is refused
+      without changing the project.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 
@@ -542,8 +547,9 @@ holds.
    chemical subscripts and symbols → export a scalable SVG → duplicate frames
    to animate the result → link explanatory screens into an app.
 8. **Maria (32):** switch to Português (Brasil) → export `.dream` → agent reads
-   it, adds a layer with a shape and text, renders a PNG, exports the app HTML
-   via the dream-mcp tools → re-import the `.dream` unchanged elsewhere.
+   it, adds/configures/reorders a layer, removes a scratch layer, adds a shape
+   and text, renders a PNG, exports the app HTML via the dream-mcp tools →
+   re-import the `.dream` unchanged elsewhere.
 9. **Aleksandr (25):** switch to Русский → keyboard-only: tool keys, marquee,
    snap-align, Cmd+D, nudge, group — a full layout without touching the mouse.
 10. **Ahmed (42):** draw a scene per frame → record narration → add readable
