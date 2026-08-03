@@ -220,6 +220,11 @@ is a refusal to confuse breadth with completion.
     layer is isolated before it combines with artwork below, so rendering is
     consistent rather than dependent on operation order; one Undo restores the
     prior appearance. Draw gains no new control.
+35. **The preview is a promise, not approximate decoration.** In-progress
+    drawing, whole-layer movement, selection transforms, adjustment previews
+    and wand movement now remain inside their owning layer at its real stack
+    position. Opacity and blending are visible before release, so committing
+    cannot suddenly change color or jump in front of content that was above it.
 
 ### What does not yet fully serve the purpose
 
@@ -263,8 +268,9 @@ is a refusal to confuse breadth with completion.
 7. **Direct manipulation now has a foundation, not full depth.** Predictive hit
    chrome, contextual cursors, open/closed-hand drags, named drop targets and
    post-component-drop selection, compact pointer ghosts and exact-scale
-   component placement previews, a named keyboard/pointer Insert alternative
-   and angle/constraint feedback during rotation are coherent. Selection snaps
+   component placement previews, exact in-stack previews for every live layer
+   edit, a named keyboard/pointer Insert alternative and angle/constraint
+   feedback during rotation are coherent. Selection snaps
    now combine the existing exact guide with compact pointer-side and optional
    tactile confirmation. Multi-item progress remains.
 8. **Long-work control has begun, but is not yet consistent.** Create, Edit,

@@ -26,8 +26,9 @@ import {
 } from '../engine/selection';
 import { mirrorOperations, SYMMETRY_TOOLS } from '../engine/symmetry';
 import { clampZoom, nextZoomIn, nextZoomOut, pickColor, zoomAtPoint } from '../engine/tools';
+import { translateOperation } from '../engine/transform';
 import type { RasterSource } from '../engine/tools';
-import type { Component, Point, Rect } from '../engine/types';
+import type { Component, ImageOp, Operation, Point, Rect } from '../engine/types';
 import { useDreamStore } from '../store/dreamStore';
 import { useUiPrefs } from '../store/uiPrefs';
 import { getComponent } from '../storage/components';
@@ -56,24 +57,16 @@ interface ComponentDropPreview {
   at: Point;
 }
 
-/** Paint a raw RGBA buffer onto the canvas at (x, y), honoring opacity. */
-function blitBuffer(
-  ctx: CanvasRenderingContext2D,
-  buffer: RasterSource,
-  x: number,
-  y: number,
-  alpha: number,
-): void {
-  const scratch = document.createElement('canvas');
-  scratch.width = buffer.width;
-  scratch.height = buffer.height;
-  const scratchCtx = scratch.getContext('2d');
-  if (!scratchCtx) return;
-  scratchCtx.putImageData(new ImageData(buffer.data, buffer.width, buffer.height), 0, 0);
-  ctx.save();
-  ctx.globalAlpha = alpha;
-  ctx.drawImage(scratch, x, y);
-  ctx.restore();
+/** A transient image operation used only to compose exact live previews. */
+function previewImage(buffer: RasterSource, x: number, y: number, id: string): ImageOp {
+  return {
+    kind: 'image',
+    id,
+    color: '#000000',
+    opacity: 1,
+    scale: 1,
+    patch: { x, y, width: buffer.width, height: buffer.height, data: buffer.data },
+  };
 }
 
 function corners(r: Rect): Point[] {
@@ -223,26 +216,62 @@ export function CanvasViewport() {
       }
     }
 
-    // While moving or adjusting, the affected layer renders separately.
     const activeLayer = doc.layers.find((l) => l.id === activeLayerId);
-    const detached = new Set<string>();
-    if (moveDraft) detached.add(activeLayerId);
-    if (adjustPreview) detached.add(adjustPreview.layerId);
-    if (wandDraft) detached.add(wandDraft.layerId);
+    const previewOps = previewOp
+      ? symmetry === 'off'
+        ? [previewOp]
+        : mirrorOperations(previewOp, symmetry, { width: doc.width, height: doc.height })
+      : [];
 
-    // During a select-transform drag, swap the selected ops for their
-    // transformed preview copies (z-order within the layer is preserved).
+    // Every live document preview stays in its owning layer. That preserves
+    // stack order, layer opacity and blend mode throughout the gesture instead
+    // of briefly painting the active layer above everything else.
     let displayDoc = doc;
-    if (selectDraft?.preview && activeLayer) {
-      const byId = new Map(selectDraft.preview.map((op) => [op.id, op]));
+    const replaceDisplayOperations = (layerId: string, operations: Operation[]) => {
       displayDoc = {
-        ...doc,
-        layers: doc.layers.map((layer) =>
-          layer.id === activeLayerId
-            ? { ...layer, operations: layer.operations.map((op) => byId.get(op.id) ?? op) }
-            : layer,
+        ...displayDoc,
+        layers: displayDoc.layers.map((layer) =>
+          layer.id === layerId ? { ...layer, operations } : layer,
         ),
       };
+    };
+    if (selectDraft?.preview && activeLayer) {
+      const byId = new Map(selectDraft.preview.map((op) => [op.id, op]));
+      replaceDisplayOperations(
+        activeLayerId,
+        activeLayer.operations.map((op) => byId.get(op.id) ?? op),
+      );
+    }
+    if (moveDraft && activeLayer) {
+      replaceDisplayOperations(
+        activeLayerId,
+        activeLayer.operations.map((op) =>
+          translateOperation(op, moveDraft.delta.x, moveDraft.delta.y),
+        ),
+      );
+    }
+    if (adjustPreview) {
+      replaceDisplayOperations(adjustPreview.layerId, [
+        previewImage(adjustPreview.buffer, 0, 0, '__adjust-preview'),
+      ]);
+    }
+    if (wandDraft) {
+      replaceDisplayOperations(wandDraft.layerId, [
+        previewImage(wandDraft.base, 0, 0, '__wand-base-preview'),
+        previewImage(
+          wandDraft.patch,
+          wandDraft.patch.x + wandDraft.offset.x,
+          wandDraft.patch.y + wandDraft.offset.y,
+          '__wand-patch-preview',
+        ),
+      ]);
+    }
+    if (previewOps.length > 0 && activeLayer) {
+      const displayLayer = displayDoc.layers.find((layer) => layer.id === activeLayerId);
+      replaceDisplayOperations(activeLayerId, [
+        ...(displayLayer?.operations ?? activeLayer.operations),
+        ...previewOps,
+      ]);
     }
 
     // Playback swaps the active frame's stack for the frame being shown.
@@ -256,9 +285,7 @@ export function CanvasViewport() {
       cache.clear();
       cachedDocIdRef.current = doc.id;
     }
-    cache.render(displayDoc, ctx, {
-      layerFilter: detached.size > 0 ? (layer) => !detached.has(layer.id) : undefined,
-    });
+    cache.render(displayDoc, ctx);
 
     // Component drags show the exact prospective copy at its eventual origin.
     // The native drag image stays small; this canvas preview carries scale and
@@ -280,47 +307,13 @@ export function CanvasViewport() {
       ctx.restore();
     }
 
-    if (adjustPreview) {
-      const layer = doc.layers.find((l) => l.id === adjustPreview.layerId);
-      if (layer?.visible) {
-        const scratch = document.createElement('canvas');
-        scratch.width = adjustPreview.buffer.width;
-        scratch.height = adjustPreview.buffer.height;
-        const scratchCtx = scratch.getContext('2d');
-        if (scratchCtx) {
-          scratchCtx.putImageData(
-            new ImageData(
-              adjustPreview.buffer.data,
-              adjustPreview.buffer.width,
-              adjustPreview.buffer.height,
-            ),
-            0,
-            0,
-          );
-          ctx.save();
-          ctx.globalAlpha = layer.opacity;
-          ctx.drawImage(scratch, 0, 0);
-          ctx.restore();
-        }
-      }
-    }
-
-    if (moveDraft && activeLayer?.visible) {
-      ctx.save();
-      ctx.translate(moveDraft.delta.x, moveDraft.delta.y);
-      renderLayer(activeLayer, ctx);
-      ctx.restore();
-    }
-
-    // Wand floating region: the layer's raster with the region erased, then
-    // the lifted patch at its drag offset, boxed in accent dashes.
+    // The wand pixels are already in displayDoc; only its selection chrome is
+    // drawn above the document.
     if (wandDraft) {
       const wandLayer = doc.layers.find((l) => l.id === wandDraft.layerId);
       if (wandLayer?.visible) {
-        blitBuffer(ctx, wandDraft.base, 0, 0, wandLayer.opacity);
         const px = wandDraft.patch.x + wandDraft.offset.x;
         const py = wandDraft.patch.y + wandDraft.offset.y;
-        blitBuffer(ctx, wandDraft.patch, px, py, wandLayer.opacity);
         ctx.strokeStyle = ACCENT;
         ctx.lineWidth = 1 / zoom;
         ctx.setLineDash([5 / zoom, 4 / zoom]);
@@ -332,17 +325,6 @@ export function CanvasViewport() {
     ctx.strokeStyle = '#c9ced6';
     ctx.lineWidth = 1 / zoom;
     ctx.strokeRect(0, 0, doc.width, doc.height);
-
-    if (previewOp && !playing) {
-      // Mirror mode: the in-progress gesture blooms live across the axes.
-      const previewOps =
-        symmetry === 'off'
-          ? [previewOp]
-          : mirrorOperations(previewOp, symmetry, { width: doc.width, height: doc.height });
-      for (const op of previewOps) {
-        renderOperation(op, ctx, { layerOpacity: activeLayer?.opacity ?? 1 });
-      }
-    }
 
     // Mirror axes: soft dashed center lines that fade toward the edges.
     if (!playing && !kidMode && symmetry !== 'off' && SYMMETRY_TOOLS.includes(tool)) {

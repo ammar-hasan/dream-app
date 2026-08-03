@@ -703,6 +703,11 @@ holds.
       below using the chosen mode; Undo restores Normal and the previous pixels
       exactly. The mode survives `.dream` save/open and agent read/write, while
       an older layer without it opens as Normal; Draw does not expose Blend.
+181.  GIVEN a layer with opacity or a non-Normal blend mode below another layer
+      WHEN drawing, moving the whole layer, transforming a selection, adjusting
+      pixels or moving a wand region is still in progress THEN its preview stays
+      at the owning layer's stack position and uses the same opacity/blending as
+      the committed result; release or Apply produces no appearance jump.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

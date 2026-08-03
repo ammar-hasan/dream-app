@@ -1575,6 +1575,24 @@ and compose without baking away editability or burdening Draw with pro chrome.
 - ✅ Full release gates remain green: 883 unit tests, 97.18% engine coverage,
   59 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 71 — Live edits keep their visual promise ✅
+
+Persona need: let mouse, pen and touch creators trust what they see during a
+gesture, especially after professional layer effects make approximate previews
+visibly misleading.
+
+- ✅ In-progress drawing, whole-layer movement, selection transforms,
+  adjustment previews and wand movement stay in the owning layer instead of
+  being painted as temporary topmost chrome.
+- ✅ Real stack order, opacity and blend mode therefore apply before release or
+  Apply; committing no longer changes color or unexpectedly jumps behind
+  content that was supposed to remain above it.
+- ✅ A real browser holds a blue stroke and then a moved blue layer over red
+  while Multiply is active, observes black pixels before pointer-up, and proves
+  the same exact results plus independent Undo after commit.
+- ✅ Full release gates remain green: 883 unit tests, 97.18% engine coverage,
+  59 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the

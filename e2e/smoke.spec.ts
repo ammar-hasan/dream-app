@@ -121,16 +121,20 @@ test('Design blend modes visibly combine layers and undo exactly', async ({ page
   const box = await canvas.boundingBox();
   if (!box) throw new Error('viewport canvas has no box');
   const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
-  const sampleCenter = () =>
-    canvas.evaluate((element) => {
-      const target = element as HTMLCanvasElement;
-      const rect = target.getBoundingClientRect();
-      const context = target.getContext('2d');
-      if (!context) throw new Error('no 2d context');
-      const x = Math.floor((rect.width / 2) * (target.width / rect.width));
-      const y = Math.floor((rect.height / 2) * (target.height / rect.height));
-      return Array.from(context.getImageData(x, y, 1, 1).data);
-    });
+  const sampleAt = (dx = 0, dy = 0) =>
+    canvas.evaluate(
+      (element, offset) => {
+        const target = element as HTMLCanvasElement;
+        const rect = target.getBoundingClientRect();
+        const context = target.getContext('2d');
+        if (!context) throw new Error('no 2d context');
+        const x = Math.floor((rect.width / 2 + offset.dx) * (target.width / rect.width));
+        const y = Math.floor((rect.height / 2 + offset.dy) * (target.height / rect.height));
+        return Array.from(context.getImageData(x, y, 1, 1).data);
+      },
+      { dx, dy },
+    );
+  const sampleCenter = () => sampleAt();
   const drawLine = async (fromX: number, fromY: number, toX: number, toY: number) => {
     await page.mouse.move(fromX, fromY);
     await page.mouse.down();
@@ -153,6 +157,35 @@ test('Design blend modes visibly combine layers and undo exactly', async ({ page
   await blend.selectOption('multiply');
   await expect.poll(sampleCenter).toEqual([0, 0, 0, 255]);
 
+  // The blend stays truthful before pointer-up too: the in-progress blue
+  // stroke already multiplies with the red layer instead of flashing blue.
+  await page.getByRole('tab', { name: 'Draw' }).click();
+  await page.getByRole('button', { name: 'Brush', exact: true }).click();
+  await page.mouse.move(center.x + 50, center.y - 80);
+  await page.mouse.down();
+  await page.mouse.move(center.x + 50, center.y, { steps: 8 });
+  await expect.poll(() => sampleAt(50, 0)).toEqual([0, 0, 0, 255]);
+  await page.mouse.up();
+  await expect.poll(() => sampleAt(50, 0)).toEqual([0, 0, 0, 255]);
+
+  // Undo removes the new stroke without changing the persistent blend.
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(() => sampleAt(50, 0)).toEqual([255, 0, 0, 255]);
+
+  // Moving the complete blended layer uses that same composition before the
+  // drag commits, including its original place in the layer stack.
+  await page.getByRole('button', { name: 'Move', exact: true }).click();
+  await page.mouse.move(center.x, center.y);
+  await page.mouse.down();
+  await page.mouse.move(center.x + 50, center.y, { steps: 8 });
+  await expect.poll(sampleCenter).toEqual([255, 0, 0, 255]);
+  await expect.poll(() => sampleAt(50, 0)).toEqual([0, 0, 0, 255]);
+  await page.mouse.up();
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(sampleCenter).toEqual([0, 0, 0, 255]);
+
+  await page.getByRole('tab', { name: 'Design' }).click();
+  await expect(blend).toHaveValue('multiply');
   await page.getByRole('button', { name: 'Undo', exact: true }).click();
   await expect(blend).toHaveValue('normal');
   await expect.poll(sampleCenter).toEqual([0, 0, 255, 255]);

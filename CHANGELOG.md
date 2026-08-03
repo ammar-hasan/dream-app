@@ -7,6 +7,11 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Truthful live layer previews** (slice 71): drawing, whole-layer movement,
+  selection transforms, adjustments and wand movement now preview inside the
+  owning layer at its real stack position. Opacity and blend modes apply before
+  release or Apply, so committing causes no surprise color or stacking jump.
+
 - **Portable layer blend modes** (slice 70): Design now exposes Normal,
   Multiply, Screen, Overlay, Darken and Lighten for the active layer. Blending
   is immediately visible, undoable, saved in `.dream`, preserved in raster and
