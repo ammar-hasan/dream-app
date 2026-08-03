@@ -47,7 +47,7 @@ export type VoiceCommand =
   | { kind: 'tool'; tool: ToolId }
   /** "mirror on" / "mirror off": toggle vertical mirror symmetry. */
   | { kind: 'mirror'; on: boolean }
-  | { kind: 'color'; color: Color; name: string }
+  | { kind: 'color'; color: Color; name: string; selection?: true }
   /** "fill red": pick the color AND the fill bucket in one breath. */
   | { kind: 'fill-color'; color: Color; name: string }
   | { kind: 'bigger' }
@@ -198,6 +198,7 @@ export interface VoiceVocabulary {
   narrationDeletePhrases: string[];
   selectionDeletePhrases: string[];
   selectionDuplicatePhrases: string[];
+  selectionReferences: string[];
   /** Outcome-level animation creation phrases; trailing words become the story. */
   storyboardPhrases: string[];
 }
@@ -273,6 +274,7 @@ const EN_VOCAB: VoiceVocabulary = {
     'copy that',
     'make another one',
   ],
+  selectionReferences: ['it', 'that', 'this', 'selection', 'selected', 'object'],
   storyboardPhrases: [
     'make a story about',
     'make a story',
@@ -380,6 +382,7 @@ const AR_VOCAB: VoiceVocabulary = {
   narrationDeletePhrases: ['امسح الصوت', 'احذف الصوت', 'امسح التسجيل', 'احذف التسجيل', 'امسح صوتي'],
   selectionDeletePhrases: ['احذف هذا', 'احذفها', 'امسح هذا', 'احذف التحديد'],
   selectionDuplicatePhrases: ['كرر هذا', 'كررها', 'انسخ هذا', 'انسخ التحديد'],
+  selectionReferences: ['هذا', 'هذه', 'التحديد', 'المحدد'],
   storyboardPhrases: [
     'اصنع قصة عن',
     'اصنع لي قصة عن',
@@ -487,6 +490,7 @@ const FA_VOCAB: VoiceVocabulary = {
   narrationDeletePhrases: ['روایت را پاک کن', 'صدا را پاک کن', 'ضبط را حذف کن'],
   selectionDeletePhrases: ['این را حذف کن', 'این رو حذف کن', 'انتخاب را حذف کن'],
   selectionDuplicatePhrases: ['این را کپی کن', 'این رو کپی کن', 'انتخاب را کپی کن', 'تکرارش کن'],
+  selectionReferences: ['این', 'انتخاب', 'انتخاب شده'],
   storyboardPhrases: [
     'یک داستان درباره',
     'داستانی درباره',
@@ -578,6 +582,7 @@ const ZH_VOCAB: VoiceVocabulary = {
   narrationDeletePhrases: ['删除旁白', '删除录音', '清除旁白'],
   selectionDeletePhrases: ['删除它', '删除这个', '删除选中内容'],
   selectionDuplicatePhrases: ['复制它', '复制这个', '复制选中内容'],
+  selectionReferences: ['它', '这个', '选中内容'],
   storyboardPhrases: ['制作一个故事', '制作故事', '创作一个故事', '制作一个动画', '制作动画'],
 };
 
@@ -699,6 +704,7 @@ const PT_VOCAB: VoiceVocabulary = {
   ],
   selectionDeletePhrases: ['excluir isso', 'apagar isso', 'remover isso', 'excluir seleção'],
   selectionDuplicatePhrases: ['duplicar isso', 'copiar isso', 'duplicar seleção'],
+  selectionReferences: ['isso', 'isto', 'seleção', 'selecionado'],
   storyboardPhrases: [
     'crie uma história sobre',
     'criar uma história sobre',
@@ -831,6 +837,7 @@ const RU_VOCAB: VoiceVocabulary = {
   ],
   selectionDeletePhrases: ['удалить это', 'удали это', 'удалить выделенное'],
   selectionDuplicatePhrases: ['дублировать это', 'скопируй это', 'дублировать выделенное'],
+  selectionReferences: ['это', 'выделение', 'выделенное'],
   storyboardPhrases: [
     'создай историю о',
     'создать историю о',
@@ -889,6 +896,7 @@ function mergeVocabulary(base: VoiceVocabulary, extra: VoiceVocabulary): VoiceVo
       ...base.selectionDuplicatePhrases,
       ...extra.selectionDuplicatePhrases,
     ],
+    selectionReferences: [...base.selectionReferences, ...extra.selectionReferences],
     storyboardPhrases: [...base.storyboardPhrases, ...extra.storyboardPhrases],
   };
 }
@@ -1004,6 +1012,15 @@ function templateIn(
 /** Phrase-level checks that single tokens can't express. */
 function hasPhrase(normalized: string, ...phrases: string[]): boolean {
   return phrases.some((p) => normalized.includes(p));
+}
+
+function hasSelectionReference(normalized: string, references: readonly string[]): boolean {
+  const padded = ` ${normalized} `;
+  return references.some((reference) =>
+    /\p{Script=Han}/u.test(reference)
+      ? normalized.includes(reference)
+      : padded.includes(` ${reference} `),
+  );
 }
 
 function storyboardRequest(
@@ -1154,7 +1171,11 @@ export function parseVoiceCommand(transcript: string, locale = 'en'): VoiceComma
   const tool = toolIn(tokens, vocab.tools);
   if (tool === 'fill' && color) return { kind: 'fill-color', ...color };
   if (tool) return { kind: 'tool', tool };
-  if (color) return { kind: 'color', ...color };
+  if (color) {
+    return hasSelectionReference(normalized, vocab.selectionReferences)
+      ? { kind: 'color', ...color, selection: true }
+      : { kind: 'color', ...color };
+  }
 
   return null;
 }

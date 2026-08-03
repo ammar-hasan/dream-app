@@ -411,7 +411,7 @@ test('a spoken story request opens a planned storyboard', async ({ page }) => {
 test('voice resolves natural “it” actions to the visible selection', async ({ page }) => {
   await page.addInitScript(() => {
     let request = 0;
-    const transcripts = ['make it bigger', 'duplicate it', 'delete it'];
+    const transcripts = ['make it red', 'make it bigger', 'duplicate it', 'delete it'];
     class FakeRecognition {
       lang = '';
       interimResults = false;
@@ -458,6 +458,24 @@ test('voice resolves natural “it” actions to the visible selection', async (
   await page.keyboard.press('v');
   await page.mouse.click((from.x + to.x) / 2, (from.y + to.y) / 2);
   const before = await nonWhitePixels(page);
+
+  await page.getByRole('button', { name: 'Voice commands' }).click();
+  await expect(page.getByRole('status')).toContainText('Made the selected part red.');
+  await expect
+    .poll(() =>
+      canvas.evaluate((element) => {
+        const context = (element as HTMLCanvasElement).getContext('2d');
+        if (!context) return 0;
+        const pixels = context.getImageData(0, 0, context.canvas.width, context.canvas.height).data;
+        let red = 0;
+        for (let index = 0; index < pixels.length; index += 4) {
+          if (pixels[index]! > 200 && pixels[index + 1]! < 120 && pixels[index + 2]! < 120)
+            red += 1;
+        }
+        return red;
+      }),
+    )
+    .toBeGreaterThan(100);
 
   await page.getByRole('button', { name: 'Voice commands' }).click();
   await expect(page.getByRole('status')).toContainText('Made the selected part bigger.');

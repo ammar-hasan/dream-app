@@ -211,9 +211,10 @@ is a refusal to confuse breadth with completion.
 6. **Voice has useful object context, but is not yet conversational.** Natural
    size, delete and duplicate phrases now resolve “it” to visible selected
    artwork, preserve brush meaning where appropriate and never turn “delete it”
-   into a whole-layer clear; mixed spoken corrections no longer disappear
-   behind a leading yes/no. Color, position and relational references,
-   multi-turn clarification and repair, and offline recognition are not present.
+   into a whole-layer clear; “make it red” recolors selected vector artwork;
+   mixed spoken corrections no longer disappear behind a leading yes/no.
+   Position and relational references, multi-turn clarification and repair, and
+   offline recognition are not present.
 7. **Direct manipulation now has a foundation, not full depth.** Predictive hit
    chrome, contextual cursors, open/closed-hand drags, named drop targets and
    post-component-drop selection, compact pointer ghosts and exact-scale

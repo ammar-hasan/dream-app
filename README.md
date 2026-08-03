@@ -157,10 +157,10 @@ RTL remain first-class product behavior.
   when **voice feedback** is on, out loud. Without SpeechRecognition the mic
   remains visible and explains the touch, mouse and keyboard alternatives.
   Visible selection supplies context: “make it bigger/smaller” scales selected
-  artwork, “delete it” removes only the selection, and “duplicate it” makes an
-  offset selected copy; every action is undoable. Without a selection, size
-  words keep changing brush size while object actions explain how to select;
-  locked selections are refused truthfully.
+  artwork, “make it red” recolors vector artwork, “delete it” removes only the
+  selection, and “duplicate it” makes an offset selected copy; every action is
+  undoable. Bare colors still choose the drawing color. Missing, locked and
+  raster selections receive truthful, task-specific guidance.
   Answer words also preserve corrections: “no, undo that” reaches Undo, while a
   standalone “no” still safely answers a pending destructive confirmation.
   The vocabulary is **per-locale**: with

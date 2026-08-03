@@ -7,6 +7,11 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Voice-selected color** (slice 57): “make it red” now recolors the visible
+  vector selection instead of silently changing the brush. Bare colors keep
+  their familiar tool-setting meaning; missing, locked and raster selections
+  receive truthful guidance across all six locales.
+
 - **Legible rotation feedback** (slice 56): rotation now shows its effective
   angle beside the pointer and distinguishes free, 15°-snapped and 90°-stepped
   behavior. Optional Touch feedback adds one tiny detent when a snapped step is

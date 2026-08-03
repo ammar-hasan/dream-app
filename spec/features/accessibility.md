@@ -92,12 +92,12 @@ not swallow the requested action; Dream follows Undo or the color request.
 
 Voice uses visible selection as conversational context. With artwork selected,
 “make it bigger” and “make it smaller” scale that artwork about its shared
-center; “delete it” removes only that artwork; and “duplicate it” makes and
-selects an offset copy. Every action is undoable and says what changed. With no
-selection, size words retain their familiar brush-size meaning while delete and
-duplicate explain that something must be selected first. A locked selection
-gets a specific refusal; Dream never changes a locked selection or silently
-falls through to changing the whole layer.
+center; “make it red” recolors selected vector artwork; “delete it” removes only
+that artwork; and “duplicate it” makes and selects an offset copy. Every action
+is undoable and says what changed. A bare color still changes the drawing color,
+while a referential color request requires an editable vector selection. Missing,
+locked and pixel selections get specific guidance; Dream never claims that
+unchanged pixels were recolored or silently changes a hidden setting.
 
 ### The complete intent table
 
@@ -115,7 +115,7 @@ falls through to changing the whole layer.
 | export real code | "export real code", "make it real"                                                                                                                     | صدّر كود حقيقي                                                                   | downloads the AI-generated real-code app (needs frames)                                          |
 | narration        | "record narration" / "stop recording" / "delete narration"                                                                                             | سجّل صوتي / أوقف التسجيل / امسح الصوت                                            | records a voice take over the playing animation (needs frames) / stops and saves it / deletes it |
 | tools            | "brush", "pencil", "spray", "eraser", "fill", "wand", "lasso", "stamp", "line", "rectangle"/"square", "ellipse"/"circle", "eyedropper", "text", "move" | فرشاة، قلم، رش، ممحاة، دلو، عصا سحرية، لاسو، طابع، خط، مستطيل، بيضاوي، قطارة، نص | activates the tool                                                                               |
-| colors           | "red", "blue", … the 22-word vocabulary below                                                                                                          | أحمر، أزرق، …                                                                    | sets the current color                                                                           |
+| colors           | "red", "blue", … / "make it red"                                                                                                                       | أحمر، أزرق، … / اجعل هذا أحمر                                                    | bare color sets the current color; a referential color recolors selected vector artwork          |
 | fill + color     | "fill red"                                                                                                                                             | —                                                                                | sets the color AND activates the fill tool                                                       |
 | mirror on/off    | "mirror on", "mirror off", "symmetry on"                                                                                                               | شغّل التناظر، أطفئ التناظر                                                       | vertical symmetry on / off (mirror phrases never trigger "play")                                 |
 | bigger / smaller | "bigger", "make it bigger", "thicker" / "smaller", "make it smaller", "thinner"                                                                        | أكبر / أصغر                                                                      | selected artwork scales gently about its center; with no selection, brush size ×~1.5 or ÷~1.5    |
@@ -204,6 +204,9 @@ keeps it silent. Every tactile cue repeats an already-visible interaction state.
 - “Delete it” and “duplicate it” require a visible editable selection. Missing
   and locked selections get named guidance; neither phrase clears a layer or
   changes the brush.
+- “Make it red” requires selected editable vector artwork and is one undoable
+  recolor. A bare “red” remains a brush choice; raster pixels are referred to AI
+  Edit rather than receiving false success feedback.
 - A pending "clear?" confirmation is cancelled by any non-yes utterance. A
   command within that correction (such as “no, undo”) then runs normally.
 - Spoken names never fire where synthesis is missing — the UI simply

@@ -1300,6 +1300,23 @@ committed without estimating from the box or discovering constraints by error.
 - ✅ Full release gates remain green: 859 unit tests, 97.74% engine coverage,
   49 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 57 — Voice can recolor “it” ✅
+
+Persona need: let a child or low-literacy creator correct the visible thing in
+ordinary speech without accidentally changing an invisible brush setting.
+
+- ✅ “Make it red” and equivalent referential phrases in all six locales carry
+  explicit selection intent; a bare color remains the current drawing color.
+- ✅ Editable strokes, shapes and text recolor as one undoable document action.
+  Missing and locked selections get contextual refusals, while raster pixels
+  are honestly directed to AI Edit instead of receiving false success.
+- ✅ Full release gates remain green: 861 unit tests, 97.74% engine coverage,
+  49 browser journeys, 24 MCP tests and four honest agent evals.
+- ✅ Spoken and visible feedback names the resulting color in the active locale.
+  Parser, executor, store and locale tests cover the context boundary.
+- ✅ A production-browser voice journey selects real artwork, says “make it red”
+  through speech recognition and proves both the feedback and painted pixels.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1311,9 +1328,9 @@ largest count of controls:
    continue with multi-item progress where batch work can become opaque.
 2. **Conversational phone-first creation:** natural clarification and reference
    handling for voice now has a selected-object foundation; continue with more
-   referents and corrections, a task-prioritized mobile shell, and a faithful
-   safe creation path that does not require a child or low-literacy user to
-   configure an AI provider.
+   position/relational referents and corrections, a task-prioritized mobile
+   shell, and a faithful safe creation path that does not require a child or
+   low-literacy user to configure an AI provider.
 3. **Professional substrate:** non-destructive masks/adjustments and blend/color
    foundations, then vector paths, typography, grids, constraints and linked
    reusable systems—Design-only, preserving Draw's first-minute simplicity.

@@ -44,6 +44,10 @@ Link tools, the Design panel, the Links panel and the Components panel.
   smaller” understands “it” as the selected artwork and scales the group gently
   about its shared center. Each request is one undoable step; a locked selection
   is refused rather than silently changing the brush.
+- **Spoken color:** “make it red” and equivalent localized phrases recolor a
+  visible vector selection as one undoable step. A bare “red” still chooses the
+  current drawing color. Missing, locked and pixel selections get specific
+  guidance; raster pixels never pretend to have changed.
 - **Duplicate** (Cmd/Ctrl+D), **delete** (Del/Backspace), **bring
   forward / send backward** (within the layer), **group** (Cmd/Ctrl+G) and
   **ungroup** (Cmd/Ctrl+Shift+G) — all undoable.

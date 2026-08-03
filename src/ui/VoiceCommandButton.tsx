@@ -29,6 +29,8 @@ import { MicIcon } from './icons';
 function executorStore(announceDone?: (message: string) => void): VoiceExecutorStore {
   const s = useDreamStore.getState();
   const layer = s.doc.layers.find((l) => l.id === s.activeLayerId);
+  const selectedOperations =
+    layer?.operations.filter((operation) => s.selection.includes(operation.id)) ?? [];
   return {
     doc: s.doc,
     canUndo: s.canUndo,
@@ -37,6 +39,16 @@ function executorStore(announceDone?: (message: string) => void): VoiceExecutorS
     activeLayerHasContent: !!layer && layer.operations.length > 0,
     selectionCount: s.selection.length,
     selectionTransformable: s.selection.length > 0 && !!layer && !layer.locked,
+    selectionRecolorable:
+      s.selection.length > 0 &&
+      !!layer &&
+      selectedOperations.length === s.selection.length &&
+      selectedOperations.every(
+        (operation) =>
+          operation.kind === 'shape' ||
+          operation.kind === 'text' ||
+          (operation.kind === 'stroke' && operation.tool !== 'eraser'),
+      ),
     undo: s.undo,
     redo: s.redo,
     clearLayer: s.clearLayer,
@@ -63,6 +75,7 @@ function executorStore(announceDone?: (message: string) => void): VoiceExecutorS
     setColor: s.setColor,
     setSize: s.setSize,
     scaleSelection: s.scaleSelection,
+    recolorSelection: s.recolorSelection,
     deleteSelection: s.deleteSelection,
     duplicateSelection: s.duplicateSelection,
     setSymmetry: s.setSymmetry,

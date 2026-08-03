@@ -228,6 +228,16 @@ describe('transform handles', () => {
 });
 
 describe('selection actions', () => {
+  it('recolors vector selections as one undoable command', () => {
+    drawRect();
+    enterDesign();
+    store().setSelection([store().doc.layers[0].operations[0].id]);
+    store().recolorSelection('#ef4444');
+    expect(store().doc.layers[0].operations[0].color).toBe('#ef4444');
+    store().undo();
+    expect(store().doc.layers[0].operations[0].color).toBe('#1f2937');
+  });
+
   it('nudge moves by exact pixels and is undoable', () => {
     drawRect();
     enterDesign();

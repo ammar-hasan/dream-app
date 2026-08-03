@@ -426,6 +426,8 @@ export interface DreamStore {
   nudgeSelection(dx: number, dy: number): void;
   /** Uniformly scale the selection about its center; one undoable command. */
   scaleSelection(factor: number): void;
+  /** Recolor vector artwork in the selection; one undoable command. */
+  recolorSelection(color: Color): void;
   deleteSelection(): void;
   /** Duplicate with a small offset; the clones become the selection. */
   duplicateSelection(): void;
@@ -1747,6 +1749,36 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       mutateSelection('Scale selection', (ops, ids) => {
         const wanted = new Set(ids);
         return ops.map((op) => (wanted.has(op.id) ? scaleOperationAbout(op, center, factor) : op));
+      });
+    },
+
+    recolorSelection: (color) => {
+      const layer = activeLayer();
+      const { selection } = get();
+      const selected = layer?.operations.filter((op) => selection.includes(op.id)) ?? [];
+      if (
+        !layer ||
+        layer.locked ||
+        selected.length === 0 ||
+        selected.some(
+          (op) =>
+            op.kind === 'fill' ||
+            op.kind === 'image' ||
+            (op.kind === 'stroke' && op.tool === 'eraser'),
+        )
+      ) {
+        return;
+      }
+      mutateSelection('Color selection', (ops, ids) => {
+        const wanted = new Set(ids);
+        return ops.map((op) =>
+          wanted.has(op.id) &&
+          (op.kind === 'shape' ||
+            op.kind === 'text' ||
+            (op.kind === 'stroke' && op.tool !== 'eraser'))
+            ? { ...op, color }
+            : op,
+        );
       });
     },
 

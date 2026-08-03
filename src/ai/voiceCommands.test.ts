@@ -52,6 +52,7 @@ describe('parseVoiceCommand — history & document', () => {
       kind: 'color',
       color: COLOR_WORDS.red,
       name: 'red',
+      selection: true,
     });
     expect(parseVoiceCommand('no, undo that')).toEqual({ kind: 'undo' });
     expect(parseVoiceCommand('yes, make it bigger')).toEqual({ kind: 'bigger' });
@@ -218,6 +219,12 @@ describe('parseVoiceCommand — Arabic vocabulary (locale "ar")', () => {
   it('parses selected-object references', () => {
     expect(parseVoiceCommand('احذف هذا', 'ar')).toEqual({ kind: 'delete-selection' });
     expect(parseVoiceCommand('انسخ هذا', 'ar')).toEqual({ kind: 'duplicate-selection' });
+    expect(parseVoiceCommand('اجعل هذا أحمر', 'ar')).toEqual({
+      kind: 'color',
+      color: COLOR_WORDS.red,
+      name: 'احمر',
+      selection: true,
+    });
   });
 
   it('parses undo/redo/clear with polite filler', () => {
@@ -366,6 +373,12 @@ describe('parseVoiceCommand — Persian vocabulary (locale "fa")', () => {
   it('parses selected-object references', () => {
     expect(parseVoiceCommand('این را حذف کن', 'fa')).toEqual({ kind: 'delete-selection' });
     expect(parseVoiceCommand('این را کپی کن', 'fa')).toEqual({ kind: 'duplicate-selection' });
+    expect(parseVoiceCommand('این را قرمز کن', 'fa')).toEqual({
+      kind: 'color',
+      color: COLOR_WORDS.red,
+      name: 'قرمز',
+      selection: true,
+    });
   });
 
   it('parses core creation, recovery and calligraphy-adjacent tools', () => {
@@ -405,6 +418,12 @@ describe('parseVoiceCommand — Simplified Chinese vocabulary (locale "zh")', ()
   it('parses selected-object references without spaces', () => {
     expect(parseVoiceCommand('请删除这个', 'zh')).toEqual({ kind: 'delete-selection' });
     expect(parseVoiceCommand('复制选中内容', 'zh')).toEqual({ kind: 'duplicate-selection' });
+    expect(parseVoiceCommand('把这个变成红色', 'zh')).toEqual({
+      kind: 'color',
+      color: COLOR_WORDS.red,
+      name: '红色',
+      selection: true,
+    });
   });
 
   it('parses recovery, confirmation and creation without word spaces', () => {
@@ -451,6 +470,12 @@ describe('parseVoiceCommand — Brazilian Portuguese vocabulary (locale "pt")', 
   it('parses selected-object references', () => {
     expect(parseVoiceCommand('apagar isso', 'pt')).toEqual({ kind: 'delete-selection' });
     expect(parseVoiceCommand('copiar isso', 'pt')).toEqual({ kind: 'duplicate-selection' });
+    expect(parseVoiceCommand('deixe isso vermelho', 'pt')).toEqual({
+      kind: 'color',
+      color: COLOR_WORDS.red,
+      name: 'vermelho',
+      selection: true,
+    });
   });
 
   it('parses recovery, confirmation and creation with polite filler', () => {
@@ -503,6 +528,12 @@ describe('parseVoiceCommand — Russian vocabulary (locale "ru")', () => {
   it('parses selected-object references', () => {
     expect(parseVoiceCommand('удали это', 'ru')).toEqual({ kind: 'delete-selection' });
     expect(parseVoiceCommand('скопируй это', 'ru')).toEqual({ kind: 'duplicate-selection' });
+    expect(parseVoiceCommand('сделай это красным', 'ru')).toEqual({
+      kind: 'color',
+      color: COLOR_WORDS.red,
+      name: 'красным',
+      selection: true,
+    });
   });
 
   it('parses recovery, confirmation and creation with polite filler', () => {

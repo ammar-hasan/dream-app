@@ -20,6 +20,7 @@ function makeStore(overrides: Partial<VoiceExecutorStore> = {}) {
     activeLayerHasContent: true,
     selectionCount: 0,
     selectionTransformable: false,
+    selectionRecolorable: false,
     undo: vi.fn(),
     redo: vi.fn(),
     clearLayer: vi.fn(),
@@ -39,6 +40,7 @@ function makeStore(overrides: Partial<VoiceExecutorStore> = {}) {
     setColor: vi.fn(),
     setSize: vi.fn(),
     scaleSelection: vi.fn(),
+    recolorSelection: vi.fn(),
     deleteSelection: vi.fn(),
     duplicateSelection: vi.fn(),
     setSymmetry: vi.fn(),
@@ -236,6 +238,37 @@ describe('executeVoiceCommand', () => {
     expect(store.setColor).toHaveBeenCalledWith('#3b82f6');
     expect(store.setTool).toHaveBeenCalledWith('fill');
     expect(result?.message).toBe('Blue! Fill bucket!');
+  });
+
+  it('“make it red” recolors only an editable vector selection', () => {
+    const selected = makeStore({
+      selectionCount: 1,
+      selectionTransformable: true,
+      selectionRecolorable: true,
+    });
+    expect(
+      executeVoiceCommand(
+        { kind: 'color', color: '#ef4444', name: 'red', selection: true },
+        selected,
+        () => {},
+      )?.message,
+    ).toBe('Made the selected part red.');
+    expect(selected.recolorSelection).toHaveBeenCalledWith('#ef4444');
+    expect(selected.setColor).not.toHaveBeenCalled();
+
+    const pixels = makeStore({
+      selectionCount: 1,
+      selectionTransformable: true,
+      selectionRecolorable: false,
+    });
+    expect(
+      executeVoiceCommand(
+        { kind: 'color', color: '#ef4444', name: 'red', selection: true },
+        pixels,
+        () => {},
+      )?.message,
+    ).toMatch(/pixels/i);
+    expect(pixels.recolorSelection).not.toHaveBeenCalled();
   });
 
   it('mirror toggles vertical symmetry on and off', () => {

@@ -279,7 +279,11 @@ holds.
 94. GIVEN no speech recognition THEN the global voice button remains visible
     and explains that touch, mouse and keyboard still work; prompt-only
     dictation controls hide because their text field is the visible fallback.
-    GIVEN no audio recorder THEN the narration button simply isn't there.
+    GIVEN no audio recorder THEN the narration button simply isn't there. GIVEN
+    visible selected vector artwork WHEN “make it red” or its localized
+    equivalent is recognized THEN only that selection becomes red as one
+    undoable action; a bare color still changes the drawing color, while missing,
+    locked or pixel selections get truthful guidance and no document change.
 95. GIVEN reduced-motion OS preference THEN every animation and
     transition in the app and its exports is effectively instant.
 96. GIVEN the dark theme THEN every surface, panel, dialog and tooltip

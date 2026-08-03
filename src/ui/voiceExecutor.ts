@@ -21,6 +21,7 @@ export interface VoiceExecutorStore {
   /** Current Design selection and whether its layer permits transforms. */
   selectionCount: number;
   selectionTransformable: boolean;
+  selectionRecolorable: boolean;
   undo(): void;
   redo(): void;
   clearLayer(): void;
@@ -45,6 +46,7 @@ export interface VoiceExecutorStore {
   setColor(color: Color): void;
   setSize(size: number): void;
   scaleSelection(factor: number): void;
+  recolorSelection(color: Color): void;
   deleteSelection(): void;
   duplicateSelection(): void;
   setSymmetry(mode: SymmetryMode): void;
@@ -197,6 +199,17 @@ export function executeVoiceCommand(
       return { message: t(command.on ? 'voice.mirrorOn' : 'voice.mirrorOff') };
 
     case 'color':
+      if (command.selection) {
+        if (store.selectionCount === 0) return { message: t('voice.selectionColorNeeded') };
+        if (!store.selectionTransformable) return { message: t('voice.selectionLocked') };
+        if (!store.selectionRecolorable) return { message: t('voice.selectionPixels') };
+        store.recolorSelection(command.color);
+        return {
+          message: t('voice.selectionColor', {
+            color: colorName(command.name).toLocaleLowerCase(),
+          }),
+        };
+      }
       store.setColor(command.color);
       return { message: t('voice.color', { color: colorName(command.name) }) };
 
