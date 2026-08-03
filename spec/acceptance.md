@@ -577,6 +577,12 @@ holds.
       result; GIVEN no selection or a locked selection THEN Dream gives specific
       guidance and changes neither the layer, brush nor undo history. “Delete
       everything” remains the separately confirmed whole-layer action.
+168.  GIVEN Test connection is waiting for an OpenAI-compatible endpoint WHEN
+      no measurable completion exists THEN Dream announces staged contacting,
+      checking and patient-waiting activity without a percentage and offers
+      Cancel; WHEN cancelled THEN Settings becomes ready, the network request is
+      asked to stop, settings remain exact and a late hello cannot replace the
+      cancellation result with success.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

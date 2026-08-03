@@ -203,7 +203,10 @@ the visible choice; a successful Save confirms the active connection.
   and reports success ("It works! Your AI said hello back.") or a friendly,
   jargon-free error ("Could not reach … — is the URL right and the app
   running?", "the API key was rejected — check it and try again", "that
-  endpoint was not found — check the base URL and model name").
+  endpoint was not found — check the base URL and model name"). While waiting,
+  it names the contacting and checking stages without inventing a percentage.
+  Cancel returns Settings to ready immediately, asks the endpoint to stop,
+  confirms settings were unchanged and ignores a late hello.
 - **Key handling (rules):** keys live in **session-only storage by
   default** (gone when the app closes); "Remember key on this device" opts
   into device storage; keys are sent only as the authorization header to

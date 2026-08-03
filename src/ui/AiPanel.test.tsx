@@ -51,6 +51,7 @@ afterEach(() => {
   setActiveProvider('mock');
   unregisterProvider('openai-compatible');
   vi.useRealTimers();
+  vi.unstubAllGlobals();
 });
 
 describe('AI operation progress', () => {
@@ -86,5 +87,50 @@ describe('AI operation progress', () => {
       await Promise.resolve();
     });
     expect(useDreamStore.getState().doc.layers).toHaveLength(layersBefore);
+  });
+
+  it('stages and cancels a provider connection test without accepting a late hello', async () => {
+    let connectionSignal: AbortSignal | undefined;
+    let finishConnection: (() => void) | undefined;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        (_url: string, init?: RequestInit) =>
+          new Promise<Response>((resolve) => {
+            connectionSignal = init?.signal ?? undefined;
+            finishConnection = () =>
+              resolve(
+                new Response(JSON.stringify({ choices: [{ message: { content: 'hello' } }] }), {
+                  status: 200,
+                  headers: { 'Content-Type': 'application/json' },
+                }),
+              );
+          }),
+      ),
+    );
+
+    render(<AiPanel />);
+    fireEvent.click(screen.getByRole('button', { name: /Settings:/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Test connection' }));
+
+    expect(screen.getByRole('progressbar', { name: 'Contacting your AI…' })).toBeVisible();
+    act(() => vi.advanceTimersByTime(5_000));
+    expect(
+      screen.getByRole('progressbar', { name: 'Checking the URL, key and model…' }),
+    ).toBeVisible();
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+      await Promise.resolve();
+    });
+    expect(connectionSignal?.aborted).toBe(true);
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    expect(screen.getByText('Stopped testing. Your settings were not changed.')).toBeVisible();
+
+    await act(async () => {
+      finishConnection?.();
+      await Promise.resolve();
+    });
+    expect(screen.queryByText('It works! Your AI said hello back.')).not.toBeInTheDocument();
   });
 });

@@ -470,6 +470,10 @@ export const ar: Record<string, string> = {
   'ai.progressEditing': 'دريم يعمل على صورتك…',
   'ai.progressLooking': 'دريم ينظر عن قرب…',
   'ai.progressWaiting': 'ما زلنا نعمل — قد تستغرق الطلبات المفصلة دقيقة.',
+  'ai.progressConnecting': 'جارٍ الاتصال بذكائك الاصطناعي…',
+  'ai.progressChecking': 'جارٍ التحقق من الرابط والمفتاح والنموذج…',
+  'ai.progressTestWaiting':
+    'ما زلنا ننتظر رد ذكائك الاصطناعي — يمكنك الإلغاء والتحقق من الإعدادات.',
   'ai.cancel': 'إلغاء',
   'ai.cancelled': 'توقفنا. لم يتغير شيء.',
   'ai.noFeedback': 'لا شيء بعد — اضغط الزر وسأخبرك بما أرى.',
@@ -487,6 +491,7 @@ export const ar: Record<string, string> = {
   'ai.saved': 'تم الحفظ! ذكاؤك الاصطناعي متصل — استخدام غير محدود بلا عدّاد يومي.',
   'ai.finishSetup': 'أكمل إعداد ذكائك الاصطناعي أدناه، ثم احفظ لإنشاء هذه الصورة به.',
   'ai.testOk': 'إنه يعمل! ردّ ذكاؤك الاصطناعي بالتحية.',
+  'ai.testCancelled': 'توقف الاختبار. لم تتغير إعداداتك.',
   'ai.cannotPaint': '{provider} لا يستطيع رسم الصور.',
   'ai.cannotEdit': '{provider} لا يستطيع تعديل الصور.',
   'ai.switchBack': 'حُلم الذكي يستطيع — عد إليه.',

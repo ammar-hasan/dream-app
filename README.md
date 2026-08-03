@@ -354,7 +354,9 @@ on the document through the same undoable history as your own strokes.
 Connected Create, Edit and Feedback requests show honest indeterminate
 progress with action-specific status instead of a made-up percentage. **Cancel**
 returns the panel to ready immediately, asks the service to stop and discards
-any late result so the artwork and undo history stay untouched.
+any late result so the artwork and undo history stay untouched. Provider
+**Test connection** follows the same staged, cancellable contract and never
+changes saved settings when stopped.
 
 **Dream AI** is the built-in offline-scene provider: free, offline,
 deterministic. Its Create hint names the scene themes it understands instead

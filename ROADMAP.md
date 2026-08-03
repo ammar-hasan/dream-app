@@ -1197,6 +1197,24 @@ work or that a copy command silently changes a hidden tool setting.
 - ✅ Full release gates remain green: 852 unit tests, 97.74% engine coverage,
   46 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 51 — Provider checks stay cancellable ✅
+
+Persona need: let a creator verify an unfamiliar AI endpoint without wondering
+whether Dream froze, being trapped behind a slow service or having a late reply
+contradict a cancellation.
+
+- ✅ Test connection names contacting, checking and patient-waiting stages with
+  honest indeterminate activity instead of inventing a completion percentage.
+- ✅ Cancel returns Settings to ready immediately, forwards an abort signal,
+  confirms settings stayed unchanged and refuses a late hello from becoming a
+  success result.
+- ✅ Save cannot race an active test; URL, model and key remain editable before
+  the next attempt, and no key enters notices, logs or persistent settings.
+- ✅ Focused component and production-browser coverage proves staged copy,
+  request cancellation, immediate readiness and late-result rejection.
+- ✅ Full release gates remain green: 853 unit tests, 97.74% engine coverage,
+  47 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1204,8 +1222,8 @@ largest count of controls:
 
 1. **Direct-manipulation foundation:** cursor semantics, hover/hit feedback,
    valid/invalid targets, post-drop selection and cancellable AI progress are
-   established; continue with drag ghosts and extend the same progress contract
-   to provider tests, project loading and code generation.
+   established, including provider checks; continue with drag ghosts and extend
+   the same progress contract to project loading and code generation.
 2. **Conversational phone-first creation:** natural clarification and reference
    handling for voice now has a selected-object foundation; continue with more
    referents and corrections, a task-prioritized mobile shell, and a faithful

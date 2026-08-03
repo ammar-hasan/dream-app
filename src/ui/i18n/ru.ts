@@ -443,6 +443,9 @@ export const ru: Record<string, string> = {
   'ai.progressEditing': 'Dream работает над вашей картинкой…',
   'ai.progressLooking': 'Dream внимательно рассматривает работу…',
   'ai.progressWaiting': 'Всё ещё работаем — подробный запрос может занять минуту.',
+  'ai.progressConnecting': 'Связываемся с вашим ИИ…',
+  'ai.progressChecking': 'Проверяем адрес, ключ и модель…',
+  'ai.progressTestWaiting': 'Всё ещё ждём ваш ИИ — можно отменить и проверить настройки.',
   'ai.cancel': 'Отмена',
   'ai.cancelled': 'Остановлено. Ничего не изменилось.',
   'ai.noFeedback': 'Пока ничего — нажмите кнопку, и я поделюсь мыслями.',
@@ -461,6 +464,7 @@ export const ru: Record<string, string> = {
   'ai.finishSetup':
     'Завершите настройку своего AI ниже и сохраните её, чтобы создать это изображение.',
   'ai.testOk': 'Работает! Ваш AI ответил.',
+  'ai.testCancelled': 'Проверка остановлена. Настройки не изменены.',
   'ai.cannotPaint': '{provider} не умеет рисовать.',
   'ai.cannotEdit': '{provider} не умеет редактировать.',
   'ai.switchBack': 'Dream AI умеет рисовать — вернуться к нему?',

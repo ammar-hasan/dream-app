@@ -7,6 +7,12 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Cancellable provider checks** (slice 51): Test connection now announces
+  honest contacting, checking and patient-waiting stages without a fake
+  percentage. Cancel stops immediately, forwards cancellation to the request,
+  confirms settings stayed unchanged, and refuses a late hello from replacing
+  that result.
+
 - **Natural selected-object voice actions** (slice 50): “delete it” and
   “duplicate it” now resolve only to visible selected artwork, remain undoable,
   and name their result. Missing and locked selections get specific guidance,

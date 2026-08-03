@@ -514,6 +514,35 @@ test('connected OpenAI-compatible image generation paints returned PNG pixels', 
   await expect.poll(() => nonWhitePixels(page)).toBeGreaterThan(before + 10_000);
 });
 
+test('provider connection progress can be cancelled without accepting a late hello', async ({
+  page,
+}) => {
+  await page.route('**/chat/completions', async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    await route
+      .fulfill({ status: 200, json: { choices: [{ message: { content: 'hello' } }] } })
+      .catch(() => {});
+  });
+
+  await bootApp(page);
+  await page.getByRole('button', { name: 'AI helper', exact: true }).click();
+  const panel = page.locator('.ai-panel');
+  await panel.getByRole('button', { name: /Settings:/ }).click();
+  await panel.locator('.ai-settings-body select').selectOption('openai-compatible');
+  await panel.getByLabel('Base URL').fill('https://api.openai.com/v1');
+  await panel.getByLabel('Model', { exact: true }).fill('gpt-4o-mini');
+  await panel.getByLabel('API key').fill('sk-e2e-not-a-secret');
+
+  await panel.getByRole('button', { name: 'Test connection' }).click();
+  await expect(panel.getByRole('progressbar', { name: 'Contacting your AI…' })).toBeVisible();
+  await panel.getByRole('button', { name: 'Cancel' }).click();
+
+  await expect(panel.getByRole('progressbar')).toHaveCount(0);
+  await expect(panel).toContainText('Stopped testing. Your settings were not changed.');
+  await page.waitForTimeout(800);
+  await expect(panel).not.toContainText('It works! Your AI said hello back.');
+});
+
 test('connected AI progress can be cancelled without applying a late picture', async ({ page }) => {
   const purplePng =
     'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAABHNCSVQICAgIfAhkiAAAAAFzUkdCAK7OHOkAAAAUSURBVAiZY6yxevufgYGBgYkBCgAn5wKm8Nhy+QAAAABJRU5ErkJggg==';

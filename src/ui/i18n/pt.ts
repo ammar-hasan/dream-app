@@ -485,6 +485,10 @@ export const pt: Record<string, string> = {
   'ai.progressEditing': 'O Dream está trabalhando na sua imagem…',
   'ai.progressLooking': 'O Dream está olhando com atenção…',
   'ai.progressWaiting': 'Ainda trabalhando — pedidos detalhados podem levar um minuto.',
+  'ai.progressConnecting': 'Entrando em contato com sua IA…',
+  'ai.progressChecking': 'Verificando URL, chave e modelo…',
+  'ai.progressTestWaiting':
+    'Ainda esperando sua IA — você pode cancelar e conferir as configurações.',
   'ai.cancel': 'Cancelar',
   'ai.cancelled': 'Parado. Nada foi alterado.',
   'ai.noFeedback': 'Ainda nada — pressione o botão e eu digo o que vejo.',
@@ -504,6 +508,7 @@ export const pt: Record<string, string> = {
   'ai.finishSetup':
     'Conclua a configuração da sua própria IA abaixo e salve para criar esta imagem com ela.',
   'ai.testOk': 'Funcionou! Sua IA respondeu um oi.',
+  'ai.testCancelled': 'Teste interrompido. Suas configurações não foram alteradas.',
   'ai.cannotPaint': '{provider} não pode pintar imagens.',
   'ai.cannotEdit': '{provider} não pode editar imagens.',
   'ai.switchBack': 'O Dream AI pode — volte para ele.',

@@ -155,7 +155,11 @@ export class OpenAICompatibleProvider implements AIProvider {
     return this.request(path, body, false, signal);
   }
 
-  async chat(messages: AIChatMessage[], context?: AIFeedbackRequest): Promise<string> {
+  private async completeChat(
+    messages: AIChatMessage[],
+    context?: AIFeedbackRequest,
+    signal = context?.signal,
+  ): Promise<string> {
     const wire = [{ role: 'system', content: SYSTEM_PROMPT }];
     if (context?.doc) {
       wire.push({
@@ -170,11 +174,15 @@ export class OpenAICompatibleProvider implements AIProvider {
         model: this.config.model,
         messages: wire,
       },
-      context?.signal,
+      signal,
     )) as { choices?: { message?: { content?: string } }[] };
     const text = data.choices?.[0]?.message?.content?.trim();
     if (!text) throw new Error('The AI answered, but said nothing. Try again?');
     return text;
+  }
+
+  async chat(messages: AIChatMessage[], context?: AIFeedbackRequest): Promise<string> {
+    return this.completeChat(messages, context);
   }
 
   async generateImage(request: AIImageRequest): Promise<AIImageResult> {
@@ -269,7 +277,7 @@ export class OpenAICompatibleProvider implements AIProvider {
   }
 
   /** Settings panel helper: one cheap round-trip to validate URL/key/model. */
-  async testConnection(): Promise<void> {
-    await this.chat([{ role: 'user', text: 'Say hello in one word.' }]);
+  async testConnection(signal?: AbortSignal): Promise<void> {
+    await this.completeChat([{ role: 'user', text: 'Say hello in one word.' }], undefined, signal);
   }
 }

@@ -165,6 +165,11 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
   const cancelAI = () => requestController.current?.abort();
 
   const progressLabel = () => {
+    if (busy === 'settings') {
+      if (progressStage === 2) return t('ai.progressTestWaiting');
+      if (progressStage === 1) return t('ai.progressChecking');
+      return t('ai.progressConnecting');
+    }
     if (progressStage === 2) return t('ai.progressWaiting');
     if (progressStage === 1 && busy === 'create') return t('ai.progressPainting');
     if (busy === 'edit') return t('ai.progressEditing');
@@ -279,8 +284,14 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
   };
 
   const testConnection = async () => {
+    if (busy) return;
+    const controller = new AbortController();
+    requestController.current = controller;
     setBusy('settings');
+    setProgressStage(0);
     setTestResult(null);
+    const detailTimer = globalThis.setTimeout(() => setProgressStage(1), 5_000);
+    const patienceTimer = globalThis.setTimeout(() => setProgressStage(2), 15_000);
     try {
       const p = new OpenAICompatibleProvider(
         {
@@ -293,11 +304,20 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
         },
         { decodeImage, encodeImage },
       );
-      await p.testConnection();
+      await Promise.race([
+        p.testConnection(controller.signal),
+        waitForCancellation(controller.signal),
+      ]);
       setTestResult({ kind: 'ok', text: t('ai.testOk') });
     } catch (error) {
-      setTestResult({ kind: 'error', text: friendlyError(error) });
+      setTestResult({
+        kind: controller.signal.aborted ? 'ok' : 'error',
+        text: controller.signal.aborted ? t('ai.testCancelled') : friendlyError(error),
+      });
     } finally {
+      globalThis.clearTimeout(detailTimer);
+      globalThis.clearTimeout(patienceTimer);
+      if (requestController.current === controller) requestController.current = null;
       setBusy(null);
     }
   };
@@ -503,7 +523,7 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
         </p>
       )}
 
-      {busy && busy !== 'settings' && (
+      {busy && (
         <div className="ai-progress">
           <div className="ai-progress-track" role="progressbar" aria-label={progressLabel()}>
             <span />
@@ -634,7 +654,12 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
                 >
                   {busy === 'settings' ? t('ai.sayingHi') : t('ai.testConnection')}
                 </button>
-                <button type="button" className="btn primary" onClick={saveSettings}>
+                <button
+                  type="button"
+                  className="btn primary"
+                  disabled={busy !== null}
+                  onClick={saveSettings}
+                >
                   {t('common.save')}
                 </button>
               </div>
