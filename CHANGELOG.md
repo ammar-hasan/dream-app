@@ -7,6 +7,13 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Truthful AI progress and cancellation** (slice 46): Create, Edit and
+  Feedback now show staged, action-specific indeterminate progress instead of
+  only changing a button label. Cancel returns immediately, forwards an abort
+  signal to connected services, confirms that nothing changed, and refuses any
+  late provider result. The accessible, reduced-motion-aware experience and
+  cancellation boundary are covered by focused tests and all six locales.
+
 - **Predictive direct manipulation** (slice 45): Select previews the exact
   topmost object before click; canvas cursors now distinguish objects, resize,
   active drags, pan, zoom direction, fill, stamp, locks and playback. Component

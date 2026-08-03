@@ -1104,14 +1104,35 @@ what a gesture will do before committing it, and what it is doing during drag.
   97.74% engine coverage, 44 browser journeys, 24 MCP tests and four honest
   evals.
 
+## Slice 46 — Truthful AI progress and cancellation ✅
+
+Persona need: keep Zainab, George and every connected-AI creator oriented and
+in control when generation is slower than a direct manipulation.
+
+- ✅ Create, Edit and Feedback show a subtle indeterminate activity track with
+  action-specific copy that becomes more candid as the wait lengthens; no fake
+  completion percentage is shown.
+- ✅ Cancel returns the panel to a ready state immediately, asks a compatible
+  network request to abort and confirms that the document stayed unchanged.
+- ✅ A provider that ignores cancellation still cannot apply a late picture,
+  edit or critique after the person has cancelled.
+- ✅ Progress announcements are polite for assistive technology, motion follows
+  the global reduced-motion contract, and all messages are localized in six
+  languages.
+- ✅ Unit coverage proves request-signal forwarding, native cancellation error
+  preservation, staged progress, immediate cancellation and late-result refusal.
+- ✅ Full release gates remain green: 839 unit tests, 97.74% engine coverage,
+  45 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
 largest count of controls:
 
 1. **Direct-manipulation foundation:** cursor semantics, hover/hit feedback,
-   valid/invalid targets and post-drop selection are now established; continue
-   with drag ghosts plus consistent progress/cancellation.
+   valid/invalid targets, post-drop selection and cancellable AI progress are
+   established; continue with drag ghosts and extend the same progress contract
+   to provider tests, project loading and code generation.
 2. **Conversational phone-first creation:** natural clarification and reference
    handling for voice, a task-prioritized mobile shell, and a faithful safe
    creation path that does not require a child or low-literacy user to configure

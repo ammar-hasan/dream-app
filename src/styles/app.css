@@ -2521,6 +2521,56 @@ body {
   color: var(--danger);
 }
 
+.ai-progress {
+  display: grid;
+  gap: 7px;
+  margin: 8px 0;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel-hover);
+}
+
+.ai-progress-track {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--accent-soft);
+}
+
+.ai-progress-track span {
+  display: block;
+  width: 42%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  animation: ai-progress-travel 1.35s ease-in-out infinite alternate;
+}
+
+.ai-progress-copy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--text-dim);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.ai-cancel {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+}
+
+@keyframes ai-progress-travel {
+  from {
+    transform: translateX(-15%);
+  }
+  to {
+    transform: translateX(155%);
+  }
+}
+
 .ai-chat {
   display: flex;
   flex-direction: column;

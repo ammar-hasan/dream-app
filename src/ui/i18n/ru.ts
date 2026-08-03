@@ -438,6 +438,13 @@ export const ru: Record<string, string> = {
   'ai.feedbackHint': 'Внимательно посмотрю и дам идеи для воплощения.',
   'ai.look': 'Оценить мой дизайн',
   'ai.looking': 'Внимательно смотрю…',
+  'ai.progressSending': 'Отправляю ваш запрос…',
+  'ai.progressPainting': 'Dream прорисовывает детали…',
+  'ai.progressEditing': 'Dream работает над вашей картинкой…',
+  'ai.progressLooking': 'Dream внимательно рассматривает работу…',
+  'ai.progressWaiting': 'Всё ещё работаем — подробный запрос может занять минуту.',
+  'ai.cancel': 'Отмена',
+  'ai.cancelled': 'Остановлено. Ничего не изменилось.',
   'ai.noFeedback': 'Пока ничего — нажмите кнопку, и я поделюсь мыслями.',
   'ai.apply': 'Применить',
   'ai.freeOver':

@@ -465,6 +465,13 @@ export const ar: Record<string, string> = {
   'ai.feedbackHint': 'سألقي نظرة لطيفة وأعطيك أفكارًا يمكنك استخدامها فورًا.',
   'ai.look': 'انظر إلى تصميمي',
   'ai.looking': 'ألقي نظرة جيدة…',
+  'ai.progressSending': 'جارٍ إرسال طلبك…',
+  'ai.progressPainting': 'دريم يرسم التفاصيل…',
+  'ai.progressEditing': 'دريم يعمل على صورتك…',
+  'ai.progressLooking': 'دريم ينظر عن قرب…',
+  'ai.progressWaiting': 'ما زلنا نعمل — قد تستغرق الطلبات المفصلة دقيقة.',
+  'ai.cancel': 'إلغاء',
+  'ai.cancelled': 'توقفنا. لم يتغير شيء.',
   'ai.noFeedback': 'لا شيء بعد — اضغط الزر وسأخبرك بما أرى.',
   'ai.apply': 'تطبيق',
   'ai.freeOver':

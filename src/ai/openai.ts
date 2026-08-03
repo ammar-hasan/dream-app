@@ -113,7 +113,12 @@ export class OpenAICompatibleProvider implements AIProvider {
     return headers;
   }
 
-  private async request(path: string, body: BodyInit, json: boolean): Promise<unknown> {
+  private async request(
+    path: string,
+    body: BodyInit,
+    json: boolean,
+    signal?: AbortSignal,
+  ): Promise<unknown> {
     const fetchFn = this.deps.fetchFn ?? globalThis.fetch;
     if (!fetchFn) throw new Error('This browser has no fetch — is it up to date?');
     let response: Response;
@@ -122,8 +127,10 @@ export class OpenAICompatibleProvider implements AIProvider {
         method: 'POST',
         headers: this.headers(json),
         body,
+        signal,
       });
-    } catch {
+    } catch (error) {
+      if (signal?.aborted || (error as { name?: unknown })?.name === 'AbortError') throw error;
       throw new Error(
         `Could not reach ${this.config.baseUrl} — is the URL right and the app running?`,
       );
@@ -140,12 +147,12 @@ export class OpenAICompatibleProvider implements AIProvider {
     return response.json();
   }
 
-  private post(path: string, body: unknown): Promise<unknown> {
-    return this.request(path, JSON.stringify(body), true);
+  private post(path: string, body: unknown, signal?: AbortSignal): Promise<unknown> {
+    return this.request(path, JSON.stringify(body), true, signal);
   }
 
-  private postForm(path: string, body: FormData): Promise<unknown> {
-    return this.request(path, body, false);
+  private postForm(path: string, body: FormData, signal?: AbortSignal): Promise<unknown> {
+    return this.request(path, body, false, signal);
   }
 
   async chat(messages: AIChatMessage[], context?: AIFeedbackRequest): Promise<string> {
@@ -157,10 +164,14 @@ export class OpenAICompatibleProvider implements AIProvider {
       });
     }
     wire.push(...messages.map((m) => ({ role: m.role, content: m.text })));
-    const data = (await this.post('/chat/completions', {
-      model: this.config.model,
-      messages: wire,
-    })) as { choices?: { message?: { content?: string } }[] };
+    const data = (await this.post(
+      '/chat/completions',
+      {
+        model: this.config.model,
+        messages: wire,
+      },
+      context?.signal,
+    )) as { choices?: { message?: { content?: string } }[] };
     const text = data.choices?.[0]?.message?.content?.trim();
     if (!text) throw new Error('The AI answered, but said nothing. Try again?');
     return text;
@@ -178,13 +189,17 @@ export class OpenAICompatibleProvider implements AIProvider {
     const model =
       this.config.imageModel?.trim() || (officialOpenAI ? 'gpt-image-2' : this.config.model);
     const gptImage = model.startsWith('gpt-image');
-    const data = (await this.post('/images/generations', {
-      model,
-      prompt: request.prompt,
-      n: 1,
-      size: imageGenerationSize(model, width, height),
-      ...(gptImage ? { quality: 'low' } : { response_format: 'b64_json' }),
-    })) as { data?: { b64_json?: string }[] };
+    const data = (await this.post(
+      '/images/generations',
+      {
+        model,
+        prompt: request.prompt,
+        n: 1,
+        size: imageGenerationSize(model, width, height),
+        ...(gptImage ? { quality: 'low' } : { response_format: 'b64_json' }),
+      },
+      request.signal,
+    )) as { data?: { b64_json?: string }[] };
     const b64 = data.data?.[0]?.b64_json;
     if (!b64) throw new Error('The AI did not send back a picture. Try different words?');
     if (!this.deps.decodeImage) {
@@ -232,7 +247,7 @@ export class OpenAICompatibleProvider implements AIProvider {
       form.append('response_format', 'b64_json');
     }
 
-    const data = (await this.postForm('/images/edits', form)) as {
+    const data = (await this.postForm('/images/edits', form, request.signal)) as {
       data?: { b64_json?: string }[];
     };
     const b64 = data.data?.[0]?.b64_json;

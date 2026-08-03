@@ -48,6 +48,20 @@ each with an **Apply** button where Dream can do it for you (one click,
 undoable): filter fixes bake into the active layer; a centering suggestion
 moves the Design-mode selection to the canvas center.
 
+### Progress and stopping
+
+Create, Edit and Feedback show an indeterminate activity track while the result
+cannot be measured honestly. The accompanying message begins with the action
+Dream is taking, becomes more specific after a short wait, and acknowledges
+that a detailed request can take a minute rather than inventing a percentage.
+The message is announced without repeatedly interrupting assistive technology.
+
+**Cancel** is always available beside that progress. It stops a connected
+network request when the service supports stopping, returns the panel to a
+ready state immediately either way, and confirms that nothing changed. A result
+that arrives after cancellation is discarded and can never add or alter a
+layer. Existing artwork, prompt text and undo history remain exact.
+
 ## Dream AI (the built-in provider)
 
 Free, works **fully offline**, deterministic: the same prompt at the same
@@ -213,8 +227,8 @@ giant dictation control and read-aloud moments.
 
 ## Edge cases
 
-- A busy assistant ignores further requests until the current one
-  finishes.
+- A busy assistant ignores further requests until the current one finishes or
+  is cancelled.
 - If an edit service returns a different image size, Dream fits it back to
   the active layer before applying it; a selected edit still cannot change
   pixels outside its box.

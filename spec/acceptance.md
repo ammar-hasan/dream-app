@@ -552,6 +552,12 @@ holds.
       canvas THEN the canvas names and highlights the pending valid or invalid
       result before release; WHEN it leaves or drops THEN the feedback clears,
       and an unsupported drop changes nothing.
+165.  GIVEN Create, Edit or Feedback is waiting for AI WHEN the result has no
+      measurable completion THEN Dream shows an announced action-specific
+      activity state without a fabricated percentage and offers Cancel; WHEN
+      Cancel is chosen THEN the panel becomes ready, confirms nothing changed,
+      asks the connected service to stop, and discards any result that arrives
+      later without changing artwork or undo history.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

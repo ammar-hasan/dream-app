@@ -25,6 +25,8 @@ export interface AIImageRequest {
   prompt: string;
   width?: number;
   height?: number;
+  /** Lets the person stop a remote request without applying a late result. */
+  signal?: AbortSignal;
 }
 
 export interface AIEditRequest extends AIImageRequest {
@@ -66,6 +68,8 @@ export interface AIFeedbackRequest {
   /** Bounds of the current Design-mode selection, if any. */
   selection?: Rect | null;
   question?: string;
+  /** Lets the person stop a remote request without applying a late result. */
+  signal?: AbortSignal;
 }
 
 export interface AIFeedbackResult {

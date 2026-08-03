@@ -470,6 +470,13 @@ export const en: Record<string, string> = {
   'ai.feedbackHint': 'I’ll take a kind look and give you ideas you can use right away.',
   'ai.look': 'Look at my design',
   'ai.looking': 'Taking a good look…',
+  'ai.progressSending': 'Sending your request…',
+  'ai.progressPainting': 'Dream is painting the details…',
+  'ai.progressEditing': 'Dream is working on your picture…',
+  'ai.progressLooking': 'Dream is looking closely…',
+  'ai.progressWaiting': 'Still working — detailed requests can take a minute.',
+  'ai.cancel': 'Cancel',
+  'ai.cancelled': 'Stopped. Nothing was changed.',
   'ai.noFeedback': 'Nothing yet — press the button and I’ll share what I see.',
   'ai.apply': 'Apply',
   'ai.freeOver':

@@ -129,6 +129,27 @@ describe('OpenAICompatibleProvider image capabilities', () => {
     expect(result.pixels.data.slice(0, 4)).toEqual(pixels.data);
   });
 
+  it('passes cancellation to image requests without disguising it as a connection error', async () => {
+    const controller = new AbortController();
+    const fetchFn = vi.fn(async (_url: unknown, init?: RequestInit) => {
+      expect(init?.signal).toBe(controller.signal);
+      controller.abort();
+      throw new DOMException('The operation was aborted', 'AbortError');
+    }) as unknown as typeof fetch;
+    const provider = new OpenAICompatibleProvider(
+      {
+        baseUrl: 'https://api.openai.com/v1',
+        model: 'gpt-4o-mini',
+        supportsImages: true,
+      },
+      { fetchFn, decodeImage: vi.fn() },
+    );
+
+    await expect(
+      provider.generateImage({ prompt: 'a cat', signal: controller.signal }),
+    ).rejects.toMatchObject({ name: 'AbortError' });
+  });
+
   it('preserves arbitrary sizes and response_format for compatible non-GPT routes', async () => {
     const pixels = {
       data: new Uint8ClampedArray(512 * 256 * 4),

@@ -8,7 +8,7 @@
  * store, so every AI action is undoable.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { applyAdjustments, DEFAULT_ADJUSTMENTS } from '../engine/filters';
 import { editRegionForSelection } from '../ai/analyze';
 import { ERASE_PROMPT, mergeEditResult } from '../ai/inpaint';
@@ -48,6 +48,27 @@ function friendlyError(error: unknown): string {
   return t('ai.error');
 }
 
+function throwIfCancelled(signal: AbortSignal): void {
+  if (!signal.aborted) return;
+  const error = new Error('AI request cancelled');
+  error.name = 'AbortError';
+  throw error;
+}
+
+function waitForCancellation(signal: AbortSignal): Promise<never> {
+  return new Promise((_resolve, reject) => {
+    signal.addEventListener(
+      'abort',
+      () => {
+        const error = new Error('AI request cancelled');
+        error.name = 'AbortError';
+        reject(error);
+      },
+      { once: true },
+    );
+  });
+}
+
 export function AiPanel({ kid = false }: { kid?: boolean }) {
   const t = useT();
   const doc = useDreamStore((s) => s.doc);
@@ -62,6 +83,8 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
   const [editPrompt, setEditPrompt] = useState('');
   const [selectedOnly, setSelectedOnly] = useState(true);
   const [busy, setBusy] = useState<Busy>(null);
+  const [progressStage, setProgressStage] = useState(0);
+  const requestController = useRef<AbortController | null>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
   const [feedback, setFeedback] = useState<AIFeedbackResult | null>(null);
   const [triesLeft, setTriesLeft] = useState(freeTriesLeft());
@@ -96,6 +119,7 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
     setByok(isBYOKActive());
     setProviderChoice(isBYOKActive() ? 'openai-compatible' : 'mock');
     setTriesLeft(freeTriesLeft());
+    return () => requestController.current?.abort();
   }, []);
 
   const refreshProvider = () => {
@@ -105,7 +129,7 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
   };
 
   /** Run one AI action with the free-tier gate, busy state and friendly errors. */
-  const runAI = async (kind: Tab, fn: (p: AIProvider) => Promise<void>) => {
+  const runAI = async (kind: Tab, fn: (p: AIProvider, signal: AbortSignal) => Promise<void>) => {
     if (busy) return;
     if (!byok && !consumeFreeTry()) {
       setTriesLeft(0);
@@ -115,44 +139,77 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
       });
       return;
     }
+    const controller = new AbortController();
+    requestController.current = controller;
     setBusy(kind);
+    setProgressStage(0);
     setNotice(null);
+    const detailTimer = globalThis.setTimeout(() => setProgressStage(1), 5_000);
+    const patienceTimer = globalThis.setTimeout(() => setProgressStage(2), 15_000);
     try {
-      await fn(provider);
+      await Promise.race([fn(provider, controller.signal), waitForCancellation(controller.signal)]);
       setTriesLeft(freeTriesLeft());
     } catch (error) {
-      setNotice({ kind: 'error', text: friendlyError(error) });
+      setNotice({
+        kind: controller.signal.aborted ? 'ok' : 'error',
+        text: controller.signal.aborted ? t('ai.cancelled') : friendlyError(error),
+      });
     } finally {
+      globalThis.clearTimeout(detailTimer);
+      globalThis.clearTimeout(patienceTimer);
+      if (requestController.current === controller) requestController.current = null;
       setBusy(null);
     }
   };
 
+  const cancelAI = () => requestController.current?.abort();
+
+  const progressLabel = () => {
+    if (progressStage === 2) return t('ai.progressWaiting');
+    if (progressStage === 1 && busy === 'create') return t('ai.progressPainting');
+    if (busy === 'edit') return t('ai.progressEditing');
+    if (busy === 'feedback') return t('ai.progressLooking');
+    return t('ai.progressSending');
+  };
+
   const create = () =>
-    runAI('create', async (p) => {
+    runAI('create', async (p, signal) => {
       const prompt = createPrompt.trim();
       if (!prompt) return;
-      const result = await p.generateImage({ prompt, width: doc.width, height: doc.height });
+      const result = await p.generateImage({
+        prompt,
+        width: doc.width,
+        height: doc.height,
+        signal,
+      });
+      throwIfCancelled(signal);
       useDreamStore.getState().importImage(result.pixels, prompt.slice(0, 40));
       setCreatePrompt('');
       setNotice({ kind: 'ok', text: t('ai.created') });
     });
 
   const edit = () =>
-    runAI('edit', async (p) => {
+    runAI('edit', async (p, signal) => {
       const prompt = editPrompt.trim();
       const store = useDreamStore.getState();
       if (!prompt || !layer || layer.operations.length === 0) return;
       const base = rasterizeLayer(layer, doc.width, doc.height);
       if (!base) throw new Error(t('ai.rasterError'));
       const region = selectedOnly ? editRegionForSelection(doc, layer, selection) : null;
-      const result = await p.editImage({ image: base, prompt, mask: region ?? undefined });
+      const result = await p.editImage({
+        image: base,
+        prompt,
+        mask: region ?? undefined,
+        signal,
+      });
+      throwIfCancelled(signal);
       store.applyLayerRaster(mergeEditResult(base, result.pixels, region), 'AI edit');
       setEditPrompt('');
       setNotice({ kind: 'ok', text: t('ai.edited') });
     });
 
   const erase = () =>
-    runAI('edit', async (p) => {
+    runAI('edit', async (p, signal) => {
       const store = useDreamStore.getState();
       if (!layer || layer.operations.length === 0) return;
       const base = rasterizeLayer(layer, doc.width, doc.height);
@@ -162,14 +219,17 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
         image: base,
         prompt: ERASE_PROMPT,
         mask: region ?? undefined,
+        signal,
       });
+      throwIfCancelled(signal);
       store.applyLayerRaster(mergeEditResult(base, result.pixels, region), 'AI erase');
       setNotice({ kind: 'ok', text: t('ai.erased') });
     });
 
   const look = () =>
-    runAI('feedback', async (p) => {
-      const result = await p.getFeedback({ doc, selection: selectionRegion });
+    runAI('feedback', async (p, signal) => {
+      const result = await p.getFeedback({ doc, selection: selectionRegion, signal });
+      throwIfCancelled(signal);
       setFeedback(result);
     });
 
@@ -441,6 +501,22 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
         <p className={`ai-notice ${notice.kind}`} role="status">
           {notice.text}
         </p>
+      )}
+
+      {busy && busy !== 'settings' && (
+        <div className="ai-progress">
+          <div className="ai-progress-track" role="progressbar" aria-label={progressLabel()}>
+            <span />
+          </div>
+          <div className="ai-progress-copy">
+            <span role="status" aria-live="polite">
+              {progressLabel()}
+            </span>
+            <button type="button" className="btn ai-cancel" onClick={cancelAI}>
+              {t('ai.cancel')}
+            </button>
+          </div>
+        </div>
       )}
 
       {!kid && (

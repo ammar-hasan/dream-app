@@ -399,6 +399,38 @@ test('connected OpenAI-compatible image generation paints returned PNG pixels', 
   await expect.poll(() => nonWhitePixels(page)).toBeGreaterThan(before + 10_000);
 });
 
+test('connected AI progress can be cancelled without applying a late picture', async ({ page }) => {
+  const purplePng =
+    'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAABHNCSVQICAgIfAhkiAAAAAFzUkdCAK7OHOkAAAAUSURBVAiZY6yxevufgYGBgYkBCgAn5wKm8Nhy+QAAAABJRU5ErkJggg==';
+  await page.route('**/images/generations', async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    await route.fulfill({ status: 200, json: { data: [{ b64_json: purplePng }] } }).catch(() => {});
+  });
+
+  await bootApp(page);
+  await page.getByRole('button', { name: 'AI helper', exact: true }).click();
+  const panel = page.locator('.ai-panel');
+  await panel.getByRole('button', { name: /Settings:/ }).click();
+  await panel.locator('.ai-settings-body select').selectOption('openai-compatible');
+  await panel.getByLabel('Base URL').fill('https://api.openai.com/v1');
+  await panel.getByLabel('Model', { exact: true }).fill('gpt-4o-mini');
+  await panel.getByLabel('Image model').fill('gpt-image-2');
+  await panel.getByLabel('API key').fill('sk-e2e-not-a-secret');
+  await panel.getByLabel('This AI can also paint images').check();
+  await panel.getByRole('button', { name: 'Save' }).click();
+  await panel.getByLabel('What should I paint?').fill('a purple dinosaur');
+
+  const layerCount = await page.locator('.layer-list > li').count();
+  await panel.getByRole('button', { name: 'Make it!' }).click();
+  await expect(panel.getByRole('progressbar', { name: 'Sending your request…' })).toBeVisible();
+  await panel.getByRole('button', { name: 'Cancel' }).click();
+
+  await expect(panel.getByRole('progressbar')).toHaveCount(0);
+  await expect(panel).toContainText('Stopped. Nothing was changed.');
+  await page.waitForTimeout(800);
+  await expect(page.locator('.layer-list > li')).toHaveCount(layerCount);
+});
+
 test('local real-code export embeds raster images instead of placeholder boxes', async ({
   page,
 }) => {

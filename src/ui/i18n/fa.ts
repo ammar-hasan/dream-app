@@ -443,6 +443,13 @@ export const fa: Record<string, string> = {
   'ai.feedbackHint': 'من با دقت نگاه می‌کنم و ایده‌هایی می‌دهم که فوراً می‌توانی استفاده کنی.',
   'ai.look': 'به طراحی من نگاه کن',
   'ai.looking': 'دقیق نگاه می‌کنم...',
+  'ai.progressSending': 'در حال فرستادن درخواست شما…',
+  'ai.progressPainting': 'دریم در حال کشیدن جزئیات است…',
+  'ai.progressEditing': 'دریم روی تصویر شما کار می‌کند…',
+  'ai.progressLooking': 'دریم با دقت نگاه می‌کند…',
+  'ai.progressWaiting': 'هنوز در حال کاریم — درخواست‌های دقیق ممکن است یک دقیقه طول بکشند.',
+  'ai.cancel': 'لغو',
+  'ai.cancelled': 'متوقف شد. چیزی تغییر نکرد.',
   'ai.noFeedback': 'هنوز نظری نیست — دکمه را بزن تا آنچه می‌بینم را به اشتراک بگذارم.',
   'ai.apply': 'اعمال کن',
   'ai.freeOver':
