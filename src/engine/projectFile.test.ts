@@ -46,6 +46,7 @@ function richDocument(): DreamDocument {
       cast: { hero: 'layer-a', good: 'layer-b' },
       settings: { fallSpeed: 120, spawnInterval: 1.5, lives: 3 },
     },
+    narration: { audio: 'data:audio/webm;base64,T25jZSB1cG9uIGEgdGltZQ==', durationMs: 1800 },
     activeFrameId: 'frame-1',
     layers: [
       {

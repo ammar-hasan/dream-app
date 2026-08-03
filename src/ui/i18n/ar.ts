@@ -248,6 +248,27 @@ export const ar: Record<string, string> = {
   'present.app': 'تطبيق',
   'present.restart': 'إعادة البدء',
 
+  // --- Voice narration -----------------------------------------------------------
+  'narration.record': 'سجّل صوتي',
+  'narration.recordTitle': 'احكِ القصة فوق الرسوم المتحركة',
+  'narration.stop': 'أوقف التسجيل',
+  'narration.kidRecord': 'احكِ القصة!',
+  'narration.kidStop': 'خلّصت!',
+  'narration.recording': 'يسجّل {time}',
+  'narration.delete': 'امسح الصوت',
+  'narration.reRecord': 'نسجّل فوق قصتك؟ القديمة ستُمسح.',
+  'narration.reRecordYes': 'نعم، سجّل من جديد',
+  'narration.reRecordNo': 'خلّ قصتي',
+  'narration.mute': 'اكتم التعليق الصوتي',
+  'narration.unmute': 'شغّل التعليق الصوتي',
+  'narration.present': 'التعليق الصوتي',
+  'narration.tooBig': 'التسجيل طويل جدًا — قد لا يُحفظ. جرّب تسجيلًا أقصر؟',
+  'narration.errorDenied': 'دريم لا يستطيع استخدام المايكروفون — اسمح به في المتصفح وحاول مجددًا.',
+  'narration.errorNoMic': 'لا يوجد مايكروفون — وصّل واحدًا وحاول مجددًا.',
+  'narration.errorBusy': 'المايكروفون مشغول في تطبيق آخر.',
+  'narration.errorUnsupported': 'هذا المتصفح لا يستطيع تسجيل الصوت.',
+  'narration.errorGeneric': 'التسجيل لم ينجح — تحاول مجددًا؟',
+
   // --- App mode (interactive prototypes) -----------------------------------------
   'link.title': 'اربط بشاشة',
   'link.target': 'عند اللمس، انتقل إلى الإطار…',
@@ -401,6 +422,7 @@ export const ar: Record<string, string> = {
   'export.spriteLabel': 'ورقة الحركة',
   'export.webmNote':
     'يسجل {frames} إطارات بمعدل {fps} إطارًا في الثانية — حوالي {seconds} ثانية من الفيديو. أبقِ هذا التبويب في المقدمة أثناء التسجيل.',
+  'export.webmWithNarration': 'يتضمّن تعليقك الصوتي المسجّل.',
   'export.spriteNote': 'كل الإطارات في شبكة PNG واحدة — مفيدة للألعاب والمشاركة.',
   'export.appLabel': 'تطبيق تفاعلي (.html)',
   'export.appNote':
@@ -486,7 +508,14 @@ export const ar: Record<string, string> = {
   'voice.mirrorOn': 'التناظر مفعّل!',
   'voice.mirrorOff': 'التناظر متوقّف.',
   'voice.saved': 'تم الحفظ!',
+  'voice.narrationStarted': 'يسجّل — احكِ قصتك!',
+  'voice.narrationSaved': 'حُفظت قصتك!',
+  'voice.narrationDeleted': 'مُسح الصوت.',
+  'voice.narrationNone': 'لا يوجد تعليق صوتي بعد.',
+  'voice.narrationNotRecording': 'لستُ أسجّل الآن.',
+  'voice.narrationNeedsFrames': 'أضف بعض الإطارات أولًا، ثم احكِ قصتك!',
+  'voice.narrationAlready': 'أسجّل بالفعل — قل «أوقف التسجيل» عندما تنتهي.',
   'voice.help':
-    'يمكنك أن تقول: فرشاة، قلم، رش، ممحاة، تعبئة، عصا سحرية، طابع، لون مثل أحمر أو أزرق، أكبر، أصغر، فعّل التناظر، أوقف التناظر، تراجع، إعادة، امسح، إطار جديد، شغّل، العب لعبتي، عاين تطبيقي، صدّر تطبيقي، صدّر كودًا حقيقيًا، أوقف، احفظ، مساعدة.',
+    'يمكنك أن تقول: فرشاة، قلم، رش، ممحاة، تعبئة، عصا سحرية، طابع، لون مثل أحمر أو أزرق، أكبر، أصغر، فعّل التناظر، أوقف التناظر، تراجع، إعادة، امسح، إطار جديد، شغّل، العب لعبتي، عاين تطبيقي، صدّر تطبيقي، صدّر كودًا حقيقيًا، سجّل صوتي، أوقف التسجيل، امسح الصوت، أوقف، احفظ، مساعدة.',
   'voice.unknown': 'عذرًا، لم أفهم. قل «مساعدة» لتسمع ما أستطيع فعله.',
 };

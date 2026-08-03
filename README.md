@@ -26,7 +26,9 @@ and the spray brush), **game mode** (turn your drawings into a playable
 Catch! mini-game) and **app mode** (link your frames into an interactive
 prototype and export it as one standalone HTML file), and the **developer
 surface** (a portable `.dream` file format, an MCP server for agents, and a
-stable engine API). It is also an **offline PWA** (installable, works with
+stable engine API), and **voice narration** (record your voice over an
+animation or presentation and export a real little movie with the voice
+baked in). It is also an **offline PWA** (installable, works with
 the network off) with an **incremental rendering pipeline** (per-layer
 bitmap caching) that keeps big documents smooth.
 
@@ -139,7 +141,8 @@ create — literacy optional. Slice 6 ships three pillars plus a settings menu.
   "spray", "wand", "stamp", "eraser", "fill",
   colors ("red",
   "blue", … a friendly vocabulary including "fill red"), "mirror on"/
-  "mirror off", "bigger"/"smaller", "export real code", "save" and "help"
+  "mirror off", "bigger"/"smaller", "export real code", "record narration"/
+  "stop recording"/"delete narration", "save" and "help"
   (speaks the command list). The pipeline is a pure parser
   (`ai/voiceCommands.ts`, case-insensitive, filler-tolerant — "um, can you
   please undo?") plus a thin executor (`ui/voiceExecutor.ts`) against a
@@ -148,6 +151,7 @@ create — literacy optional. Slice 6 ships three pillars plus a settings menu.
   SpeechRecognition is unsupported. The vocabulary is **per-locale**: with
   the UI in Arabic the parser also understands Arabic commands (تراجع،
   إعادة، امسح، إطار جديد، شغّل، أوقف، فرشاة، ممحاة، طابع، العب لعبتي،
+  سجّل صوتي، أوقف التسجيل، امسح الصوت،
   أحمر/أزرق/أخضر/أصفر/أسود/أبيض، أكبر/أصغر…) — the Arabic words merge into
   the English table (which always keeps working), transcripts are
   normalized for diacritics and alef forms, and recognition switches to
@@ -228,6 +232,22 @@ play button, everything called "frames".
   on/off. Editing pauses while playing. Space toggles play **when the
   timeline has focus** (click any frame first); everywhere else Space stays
   hold-to-pan.
+- **Voice narration**: the timeline's mic button records one voice take over
+  the playing animation — tap, talk ("once upon a time…"), tap to save.
+  Re-recording replaces the take after a gentle confirm (kid mode skips the
+  confirm and gets a big "Tell the story!" mic); a take can be muted or
+  deleted. Recording shows a pulsing red dot, elapsed time and a live mic
+  level; the mic is asked for on the first record only, and the take never
+  leaves the device (it persists with the project as a data URL, outside
+  undo, with a warning over ~10 MB). One track per document, starting at
+  time 0 — per-frame tracks are deliberately out of scope. The narration
+  plays in sync during editor playback and when a Present session opens
+  (with a small indicator + mute there), and the WebM export **bakes it in
+  as the video's audio track** (mixed on-device via WebAudio; silent exports
+  are unchanged). Voice commands: "record narration" / "stop recording" /
+  "delete narration" — and in Arabic «سجّل صوتي» / «أوقف التسجيل» /
+  «امسح الصوت». The recorder lives in `ui/narration.ts` (getUserMedia +
+  MediaRecorder behind injectable deps, unit-tested state machine).
 - **Export**: the Export dialog gains **WebM video** (recorded client-side
   via `canvas.captureStream` + `MediaRecorder`, VP9 with VP8/bare-WebM
   fallback, progress shown while recording) and **Sprite sheet** (all frames
@@ -725,9 +745,16 @@ restart button bottom-end)
   a fake AudioContext
 - Export tests: WebM mime fallback, filenames, progress and error paths with
   mocked recorder/canvas (MediaRecorder can't run in Node — it's isolated
-  behind injectable deps in `ui/exportAnimation.ts`)
+  behind injectable deps in `ui/exportAnimation.ts`), plus the narration
+  mix-in path (tracks combined, no-narration path untouched)
+- Narration tests (`ui/narration.ts`): the recorder state machine
+  (idle/recording/error with fake MediaRecorder/getUserMedia), permission
+  error mapping, data-URL serialization round-trip, the WebAudio export-mix
+  composition with a fake AudioContext, and the record/save flows against a
+  fake store
 - Storage tests: real IndexedDB round-trips via `fake-indexeddb` (projects
-  including image ops, animation frames, and the component library)
+  including image ops, animation frames, the narration take, and the
+  component library)
 - React smoke test: `App` renders (jsdom)
 - PWA tests: service-worker registration gating (production-only, unsupported
   browsers, first-install vs. update) and the update flow (waiting worker →

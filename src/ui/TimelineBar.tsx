@@ -15,6 +15,7 @@ import type { DreamDocument, Frame } from '../engine/types';
 import { useDreamStore } from '../store/dreamStore';
 import { useUiPrefs } from '../store/uiPrefs';
 import { PauseIcon, PlayIcon, PlusIcon } from './icons';
+import { NarrationControls } from './NarrationControls';
 import { useT } from './i18n';
 
 const THUMB_HEIGHT = 56;
@@ -134,6 +135,8 @@ export function TimelineBar() {
           >
             {playing ? <PauseIcon /> : <PlayIcon />}
           </button>
+
+          <NarrationControls />
 
           <div className="timeline-frames">
             {frames.map((frame, i) => (

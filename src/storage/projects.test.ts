@@ -186,6 +186,20 @@ describe('projects storage (IndexedDB)', () => {
     expect((await loadProject(plain.id))?.frames?.[0].hotspots).toBeUndefined();
   });
 
+  it('persists the narration take (additive, backward compatible)', async () => {
+    const doc = {
+      ...createDocument({ width: 8, height: 8, name: 'Story' }),
+      narration: { audio: 'data:audio/webm;base64,T25jZSB1cG9uIGEgdGltZQ==', durationMs: 1800 },
+    };
+    await saveProject(doc);
+    const loaded = await loadProject(doc.id);
+    expect(loaded?.narration).toEqual(doc.narration);
+    // A document without the field (old saves) loads with it undefined.
+    const plain = createDocument({ width: 8, height: 8 });
+    await saveProject(plain);
+    expect((await loadProject(plain.id))?.narration).toBeUndefined();
+  });
+
   it('old saves (no frames/animation/mode fields) load untouched', async () => {
     // A slice-1-era document shape: nothing but the pre-animation fields.
     const doc = createDocument({ width: 8, height: 8 });

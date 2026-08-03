@@ -71,6 +71,18 @@ describe('parseVoiceCommand — animation', () => {
     expect(parseVoiceCommand('pause it')).toEqual({ kind: 'stop' });
   });
 
+  it('parses the narration commands', () => {
+    expect(parseVoiceCommand('record narration')).toEqual({ kind: 'record-narration' });
+    expect(parseVoiceCommand('record my voice')).toEqual({ kind: 'record-narration' });
+    expect(parseVoiceCommand('tell the story')).toEqual({ kind: 'record-narration' });
+    expect(parseVoiceCommand('stop recording')).toEqual({ kind: 'stop-recording' });
+    expect(parseVoiceCommand('delete narration')).toEqual({ kind: 'delete-narration' });
+    expect(parseVoiceCommand('delete the narration')).toEqual({ kind: 'delete-narration' });
+    // The phrases win over the words they contain.
+    expect(parseVoiceCommand('stop recording')).not.toEqual({ kind: 'stop' });
+    expect(parseVoiceCommand('delete narration')).not.toEqual({ kind: 'clear' });
+  });
+
   it('"play my game" routes to the game; "stop the game" still stops', () => {
     expect(parseVoiceCommand('play my game')).toEqual({ kind: 'play-game' });
     expect(parseVoiceCommand('can you please play the game')).toEqual({ kind: 'play-game' });
@@ -206,6 +218,18 @@ describe('parseVoiceCommand — Arabic vocabulary (locale "ar")', () => {
     expect(parseVoiceCommand('كود حقيقي', 'ar')).toEqual({ kind: 'export-code' });
     expect(parseVoiceCommand('صدّر الكود', 'ar')).toEqual({ kind: 'export-code' });
     expect(parseVoiceCommand('صدر التطبيق', 'ar')).toEqual({ kind: 'export-app' });
+  });
+
+  it('parses the narration commands; «امسح الصوت» is not a clear', () => {
+    expect(parseVoiceCommand('سجّل صوتي', 'ar')).toEqual({ kind: 'record-narration' });
+    expect(parseVoiceCommand('سجل الصوت', 'ar')).toEqual({ kind: 'record-narration' });
+    expect(parseVoiceCommand('أوقف التسجيل', 'ar')).toEqual({ kind: 'stop-recording' });
+    expect(parseVoiceCommand('امسح الصوت', 'ar')).toEqual({ kind: 'delete-narration' });
+    expect(parseVoiceCommand('احذف التسجيل', 'ar')).toEqual({ kind: 'delete-narration' });
+    // The phrases win over the stop/clear words they contain; English works too.
+    expect(parseVoiceCommand('أوقف التسجيل', 'ar')).not.toEqual({ kind: 'stop' });
+    expect(parseVoiceCommand('امسح الصوت', 'ar')).not.toEqual({ kind: 'clear' });
+    expect(parseVoiceCommand('record narration', 'ar')).toEqual({ kind: 'record-narration' });
   });
 
   it('"العب المتاهة/الطيران/الصيد/فلابي" pick a template; English still works', () => {

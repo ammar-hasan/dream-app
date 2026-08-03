@@ -16,19 +16,20 @@ The unit of work: one drawing / design / animation / app. A document is a
 sized canvas with a background color and a stack of layers, optionally
 extended with animation frames, app-mode links, and a game setup.
 
-| Attribute | Type | Default | Meaning |
-|---|---|---|---|
-| `id` | string | generated | unique identity |
-| `name` | string | `"Untitled"` | shown in the toolbar and dialogs |
-| `width`, `height` | number | — | canvas size in pixels, integers ≥ 1 (new-document dialog: 1–4096; default preset 1024×768) |
-| `background` | color | `#ffffff` | the canvas's base color |
-| `layers` | list of Layer | one empty layer named "Layer 1" | bottom-to-top paint order; when frames exist, this always mirrors the **active frame's** layer stack |
-| `frames` | list of Frame, optional | absent | presence = animation is on (see below) |
-| `activeFrameId` | string, optional | — | which frame `layers` currently mirrors |
-| `animation` | AnimationSettings, optional | absent = defaults | playback + onion-skin preferences; outside undo |
-| `mode` | workspace mode, optional | `"draw"` | the workspace the project was last in; outside undo |
-| `game` | GameSetup, optional | absent = defaults | Play-mode casting + settings; outside undo |
-| `createdAt`, `updatedAt` | number | creation time | `updatedAt` is touched by every edit; drives library sorting |
+| Attribute                | Type                        | Default                         | Meaning                                                                                              |
+| ------------------------ | --------------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `id`                     | string                      | generated                       | unique identity                                                                                      |
+| `name`                   | string                      | `"Untitled"`                    | shown in the toolbar and dialogs                                                                     |
+| `width`, `height`        | number                      | —                               | canvas size in pixels, integers ≥ 1 (new-document dialog: 1–4096; default preset 1024×768)           |
+| `background`             | color                       | `#ffffff`                       | the canvas's base color                                                                              |
+| `layers`                 | list of Layer               | one empty layer named "Layer 1" | bottom-to-top paint order; when frames exist, this always mirrors the **active frame's** layer stack |
+| `frames`                 | list of Frame, optional     | absent                          | presence = animation is on (see below)                                                               |
+| `activeFrameId`          | string, optional            | —                               | which frame `layers` currently mirrors                                                               |
+| `animation`              | AnimationSettings, optional | absent = defaults               | playback + onion-skin preferences; outside undo                                                      |
+| `mode`                   | workspace mode, optional    | `"draw"`                        | the workspace the project was last in; outside undo                                                  |
+| `game`                   | GameSetup, optional         | absent = defaults               | Play-mode casting + settings; outside undo                                                           |
+| `narration`              | Narration, optional         | absent = none                   | one voice take over the animation/presentation; outside undo                                         |
+| `createdAt`, `updatedAt` | number                      | creation time                   | `updatedAt` is touched by every edit; drives library sorting                                         |
 
 **Workspace modes** — `'draw' | 'design' | 'play' | 'present'`. Draw and
 Design are persisted with the project; Play and Present are **session-only**:
@@ -39,14 +40,14 @@ a project saved while playing or presenting reopens in Draw.
 A named, ordered sheet of content. Layers stack bottom-to-top; each layer's
 opacity multiplies everything on it.
 
-| Attribute | Type | Default | Meaning |
-|---|---|---|---|
-| `id` | string | generated | |
-| `name` | string | `"Layer N"` | user-renameable |
-| `visible` | boolean | `true` | hidden layers don't paint and can't be hit |
-| `opacity` | number 0–1 | `1` | multiplies the alpha of everything on the layer |
-| `locked` | boolean | `false` | locked layers reject all edits (adding, moving, deleting content) |
-| `operations` | list of Operation | `[]` | the layer's content, bottom-to-top paint order |
+| Attribute    | Type              | Default     | Meaning                                                           |
+| ------------ | ----------------- | ----------- | ----------------------------------------------------------------- |
+| `id`         | string            | generated   |                                                                   |
+| `name`       | string            | `"Layer N"` | user-renameable                                                   |
+| `visible`    | boolean           | `true`      | hidden layers don't paint and can't be hit                        |
+| `opacity`    | number 0–1        | `1`         | multiplies the alpha of everything on the layer                   |
+| `locked`     | boolean           | `false`     | locked layers reject all edits (adding, moving, deleting content) |
+| `operations` | list of Operation | `[]`        | the layer's content, bottom-to-top paint order                    |
 
 Layer add, delete, rename, reorder, visibility, opacity and lock changes are
 all undoable.
@@ -55,13 +56,13 @@ all undoable.
 
 One committed mark on a layer. Five kinds:
 
-| Kind | Made by | Essence |
-|---|---|---|
-| **stroke** | brush, pencil, eraser, spray | a polyline with width, color, round caps/joins; optionally per-point widths (pen pressure) and a spray seed/density |
-| **shape** | line, rectangle, ellipse tools | two corner points + outline width; rectangles/ellipses may instead be filled with the current color (no outline) |
-| **fill** | flood fill (bucket) | a contiguous filled region, baked to pixels at commit time |
-| **text** | text tool | a string at an anchor point with font size and family |
-| **image** | image import, baked filters, wand moves, AI pictures | a pixel rectangle placed at a position with a scale |
+| Kind       | Made by                                              | Essence                                                                                                             |
+| ---------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **stroke** | brush, pencil, eraser, spray                         | a polyline with width, color, round caps/joins; optionally per-point widths (pen pressure) and a spray seed/density |
+| **shape**  | line, rectangle, ellipse tools                       | two corner points + outline width; rectangles/ellipses may instead be filled with the current color (no outline)    |
+| **fill**   | flood fill (bucket)                                  | a contiguous filled region, baked to pixels at commit time                                                          |
+| **text**   | text tool                                            | a string at an anchor point with font size and family                                                               |
+| **image**  | image import, baked filters, wand moves, AI pictures | a pixel rectangle placed at a position with a scale                                                                 |
 
 Every operation carries: `id`, `color`, `opacity` (0–1, multiplied with the
 layer's opacity), and an optional `groupId` (Design-mode grouping). Full
@@ -80,12 +81,12 @@ is navigation and is not.
 
 A tappable rectangle on a frame — the unit of App mode.
 
-| Attribute | Type | Default | Meaning |
-|---|---|---|---|
-| `id` | string | generated | |
-| `rect` | rectangle | — | tap area in canvas pixels; minimum committed size 4×4 |
-| `targetFrameId` | string | — | the frame shown when tapped; **broken** if that frame no longer exists |
-| `transition` | `'none' \| 'fade' \| 'slide'` | `'fade'` | how the target screen enters |
+| Attribute       | Type                          | Default   | Meaning                                                                |
+| --------------- | ----------------------------- | --------- | ---------------------------------------------------------------------- |
+| `id`            | string                        | generated |                                                                        |
+| `rect`          | rectangle                     | —         | tap area in canvas pixels; minimum committed size 4×4                  |
+| `targetFrameId` | string                        | —         | the frame shown when tapped; **broken** if that frame no longer exists |
+| `transition`    | `'none' \| 'fade' \| 'slide'` | `'fade'`  | how the target screen enters                                           |
 
 Broken hotspots are flagged in the UI and ignored by previews and exports.
 
@@ -123,23 +124,31 @@ portable `.dream` files (see `data/dream-file.md`).
 
 ## Animation settings
 
-| Attribute | Type | Default | Range |
-|---|---|---|---|
-| `fps` | number | 6 | 1–24 |
-| `loop` | boolean | true | |
-| `onionSkin` | boolean | false | ghost the previous frame while drawing |
-| `onionNext` | boolean | false | also ghost the next frame |
-| `onionOpacity` | number | 0.3 | 0–1 (UI slider: 5–80%) |
+| Attribute      | Type    | Default | Range                                  |
+| -------------- | ------- | ------- | -------------------------------------- |
+| `fps`          | number  | 6       | 1–24                                   |
+| `loop`         | boolean | true    |                                        |
+| `onionSkin`    | boolean | false   | ghost the previous frame while drawing |
+| `onionNext`    | boolean | false   | also ghost the next frame              |
+| `onionOpacity` | number  | 0.3     | 0–1 (UI slider: 5–80%)                 |
 
 Saved with the project, outside undo.
 
+## Narration
+
+One voice take per document (`narration`): the recorded audio (a data URL)
+plus its length. It starts at time 0 of the animation or presentation —
+there is deliberately no per-frame track. Saved with the project, outside
+undo (undo must never delete a recording), and it never leaves the device.
+Full rules: `features/animation.md` §Voice narration.
+
 ## Game settings
 
-| Attribute | Meaning | Range | Default (adult) | Default (kid mode) |
-|---|---|---|---|---|
-| `fallSpeed` | base speed, px/s (Catch: fall speed; Flappy: flight speed) | 60–400 | Catch 180 · Flappy 170 | Catch 110 · Flappy 120 |
-| `spawnInterval` | seconds between spawns | 0.4–2.5 | Catch 1.1 · Flappy 1.35 | Catch 1.6 · Flappy 1.8 |
-| `lives` | Catch: lives; Flappy: shields | 1–9 | Catch 3 · Flappy 1 | Catch 5 · Flappy 3 |
+| Attribute       | Meaning                                                    | Range   | Default (adult)         | Default (kid mode)     |
+| --------------- | ---------------------------------------------------------- | ------- | ----------------------- | ---------------------- |
+| `fallSpeed`     | base speed, px/s (Catch: fall speed; Flappy: flight speed) | 60–400  | Catch 180 · Flappy 170  | Catch 110 · Flappy 120 |
+| `spawnInterval` | seconds between spawns                                     | 0.4–2.5 | Catch 1.1 · Flappy 1.35 | Catch 1.6 · Flappy 1.8 |
+| `lives`         | Catch: lives; Flappy: shields                              | 1–9     | Catch 3 · Flappy 1      | Catch 5 · Flappy 3     |
 
 Settings stay unset until the user touches a knob — that's how the gentler
 kid defaults can apply. Full rules: `features/play.md`.

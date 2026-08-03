@@ -11,7 +11,8 @@
 
 import { animationDurationMs, spriteSheetLayout } from '../engine/animation';
 import { renderDocument } from '../engine/renderer';
-import type { DreamDocument } from '../engine/types';
+import type { DreamDocument, Narration } from '../engine/types';
+import { mixNarrationTracks } from './narration';
 
 export const WEBM_MIME_CANDIDATES = [
   'video/webm;codecs=vp9',
@@ -54,8 +55,43 @@ export interface VideoExportDeps {
   createCanvas?: () => HTMLCanvasElement;
   /** Defaults to canvas.captureStream + new MediaRecorder. */
   createRecorder?: (canvas: HTMLCanvasElement, mimeType: string) => RecorderLike;
+  /**
+   * Narration path: capture the canvas, mix the take in via WebAudio and
+   * record the combined stream. Defaults to captureStream +
+   * mixNarrationTracks + new MediaRecorder.
+   */
+  createRecorderWithNarration?: (
+    canvas: HTMLCanvasElement,
+    mimeType: string,
+    narration: Narration,
+    fps: number,
+  ) => Promise<RecorderSession>;
   /** Defaults to setTimeout; tests pass an instant wait. */
   wait?: (ms: number) => Promise<void>;
+}
+
+export interface RecorderSession {
+  recorder: RecorderLike;
+  /** Release mixer resources (the AudioContext) after recording stops. */
+  finish?: () => Promise<void>;
+}
+
+/** Real WebAudio narration mix: canvas stream + decoded take → one recorder. */
+async function defaultRecorderWithNarration(
+  canvas: HTMLCanvasElement,
+  mimeType: string,
+  narration: Narration,
+  fps: number,
+): Promise<RecorderSession> {
+  if (typeof MediaRecorder === 'undefined') {
+    throw new Error('This browser cannot record video (no MediaRecorder).');
+  }
+  const stream = canvas.captureStream(fps);
+  const mix = await mixNarrationTracks(stream, narration);
+  return {
+    recorder: new MediaRecorder(new MediaStream(mix.tracks), { mimeType }) as RecorderLike,
+    finish: mix.finish,
+  };
 }
 
 export interface VideoExportOptions {
@@ -92,16 +128,27 @@ export async function exportAnimationWebM(
 
   const createRecorder =
     deps.createRecorder ??
-    ((c: HTMLCanvasElement, mime: string) => {
+    ((c: HTMLCanvasElement, mime: string): RecorderLike => {
       if (typeof MediaRecorder === 'undefined') {
         throw new Error('This browser cannot record video (no MediaRecorder).');
       }
-      return new MediaRecorder(c.captureStream(options.fps), { mimeType: mime });
+      return new MediaRecorder(c.captureStream(options.fps), { mimeType: mime }) as RecorderLike;
     });
   const wait =
     deps.wait ?? ((ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms)));
 
-  const recorder = createRecorder(canvas, mimeType);
+  // With a narration take, the recorder gets the canvas video track plus the
+  // take's audio track in one stream; without one, behavior is unchanged.
+  let recorder: RecorderLike;
+  let finish: (() => Promise<void>) | undefined;
+  if (doc.narration) {
+    const createSession = deps.createRecorderWithNarration ?? defaultRecorderWithNarration;
+    const session = await createSession(canvas, mimeType, doc.narration, options.fps);
+    recorder = session.recorder;
+    finish = session.finish;
+  } else {
+    recorder = createRecorder(canvas, mimeType);
+  }
   const chunks: Blob[] = [];
   const stopped = new Promise<void>((resolve) => {
     recorder.onstop = () => resolve();
@@ -119,6 +166,7 @@ export async function exportAnimationWebM(
   }
   recorder.stop();
   await stopped;
+  await finish?.();
   return new Blob(chunks, { type: mimeType });
 }
 

@@ -133,7 +133,7 @@ presenter, Zǐxuān the student, Ali/Fatima the hobbyists). Score: impact
 | 1   | ~~AI "make real" code export — turn an app-mode drawing into runnable code~~ ✅ shipped (slice 18) | Maria, Ahmed, Sara    | 5      | M      |
 | 2   | More game templates + conversational game generation ("make a game where…")                        | Zainab, George        | 5      | M      |
 | 3   | ~~Stamps, stickers, and coloring-page starters~~ ✅ shipped (slice 16)                             | Zainab, George        | 4      | S      |
-| 4   | Voice narration recording for animations and Present mode                                          | Zainab, Ahmed, Victor | 4      | M      |
+| 4   | ~~Voice narration recording for animations and Present mode~~ ✅ shipped (slice 19)                | Zainab, Ahmed, Victor | 4      | M      |
 | 5   | Generative fill / inpainting via BYOK providers                                                    | Ali, Fatima, Sara     | 4      | M      |
 | 6   | ~~Localized voice-command vocabularies, Arabic-first~~ ✅ shipped (slice 16)                       | Zainab, George, Ahmed | 4      | S      |
 | 7   | ~~Senior comfort toggle (larger UI, higher contrast, slower animations)~~ ✅ shipped (slice 16)    | Victor                | 4      | S      |

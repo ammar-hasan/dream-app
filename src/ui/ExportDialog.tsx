@@ -157,6 +157,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
               fps,
               seconds: videoDurationSeconds(doc, fps).toFixed(1),
             })}
+            {doc.narration ? ` ${t('export.webmWithNarration')}` : ''}
           </p>
         )}
 

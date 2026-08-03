@@ -250,6 +250,28 @@ export const en: Record<string, string> = {
   'present.app': 'App',
   'present.restart': 'Restart',
 
+  // --- Voice narration -----------------------------------------------------------
+  'narration.record': 'Record narration',
+  'narration.recordTitle': 'Tell the story over your animation',
+  'narration.stop': 'Stop recording',
+  'narration.kidRecord': 'Tell the story!',
+  'narration.kidStop': 'All done!',
+  'narration.recording': 'Recording {time}',
+  'narration.delete': 'Delete narration',
+  'narration.reRecord': 'Record over your story? The old one will be gone.',
+  'narration.reRecordYes': 'Yes, record over it',
+  'narration.reRecordNo': 'Keep my story',
+  'narration.mute': 'Mute narration',
+  'narration.unmute': 'Play narration',
+  'narration.present': 'Narration',
+  'narration.tooBig': 'That take is very long — it may not save. Try a shorter one?',
+  'narration.errorDenied':
+    'Dream can’t use the microphone — allow it in your browser and try again.',
+  'narration.errorNoMic': 'No microphone found — plug one in and try again.',
+  'narration.errorBusy': 'The microphone is busy in another app.',
+  'narration.errorUnsupported': 'This browser can’t record audio.',
+  'narration.errorGeneric': 'Recording didn’t work — try again?',
+
   // --- App mode (interactive prototypes) -----------------------------------------
   'link.title': 'Link to a screen',
   'link.target': 'When tapped, go to frame…',
@@ -406,6 +428,7 @@ export const en: Record<string, string> = {
   'export.spriteLabel': 'Sprite sheet',
   'export.webmNote':
     'Records {frames} frames at {fps} fps — about {seconds} seconds of video. Keep this tab in front while it records.',
+  'export.webmWithNarration': 'Includes your recorded narration.',
   'export.spriteNote': 'All frames in one PNG grid — handy for games and sharing.',
   'export.appLabel': 'Interactive app (.html)',
   'export.appNote':
@@ -491,7 +514,14 @@ export const en: Record<string, string> = {
   'voice.mirrorOn': 'Mirror on!',
   'voice.mirrorOff': 'Mirror off.',
   'voice.saved': 'Saved!',
+  'voice.narrationStarted': 'Recording — tell your story!',
+  'voice.narrationSaved': 'Your story is saved!',
+  'voice.narrationDeleted': 'Narration deleted.',
+  'voice.narrationNone': 'There’s no narration yet.',
+  'voice.narrationNotRecording': 'I’m not recording right now.',
+  'voice.narrationNeedsFrames': 'Add some frames first, then tell your story!',
+  'voice.narrationAlready': 'Already recording — say “stop recording” when you’re done.',
   'voice.help':
-    'You can say: brush, pencil, spray, eraser, fill, wand, stamp, a color like red or blue, bigger, smaller, mirror on, mirror off, undo, redo, clear, new frame, play, play my game, preview my app, export my app, export real code, stop, save, and help.',
+    'You can say: brush, pencil, spray, eraser, fill, wand, stamp, a color like red or blue, bigger, smaller, mirror on, mirror off, undo, redo, clear, new frame, play, play my game, preview my app, export my app, export real code, record narration, stop recording, delete narration, stop, save, and help.',
   'voice.unknown': 'Sorry, I didn’t understand. Say “help” to hear what I can do.',
 };

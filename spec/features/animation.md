@@ -50,9 +50,40 @@ everything called "frames".
 
 Appears at the bottom whenever a document has frames: a collapse toggle, a
 big play/pause button, live thumbnails (56 px tall, numbered, in play
-order), the dashed `+` add button, frame controls (⧉ ←/→ ✕), the fps
-slider, Loop and Onion toggles. Thumbnails update when their frame's
-content changes — editing frame 3 never repaints the others.
+order), the dashed `+` add button, frame controls (⧉ ←/→ ✕), the narration
+mic, the fps slider, Loop and Onion toggles. Thumbnails update when their
+frame's content changes — editing frame 3 never repaints the others.
+
+## Voice narration
+
+One **voice narration** take per document — a single track that starts at
+time 0 of the animation. Per-frame tracks are deliberately out of scope: one
+"tell the whole story" take matches how kids and presenters actually narrate
+and keeps recording a one-tap gesture.
+
+- The timeline bar carries a **mic button**. Tapping it starts recording AND
+  starts playback, so the timing is natural — you talk over your flipbook as
+  it plays. Tapping again (or the stop affordance) ends the take and saves
+  it.
+- **Re-recording replaces** the previous take, after a gentle inline
+  confirmation ("Record over your story?"). In kid mode there is no
+  confirmation — no reading required — the new take simply replaces the old.
+- A take can be **deleted** (one tap) and **muted** (a session toggle; the
+  take stays saved).
+- While recording, a **pulsing red dot, the elapsed time and a live mic
+  level** make the recording unmistakable.
+- The microphone is asked for **on the first record only**. Denial or a
+  missing/busy microphone gets a friendly, jargon-free message; where the
+  device cannot record audio at all, the mic button simply isn't there.
+- **Privacy:** the narration never leaves the device — it is stored with the
+  project like any other document data.
+- During playback the narration **plays from the start**, in sync with the
+  flipbook (unless muted). The take plays once; if a looping animation runs
+  longer, the voice simply stops.
+- Kid mode gets a big friendly mic ("Tell the story!") — one tap deep, like
+  everything else.
+- Very long takes (over ~10 MB saved) earn a gentle warning that the project
+  may get too big to keep.
 
 ## Export
 
@@ -63,7 +94,9 @@ The Export dialog offers, for animated documents:
   WebM, the first the device supports; if none, a plain error says this
   browser can't record WebM. Progress shows "Frame N of total" while
   recording; the dialog asks you to keep the tab in front. Filename
-  `{name}.webm`.
+  `{name}.webm`. **A saved narration is baked in as the video's audio
+  track** — the exported movie talks; without a take the export is
+  unchanged (silent).
 - **Sprite sheet** — all frames in one PNG grid: up to **8 columns**
   (columns = the smallest of: frame count, 8, and the ceiling of the square
   root of the frame count), rows as needed, each cell the full document
@@ -80,9 +113,11 @@ flipbook is reframed, not just the current frame.
 
 ## Persistence
 
-Frames and animation settings (fps, loop, onion preferences) are saved with
-the project. Animation settings live outside undo (principle 3). Old saves
-load unchanged — animation simply stays off.
+Frames, animation settings (fps, loop, onion preferences) and the narration
+take are saved with the project. Animation settings and the narration live
+outside undo (principle 3) — undo must never change how fast you watch your
+flipbook, and must never delete a recording. Old saves load unchanged —
+animation simply stays off, and there is no narration.
 
 ## Edge cases
 
@@ -91,3 +126,5 @@ load unchanged — animation simply stays off.
 - Deleting frames that hotspots point at creates **broken hotspots** —
   flagged in the Links panel, ignored in previews/exports (`app-mode.md`).
 - Switching to Present or Play mode stops playback.
+- The narration survives every frame operation untouched — deleting frames
+  never deletes the take; only the delete-narration affordance does.

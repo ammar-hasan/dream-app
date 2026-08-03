@@ -151,4 +151,68 @@ describe('exportAnimationWebM', () => {
     // Each frame paints the document background → one fillRect per frame.
     expect(ctx.calls('fillRect').length).toBe(2);
   });
+
+  it('mixes the narration take in when the document has one', async () => {
+    const narration = { audio: 'data:audio/webm;base64,AAAA', durationMs: 1200 };
+    const doc = { ...animatedDoc(2), narration };
+    const { canvas } = fakeCanvas();
+    const seen: { narration?: unknown; fps?: number; mime?: string } = {};
+    let finished = false;
+    let plainRecorderUsed = false;
+
+    const blob = await exportAnimationWebM(
+      doc,
+      { fps: 10 },
+      {
+        isTypeSupported: () => true,
+        createCanvas: () => canvas,
+        createRecorder: () => {
+          plainRecorderUsed = true;
+          return fakeRecorder({ value: false }, { value: false });
+        },
+        createRecorderWithNarration: (c, mime, n, fps) => {
+          expect(c).toBe(canvas);
+          seen.mime = mime;
+          seen.narration = n;
+          seen.fps = fps;
+          return Promise.resolve({
+            recorder: fakeRecorder({ value: false }, { value: false }),
+            finish: () => {
+              finished = true;
+              return Promise.resolve();
+            },
+          });
+        },
+        wait: () => Promise.resolve(),
+      },
+    );
+
+    expect(plainRecorderUsed).toBe(false);
+    expect(seen.narration).toEqual(narration);
+    expect(seen.fps).toBe(10);
+    expect(seen.mime).toBe('video/webm;codecs=vp9');
+    expect(finished).toBe(true); // mixer released after recording stops
+    expect(blob.size).toBeGreaterThan(0);
+  });
+
+  it('uses the plain recorder when there is no narration', async () => {
+    const doc = animatedDoc(1);
+    const { canvas } = fakeCanvas();
+    let narrationPathUsed = false;
+    await exportAnimationWebM(
+      doc,
+      { fps: 6 },
+      {
+        isTypeSupported: () => true,
+        createCanvas: () => canvas,
+        createRecorder: () => fakeRecorder({ value: false }, { value: false }),
+        createRecorderWithNarration: () => {
+          narrationPathUsed = true;
+          return Promise.resolve({ recorder: fakeRecorder({ value: false }, { value: false }) });
+        },
+        wait: () => Promise.resolve(),
+      },
+    );
+    expect(narrationPathUsed).toBe(false);
+  });
 });

@@ -1,6 +1,7 @@
 /** Voice executor: intents map to the right store actions + friendly messages. */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { enableAnimation } from '../engine/animation';
 import { createDocument, createLayer } from '../engine/document';
 import { useUiPrefs } from '../store/uiPrefs';
 import {
@@ -35,6 +36,10 @@ function makeStore(overrides: Partial<VoiceExecutorStore> = {}) {
     setColor: vi.fn(),
     setSize: vi.fn(),
     setSymmetry: vi.fn(),
+    narrationRecording: false,
+    startNarration: vi.fn(),
+    stopNarration: vi.fn(),
+    deleteNarration: vi.fn(),
     ...overrides,
   };
   return store;
@@ -265,5 +270,62 @@ describe('executeVoiceCommand', () => {
     expect(executeVoiceCommand({ kind: 'tool', tool: 'eraser' }, store, () => {})?.message).toBe(
       'ممحاة!',
     );
+  });
+
+  it('record narration needs frames, then starts the take', () => {
+    const store = makeStore(); // no frames yet
+    expect(executeVoiceCommand({ kind: 'record-narration' }, store, () => {})?.message).toBe(
+      'Add some frames first, then tell your story!',
+    );
+    expect(store.startNarration).not.toHaveBeenCalled();
+
+    const animated = makeStore({ doc: enableAnimation(createDocument({ width: 8, height: 8 })) });
+    expect(executeVoiceCommand({ kind: 'record-narration' }, animated, () => {})?.message).toBe(
+      'Recording — tell your story!',
+    );
+    expect(animated.startNarration).toHaveBeenCalledOnce();
+
+    // Already recording: a second "record narration" is a no-op with a hint.
+    const midTake = makeStore({
+      doc: enableAnimation(createDocument({ width: 8, height: 8 })),
+      narrationRecording: true,
+    });
+    expect(executeVoiceCommand({ kind: 'record-narration' }, midTake, () => {})?.message).toMatch(
+      /already recording/i,
+    );
+    expect(midTake.startNarration).not.toHaveBeenCalled();
+  });
+
+  it('stop recording saves the take only while recording', () => {
+    const store = makeStore({ narrationRecording: true });
+    expect(executeVoiceCommand({ kind: 'stop-recording' }, store, () => {})?.message).toBe(
+      'Your story is saved!',
+    );
+    expect(store.stopNarration).toHaveBeenCalledOnce();
+
+    const idle = makeStore();
+    expect(executeVoiceCommand({ kind: 'stop-recording' }, idle, () => {})?.message).toBe(
+      'I’m not recording right now.',
+    );
+    expect(idle.stopNarration).not.toHaveBeenCalled();
+  });
+
+  it('delete narration removes the take when one exists', () => {
+    const store = makeStore();
+    expect(executeVoiceCommand({ kind: 'delete-narration' }, store, () => {})?.message).toBe(
+      'There’s no narration yet.',
+    );
+    expect(store.deleteNarration).not.toHaveBeenCalled();
+
+    const withTake = makeStore({
+      doc: {
+        ...createDocument({ width: 8, height: 8 }),
+        narration: { audio: 'data:audio/webm;base64,AAAA', durationMs: 1000 },
+      },
+    });
+    expect(executeVoiceCommand({ kind: 'delete-narration' }, withTake, () => {})?.message).toBe(
+      'Narration deleted.',
+    );
+    expect(withTake.deleteNarration).toHaveBeenCalledOnce();
   });
 });

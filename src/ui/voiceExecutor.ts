@@ -40,6 +40,14 @@ export interface VoiceExecutorStore {
   setColor(color: Color): void;
   setSize(size: number): void;
   setSymmetry(mode: SymmetryMode): void;
+  /** True while a narration take is being recorded. */
+  narrationRecording: boolean;
+  /** Start a narration take (mic + playback); errors surface via wiring. */
+  startNarration(): void;
+  /** Stop and save the current take. */
+  stopNarration(): void;
+  /** Delete the saved take. */
+  deleteNarration(): void;
 }
 
 export interface VoiceResult {
@@ -136,6 +144,24 @@ export function executeVoiceCommand(
       store.pause();
       store.stopGame();
       return { message: t('voice.stopped') };
+
+    case 'record-narration':
+      if (!store.doc.frames || store.doc.frames.length === 0) {
+        return { message: t('voice.narrationNeedsFrames') };
+      }
+      if (store.narrationRecording) return { message: t('voice.narrationAlready') };
+      store.startNarration();
+      return { message: t('voice.narrationStarted') };
+
+    case 'stop-recording':
+      if (!store.narrationRecording) return { message: t('voice.narrationNotRecording') };
+      store.stopNarration();
+      return { message: t('voice.narrationSaved') };
+
+    case 'delete-narration':
+      if (!store.doc.narration) return { message: t('voice.narrationNone') };
+      store.deleteNarration();
+      return { message: t('voice.narrationDeleted') };
 
     case 'tool':
       store.setTool(command.tool);

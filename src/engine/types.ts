@@ -238,6 +238,19 @@ export interface GameSettings {
 }
 
 /**
+ * A voice narration take for the whole document: one track, starting at time
+ * 0 of the animation/presentation (per-frame tracks are deliberately out of
+ * scope). The audio lives as a data URL so it persists through IndexedDB and
+ * `.dream` files like any other string. Additive; absent on old saves.
+ */
+export interface Narration {
+  /** `data:audio/webm;base64,...` (the codec depends on the recording device). */
+  audio: string;
+  /** Take length in milliseconds. */
+  durationMs: number;
+}
+
+/**
  * The Play-mode game templates. `'catch'` is the original; old documents
  * without a `template` field resolve to it.
  */
@@ -284,6 +297,11 @@ export interface DreamDocument {
   mode?: WorkspaceMode;
   /** Play-mode casting + settings; undefined = friendly defaults. */
   game?: GameSetup;
+  /**
+   * The voice narration take; undefined = none. Updated outside History
+   * (like `mode` and `animation`): undo must never delete a recording.
+   */
+  narration?: Narration;
   createdAt: number;
   updatedAt: number;
 }

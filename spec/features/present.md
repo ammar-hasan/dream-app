@@ -47,3 +47,13 @@ flavor it behaves like an app, not a slideshow — full hotspot semantics in
   in Slideshow flavor.
 - Under reduced-motion, transitions render instantly (see
   `../visual-identity.md`).
+
+## Voice narration
+
+If the document has a narration take (see `animation.md`), it **plays once
+from the start** when a Present session opens — the presenter tells the
+story over the slides, hands-free. A small indicator button (bottom-end)
+shows that a narration exists and toggles **mute**; muting stops the voice
+immediately, unmuting restarts it from the beginning. The mute choice is
+session state shared with the editor's playback. Without a take, no
+indicator appears.

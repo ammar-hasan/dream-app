@@ -7,6 +7,24 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Voice narration** (slice 19, research backlog #4): record one voice take
+  over your animation from the timeline's mic button — recording starts
+  playback so the timing is natural, with a pulsing red dot, elapsed time and
+  live mic level while you talk. Re-recording replaces the take after a
+  gentle inline confirm (kid mode skips it and gets a big "Tell the story!"
+  mic); takes can be muted (session toggle) or deleted. The take plays in
+  sync during editor playback and when a Present session opens (with a small
+  indicator + mute there), and the WebM video export now bakes it in as the
+  audio track (mixed on-device via WebAudio). One track per document starting
+  at time 0 — per-frame tracks deliberately out of scope. The take persists
+  with the project (data URL, IndexedDB and `.dream`, outside undo, warning
+  over ~10 MB), the mic is asked for on the first record only with friendly
+  jargon-free errors, the button hides where recording is unsupported, and
+  the narration never leaves the device.
+- Voice intents "record narration" / "stop recording" / "delete narration"
+  (English) and «سجّل صوتي» / «أوقف التسجيل» / «امسح الصوت» (Arabic) for the
+  narration take.
+
 - **AI "make real" code export**: animated documents gain a second app
   export — "Real code (AI) (.html)" — that turns the app description
   (screens, texts, shapes as boxes, the hotspot navigation graph) into a

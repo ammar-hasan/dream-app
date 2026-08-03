@@ -103,6 +103,7 @@ import type {
   Hotspot,
   HotspotTransition,
   ImageOp,
+  Narration,
   Operation,
   Point,
   RasterPatch,
@@ -345,6 +346,11 @@ export interface DreamStore {
   moveFrame(id: string, toIndex: number): void;
   /** Playback/onion-skin preferences (fps, loop, onion…); not undoable. */
   setAnimation(patch: Partial<AnimationSettings>): void;
+  /** Save/replace (or clear, with null) the narration take; not undoable. */
+  setNarration(narration: Narration | null): void;
+  /** Session toggle: play the narration track during playback/Present. */
+  narrationMuted: boolean;
+  setNarrationMuted(muted: boolean): void;
   play(): void;
   pause(): void;
   togglePlay(): void;
@@ -1472,6 +1478,18 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         return { doc: { ...s.doc, animation: next }, isDirty: true };
       }),
 
+    setNarration: (narration) =>
+      set((s) => ({
+        // Metadata like `mode` and `animation`: persisted, but undo must
+        // never delete or resurrect a recording.
+        doc: narration === null ? { ...s.doc, narration: undefined } : { ...s.doc, narration },
+        isDirty: true,
+      })),
+
+    narrationMuted: false,
+
+    setNarrationMuted: (muted) => set({ narrationMuted: muted }),
+
     play: () => {
       const { doc } = get();
       if (!doc.frames || doc.frames.length === 0) return;
@@ -1562,7 +1580,10 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       set((s) => {
         if (!isGameTemplateId(template) || gameSetupOf(s.doc).template === template) return {};
         return {
-          doc: { ...s.doc, game: { cast: { ...s.doc.game?.cast }, settings: s.doc.game?.settings, template } },
+          doc: {
+            ...s.doc,
+            game: { cast: { ...s.doc.game?.cast }, settings: s.doc.game?.settings, template },
+          },
           isDirty: true,
         };
       }),

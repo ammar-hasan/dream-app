@@ -229,8 +229,8 @@ holds.
 80. GIVEN a drawing WHEN the app is closed and reopened THEN it restores
     from the last-opened pointer after the splash.
 81. GIVEN a `.dream` export imported into a fresh Dream THEN document,
-    frames, hotspots and game setup are identical (opaque pixels exactly;
-    vector content exactly).
+    frames, hotspots, game setup and narration are identical (opaque pixels
+    exactly; vector content exactly).
 82. GIVEN a `.dream` file with unknown extra fields WHEN loaded and
     re-saved THEN the unknown fields survive verbatim.
 83. GIVEN a corrupt or version-2 `.dream` file WHEN opened THEN a plain
@@ -249,8 +249,8 @@ holds.
 88. GIVEN any document mutation WHEN undone and redone THEN the result is
     bit-identical to never having undone.
 89. GIVEN undo history WHEN the user changes workspace mode, fps, onion
-    settings, game casting or the active frame THEN none of those appear
-    as undo steps — but frame add/duplicate/delete/reorder do.
+    settings, game casting, the narration or the active frame THEN none of
+    those appear as undo steps — but frame add/duplicate/delete/reorder do.
 90. GIVEN a project saved in Play or Present mode WHEN reopened THEN it
     opens in Draw.
 91. GIVEN a hidden feature (no speech recognition, no audio, no
@@ -261,6 +261,22 @@ holds.
     uses the dark tokens; the choice persists.
 94. GIVEN any list of projects or components THEN it sorts by
     last-modified, newest first.
+95. GIVEN an animated document WHEN the timeline mic is tapped THEN playback
+    starts and the voice records with a pulsing indicator and elapsed time;
+    stopping saves the take, re-recording asks first (never in kid mode),
+    deleting removes it, and undo never touches the take.
+96. GIVEN a document with a narration WHEN the animation plays or a Present
+    session opens THEN the take plays once from the start; the mute toggle
+    silences it in both places and the choice is session state.
+97. GIVEN a document with a narration WHEN exported to WebM THEN the video
+    carries the voice as its audio track; without a take the export behaves
+    exactly as before (silent).
+98. GIVEN a browser without audio recording THEN the timeline mic simply
+    isn't there; a denied or busy microphone gets a friendly, jargon-free
+    message and nothing is recorded.
+99. GIVEN "record narration" spoken WHEN frames exist THEN recording starts;
+    "stop recording" saves the take, "delete narration" removes it, and
+    «أوقف التسجيل» / «امسح الصوت» never trigger stop or clear.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

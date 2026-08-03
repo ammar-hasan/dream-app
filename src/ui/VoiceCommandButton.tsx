@@ -22,6 +22,7 @@ import {
 import { saveNow } from './saveNow';
 import { exportAppHtml } from './exportApp';
 import { exportRealCodeHtml } from './exportRealCode';
+import { beginNarrationTake, finishNarrationTake, sharedNarrationRecorder } from './narration';
 import { MicIcon } from './icons';
 
 /** Snapshot of the dream store shaped for the voice executor. */
@@ -59,6 +60,16 @@ function executorStore(announceDone?: (message: string) => void): VoiceExecutorS
     setColor: s.setColor,
     setSize: s.setSize,
     setSymmetry: s.setSymmetry,
+    narrationRecording: sharedNarrationRecorder().state === 'recording',
+    // Async: the mic permission prompt resolves later; a denial is announced
+    // when it happens, like the code export above.
+    startNarration: () => {
+      void beginNarrationTake(sharedNarrationRecorder(), s).then((errorKey) => {
+        if (errorKey) announceDone?.(t(errorKey));
+      });
+    },
+    stopNarration: () => void finishNarrationTake(sharedNarrationRecorder(), s),
+    deleteNarration: () => s.setNarration(null),
   };
 }
 

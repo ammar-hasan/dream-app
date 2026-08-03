@@ -26,6 +26,7 @@ import { useDreamStore } from '../store/dreamStore';
 import { useUiPrefs } from '../store/uiPrefs';
 import { getComponent } from '../storage/components';
 import { importImageFiles } from './importImage';
+import { playNarration } from './narration';
 import { TextOverlay } from './TextOverlay';
 import { useT } from './i18n';
 import { DreamMark } from './icons';
@@ -118,6 +119,15 @@ export function CanvasViewport() {
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [playing]);
+
+  // Narration sync: the take plays from time 0 alongside the flipbook.
+  const narration = useDreamStore((s) => s.doc.narration);
+  const narrationMuted = useDreamStore((s) => s.narrationMuted);
+  useEffect(() => {
+    if (!playing || narrationMuted || !narration) return;
+    const playback = playNarration(narration);
+    return () => playback.stop();
+  }, [playing, narrationMuted, narration]);
 
   // Redraw whenever the subscribed state changes (effect runs every render).
   useEffect(() => {

@@ -41,6 +41,7 @@ Conventions for anyone (human or agent) working on Dream.
    all document metadata updated outside history: the workspace `mode` field —
    undo must not flip the user's workspace — animation settings (`doc.animation`),
    Play-mode casting + settings (`doc.game`) — undo must not re-cast your game —
+   the narration take (`doc.narration`) — undo must not delete a recording —
    and switching the active frame — undo must not teleport the user between
    frames. Frame add/duplicate/delete/reorder ARE undoable commands.)
 4. Document updates are immutable (structural sharing); never mutate an operation
@@ -128,7 +129,10 @@ Conventions for anyone (human or agent) working on Dream.
   PresentView's Slideshow/App toggle),
   `i18n/` string tables (add a locale: copy `en.ts`, register in `i18n/index.ts`
   — see README), voice-command executor (`voiceExecutor.ts`, thin layer over
-  the store, driven by a fake in tests), PWA glue (`pwa.ts` — production-only
+  the store, driven by a fake in tests), voice narration (`narration.ts` —
+  recorder state machine, playback and WebAudio export mixing behind
+  injectable deps, `NarrationControls.tsx` — the timeline mic), PWA glue
+  (`pwa.ts` — production-only
   SW registration behind injectable fakes, `UpdateToast.tsx` — the
   version-update prompt)
 - `src/storage/` — IndexedDB project persistence + cross-project component

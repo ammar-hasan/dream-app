@@ -12,6 +12,8 @@ import { renderDocument } from '../engine/renderer';
 import type { DreamDocument, Hotspot } from '../engine/types';
 import { useDreamStore } from '../store/dreamStore';
 import { useT } from './i18n';
+import { MuteIcon, SoundIcon } from './icons';
+import { playNarration } from './narration';
 
 const ADVANCE_KEYS = new Set(['ArrowRight', 'ArrowDown', ' ', 'PageDown', 'Enter']);
 const BACK_KEYS = new Set(['ArrowLeft', 'ArrowUp', 'PageUp']);
@@ -42,6 +44,16 @@ export function PresentView() {
   const frames = presentationFrames(doc);
   const index = Math.min(presentIndex, frames.length - 1);
   const frame = doc.frames?.[index];
+  const narration = doc.narration;
+  const narrationMuted = useDreamStore((s) => s.narrationMuted);
+
+  // Narration: the take plays once from the start of the presentation
+  // (unmuted only); leaving Present — or muting — stops it.
+  useEffect(() => {
+    if (!narration || narrationMuted) return;
+    const playback = playNarration(narration);
+    return () => playback.stop();
+  }, [narration, narrationMuted]);
 
   const exit = () => {
     const store = useDreamStore.getState();
@@ -208,6 +220,21 @@ export function PresentView() {
           }}
         >
           {t('present.restart')}
+        </button>
+      )}
+
+      {narration && (
+        <button
+          type="button"
+          className="btn icon-btn present-narration"
+          aria-pressed={!narrationMuted}
+          aria-label={`${t('narration.present')}: ${narrationMuted ? t('narration.unmute') : t('narration.mute')}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            useDreamStore.getState().setNarrationMuted(!narrationMuted);
+          }}
+        >
+          {narrationMuted ? <MuteIcon /> : <SoundIcon />}
         </button>
       )}
 

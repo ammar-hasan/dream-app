@@ -32,6 +32,12 @@ export type VoiceCommand =
   /** "export real code" / "make it real": the AI code export. */
   | { kind: 'export-code' }
   | { kind: 'stop' }
+  /** "record narration": start a voice take over the playing animation. */
+  | { kind: 'record-narration' }
+  /** "stop recording": finish and save the take. */
+  | { kind: 'stop-recording' }
+  /** "delete narration": remove the saved take. */
+  | { kind: 'delete-narration' }
   | { kind: 'tool'; tool: ToolId }
   /** "mirror on" / "mirror off": toggle vertical mirror symmetry. */
   | { kind: 'mirror'; on: boolean }
@@ -180,6 +186,10 @@ export interface VoiceVocabulary {
   mirrorOffPhrases: string[];
   /** Whole-phrase ways to ask for the code export ("make it real"). */
   codePhrases: string[];
+  /** "record narration" — checked early: they contain stop/clear words. */
+  narrationRecordPhrases: string[];
+  narrationStopPhrases: string[];
+  narrationDeletePhrases: string[];
 }
 
 const EN_VOCAB: VoiceVocabulary = {
@@ -219,6 +229,23 @@ const EN_VOCAB: VoiceVocabulary = {
     'export code',
     'code export',
     'turn it into code',
+  ],
+  narrationRecordPhrases: [
+    'record narration',
+    'record my voice',
+    'record voice',
+    'record a narration',
+    'narrate',
+    'tell the story',
+    'tell a story',
+  ],
+  narrationStopPhrases: ['stop recording', 'stop narrating', 'finish recording'],
+  narrationDeletePhrases: [
+    'delete narration',
+    'delete the narration',
+    'erase narration',
+    'remove narration',
+    'delete my voice',
   ],
 };
 
@@ -313,6 +340,9 @@ const AR_VOCAB: VoiceVocabulary = {
   mirrorOnPhrases: ['شغل التناظر', 'فعل التناظر', 'شغل المراية', 'تناظر شغال'],
   mirrorOffPhrases: ['اطف التناظر', 'اطفي التناظر', 'اطفي المراية', 'بدون تناظر'],
   codePhrases: ['كود حقيقي', 'صدر كود حقيقي', 'صدر الكود', 'حوله الي كود'],
+  narrationRecordPhrases: ['سجل صوتي', 'سجل الصوت', 'سجل تعليق', 'احك القصة', 'احكي القصة'],
+  narrationStopPhrases: ['اوقف التسجيل', 'اوقفي التسجيل', 'انهي التسجيل', 'انهاء التسجيل'],
+  narrationDeletePhrases: ['امسح الصوت', 'احذف الصوت', 'امسح التسجيل', 'احذف التسجيل', 'امسح صوتي'],
 };
 
 function union<T>(a: Set<T>, b: Set<T>): Set<T> {
@@ -352,6 +382,9 @@ function mergeVocabulary(base: VoiceVocabulary, extra: VoiceVocabulary): VoiceVo
     mirrorOnPhrases: [...base.mirrorOnPhrases, ...extra.mirrorOnPhrases],
     mirrorOffPhrases: [...base.mirrorOffPhrases, ...extra.mirrorOffPhrases],
     codePhrases: [...base.codePhrases, ...extra.codePhrases],
+    narrationRecordPhrases: [...base.narrationRecordPhrases, ...extra.narrationRecordPhrases],
+    narrationStopPhrases: [...base.narrationStopPhrases, ...extra.narrationStopPhrases],
+    narrationDeletePhrases: [...base.narrationDeletePhrases, ...extra.narrationDeletePhrases],
   };
 }
 
@@ -453,6 +486,19 @@ export function parseVoiceCommand(transcript: string, locale = 'en'): VoiceComma
   if (has(tokens, vocab.help)) return { kind: 'help' };
   if (has(tokens, vocab.undo)) return { kind: 'undo' };
   if (has(tokens, vocab.redo)) return { kind: 'redo' };
+
+  // Narration phrases win over the words they contain: "stop recording"
+  // holds a stop word, and Arabic «امسح الصوت» (delete narration) holds the
+  // clear word امسح — neither is a stop or a clear.
+  if (hasPhrase(normalized, ...vocab.narrationStopPhrases)) {
+    return { kind: 'stop-recording' };
+  }
+  if (hasPhrase(normalized, ...vocab.narrationDeletePhrases)) {
+    return { kind: 'delete-narration' };
+  }
+  if (hasPhrase(normalized, ...vocab.narrationRecordPhrases)) {
+    return { kind: 'record-narration' };
+  }
 
   const isClearAll = has(tokens, vocab.clear) || hasPhrase(normalized, ...vocab.clearPhrases);
   if (isClearAll) return { kind: 'clear' };

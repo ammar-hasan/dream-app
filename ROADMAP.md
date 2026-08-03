@@ -85,8 +85,9 @@ are roughly ordered by dependency, not by a fixed schedule.
 ## Slice 5 — Video export (remainder)
 
 - ✅ WebM export shipped in slice 4 (MediaRecorder, VP9/VP8 fallback).
-- Remaining: optional audio track; MP4/WebCodecs path for players that
-  don't support WebM.
+- ✅ Optional audio track shipped in slice 19 (voice narration baked into the
+  WebM via a WebAudio mix).
+- Remaining: MP4/WebCodecs path for players that don't support WebM.
 
 ## Slice 6 — Presentation mode (remainder)
 
@@ -435,7 +436,7 @@ every piece points at the existing gates (`check`, `check:full`,
 - More locales (voice vocabularies are now per-locale tables — adding one is
   data only); axe-core audit.
 - Per-OS visual baselines if the generous-threshold single baseline flakes.
-- Slice 5/6 remainders: audio track, MP4/WebCodecs export, slide transitions,
+- Slice 5/6 remainders: MP4/WebCodecs export, slide transitions,
   presenter view with notes, per-slide duration.
 - Slice 12 remainder: more game templates (platformer, maze, flappy),
   conversational game generation.
@@ -511,3 +512,41 @@ every piece points at the existing gates (`check`, `check:full`,
   persona: Maria — shipped as slice 14, the developer surface.)
 - Acceptance met: a child draws a blob, casts it as the hero, presses play —
   and their own drawing catches stars.
+
+## Slice 19 — Voice narration ✅
+
+Research backlog #4 (RESEARCH.md §4): record your voice over animations and
+presentations, and bake it into exported videos. Personas: Zainab (5,
+narrating her flipbook), Ahmed (voice-over shorts), Victor (stories over
+slides). One narration track per document, starting at time 0 — per-frame
+tracks deliberately out of scope (one "tell the whole story" take is how
+people actually narrate, and it keeps recording a one-tap gesture).
+
+- ✅ Recording (`src/ui/narration.ts`, browser layer behind injectable deps):
+  getUserMedia + MediaRecorder with a friendly mime fallback
+  (opus/WebM → WebM → MP4 → Ogg), an idle/recording/error state machine, mic
+  level via AnalyserNode for the recording indicator, and jargon-free
+  permission errors in EN+AR (denied / no mic / busy / unsupported). The mic
+  is asked for on the first record only; the button hides where recording is
+  unsupported. The take is stored on the document as a data URL
+  (`doc.narration`, additive, outside undo like `mode`/`animation`), persists
+  through IndexedDB and `.dream` files, and warns over ~10 MB.
+- ✅ Timeline UI (`src/ui/NarrationControls.tsx`): one tap starts recording
+  AND playback (natural timing), one tap stops and saves; a pulsing red dot,
+  elapsed time and live level while recording; re-record replaces after a
+  gentle inline confirm (kid mode never asks); delete and a session mute
+  toggle. Kid mode gets the big friendly "Tell the story!" mic.
+- ✅ Playback: the take plays from the start during editor playback and when
+  a Present session opens (small indicator + mute button there too);
+  autoplay refusals are swallowed, muting/restarting is instant.
+- ✅ Export: WebM gains the narration as its audio track — the take is
+  decoded and mixed via AudioContext → MediaStreamDestination and combined
+  with the canvas captureStream tracks into one MediaStream for
+  MediaRecorder (composition unit-tested with fakes). No take → byte-for-byte
+  the old behavior.
+- ✅ Voice commands: "record narration" / "stop recording" /
+  "delete narration" (EN) and «سجّل صوتي» / «أوقف التسجيل» / «امسح الصوت»
+  (AR) — phrases take precedence over the stop/clear words they contain.
+- Acceptance met: a kid records "once upon a time…" over her three-frame
+  animation, plays it back with her voice, and exports a WebM that talks —
+  one tap deep throughout, and nothing ever leaves the device.
