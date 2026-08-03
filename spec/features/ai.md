@@ -142,8 +142,12 @@ editable moments before any provider call or document change. Each
 reviewed moment can be read aloud; the user explicitly confirms before the
 active image-capable provider paints the sequence. The provider is reminded of
 the complete story for every moment so recurring characters and colors remain
-coherent. All pictures must succeed before the complete captioned frame batch
-lands as one undoable change. Full behavior is in `features/animation.md`.
+coherent. While it works, a determinate track names the exact moment, marks
+completed moments and keeps Cancel and Escape available. Stopping is immediate:
+the active request is asked to stop, later moments never begin and even a late
+provider reply is discarded. All pictures must succeed before the complete
+captioned frame batch lands as one undoable change. Full behavior is in
+`features/animation.md`.
 
 ### The free tier
 

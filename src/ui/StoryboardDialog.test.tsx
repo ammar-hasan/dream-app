@@ -1,6 +1,13 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { MockAIProvider, setActiveProvider, type AIProvider } from '../ai/registry';
+import {
+  MockAIProvider,
+  registerProvider,
+  setActiveProvider,
+  unregisterProvider,
+  type AIImageResult,
+  type AIProvider,
+} from '../ai/registry';
 import { useDreamStore } from '../store/dreamStore';
 import { useUiPrefs } from '../store/uiPrefs';
 import { paintStoryboard, StoryboardDialog } from './StoryboardDialog';
@@ -31,6 +38,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  unregisterProvider('slow-story');
   delete speechGlobal.webkitSpeechRecognition;
   FakeRecognition.instances = [];
 });
@@ -56,9 +64,9 @@ describe('paintStoryboard', () => {
     // Dream AI's procedural painter keeps a tiny 8 px safety floor.
     expect(result[0].pixels).toMatchObject({ width: 8, height: 8 });
     expect(progress.mock.calls).toEqual([
-      [0, 2],
-      [1, 2],
-      [2, 2],
+      [0, 2, 'Moon wakes'],
+      [1, 2, 'Fox waves'],
+      [2, 2, 'Fox waves'],
     ]);
   });
 
@@ -85,6 +93,42 @@ describe('paintStoryboard', () => {
         { width: 1, height: 1 },
       ),
     ).rejects.toThrow('No picture');
+  });
+
+  it('forwards cancellation and ignores a provider result that arrives late', async () => {
+    let finish: ((result: AIImageResult) => void) | undefined;
+    const controller = new AbortController();
+    const generateImage = vi.fn(
+      (_request: Parameters<AIProvider['generateImage']>[0]) =>
+        new Promise<AIImageResult>((resolve) => {
+          finish = resolve;
+        }),
+    );
+    const provider = {
+      id: 'slow-story',
+      name: 'Slow story painter',
+      capabilities: { generateImage: true, editImage: false, chat: false },
+      generateImage,
+    } as unknown as AIProvider;
+    const request = paintStoryboard(
+      { story: 'Story', scenes: [{ description: 'One' }, { description: 'Two' }] },
+      provider,
+      { width: 1, height: 1 },
+      () => {},
+      controller.signal,
+    );
+
+    expect(generateImage.mock.calls[0]?.[0].signal).toBe(controller.signal);
+    controller.abort();
+    await expect(request).rejects.toMatchObject({ name: 'AbortError' });
+
+    finish?.({
+      pixels: { width: 1, height: 1, data: new Uint8ClampedArray(4) },
+      prompt: 'late',
+      providerId: 'slow-story',
+    });
+    await Promise.resolve();
+    expect(generateImage).toHaveBeenCalledOnce();
   });
 });
 
@@ -148,6 +192,52 @@ describe('StoryboardDialog', () => {
     expect(store.playing).toBe(true);
 
     store.undo();
+    expect(useDreamStore.getState().doc.frames).toBeUndefined();
+  });
+
+  it('shows the active scene and cancels immediately without accepting late frames', async () => {
+    let finish: ((result: AIImageResult) => void) | undefined;
+    let requestSignal: AbortSignal | undefined;
+    const generateImage = vi.fn(
+      (request: Parameters<AIProvider['generateImage']>[0]) =>
+        new Promise<AIImageResult>((resolve) => {
+          requestSignal = request.signal;
+          finish = resolve;
+        }),
+    );
+    const provider = {
+      id: 'slow-story',
+      name: 'Slow story painter',
+      capabilities: { generateImage: true, editImage: false, chat: false },
+      generateImage,
+    } as unknown as AIProvider;
+    registerProvider(provider);
+    setActiveProvider(provider.id);
+    render(<StoryboardDialog initialPrompt="Moon wakes, then Fox waves" onClose={() => {}} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Make animation' }));
+    expect(screen.getByRole('progressbar', { name: 'Painting frame 1 of 2…' })).toHaveAttribute(
+      'aria-valuenow',
+      '0',
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('Moon wakes');
+    expect(screen.getByLabelText('Frame 1').closest('li')).toHaveClass('is-current');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByRole('progressbar')).not.toBeInTheDocument());
+    expect(screen.getByRole('status')).toHaveTextContent('Stopped. Nothing was changed.');
+    expect(requestSignal?.aborted).toBe(true);
+    expect(useDreamStore.getState().doc.frames).toBeUndefined();
+
+    await act(async () => {
+      finish?.({
+        pixels: { width: 1, height: 1, data: new Uint8ClampedArray(4) },
+        prompt: 'late',
+        providerId: provider.id,
+      });
+      await Promise.resolve();
+    });
+    expect(generateImage).toHaveBeenCalledOnce();
     expect(useDreamStore.getState().doc.frames).toBeUndefined();
   });
 });

@@ -1639,6 +1639,16 @@ body {
   background: var(--panel-hover);
 }
 
+.storyboard-scenes li.is-current {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.storyboard-scenes li.is-done .storyboard-scene-number {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
 .storyboard-scene-number {
   display: grid;
   place-items: center;
@@ -1670,15 +1680,6 @@ body {
 
 .storyboard-provider {
   margin: 12px 0 0;
-}
-
-.storyboard-status {
-  margin: 12px 0 0;
-  padding: 10px 12px;
-  border-radius: var(--radius);
-  background: var(--accent-soft);
-  color: var(--accent-text);
-  font-weight: 600;
 }
 
 .kid-story-btn {
@@ -2570,6 +2571,34 @@ body {
   border-radius: inherit;
   background: var(--accent);
   animation: ai-progress-travel 1.35s ease-in-out infinite alternate;
+}
+
+.storyboard-progress {
+  margin-top: 12px;
+}
+
+.storyboard-progress .ai-progress-track span {
+  width: 100%;
+  transform-origin: left;
+  animation: none;
+  transition: transform 180ms ease;
+}
+
+[dir='rtl'] .storyboard-progress .ai-progress-track span {
+  transform-origin: right;
+}
+
+.storyboard-progress-copy {
+  display: grid;
+  gap: 2px;
+  color: var(--text-dim);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.storyboard-progress-copy strong {
+  color: var(--accent-text);
+  font-size: 13px;
 }
 
 .ai-progress-copy {

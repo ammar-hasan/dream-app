@@ -564,6 +564,61 @@ test('a reviewed story becomes painted animation frames and one undo removes the
   await expect(page.locator('.timeline-bar')).toHaveCount(0);
 });
 
+test('story painting names its current moment and cancels without late frames', async ({
+  page,
+}) => {
+  const purplePng =
+    'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAABHNCSVQICAgIfAhkiAAAAAFzUkdCAK7OHOkAAAAUSURBVAiZY6yxevufgYGBgYkBCgAn5wKm8Nhy+QAAAABJRU5ErkJggg==';
+  let requests = 0;
+  await page.route('**/images/generations', async (route) => {
+    requests += 1;
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    await route.fulfill({ status: 200, json: { data: [{ b64_json: purplePng }] } }).catch(() => {});
+  });
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'dream:ai-config',
+      JSON.stringify({
+        activeId: 'openai-compatible',
+        providers: {
+          'openai-compatible': {
+            baseUrl: 'https://api.openai.com/v1',
+            model: 'gpt-4o-mini',
+            imageModel: 'gpt-image-2',
+            supportsImages: true,
+          },
+        },
+      }),
+    );
+    sessionStorage.setItem('dream:ai-key:openai-compatible', 'e2e-placeholder-key');
+  });
+
+  await bootApp(page);
+  await page.getByRole('button', { name: /^Story/ }).click();
+  const dialog = page.getByRole('dialog', { name: 'Make a story' });
+  await dialog
+    .getByLabel('What happens in your story?')
+    .fill('Moon wakes up, then Fox waves hello');
+  await dialog.getByRole('button', { name: 'Plan my frames' }).click();
+  await dialog.getByRole('button', { name: 'Make animation' }).click();
+
+  await expect(dialog.getByRole('progressbar', { name: 'Painting frame 1 of 2…' })).toHaveAttribute(
+    'aria-valuenow',
+    '0',
+  );
+  await expect(dialog.locator('.storyboard-progress-copy')).toContainText('Moon wakes up');
+  await expect(
+    dialog.getByRole('textbox', { name: 'Frame 1', exact: true }).locator('xpath=..'),
+  ).toHaveClass(/is-current/);
+  await dialog.getByRole('button', { name: 'Cancel' }).click();
+
+  await expect(dialog.getByRole('progressbar')).toHaveCount(0);
+  await expect(dialog).toContainText('Stopped. Nothing was changed.');
+  await page.waitForTimeout(800);
+  expect(requests).toBe(1);
+  await expect(page.locator('.timeline-bar')).toHaveCount(0);
+});
+
 test('connected OpenAI-compatible image generation paints returned PNG pixels', async ({
   page,
 }) => {

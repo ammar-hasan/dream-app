@@ -7,6 +7,11 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Cancellable storyboard batches** (slice 58): story creation now shows the
+  exact scene and completed-frame progress, marks current/completed moments, and
+  keeps Cancel and Escape available. Stopping asks the painter to abort and
+  guarantees that partial or late frames never reach the document.
+
 - **Voice-selected color** (slice 57): “make it red” now recolors the visible
   vector selection instead of silently changing the brush. Bare colors keep
   their familiar tool-setting meaning; missing, locked and raster selections

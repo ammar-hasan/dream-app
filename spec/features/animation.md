@@ -82,10 +82,16 @@ turn one spoken or typed idea into a small, reviewable flipbook:
 4. **Make animation** paints the reviewed moments in order. Recurring
    characters, clothes and colors are requested consistently across the whole
    story, and pictures contain no generated lettering; the reviewed moment is
-   kept separately as that frame's caption.
+   kept separately as that frame's caption. A determinate progress track names
+   the exact moment being painted while the reviewed list distinguishes the
+   current moment from completed ones.
 5. Nothing is added until every picture succeeds. A failure leaves the
    document exactly as it was. On success the complete batch is one undoable
    change: one Undo removes every generated frame and Redo restores them.
+6. **Cancel** and **Escape** remain available throughout painting. Either stops
+   the wait immediately, asks the active painter to stop, prevents later moments
+   from starting and discards completed or late-arriving pictures. The reviewed
+   plan remains ready to change or retry and the document remains untouched.
 
 On a blank static canvas, the generated moments become the complete animation.
 Existing static artwork is preserved as frame 1 before the generated moments;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getActiveProvider, getProvider, setAIDeps, type AIProvider } from '../ai/registry';
 import {
   MAX_STORYBOARD_SCENES,
@@ -24,24 +24,60 @@ function painterForActiveProvider(): AIProvider {
   return active.capabilities.generateImage ? active : (getProvider('mock') ?? active);
 }
 
+function storyboardCancelled(): Error {
+  const error = new Error('Story creation cancelled');
+  error.name = 'AbortError';
+  return error;
+}
+
+function waitForImage<T>(request: Promise<T>, signal?: AbortSignal): Promise<T> {
+  if (!signal) return request;
+  if (signal.aborted) return Promise.reject(storyboardCancelled());
+  return new Promise<T>((resolve, reject) => {
+    const cancel = () => reject(storyboardCancelled());
+    signal.addEventListener('abort', cancel, { once: true });
+    request.then(
+      (value) => {
+        signal.removeEventListener('abort', cancel);
+        if (signal.aborted) reject(storyboardCancelled());
+        else resolve(value);
+      },
+      (error: unknown) => {
+        signal.removeEventListener('abort', cancel);
+        reject(error);
+      },
+    );
+  });
+}
+
 export async function paintStoryboard(
   plan: StoryboardPlan,
   provider: AIProvider,
   size: { width: number; height: number },
-  onProgress: (done: number, total: number) => void = () => {},
+  onProgress: (done: number, total: number, scene: string) => void = () => {},
+  signal?: AbortSignal,
 ): Promise<StoryboardFrameInput[]> {
   const frames: StoryboardFrameInput[] = [];
   for (let index = 0; index < plan.scenes.length; index += 1) {
-    onProgress(index, plan.scenes.length);
+    if (signal?.aborted) throw storyboardCancelled();
     const scene = plan.scenes[index];
-    const result = await provider.generateImage({
-      prompt: storyboardImagePrompt(plan.story, scene.description, index, plan.scenes.length),
-      width: size.width,
-      height: size.height,
-    });
+    onProgress(index, plan.scenes.length, scene.description);
+    const result = await waitForImage(
+      provider.generateImage({
+        prompt: storyboardImagePrompt(plan.story, scene.description, index, plan.scenes.length),
+        width: size.width,
+        height: size.height,
+        signal,
+      }),
+      signal,
+    );
     frames.push({ pixels: result.pixels, caption: scene.description });
   }
-  onProgress(plan.scenes.length, plan.scenes.length);
+  onProgress(
+    plan.scenes.length,
+    plan.scenes.length,
+    plan.scenes[plan.scenes.length - 1]?.description ?? '',
+  );
   return frames;
 }
 
@@ -63,12 +99,15 @@ export function StoryboardDialog({
   );
   const [painter, setPainter] = useState<AIProvider>(painterForActiveProvider);
   const [busy, setBusy] = useState(false);
-  const [progress, setProgress] = useState({ done: 0, total: 0 });
+  const [progress, setProgress] = useState({ done: 0, total: 0, scene: '' });
   const [error, setError] = useState<string | null>(null);
+  const [cancelled, setCancelled] = useState(false);
+  const requestController = useRef<AbortController | null>(null);
 
   useEffect(() => {
     setAIDeps({ decodeImage, encodeImage });
     setPainter(painterForActiveProvider());
+    return () => requestController.current?.abort();
   }, []);
 
   const applyPlan = (value: string) => {
@@ -79,6 +118,7 @@ export function StoryboardDialog({
     }
     setScenes(next.scenes.map((scene) => scene.description));
     setError(null);
+    setCancelled(false);
     return true;
   };
 
@@ -103,6 +143,9 @@ export function StoryboardDialog({
 
     setBusy(true);
     setError(null);
+    setCancelled(false);
+    const controller = new AbortController();
+    requestController.current = controller;
     const store = useDreamStore.getState();
     const wasAnimated = store.doc.frames !== undefined;
     try {
@@ -113,8 +156,10 @@ export function StoryboardDialog({
         },
         painter,
         { width: store.doc.width, height: store.doc.height },
-        (done, total) => setProgress({ done, total }),
+        (done, total, scene) => setProgress({ done, total, scene }),
+        controller.signal,
       );
+      if (controller.signal.aborted) throw storyboardCancelled();
       store.addStoryboardFrames(frames);
       if (!wasAnimated) store.setAnimation({ fps: 1, loop: true });
       store.play();
@@ -123,8 +168,10 @@ export function StoryboardDialog({
       if (prefs.voiceFeedback) say(done, { lang: prefs.locale });
       onClose();
     } catch (caught) {
-      setError(caught instanceof Error && caught.message ? caught.message : t('ai.error'));
+      if (controller.signal.aborted) setCancelled(true);
+      else setError(caught instanceof Error && caught.message ? caught.message : t('ai.error'));
     } finally {
+      if (requestController.current === controller) requestController.current = null;
       setBusy(false);
     }
   };
@@ -142,7 +189,10 @@ export function StoryboardDialog({
         onClick={(event) => event.stopPropagation()}
         onKeyDown={(event) => {
           event.stopPropagation();
-          if (event.key === 'Escape' && !busy) onClose();
+          if (event.key === 'Escape') {
+            if (busy) requestController.current?.abort();
+            else onClose();
+          }
         }}
       >
         <h2 className="dialog-title">{t('storyboard.title')}</h2>
@@ -203,7 +253,16 @@ export function StoryboardDialog({
             <p className="dialog-note">{t('storyboard.confirmHint')}</p>
             <ol className="storyboard-scenes">
               {scenes.map((scene, index) => (
-                <li key={index}>
+                <li
+                  key={index}
+                  className={
+                    busy && index < progress.done
+                      ? 'is-done'
+                      : busy && progress.done < progress.total && index === progress.done
+                        ? 'is-current'
+                        : undefined
+                  }
+                >
                   <span className="storyboard-scene-number" aria-hidden="true">
                     {index + 1}
                   </span>
@@ -263,11 +322,38 @@ export function StoryboardDialog({
         )}
 
         {busy && (
-          <p className="storyboard-status" role="status">
-            {t('storyboard.painting', {
-              current: Math.min(progress.done + 1, progress.total),
-              total: progress.total,
-            })}
+          <div className="ai-progress storyboard-progress" role="status">
+            <div
+              className="ai-progress-track"
+              role="progressbar"
+              aria-label={t('storyboard.painting', {
+                current: Math.min(progress.done + 1, progress.total),
+                total: progress.total,
+              })}
+              aria-valuemin={0}
+              aria-valuemax={progress.total}
+              aria-valuenow={progress.done}
+            >
+              <span
+                style={{
+                  transform: `scaleX(${progress.total > 0 ? progress.done / progress.total : 0})`,
+                }}
+              />
+            </div>
+            <div className="storyboard-progress-copy">
+              <strong>
+                {t('storyboard.painting', {
+                  current: Math.min(progress.done + 1, progress.total),
+                  total: progress.total,
+                })}
+              </strong>
+              <span>{progress.scene}</span>
+            </div>
+          </div>
+        )}
+        {cancelled && (
+          <p className="ai-notice ok" role="status">
+            {t('ai.cancelled')}
           </p>
         )}
         {error && (
@@ -280,10 +366,9 @@ export function StoryboardDialog({
           <button
             type="button"
             className="btn"
-            disabled={busy}
             onPointerEnter={speak('common.cancel')}
             onFocus={speak('common.cancel')}
-            onClick={onClose}
+            onClick={busy ? () => requestController.current?.abort() : onClose}
           >
             {t('common.cancel')}
           </button>

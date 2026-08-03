@@ -358,9 +358,14 @@ holds.
 115.  GIVEN a reviewed storyboard WHEN Make animation is confirmed THEN the
       active image-capable provider, or the visibly named built-in fallback,
       paints each moment in order with whole-story continuity instructions;
-      no frame lands unless all pictures succeed, captions keep the reviewed
-      moments, existing art is preserved, a new storyboard loops and plays at
-      one frame per second, and one Undo removes the complete generated batch.
+      determinate progress names the active moment and distinguishes completed
+      moments; no frame lands unless all pictures succeed, captions keep the
+      reviewed moments, existing art is preserved, a new storyboard loops and
+      plays at one frame per second, and one Undo removes the complete generated
+      batch. WHEN Cancel or Escape is used during painting THEN the wait ends
+      immediately, the active request is asked to stop, no later moment begins,
+      any completed or late result is discarded, the plan remains and the
+      document is unchanged.
 116.  GIVEN the global microphone WHEN “make a story about a moon adventure”
       or «اصنع لي قصة عن القمر» is spoken THEN the storyboard opens already
       planned from the trailing request, while “tell the story” remains the

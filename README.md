@@ -276,10 +276,12 @@ play button, everything called "frames".
   plans two to six numbered moments before touching the canvas. Edit, add,
   remove, replan or hear each moment aloud, then confirm once. The active
   image-capable provider (or the clearly named built-in fallback) paints the
-  sequence with whole-story continuity; only a completely successful batch
-  lands, captions retain the reviewed words, existing artwork is preserved,
-  and one Undo removes all generated frames. A whole built-in story costs one
-  daily try; image-capable BYOK stays unlimited.
+  sequence with whole-story continuity. Determinate progress names the exact
+  moment being painted and marks completed moments; Cancel or Escape stops
+  immediately. Only a completely successful batch lands—even a late provider
+  reply after cancellation is discarded. Captions retain the reviewed words,
+  existing artwork is preserved, and one Undo removes all generated frames. A
+  whole built-in story costs one daily try; image-capable BYOK stays unlimited.
 - **Voice narration**: the timeline's mic button records one voice take over
   the playing animation — tap, talk ("once upon a time…"), tap to save.
   Re-recording replaces the take after a gentle confirm (kid mode skips the

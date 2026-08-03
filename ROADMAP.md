@@ -1317,6 +1317,22 @@ ordinary speech without accidentally changing an invisible brush setting.
 - ✅ A production-browser voice journey selects real artwork, says “make it red”
   through speech recognition and proves both the feedback and painted pixels.
 
+## Slice 58 — Story batches stay legible and cancellable ✅
+
+Persona need: keep a child, low-literacy creator or impatient professional in
+control while several remote pictures are painted one after another.
+
+- ✅ Determinate progress names the exact reviewed moment, fills only as frames
+  complete, and visually distinguishes the current and completed moments.
+- ✅ Cancel and Escape remain available throughout painting, return the dialog
+  to a ready reviewed plan immediately and confirm that nothing changed.
+- ✅ The active painter receives a stop signal; providers that ignore it cannot
+  advance to later moments or land a partial or late frame batch.
+- ✅ Focused tests prove ordered scene progress, signal forwarding, immediate
+  cancellation and late-result refusal without any document mutation.
+- ✅ Full release gates remain green: 863 unit tests, 97.74% engine coverage,
+  50 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1324,8 +1340,9 @@ largest count of controls:
 
 1. **Direct-manipulation foundation:** cursor semantics, hover/hit feedback,
    valid/invalid targets, post-drop selection and cancellable AI progress are
-   established, including provider checks, code generation and project opening;
-   continue with multi-item progress where batch work can become opaque.
+   established, including provider checks, code generation, project opening and
+   item-level story progress; continue with batch delivery and other operations
+   where multi-item work can become opaque.
 2. **Conversational phone-first creation:** natural clarification and reference
    handling for voice now has a selected-object foundation; continue with more
    position/relational referents and corrections, a task-prioritized mobile

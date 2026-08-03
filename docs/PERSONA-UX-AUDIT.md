@@ -224,12 +224,14 @@ is a refusal to confuse breadth with completion.
 8. **Long-work control has begun, but is not yet consistent.** Create, Edit,
    Feedback and provider connection tests now show honest staged activity,
    allow immediate cancellation and reject late results. Story creation and
-   video export have useful step counts, while Real Code now names preparation,
-   writing and verification, allows immediate cancellation and rejects late
-   downloads. Saved and portable project opening now names reading, restoration
-   and a longer wait, allows immediate cancellation, preserves current work and
-   rejects late loads. Meaningful partial-state placeholders remain future work
-   where an operation can safely expose partial output.
+   video export have useful step counts; Story also names the active moment,
+   marks completed moments, cancels immediately and rejects partial or late
+   batches. Real Code names preparation, writing and verification, allows
+   immediate cancellation and rejects late downloads. Saved and portable
+   project opening names reading, restoration and a longer wait, allows
+   immediate cancellation, preserves current work and rejects late loads.
+   Meaningful partial-state placeholders remain future work where an operation
+   can safely expose partial output.
 9. **Tactile feedback now has a sparse foundation.** On supported touch devices,
    optional short cues reinforce the first visible valid drop target and a
    visible refusal, remain silent under reduced motion and never buzz while
