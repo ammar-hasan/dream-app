@@ -225,7 +225,9 @@ holds.
 76. GIVEN "um, can you please undo?" spoken THEN one undo happens and the
     status confirms "Took that back!".
 77. GIVEN "clear" spoken THEN the app asks for a spoken yes before
-    wiping; "no" cancels and keeps everything.
+    wiping; "no" cancels and keeps everything. GIVEN a mixed correction such
+    as "no, undo that" or "yes, make it red" THEN the answer word does not
+    swallow the command: Undo or the color change runs normally.
 78. GIVEN the Arabic UI WHEN "تراجع" is spoken THEN undo happens; "undo"
     still works too; "شغّل التناظر" turns mirroring on and never starts
     playback.

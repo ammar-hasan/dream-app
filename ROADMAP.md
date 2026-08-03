@@ -1142,6 +1142,24 @@ instead of learning that every phrase controls a hidden tool setting.
 - ✅ Full release gates remain green: 841 unit tests, 97.74% engine coverage,
   46 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 48 — Voice corrections keep the intended action ✅
+
+Persona need: let a person repair what they just said naturally instead of
+having a leading yes/no silently consume the command that follows it.
+
+- ✅ Yes and no act as confirmation only when every meaningful word is an
+  answer, so “yeah sure” still confirms while “no, undo that” runs Undo and
+  “yes, make it red” chooses red.
+- ✅ The same rule applies across localized vocabularies; an Arabic “no, undo”
+  correction reaches Undo rather than becoming a bare cancellation.
+- ✅ Existing clear-layer safety remains exact: a standalone yes confirms, a
+  standalone no cancels, and a mixed new command abandons the pending clear
+  before running safely.
+- ✅ Pure parser tests cover affirmative, negative and mixed corrections without
+  relying on a speech service or network.
+- ✅ Full release gates remain green: 841 unit tests, 97.74% engine coverage,
+  46 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the

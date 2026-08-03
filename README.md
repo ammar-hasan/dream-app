@@ -158,6 +158,8 @@ RTL remain first-class product behavior.
   Visible selection supplies context: “make it bigger/smaller” scales selected
   artwork about its shared center as one undoable action; without a selection
   it keeps changing brush size, and a locked selection is refused truthfully.
+  Answer words also preserve corrections: “no, undo that” reaches Undo, while a
+  standalone “no” still safely answers a pending destructive confirmation.
   The vocabulary is **per-locale**: with
   the UI in Arabic the parser also understands Arabic commands (تراجع،
   إعادة، امسح، إطار جديد، شغّل، أوقف، فرشاة، ممحاة، طابع، العب لعبتي،

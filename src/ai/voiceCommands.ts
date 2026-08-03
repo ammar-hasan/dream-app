@@ -1004,7 +1004,8 @@ export function parseVoiceCommand(transcript: string, locale = 'en'): VoiceComma
     .toLowerCase()
     .replace(/[^\p{L}\p{N}' ]+/gu, ' ')
     .trim();
-  const tokens = new Set(tokenize(transcript, vocab.filler, locale));
+  const tokenList = tokenize(transcript, vocab.filler, locale);
+  const tokens = new Set(tokenList);
   if (locale === 'zh') {
     for (const term of vocabularyTerms(vocab)) {
       if (/\p{Script=Han}/u.test(term) && normalized.includes(term)) tokens.add(term);
@@ -1012,10 +1013,9 @@ export function parseVoiceCommand(transcript: string, locale = 'en'): VoiceComma
   }
   if (tokens.size === 0) return null;
 
-  // Confirmations are tiny sentences ("yes", "no thanks") — match them first,
-  // but only when the raw message is a word or two, so "yes, make it red"
-  // still falls through to the color command.
-  const rawWordCount = normalized.split(/\s+/).filter((w) => w !== '').length;
+  // Confirmations win only when every meaningful word is an answer. This keeps
+  // “yeah sure” as yes while letting corrections such as “no, undo” continue
+  // to the requested command instead of being swallowed as a bare no.
   if (locale === 'zh') {
     const confirmation = [...vocab.filler]
       .sort((a, b) => b.length - a.length)
@@ -1023,9 +1023,9 @@ export function parseVoiceCommand(transcript: string, locale = 'en'): VoiceComma
       .replace(/\s+/g, '');
     if (vocab.yes.has(confirmation)) return { kind: 'confirm' };
     if (vocab.no.has(confirmation)) return { kind: 'cancel' };
-  } else if (rawWordCount <= 2) {
-    if (has(tokens, vocab.yes)) return { kind: 'confirm' };
-    if (has(tokens, vocab.no)) return { kind: 'cancel' };
+  } else if (tokenList.length > 0) {
+    if (tokenList.every((word) => vocab.yes.has(word))) return { kind: 'confirm' };
+    if (tokenList.every((word) => vocab.no.has(word))) return { kind: 'cancel' };
   }
 
   if (has(tokens, vocab.help)) return { kind: 'help' };

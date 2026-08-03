@@ -85,6 +85,11 @@ game lives. **English commands always work** under every additional
 language because each locale vocabulary merges into the English base. Unknown
 input gets a kind local-language fallback and changes nothing.
 
+An answer word is treated as confirmation or cancellation only when every
+meaningful word in the utterance is an answer (for example, “yeah sure”). In a
+correction such as “no, undo that” or “yes, make it red,” the answer word does
+not swallow the requested action; Dream follows Undo or the color request.
+
 Voice uses visible selection as conversational context. With artwork selected,
 “make it bigger” and “make it smaller” refer to that artwork, scale it about its
 shared center, and say what changed. With no selection the same words retain
@@ -113,7 +118,7 @@ Dream never claims to have resized it and never falls through to the brush.
 | bigger / smaller | "bigger", "make it bigger", "thicker" / "smaller", "make it smaller", "thinner"                                                                        | أكبر / أصغر                                                                      | selected artwork scales gently about its center; with no selection, brush size ×~1.5 or ÷~1.5    |
 | save             | "save"                                                                                                                                                 | احفظ                                                                             | saves now                                                                                        |
 | help             | "help", "commands"                                                                                                                                     | مساعدة، أوامر                                                                    | speaks the full command list                                                                     |
-| confirm / cancel | "yes", "yeah" / "no", "cancel"                                                                                                                         | نعم / لا، ألغِ                                                                   | answers the clear confirmation (only as ≤2-word utterances)                                      |
+| confirm / cancel | "yes", "yeah sure" / "no", "cancel"                                                                                                                    | نعم / لا، ألغِ                                                                   | answers the clear confirmation only when all meaningful words are answer words                   |
 
 Persian provides the same complete intent surface. Canonical phrases include
 واگرد / بازانجام, پاک کن, فریم جدید, یک داستان درباره…, پخش / توقف,
@@ -165,7 +170,8 @@ include красный, оранжевый, жёлтый, зелёный, бир
 
 ### Precedence rules (the parser's decision order)
 
-1. Confirmation answers (yes/no) — only for very short utterances.
+1. Confirmation answers (yes/no) — only when every meaningful word is an
+   answer; mixed corrections continue to their requested command.
 2. Help, undo, redo, then **narration phrases** — they contain stop and
    clear words ("stop recording" isn't stop; «امسح الصوت» isn't clear) —
    then the make-a-story phrases, clear and new frame. "Tell the story" stays
@@ -189,7 +195,7 @@ it — Install Dream.
   already empty.", "Nothing to play yet — add some frames first.").
 - With no selection, "Bigger" at brush size 64 stays 64 and "smaller" at 1
   stays 1. With a locked selection, both refuse and leave brush and art exact.
-- A pending "clear?" confirmation is cancelled by any non-yes utterance,
-  which is then interpreted as a new command.
+- A pending "clear?" confirmation is cancelled by any non-yes utterance. A
+  command within that correction (such as “no, undo”) then runs normally.
 - Spoken names never fire where synthesis is missing — the UI simply
   stays silent rather than erroring.

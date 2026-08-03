@@ -7,6 +7,12 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Natural voice corrections** (slice 48): yes/no now acts as an answer only
+  when the whole meaningful utterance is an answer. “No, undo that” reaches
+  Undo and “yes, make it red” reaches the color action instead of being
+  swallowed as confirmation, while standalone answers keep destructive-clear
+  safety exact across localized vocabularies.
+
 - **Voice selection reference** (slice 47): “make it bigger/smaller” now
   understands visible selected artwork as “it,” scales it about its shared
   center in one undoable step, and names the result. With no selection it keeps

@@ -46,6 +46,8 @@ describe('parseVoiceCommand — history & document', () => {
       color: COLOR_WORDS.red,
       name: 'red',
     });
+    expect(parseVoiceCommand('no, undo that')).toEqual({ kind: 'undo' });
+    expect(parseVoiceCommand('yes, make it bigger')).toEqual({ kind: 'bigger' });
   });
 
   it('parses save', () => {
@@ -217,6 +219,7 @@ describe('parseVoiceCommand — Arabic vocabulary (locale "ar")', () => {
   it('parses confirmations and cancellations', () => {
     expect(parseVoiceCommand('نعم', 'ar')).toEqual({ kind: 'confirm' });
     expect(parseVoiceCommand('لا', 'ar')).toEqual({ kind: 'cancel' });
+    expect(parseVoiceCommand('لا، تراجع', 'ar')).toEqual({ kind: 'undo' });
   });
 
   it('parses frames and playback, diacritics optional', () => {
