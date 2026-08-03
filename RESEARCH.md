@@ -200,6 +200,14 @@ Modern interaction craft should make state legible rather than add spectacle:
   https://developer.apple.com/design/human-interface-guidelines/feedback ·
   https://www.w3.org/WAI/WCAG22/Understanding/status-messages ·
   https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition)
+- **Teach depth at the moment its value becomes concrete.** Progressive
+  disclosure should not require a new user to decode workspace architecture
+  before editing the mark they just made. A single contextual invitation can
+  bridge into the real advanced model, then disappear permanently once learned.
+  Its outcome must remain visible, undo semantics unchanged, mobile targets
+  generous and tactile feedback optional and redundant.
+  (https://developer.apple.com/design/human-interface-guidelines/design-principles ·
+  https://developer.apple.com/design/human-interface-guidelines/feedback)
 
 ## 3. Trend watch
 

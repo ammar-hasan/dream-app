@@ -1513,6 +1513,29 @@ unexpected edit.
 - ✅ Full release gates remain green: 875 unit tests, 97.74% engine coverage,
   55 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 68 — The first drawing teaches direct editing ✅
+
+Persona need: let George discover how to move or change what he just made
+without first decoding workspace architecture, while leaving experienced
+people and Little Dreamer alone.
+
+- ✅ After the first successful adult drawing gesture, one compact localized
+  invitation asks whether to move or change it and offers Select it directly.
+  It never appears for an empty gesture, restored artwork or Little Dreamer.
+- ✅ Select it enters the ordinary Design/Select workspace with exactly the new
+  marks selected. The handoff creates no document-history step: one Undo still
+  removes the drawing itself.
+- ✅ Selection receives one optional sparse tactile confirmation only after the
+  visible selection succeeds. The card uses a short transform/opacity entrance,
+  reduced motion makes it effectively instant and phone actions are 44 px.
+- ✅ Selection or Close persists the lesson per device; continuing to draw or
+  finding Design independently also dismisses it permanently.
+- ✅ Browser coverage proves selection, one-step Undo, persistence, haptics,
+  390 px containment and serious accessibility scans. The settled phone render
+  was inspected directly.
+- ✅ Full release gates remain green: 877 unit tests, 97.74% engine coverage,
+  57 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1521,8 +1544,9 @@ largest count of controls:
 1. **Direct-manipulation foundation:** cursor semantics, hover/hit feedback,
    valid/invalid targets, post-drop selection and cancellable AI progress are
    established, including provider checks, code generation, project opening and
-   item-level story/video progress; continue with other operations where
-   multi-item work can become opaque.
+   item-level story/video progress. A one-time first-drawing invitation now
+   bridges Draw into real object editing; continue with other operations where
+   multi-item work or advanced destinations can become opaque.
 2. **Conversational phone-first creation:** natural clarification and reference
    handling for voice now covers selected-object identity, color, size, basic
    position, canvas-edge targets and a bounded missing-direction follow-up.

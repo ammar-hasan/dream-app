@@ -1169,6 +1169,72 @@ body {
   }
 }
 
+.edit-invite {
+  position: absolute;
+  inset-block-start: 16px;
+  inset-inline-start: 50%;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--glass);
+  box-shadow: var(--shadow-lg);
+  color: var(--text);
+  backdrop-filter: blur(10px);
+  transform: translateX(-50%);
+  animation: edit-invite-in 180ms cubic-bezier(0.2, 0.9, 0.25, 1.08);
+}
+
+.edit-invite > svg {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  color: var(--accent);
+}
+
+.edit-invite p {
+  margin: 0 4px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.edit-invite .btn {
+  min-height: 36px;
+  white-space: nowrap;
+}
+
+@keyframes edit-invite-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -7px) scale(0.98);
+  }
+}
+
+@media (max-width: 600px) {
+  .edit-invite {
+    inset-block-start: 10px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .edit-invite p {
+    grid-column: 2 / 4;
+  }
+
+  .edit-invite .btn.primary {
+    grid-column: 2;
+  }
+
+  .edit-invite .btn {
+    min-height: 44px;
+  }
+}
+
 /* --- Side panel (right) -------------------------------------------------- */
 
 .side-panel {

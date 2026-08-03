@@ -13,7 +13,12 @@ together on screen.
    "**Pick a brush and start dreaming**". It dismisses on the first canvas
    interaction or the first successful story creation, so it never obscures a
    generated result, and never returns (remembered per device).
-3. A brand-new user gets a 1024×768 white document with one layer, the
+3. After the first successful adult drawing gesture, a compact one-time card
+   asks “Want to move or change that?” **Select it** enters Design with those
+   new marks selected; Close, continuing to draw or finding Design independently
+   teaches the same lesson and dismisses the card forever on that device. It
+   never appears in Little Dreamer.
+4. A brand-new user gets a 1024×768 white document with one layer, the
    brush active, color `#1f2937`, size 8.
 
 ## The shell (adult)

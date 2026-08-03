@@ -20,7 +20,13 @@ test('core creation modes have no serious automated accessibility violations', a
   await bootApp(page);
   expect(await seriousViolations(page)).toEqual([]);
 
-  await page.getByRole('tab', { name: 'Design' }).click();
+  await drawStroke(page);
+  const invitation = page.getByRole('complementary', {
+    name: 'Want to move or change that?',
+  });
+  await expect(invitation).toBeVisible();
+  expect(await seriousViolations(page)).toEqual([]);
+  await invitation.getByRole('button', { name: 'Select it' }).click();
   expect(await seriousViolations(page)).toEqual([]);
 
   await page.getByRole('tab', { name: 'Play' }).click();

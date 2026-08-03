@@ -654,6 +654,8 @@ export const zh: Record<string, string> = {
 
   // --- Canvas & status ------------------------------------------------------------------
   'hint.firstRun': '选一支笔，开始做梦吧',
+  'hint.editQuestion': '想移动或修改它吗？',
+  'hint.editAction': '选中它',
   'text.placeholder': '在此输入…',
   'text.label': '文本输入',
   'text.scienceSymbols': '科学符号',

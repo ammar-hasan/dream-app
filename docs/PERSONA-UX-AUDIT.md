@@ -56,7 +56,7 @@ against the much smaller question “does a related feature exist?”
 | Victor, 85    | Express an idea with dignity and confidence despite possible vision, tremor or memory limits; never fear losing work or wonder what mode/tool is active.                                          | Comfort mode, contrast, 44 px targets, reduced motion, autosave, exact Undo.                                                                  | Comfort is hidden behind Settings; the adult shell is dense; no tremor stabilization, guided first journey, persistent task orientation, or manual assistive-technology proof.                                |   5.5 |
 | Ali, 30       | Preserve the feel of real media while gaining digital control, speed and production trust: expressive input, deep brushes, non-destructive experimentation, calibrated color and reliable output. | Pressure, calligraphy, presets, layers, raster editing, selection, AI edits, PNG/JPEG.                                                        | No tilt/azimuth, stabilization, custom brush dynamics, blend modes, masks, adjustment layers, color profiles, soft proofing, large-canvas performance proof or professional interchange.                      |   4.0 |
 | Fatima, 21    | Explore calligraphy authentically in her own language and direction, controlling the nib and composition precisely while keeping work suitable for high-quality sharing or print.                 | Persian RTL, regional speech, broad nib, pressure, symmetry, Persian text, scalable native marks.                                             | Fixed nib angle, no pen tilt/rotation, path refinement, calligraphic guides, OpenType/font controls, custom brush creation, print color or high-resolution publication workflow.                              |   5.0 |
-| George, 45    | Turn a feeling into an understandable moving story on a new phone with little reading, weak technical vocabulary and minimal setup; share it confidently with family.                             | Task-first phone shell/dock, direct Select, visible/retryable voice with one guided follow-up, story planning, narration, games and recovery. | Natural conversation stops at bounded intents; fallback, panel controls and export remain text-heavy; generated fidelity and sharing handoff are not resilient enough.                                        |   4.0 |
+| George, 45    | Turn a feeling into an understandable moving story on a new phone with little reading, weak technical vocabulary and minimal setup; share it confidently with family.                             | Task-first phone shell/dock, first-drawing edit invitation, guided voice follow-up, story planning, narration, games and recovery.            | Natural conversation stops at bounded intents; advanced panels and export remain text-heavy; generated fidelity and sharing handoff are not resilient enough.                                                 |   4.0 |
 | Sara, 15      | Earn trust and income: create a distinctive logo quickly, revise it from client feedback, keep typography/colors precise, and deliver every professional file without embarrassment.              | Selection/layout, components, layers, honest SVG and one-click multi-size brand pack.                                                         | No vector-node editing, typography depth, transparent-background workflow, grids, brand colors/tokens, variants, PDF/print/CMYK delivery or client-review loop.                                               |   5.0 |
 | Zǐxuān, 28    | Communicate science accurately and publishably: preserve data integrity, build editable accessible figures/animations, use domain notation, and meet journal/export requirements.                 | Native grouped plots, scientific text/connectors, SVG, animation, app links, Chinese journey.                                                 | No units/error bars/log scales/fits, chemical structures, color-blind palette checks, scale bars, provenance, image-integrity record, editable PDF/EPS, DPI/physical sizing or publication preflight.         |   4.0 |
 | Maria, 32     | Let agents reliably read, create, revise, render and ship real design assets inside coding workflows with typed contracts, transparent side effects and easy installation.                        | Portable `.dream`, stable engine, local MCP tools for read/render/export, layers, strokes, shapes/text.                                       | Package not publicly installable; no raster/AI/link/component authoring, resources/prompts, output schemas, side-effect annotations, progress/cancellation, remote API/SDK or complete round-trip eval.       |   3.5 |
@@ -203,6 +203,11 @@ is a refusal to confuse breadth with completion.
     editing. Four visible choices mirror the next spoken or typed answer;
     unknown input re-asks, Cancel cancels and another understood command takes
     over. This is a small but complete model for trustworthy multi-turn repair.
+32. **Teach architecture only when it unlocks an immediate intent.** The first
+    adult mark now offers one direct Select-it bridge into the real Design
+    model, with the new marks already selected. It preserves one-step Undo,
+    confirms success visually and optionally tactually, respects phone targets
+    and disappears forever once learned instead of becoming permanent chrome.
 
 ### What does not yet fully serve the purpose
 
@@ -216,10 +221,11 @@ is a refusal to confuse breadth with completion.
    orientation, direct selection, complete tool access and advanced panels
    without sideways scanning. Those panels and export choices still demand too
    much reading and precision from George's one-handed journey.
-3. **Advanced depth is discoverable mainly by mode labels and panels.** New
-   users can miss components, links, AI selection editing and export variants.
-   Lightweight contextual invitations should appear after relevant actions and
-   disappear permanently once learned.
+3. **Advanced depth has one contextual bridge, not a complete teaching
+   system.** The first-drawing invitation now makes basic object editing
+   concrete and disappears once learned. New users can still miss components,
+   links, AI selection editing and export variants; equally restrained
+   invitations are needed only where behavior proves the gap.
 4. **Accessibility assurance now has an automated floor, not a ceiling.** Draw,
    Design, Play, slide settings, Presenter and every phone timeline task clear
    serious/critical browser scans after the audit corrected six contrast

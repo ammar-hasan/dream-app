@@ -18,6 +18,7 @@ const LOCALE_KEY = 'dream:locale';
 const THEME_KEY = 'dream:theme';
 const COMFORT_KEY = 'dream:comfort-mode';
 const HAPTICS_KEY = 'dream:haptics';
+const EDIT_HINT_KEY = 'dream:edit-hint-seen';
 const RECENT_COLORS_KEY = 'dream:recent-colors';
 const MAX_RECENT_COLORS = 8;
 
@@ -39,6 +40,8 @@ export interface UiPrefs {
   haptics: boolean;
   /** Most-recently-used colors, newest first (for the options panel row). */
   recentColors: string[];
+  /** Whether the one-time direct-edit invitation has been learned or dismissed. */
+  editHintSeen: boolean;
 
   setKidMode(on: boolean): void;
   setSpeakToolNames(on: boolean): void;
@@ -48,6 +51,7 @@ export interface UiPrefs {
   setComfortMode(on: boolean): void;
   setHaptics(on: boolean): void;
   rememberColor(color: string): void;
+  markEditHintSeen(): void;
 }
 
 function readFlag(key: string): boolean {
@@ -117,6 +121,7 @@ export const useUiPrefs = create<UiPrefs>()((set) => {
     comfortMode: readFlag(COMFORT_KEY),
     haptics: readDefaultOnFlag(HAPTICS_KEY),
     recentColors: readRecentColors(),
+    editHintSeen: readFlag(EDIT_HINT_KEY),
 
     setKidMode: (on) => {
       set({ kidMode: on, speakToolNames: on, voiceFeedback: on });
@@ -164,6 +169,11 @@ export const useUiPrefs = create<UiPrefs>()((set) => {
         write(RECENT_COLORS_KEY, JSON.stringify(recentColors));
         return { recentColors };
       });
+    },
+
+    markEditHintSeen: () => {
+      set({ editHintSeen: true });
+      write(EDIT_HINT_KEY, '1');
     },
   };
 });

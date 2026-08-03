@@ -14,6 +14,7 @@ beforeEach(() => {
     comfortMode: false,
     haptics: true,
     recentColors: [],
+    editHintSeen: false,
   });
 });
 
@@ -99,5 +100,11 @@ describe('uiPrefs store', () => {
     expect(JSON.parse(localStorage.getItem('dream:recent-colors') ?? '[]')).toEqual(
       useUiPrefs.getState().recentColors,
     );
+  });
+
+  it('remembers when the one-time direct-edit invitation is learned', () => {
+    useUiPrefs.getState().markEditHintSeen();
+    expect(useUiPrefs.getState().editHintSeen).toBe(true);
+    expect(localStorage.getItem('dream:edit-hint-seen')).toBe('1');
   });
 });

@@ -475,6 +475,13 @@ The Draw / Design switch in the top toolbar moves between two workspaces. Draw
 is the default MS-Paint-simple experience, exactly as before. Design mode is the
 pro workspace — the mode is persisted per project.
 
+After an adult's first successful drawing, a one-time “Want to move or change
+that?” invitation offers **Select it**. It enters the ordinary Design/Select
+workspace with only the marks from that gesture selected; one Undo still
+removes the drawing because the handoff itself is not history. Selecting,
+closing, continuing to draw or finding Design independently teaches the lesson
+once per device. Little Dreamer remains invitation-free.
+
 - **Select tool (V)**: click any object on the active layer to select it
   (strokes, shapes, text, images, fills — topmost wins). Shift-click toggles,
   drag on empty canvas rubber-band-selects. The **lasso (K)** selects with a

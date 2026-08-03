@@ -641,6 +641,8 @@ export const fa: Record<string, string> = {
   'common.apply': 'اعمال',
   'common.reset': 'بازنشانی',
   'hint.firstRun': 'یک قلم‌مو انتخاب کن و شروع به خیال‌پردازی کن',
+  'hint.editQuestion': 'می‌خواهی حرکتش بدهی یا تغییرش بدهی؟',
+  'hint.editAction': 'انتخابش کن',
   'text.placeholder': 'اینجا تایپ کنید…',
   'text.label': 'ورودی متن',
   'text.scienceSymbols': 'نمادهای علمی',

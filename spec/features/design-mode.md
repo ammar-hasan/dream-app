@@ -10,6 +10,18 @@ The workspace switch (Draw / Design / Play / Present) moves to Design; the
 choice is saved with the project. Design mode reveals the Select, Lasso and
 Link tools, the Design panel, the Links panel and the Components panel.
 
+After an adult's first successful drawing gesture, one compact invitation asks
+whether they want to move or change what they just made. **Select it** enters
+this same Design workspace, activates Select and selects exactly the marks
+created by that gesture. It is a navigation/selection handoff, not an edit, so
+one Undo still removes the drawing itself. Selecting, closing, continuing to
+draw or finding Design independently dismisses the invitation permanently on
+that device. It does not appear for Little Dreamer, empty gestures, restored
+artwork or later drawings. A successful handoff may add one optional tactile
+cue, always alongside the visible selection. After either invitation action
+removes the temporary controls, keyboard focus lands on the active workspace
+tab.
+
 ## Selection
 
 1. **Select tool (V):** click any object on the active layer to select it

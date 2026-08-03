@@ -634,6 +634,8 @@ export const ru: Record<string, string> = {
   'common.apply': 'Применить',
   'common.reset': 'Сбросить',
   'hint.firstRun': 'Выберите кисть и вперёд — мечтайте!',
+  'hint.editQuestion': 'Хотите переместить или изменить это?',
+  'hint.editAction': 'Выбрать',
   'text.placeholder': 'Печатайте здесь…',
   'text.label': 'Ввод текста',
   'text.scienceSymbols': 'Научные символы',

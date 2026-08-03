@@ -688,6 +688,8 @@ export const pt: Record<string, string> = {
 
   // --- Canvas & status ------------------------------------------------------------------
   'hint.firstRun': 'Escolha um pincel e comece a sonhar',
+  'hint.editQuestion': 'Quer mover ou mudar isso?',
+  'hint.editAction': 'Selecionar',
   'text.placeholder': 'Digite aqui…',
   'text.label': 'Entrada de texto',
   'text.scienceSymbols': 'Símbolos científicos',

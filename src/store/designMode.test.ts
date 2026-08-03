@@ -229,6 +229,18 @@ describe('transform handles', () => {
 });
 
 describe('selection actions', () => {
+  it('enters the existing Design selection with known artwork without adding history', () => {
+    drawRect({ x: 10, y: 10 }, { x: 30, y: 30 });
+    const id = store().doc.layers[0].operations[0].id;
+    const undoBefore = store().canUndo;
+
+    store().editOperations([id, 'missing']);
+    expect(store().mode).toBe('design');
+    expect(store().tool).toBe('select');
+    expect(store().selection).toEqual([id]);
+    expect(store().canUndo).toBe(undoBefore);
+  });
+
   it('recolors vector selections as one undoable command', () => {
     drawRect();
     enterDesign();

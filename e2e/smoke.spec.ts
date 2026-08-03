@@ -20,6 +20,65 @@ test('a brush stroke paints pixels onto the canvas', async ({ page }) => {
   await expect(page.locator('.hint-card')).toHaveCount(0);
 });
 
+test('the first drawing offers one direct, undo-safe path into editing', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => {
+    const target = window as Window & { __dreamHaptics?: Array<number | number[]> };
+    target.__dreamHaptics = [];
+    Object.defineProperty(navigator, 'vibrate', {
+      configurable: true,
+      value: (pattern: number | number[]) => {
+        target.__dreamHaptics?.push(pattern);
+        return true;
+      },
+    });
+  });
+  await bootApp(page);
+  const before = await nonWhitePixels(page);
+  await drawStroke(page);
+
+  const invitation = page.locator('.edit-invite');
+  await expect(invitation).toContainText('Want to move or change that?');
+  await expect(invitation.getByRole('button', { name: 'Select it' })).toHaveCSS(
+    'min-height',
+    '44px',
+  );
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    ),
+  ).toBe(0);
+  await expect(page.getByRole('tab', { name: 'Draw' })).toHaveAttribute('aria-selected', 'true');
+
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await invitation.getByRole('button', { name: 'Select it' }).click();
+  await expect(page.getByRole('tab', { name: 'Design' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('tab', { name: 'Design' })).toBeFocused();
+  await expect(page.locator('.design-panel')).toContainText('1 object selected');
+  await expect(invitation).toHaveCount(0);
+  expect(
+    await page.evaluate(
+      () => (window as Window & { __dreamHaptics?: Array<number | number[]> }).__dreamHaptics,
+    ),
+  ).toEqual([8]);
+
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(() => nonWhitePixels(page)).toBeLessThan(before + 100);
+  await expect(page.getByRole('button', { name: 'Undo', exact: true })).toBeDisabled();
+  await page.getByRole('tab', { name: 'Draw' }).click();
+  await drawStroke(page);
+  await expect(invitation).toHaveCount(0);
+});
+
+test('finding Design independently suppresses the beginner edit invitation', async ({ page }) => {
+  await bootApp(page);
+  await page.getByRole('tab', { name: 'Design' }).click();
+  await page.getByRole('tab', { name: 'Draw' }).click();
+  await drawStroke(page);
+  await expect(page.locator('.edit-invite')).toHaveCount(0);
+  expect(await page.evaluate(() => localStorage.getItem('dream:edit-hint-seen'))).toBe('1');
+});
+
 test('brush presets expose their complete editable settings', async ({ page }) => {
   await bootApp(page);
   const marker = page.getByRole('button', { name: 'Soft marker' });

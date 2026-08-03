@@ -426,6 +426,8 @@ export interface DreamStore {
   nudgeSelection(dx: number, dy: number): void;
   /** Uniformly scale the selection about its center; one undoable command. */
   scaleSelection(factor: number): void;
+  /** Enter Design + Select with known operations selected; no document history entry. */
+  editOperations(ids: string[]): void;
   /** Recolor vector artwork in the selection; one undoable command. */
   recolorSelection(color: Color): void;
   deleteSelection(): void;
@@ -1752,6 +1754,19 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         const wanted = new Set(ids);
         return ops.map((op) => (wanted.has(op.id) ? scaleOperationAbout(op, center, factor) : op));
       });
+    },
+
+    editOperations: (ids) => {
+      const { activeLayerId, doc } = get();
+      const layer = doc.layers.find((candidate) => candidate.id === activeLayerId);
+      if (!layer || layer.locked) return;
+      const wanted = new Set(ids);
+      const selection = layer.operations
+        .filter((operation) => wanted.has(operation.id))
+        .map((operation) => operation.id);
+      if (selection.length === 0) return;
+      get().setMode('design');
+      set({ tool: 'select', selection });
     },
 
     recolorSelection: (color) => {

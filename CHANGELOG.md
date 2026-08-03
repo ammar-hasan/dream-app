@@ -7,6 +7,13 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **First-drawing edit invitation** (slice 68): after an adult’s first new
+  mark, a localized one-time card asks whether they want to move or change it.
+  Select it enters the real Design/Select workspace with exactly those new
+  marks selected, adds no Undo step, uses one optional tactile confirmation,
+  and never returns after selection or dismissal. Phone actions are 44 px and
+  the brief entrance effect disappears under reduced motion.
+
 - **Guided voice movement** (slice 67): with editable artwork selected, “move
   it” now asks which direction and changes nothing until the person answers
   left, right, up or down. The question exposes four touch/keyboard choices and

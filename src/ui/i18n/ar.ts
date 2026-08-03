@@ -667,6 +667,8 @@ export const ar: Record<string, string> = {
 
   // --- Canvas & status ------------------------------------------------------------------
   'hint.firstRun': 'اختر فرشاة وابدأ الحلم',
+  'hint.editQuestion': 'هل تريد تحريك هذا أو تغييره؟',
+  'hint.editAction': 'حدّده',
   'text.placeholder': 'اكتب هنا…',
   'text.label': 'إدخال نص',
   'text.scienceSymbols': 'رموز علمية',

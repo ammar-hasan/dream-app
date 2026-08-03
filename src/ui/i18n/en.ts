@@ -672,6 +672,8 @@ export const en: Record<string, string> = {
 
   // --- Canvas & status ------------------------------------------------------------------
   'hint.firstRun': 'Pick a brush and start dreaming',
+  'hint.editQuestion': 'Want to move or change that?',
+  'hint.editAction': 'Select it',
   'text.placeholder': 'Type here…',
   'text.label': 'Text input',
   'text.scienceSymbols': 'Science symbols',

@@ -35,7 +35,7 @@ import { importImageFiles } from './importImage';
 import { playNarration } from './narration';
 import { TextOverlay } from './TextOverlay';
 import { useT } from './i18n';
-import { DreamMark } from './icons';
+import { DreamMark, SelectIcon } from './icons';
 import { pulseHaptic } from './haptics';
 import { activeComponentDrag, endComponentDrag, onComponentDragEnd } from './componentDrag';
 
@@ -97,9 +97,11 @@ export function CanvasViewport() {
   const [componentDropPreview, setComponentDropPreview] = useState<ComponentDropPreview | null>(
     null,
   );
+  const [editInviteIds, setEditInviteIds] = useState<string[] | null>(null);
   const dropFeedbackRef = useRef<DropFeedback>(null);
   const rotationDetentRef = useRef<string | null>(null);
   const snapDetentRef = useRef<string | null>(null);
+  const drawStartIdsRef = useRef<Set<string> | null>(null);
 
   const doc = useDreamStore((s) => s.doc);
   const activeLayerId = useDreamStore((s) => s.activeLayerId);
@@ -125,6 +127,7 @@ export function CanvasViewport() {
   const playbackFrame = useDreamStore((s) => s.playbackFrame);
   const kidMode = useUiPrefs((s) => s.kidMode);
   const haptics = useUiPrefs((s) => s.haptics);
+  const editHintSeen = useUiPrefs((s) => s.editHintSeen);
   const skinCanvasRef = useRef<HTMLCanvasElement | null>(null);
   // Incremental compositor: one bitmap per layer, re-rendered only when the
   // layer's ops change — stroke previews, pan and zoom cost one drawImage
@@ -628,6 +631,53 @@ export function CanvasViewport() {
     });
   };
 
+  const dismissEditInvite = () => {
+    setEditInviteIds(null);
+    useUiPrefs.getState().markEditHintSeen();
+  };
+
+  const focusActiveModeTab = () => {
+    window.requestAnimationFrame(() => {
+      document.querySelector<HTMLElement>('.mode-tab.active')?.focus();
+    });
+  };
+
+  const offerEditForNewOperations = (before: Set<string> | null) => {
+    if (!before || useUiPrefs.getState().editHintSeen) return;
+    const state = useDreamStore.getState();
+    if (state.mode !== 'draw' || useUiPrefs.getState().kidMode) return;
+    const layer = state.doc.layers.find((candidate) => candidate.id === state.activeLayerId);
+    if (!layer || layer.locked) return;
+    const added = layer.operations
+      .filter((operation) => !before.has(operation.id))
+      .map((operation) => operation.id);
+    if (added.length > 0) setEditInviteIds(added);
+  };
+
+  const acceptEditInvite = () => {
+    const ids = editInviteIds;
+    if (!ids) return;
+    dismissEditInvite();
+    useDreamStore.getState().editOperations(ids);
+    focusActiveModeTab();
+    if (useDreamStore.getState().selection.some((id) => ids.includes(id))) {
+      pulseHaptic('target', haptics);
+    }
+  };
+
+  useEffect(() => {
+    if (mode === 'design' && !editHintSeen) useUiPrefs.getState().markEditHintSeen();
+  }, [editHintSeen, mode]);
+
+  useEffect(() => {
+    if (!editInviteIds) return;
+    const layer = doc.layers.find((candidate) => candidate.id === activeLayerId);
+    const present = new Set(layer?.operations.map((operation) => operation.id) ?? []);
+    if (mode !== 'draw' || kidMode || editInviteIds.some((id) => !present.has(id))) {
+      dismissEditInvite();
+    }
+  }, [activeLayerId, doc.layers, editInviteIds, kidMode, mode]);
+
   const updateSelectHover = (point: Point) => {
     if (playing || mode !== 'design' || tool !== 'select') {
       setSelectHover(null);
@@ -692,6 +742,13 @@ export function CanvasViewport() {
     if (e.button !== 0) return;
     if (playing) return; // watching, not editing — pause first
     const point = toDocPoint(e.clientX, e.clientY);
+    if (editInviteIds) dismissEditInvite();
+    const state = useDreamStore.getState();
+    const layer = state.doc.layers.find((candidate) => candidate.id === state.activeLayerId);
+    drawStartIdsRef.current =
+      state.mode === 'draw' && !useUiPrefs.getState().kidMode && !useUiPrefs.getState().editHintSeen
+        ? new Set(layer?.operations.map((operation) => operation.id) ?? [])
+        : null;
     rotationDetentRef.current = null;
     snapDetentRef.current = null;
     if (tool === 'zoom') {
@@ -700,6 +757,8 @@ export function CanvasViewport() {
     }
     if (tool === 'fill') {
       doFill(point);
+      offerEditForNewOperations(drawStartIdsRef.current);
+      drawStartIdsRef.current = null;
       return;
     }
     if (tool === 'wand') {
@@ -761,7 +820,10 @@ export function CanvasViewport() {
       return;
     }
     const point = toDocPoint(e.clientX, e.clientY);
+    const drawStartIds = drawStartIdsRef.current;
+    drawStartIdsRef.current = null;
     useDreamStore.getState().pointerUp(point, { shiftKey: e.shiftKey });
+    offerEditForNewOperations(drawStartIds);
     rotationDetentRef.current = null;
     snapDetentRef.current = null;
     updateSelectHover(point);
@@ -942,6 +1004,7 @@ export function CanvasViewport() {
         onPointerLeave={clearPointerFeedback}
         onPointerCancel={() => {
           panRef.current = null;
+          drawStartIdsRef.current = null;
           rotationDetentRef.current = null;
           snapDetentRef.current = null;
           setPanning(false);
@@ -963,6 +1026,25 @@ export function CanvasViewport() {
             <p className="hint-text">{t('hint.firstRun')}</p>
           </div>
         </div>
+      )}
+      {editInviteIds && !editHintSeen && (
+        <aside className="edit-invite" aria-label={t('hint.editQuestion')}>
+          <SelectIcon aria-hidden="true" />
+          <p role="status">{t('hint.editQuestion')}</p>
+          <button type="button" className="btn primary" onClick={acceptEditInvite}>
+            {t('hint.editAction')}
+          </button>
+          <button
+            type="button"
+            className="btn"
+            onClick={() => {
+              dismissEditInvite();
+              focusActiveModeTab();
+            }}
+          >
+            {t('common.close')}
+          </button>
+        </aside>
       )}
       {dropMessage && (
         <div className="drop-feedback" role="status">

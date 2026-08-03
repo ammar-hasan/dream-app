@@ -678,6 +678,18 @@ holds.
       “again” may repeat it. An unknown answer repeats the question; Cancel or
       closing cancels it; another understood command replaces it. Missing or
       locked selections receive truthful guidance without opening a follow-up.
+178.  GIVEN an adult who has not learned the direct-edit invitation WHEN their
+      first successful drawing gesture creates one or more marks THEN one
+      localized, viewport-contained card asks whether to move or change them;
+      empty gestures, restored art and Little Dreamer do not show it. WHEN
+      Select it is chosen THEN Dream enters Design/Select with exactly those new
+      marks selected, optionally reinforces the visible success with one short
+      tactile cue, and adds no history step, so one Undo removes the drawing.
+      WHEN Select it, Close, another drawing gesture or independently entering
+      Design dismisses the card THEN it never returns on that device. Phone
+      actions are at least 44 px and reduced motion removes perceptible entrance
+      timing. Select it and Close return keyboard focus to the resulting active
+      workspace tab instead of losing it with the removed card.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

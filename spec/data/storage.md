@@ -17,7 +17,7 @@ labeled data contract.
 | AI API keys                                                              | per session by default    | gone when the app closes       | opt-in "remember key" moves them to device storage |
 | AI free-tier counter                                                     | per device                | resets each local calendar day |                                                    |
 | Play-mode best score                                                     | per project, per device   | until beaten                   | does NOT travel with `.dream` exports              |
-| One-time hints (welcome card, install prompt dismissal)                  | per device                | once dismissed, forever        |                                                    |
+| One-time hints (welcome, direct-edit invitation, install prompt)         | per device                | once dismissed, forever        |                                                    |
 
 ## Behavioral rules
 
@@ -67,6 +67,7 @@ above.
 | `dream:recent-colors`           | JSON array of hex colors, newest first, max 8                                                                                                                    |
 | `dream:last-doc-id`             | document id; written on every autosave                                                                                                                           |
 | `dream:hint-dismissed`          | `'1'`                                                                                                                                                            |
+| `dream:edit-hint-seen`          | `'1'` once the first-drawing edit invitation is selected, dismissed or otherwise learned                                                                         |
 | `dream:install-dismissed`       | `'1'`                                                                                                                                                            |
 | `dream:high-score:<documentId>` | best score as an integer string                                                                                                                                  |
 | `dream:ai-usage`                | JSON `{ date: 'YYYY-MM-DD', count: number }` (local calendar day)                                                                                                |

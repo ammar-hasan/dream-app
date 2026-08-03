@@ -145,6 +145,12 @@ Text `#0f141f` / `#ffffff`, dim text `#454d61` / `#ccd4e8`, borders
     buttons with redundant directional arrows. The buttons use the ordinary
     focus, hover and comfort-target language; no animation or color alone
     communicates the choice.
+12. A one-time contextual invitation uses the glass-card language at the top
+    center of the canvas, outside the new mark. One selection glyph, one short
+    question and two plain actions are the complete hierarchy. Phone actions
+    are at least 44 px. Its brief transform/opacity entrance becomes effectively
+    instant under reduced motion, and a tactile cue never replaces the visible
+    selected state.
 
 ## Video captions
 
