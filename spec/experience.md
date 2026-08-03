@@ -11,7 +11,8 @@ together on screen.
    even if restore fails).
 2. **Welcome card:** on a fresh canvas, a glass card with the mark says
    "**Pick a brush and start dreaming**". It dismisses on the first canvas
-   interaction and never returns (remembered per device).
+   interaction or the first successful story creation, so it never obscures a
+   generated result, and never returns (remembered per device).
 3. A brand-new user gets a 1024×768 white document with one layer, the
    brush active, color `#1f2937`, size 8.
 
@@ -20,7 +21,7 @@ together on screen.
 - **Top toolbar, left to right:** the Dream mark + "Dream" title + document
   name (a `•` while unsaved) · New, Open, Save, Import, Resize, Export ·
   the **workspace switch** (Draw / Design / Play / Present, a sliding
-  pill) · Animate toggle · AI sparkle · voice mic (only where speech
+  pill) · Animate toggle · Story · AI sparkle · voice mic (only where speech
   recognition exists) · Undo, Redo · kid-mode star · settings gear.
 - **Left tool rail (in order):** Select*, Lasso*, Link*, Move, Brush,
   Pencil, Spray, Eraser, Line, Rectangle, Ellipse, Fill, Magic wand,
@@ -31,7 +32,16 @@ together on screen.
   (pointer x,y · document size · active tool · zoom %).
 - **Floating zoom pill** at the bottom-end of the canvas: −, % (tap to
   fit), +.
+- At ordinary 1280 px laptop width, spacing and brand text compact before any
+  action disappears: Story, AI, voice, Undo, Redo, Little Dreamer and Settings
+  all remain visible. Very narrow windows may scroll the toolbar horizontally.
 - Narrow windows (under ~860 px) drop the side panel.
+- On phone-width adult layouts, the bottom timeline keeps frames and their
+  add/duplicate/reorder/delete actions visible while an **Animate / Slides /
+  App** choice reveals only that job's controls. App offers linking before any
+  links exist and preview afterward. The top toolbar remains horizontally
+  scrollable so no command is silently removed. Little Dreamer keeps its
+  reading-light animation controls without the job choice.
 
 ## Mode × audience matrix
 
@@ -111,15 +121,26 @@ phrases, precedence rules and the color vocabulary — is in
    message to all frames; Export saves the captions and burns them into the
    movie.
 
+### Tell a story → reviewed animation
+
+1. Choose **Story** or say “make a story about…”; in Little Dreamer mode tap
+   the large **Tell a story!** control. 2. Speak or type the idea. Dream shows
+   two to six numbered moments without changing the canvas. 3. Edit, add,
+   remove, re-plan or hear any moment aloud, then confirm **Make animation**.
+2. Progress names the current picture while the chosen painter works. The
+   complete captioned flipbook appears only after every picture succeeds,
+   begins playing slowly, and one Undo removes the whole result.
+
 ### Frames → present
 
 1. Select a frame and open **Slide settings**. 2. Choose how it enters,
    optionally give it a 1–60 second duration, and add speaker notes; save all
    three together. 3. Repeat only for slides that need different behavior.
 2. Enter **Present**. Navigate manually, or turn on **Auto** to follow the
-   per-slide timings (untimed slides pause). 5. Turn on **Presenter** to see the
-   current notes, timing and what comes next; turn it off to return to the clean
-   stage.
+   per-slide timings (untimed slides pause). 5. Turn on **Presenter** to open a
+   separate private console with current/next previews, notes, elapsed and
+   remaining time, and synchronized controls. The audience window stays clean;
+   close the console without stopping the show.
 
 ### Draw → play
 

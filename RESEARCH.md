@@ -138,9 +138,11 @@ presenter, Zǐxuān the student, Ali/Fatima the hobbyists). Score: impact
 | 6   | ~~Localized voice-command vocabularies, Arabic-first~~ ✅ shipped (slice 16)                                                                  | Zainab, George, Ahmed | 4      | S      |
 | 7   | ~~Senior comfort toggle (larger UI, higher contrast, slower animations)~~ ✅ shipped (slice 16)                                               | Victor                | 4      | S      |
 | 8   | Publish dream-mcp to MCP registries + add more tools — authoring tools and registry package ready (slice 21); public publish pending approval | Maria                 | 4      | S      |
-| 9   | ~~Slide transitions, speaker notes, per-slide duration~~ ✅ shipped (slice 24)                                                                | Sara, Zǐxuān, Victor  | 3      | M      |
+| 9   | ~~Slide transitions, timing, notes and a private Presenter window~~ ✅ shipped (slices 24 + 29)                                               | Sara, Zǐxuān, Victor  | 3      | M      |
 | 10  | ~~Social video shapes and frame captions~~ ✅ shipped (slice 27)                                                                              | Ahmed                 | 4      | M      |
 | 11  | Shareable prototype via URL (hash-compressed state, no backend)                                                                               | Ahmed, Sara, Zǐxuān   | 3      | L      |
+| 12  | ~~Voice-to-storyboard animation with visible bilingual confirmation~~ ✅ shipped (slice 28)                                                   | Zainab, George        | 5      | M      |
+| 13  | ~~Phone timeline task focus for animation, slides and apps~~ ✅ shipped (slice 30)                                                            | George, Ahmed, Sara   | 4      | S      |
 
 Deliberately deferred: **vector/SVG editing** (different medium — Recraft and
 Excalidraw own it; raster-first keeps Dream simple), **real-time

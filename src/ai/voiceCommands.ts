@@ -21,6 +21,8 @@ export type VoiceCommand =
   | { kind: 'confirm' }
   | { kind: 'cancel' }
   | { kind: 'new-frame' }
+  /** Open the confirmable storyboard builder, optionally prefilled by speech. */
+  | { kind: 'storyboard'; prompt?: string }
   | { kind: 'play' }
   /** "play my game": switch to Play mode and start a run. An optional
    *  template ("play flappy", "play maze", "play catch") selects it first. */
@@ -190,6 +192,8 @@ export interface VoiceVocabulary {
   narrationRecordPhrases: string[];
   narrationStopPhrases: string[];
   narrationDeletePhrases: string[];
+  /** Outcome-level animation creation phrases; trailing words become the story. */
+  storyboardPhrases: string[];
 }
 
 const EN_VOCAB: VoiceVocabulary = {
@@ -247,6 +251,14 @@ const EN_VOCAB: VoiceVocabulary = {
     'erase narration',
     'remove narration',
     'delete my voice',
+  ],
+  storyboardPhrases: [
+    'make a story about',
+    'make a story',
+    'make an animation about',
+    'make an animation',
+    'animate a story about',
+    'animate my story about',
   ],
 };
 
@@ -345,6 +357,14 @@ const AR_VOCAB: VoiceVocabulary = {
   narrationRecordPhrases: ['سجل صوتي', 'سجل الصوت', 'سجل تعليق', 'احك القصة', 'احكي القصة'],
   narrationStopPhrases: ['اوقف التسجيل', 'اوقفي التسجيل', 'انهي التسجيل', 'انهاء التسجيل'],
   narrationDeletePhrases: ['امسح الصوت', 'احذف الصوت', 'امسح التسجيل', 'احذف التسجيل', 'امسح صوتي'],
+  storyboardPhrases: [
+    'اصنع قصة عن',
+    'اصنع لي قصة عن',
+    'اصنع قصة',
+    'اصنع لي قصة',
+    'اصنع رسوما متحركة عن',
+    'حول قصتي الى رسوم',
+  ],
 };
 
 function union<T>(a: Set<T>, b: Set<T>): Set<T> {
@@ -388,6 +408,7 @@ function mergeVocabulary(base: VoiceVocabulary, extra: VoiceVocabulary): VoiceVo
     narrationRecordPhrases: [...base.narrationRecordPhrases, ...extra.narrationRecordPhrases],
     narrationStopPhrases: [...base.narrationStopPhrases, ...extra.narrationStopPhrases],
     narrationDeletePhrases: [...base.narrationDeletePhrases, ...extra.narrationDeletePhrases],
+    storyboardPhrases: [...base.storyboardPhrases, ...extra.storyboardPhrases],
   };
 }
 
@@ -461,6 +482,23 @@ function hasPhrase(normalized: string, ...phrases: string[]): boolean {
   return phrases.some((p) => normalized.includes(p));
 }
 
+function storyboardRequest(
+  normalized: string,
+  phrases: readonly string[],
+): { matched: boolean; prompt?: string } {
+  for (const phrase of [...phrases].sort((a, b) => b.length - a.length)) {
+    const index = normalized.indexOf(phrase);
+    if (index === -1) continue;
+    const prompt = normalized
+      .slice(index + phrase.length)
+      .trim()
+      .replace(/^(?:about|where|with|of|عن|حول|فيها)\s+/u, '')
+      .trim();
+    return prompt ? { matched: true, prompt } : { matched: true };
+  }
+  return { matched: false };
+}
+
 /**
  * Parse a transcript into a command intent, or null when nothing matches.
  * `locale` picks the vocabulary ('ar' adds Arabic words to the English base).
@@ -489,6 +527,13 @@ export function parseVoiceCommand(transcript: string, locale = 'en'): VoiceComma
   if (has(tokens, vocab.help)) return { kind: 'help' };
   if (has(tokens, vocab.undo)) return { kind: 'undo' };
   if (has(tokens, vocab.redo)) return { kind: 'redo' };
+
+  const storyboard = storyboardRequest(normalized, vocab.storyboardPhrases);
+  if (storyboard.matched) {
+    return storyboard.prompt
+      ? { kind: 'storyboard', prompt: storyboard.prompt }
+      : { kind: 'storyboard' };
+  }
 
   // Narration phrases win over the words they contain: "stop recording"
   // holds a stop word, and Arabic «امسح الصوت» (delete narration) holds the

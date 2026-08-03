@@ -312,9 +312,9 @@ holds.
       reduced-motion change slides instantly.
 108.  GIVEN Auto is on WHEN a slide has a duration THEN the deck advances after
       that delay; an untimed slide and the final slide pause without wrapping.
-109.  GIVEN Presenter view is on WHEN the slide changes THEN its presenter panel
-      shows the current slide's notes and timing plus the next slide number;
-      the audience canvas never contains the notes.
+109.  GIVEN Presenter view is on WHEN the slide changes THEN its separate
+      synchronized window shows the current preview, notes, elapsed/remaining
+      timing and next preview while the audience window never contains notes.
 110.  GIVEN a browser that reports native MP4 recording WHEN an animated
       document is exported as MP4 THEN every frame follows the chosen flipbook
       timing in a real `.mp4` container, narration is included when present,
@@ -334,20 +334,58 @@ holds.
       response-format option is sent, and the returned picture fills Dream's
       exact canvas dimensions; a separately configured compatible endpoint
       continues to receive its requested model and canvas size.
+114.  GIVEN an English or Arabic story WHEN it is planned THEN two to six
+      numbered moments appear locally without an AI request or document
+      mutation, and each moment can be edited, heard aloud, added, removed or
+      regenerated from revised story words before confirmation; Little
+      Dreamer dictation plans immediately and its storyboard actions speak
+      their names.
+115.  GIVEN a reviewed storyboard WHEN Make animation is confirmed THEN the
+      active image-capable provider, or the visibly named built-in fallback,
+      paints each moment in order with whole-story continuity instructions;
+      no frame lands unless all pictures succeed, captions keep the reviewed
+      moments, existing art is preserved, a new storyboard loops and plays at
+      one frame per second, and one Undo removes the complete generated batch.
+116.  GIVEN the global microphone WHEN “make a story about a moon adventure”
+      or «اصنع لي قصة عن القمر» is spoken THEN the storyboard opens already
+      planned from the trailing request, while “tell the story” remains the
+      distinct narration action.
+117.  GIVEN the adult shell at 1280 px width WHEN Story is present THEN Story,
+      AI, voice, Undo, Redo, Little Dreamer and Settings remain visible without
+      horizontal scrolling; narrower windows may scroll rather than dropping
+      an action.
+118.  GIVEN the first-run welcome card is still visible WHEN a storyboard
+      succeeds THEN the card dismisses before the painted animation is shown
+      and never obscures that result.
+119.  GIVEN the private Presenter window WHEN Previous, Next or Auto is used
+      there—or navigation happens in the audience window—THEN both windows stay
+      on the same slide; Show audience brings that window forward, closing only
+      the console leaves the show running, and Exit closes the session.
+120.  GIVEN a browser blocks the Presenter window WHEN Presenter is requested
+      THEN a friendly pop-up instruction appears on the audience stage without
+      exposing speaker notes or interrupting navigation.
+121.  GIVEN an adult animated document at 390 px width WHEN Animate, Slides or
+      App is chosen in the timeline THEN frame thumbnails and
+      add/duplicate/reorder/delete remain visible, only the selected job's
+      controls appear, and App offers linking before links exist or preview
+      afterward; wider layouts remain unchanged and Little Dreamer has no job
+      chooser.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 
-1. **Zainab (5):** kid mode on → tap the purple swatch → draw → say
-   "تراجع" (or "oops") → it undoes → stamp a rocket → say "play my game"
-   → the rocket catches stars.
+1. **Zainab (5):** kid mode on → say «اصنع لي قصة عن القمر» → hear the two
+   planned moments aloud → confirm → the painted, captioned flipbook plays →
+   one Undo removes the whole story → stamp a rocket → say "play my game" →
+   the rocket catches stars.
 2. **Victor (85):** comfort mode on → everything bigger and calmer →
    draw → undo → save → reopen tomorrow: the drawing is there.
 3. **Ali (30):** stylus pressure strokes → layers → import a photo →
    Vintage preset → crop → export JPEG q92.
 4. **Fatima (21):** Arabic UI → full RTL → draw calligraphy with mirror
    symmetry on → one undo removes the whole bloom.
-5. **George (45):** voice only: "brush" → "red" → "bigger" → draw → "new
-   frame" → draw → "play" → "save".
+5. **George (45):** voice-first: "make an animation with a red bird that finds
+   home" → hear and confirm the planned moments → the complete animation plays
+   → "record narration" → tell it aloud → "stop recording" → "save".
 6. **Sara (15):** Design mode → draw logo elements → align/distribute →
    save as component → new project → insert the component → export PNG.
 7. **Zǐxuān (28):** 12-frame bouncing ball (duplicate + onion skin) →

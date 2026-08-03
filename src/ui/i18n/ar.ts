@@ -81,6 +81,7 @@ export const ar: Record<string, string> = {
   'kid.play': 'شغّل!',
   'kid.stop': 'أوقف!',
   'kid.ai': 'اسأل حُلم!',
+  'storyboard.kid': 'احكِ قصة!',
   'kid.playGame': 'شغّل لعبتي!',
 
   // --- Tool options panel ---------------------------------------------------
@@ -221,6 +222,10 @@ export const ar: Record<string, string> = {
 
   // --- Timeline -----------------------------------------------------------------
   'timeline.frames': 'الإطارات',
+  'timeline.taskLabel': 'أدوات الخط الزمني',
+  'timeline.animateTask': 'تحريك',
+  'timeline.slidesTask': 'شرائح',
+  'timeline.appTask': 'تطبيق',
   'timeline.showFrames': 'إظهار الإطارات',
   'timeline.hideFrames': 'إخفاء الإطارات',
   'timeline.play': 'تشغيل',
@@ -267,12 +272,25 @@ export const ar: Record<string, string> = {
   'present.auto': 'تلقائي',
   'present.presenter': 'المقدّم',
   'present.presenterTitle': 'عرض المقدّم',
+  'present.loading': 'جارٍ فتح عرض المقدّم…',
+  'present.presenterBlocked':
+    'حظر المتصفح نافذة المقدّم. اسمح بالنوافذ المنبثقة لـ Dream ثم حاول مجددًا.',
+  'present.closeConsole': 'إغلاق نافذة المقدّم',
   'present.currentSlide': 'الشريحة الحالية {n}',
+  'present.currentPreview': 'معاينة الشريحة الحالية',
   'present.nextSlide': 'التالي: الشريحة {n}',
+  'present.nextPreview': 'معاينة الشريحة التالية',
   'present.endOfDeck': 'نهاية العرض',
   'present.noNotes': 'لا ملاحظات لهذه الشريحة.',
   'present.manual': 'تقدّم يدوي',
   'present.timed': 'تتقدم خلال {seconds} ثوانٍ',
+  'present.timing': 'توقيت العرض',
+  'present.elapsed': 'وقت العرض',
+  'present.remaining': 'الوقت المتبقي',
+  'present.noTimer': 'يدوي',
+  'present.previous': 'الشريحة السابقة',
+  'present.next': 'الشريحة التالية',
+  'present.focusAudience': 'إظهار نافذة الجمهور',
 
   // --- Voice narration -----------------------------------------------------------
   'narration.record': 'سجّل صوتي',
@@ -444,6 +462,32 @@ export const ar: Record<string, string> = {
   'ai.keyNote':
     'تبقى المفاتيح في ذاكرة هذا التبويب فقط ما لم تفعّل «تذكّر المفتاح». لا تُرسل أبدًا إلا إلى ذكائك الاصطناعي.',
 
+  // --- Storyboard ---------------------------------------------------------------------
+  'storyboard.short': 'قصة',
+  'storyboard.toolbarHint': 'حوّل قصة منطوقة أو مكتوبة إلى إطارات متحركة',
+  'storyboard.title': 'اصنع قصة',
+  'storyboard.hint':
+    'تحدث أو اكتب. يضع حُلم خطة صغيرة أولًا—لن يتغير شيء حتى تراجعها وتضغط «اصنع الرسوم».',
+  'storyboard.story': 'ماذا يحدث في قصتك؟',
+  'storyboard.placeholder': 'يستيقظ قمر صغير ويقابل ثعلبًا، ثم يرقصان تحت النجوم…',
+  'storyboard.empty': 'احكِ لي قصة صغيرة أولًا.',
+  'storyboard.plan': 'خطط الإطارات',
+  'storyboard.review': 'لوحة قصتك',
+  'storyboard.replan': 'خطط من جديد',
+  'storyboard.count': '{count} إطارات',
+  'storyboard.confirmHint': 'راجع كل لحظة أو غيّرها. رسمك ما زال كما هو.',
+  'storyboard.frame': 'الإطار {n}',
+  'storyboard.speak': 'اقرأ الإطار {n} بصوت عالٍ',
+  'storyboard.remove': 'حذف الإطار {n}',
+  'storyboard.newScene': 'لحظة جديدة في القصة',
+  'storyboard.add': 'أضف إطارًا',
+  'storyboard.provider': 'سيرسم {provider} عدد {count} من الإطارات التي راجعتها.',
+  'storyboard.painting': 'أرسم الإطار {current} من {total}…',
+  'storyboard.needScenes': 'احتفظ بلحظتين على الأقل كي تتحرك القصة.',
+  'storyboard.make': 'اصنع الرسوم',
+  'storyboard.working': 'أصنع قصتك…',
+  'storyboard.done': 'قصتك تتحرك! التراجع يزيل كل الإطارات الجديدة.',
+
   // --- Dialogs -----------------------------------------------------------------------
   'newDoc.title': 'مستند جديد',
   'newDoc.name': 'الاسم',
@@ -558,6 +602,7 @@ export const ar: Record<string, string> = {
   'voice.nothingToRedo': 'لا شيء لإعادته.',
   'voice.layerEmpty': 'هذه الطبقة فارغة أصلًا.',
   'voice.newFrame': 'إطار جديد!',
+  'voice.storyboard': 'هذه لوحة قصتك — راجعها ثم حرّكها!',
   'voice.playing': 'يعمل الآن!',
   'voice.playGame': 'هيّا نلعب لعبتك!',
   'voice.previewApp': 'هذا هو تطبيقك!',

@@ -7,13 +7,14 @@
  */
 
 import { create } from 'zustand';
-import { createDocument, createLayer, genId } from '../engine/document';
+import { createDocument, createFrame, createLayer, genId } from '../engine/document';
 import {
   activeFrameIndex,
   animationSettingsOf,
   blankFrame,
   cloneFrame,
   isAnimated,
+  MAX_FRAME_CAPTION_LENGTH,
   presentationFrames,
   MAX_FPS,
   MIN_FPS,
@@ -24,6 +25,7 @@ import {
   addLayerCommand,
   addOperationCommand,
   addOperationsCommand,
+  addStoryboardFramesCommand,
   cropDocumentCommand,
   duplicateFrameCommand,
   History,
@@ -202,6 +204,11 @@ export interface NewDocumentOptions {
   background?: Color;
 }
 
+export interface StoryboardFrameInput {
+  pixels: PixelBuffer;
+  caption: string;
+}
+
 export interface DreamStore {
   doc: DreamDocument;
   activeLayerId: string;
@@ -259,8 +266,13 @@ export interface DreamStore {
   lastEditMode: 'draw' | 'design';
   /** Right-side AI panel visibility (UI state, not persisted per project). */
   aiPanelOpen: boolean;
+  /** Voice-first storyboard builder visibility and optional spoken seed. */
+  storyboardOpen: boolean;
+  storyboardPrompt: string;
 
   toggleAiPanel(): void;
+  openStoryboard(prompt?: string): void;
+  closeStoryboard(): void;
 
   setTool(tool: ToolId): void;
   /** Switch workspace mode; persisted with the document (not undoable). */
@@ -344,6 +356,8 @@ export interface DreamStore {
   /** Switch the active frame — navigation, intentionally NOT undoable. */
   selectFrame(id: string): void;
   addFrame(): void;
+  /** Add a reviewed AI-painted storyboard as one undoable frame batch. */
+  addStoryboardFrames(scenes: readonly StoryboardFrameInput[]): void;
   duplicateFrame(): void;
   deleteFrame(id: string): void;
   moveFrame(id: string, toIndex: number): void;
@@ -530,8 +544,12 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
     gameRunning: false,
     lastEditMode: 'draw',
     aiPanelOpen: false,
+    storyboardOpen: false,
+    storyboardPrompt: '',
 
     toggleAiPanel: () => set((s) => ({ aiPanelOpen: !s.aiPanelOpen })),
+    openStoryboard: (prompt = '') => set({ storyboardOpen: true, storyboardPrompt: prompt }),
+    closeStoryboard: () => set({ storyboardOpen: false, storyboardPrompt: '' }),
 
     setTool: (tool) => {
       get().commitWand(); // a floating wand region settles before switching
@@ -1446,6 +1464,41 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       if (!doc.frames) return; // timeline is only reachable when animated
       execute(addFrameCommand(doc, blankFrame()));
       set((s) => ({ activeLayerId: reconcileActiveLayer(get().doc, s.activeLayerId) }));
+    },
+
+    addStoryboardFrames: (scenes) => {
+      const { doc } = get();
+      const frames = scenes
+        .filter(({ pixels }) => pixels.width > 0 && pixels.height > 0)
+        .map(({ pixels, caption }, index) => {
+          const scale = Math.min(doc.width / pixels.width, doc.height / pixels.height);
+          const op: ImageOp = {
+            kind: 'image',
+            id: genId('op'),
+            color: '#000000',
+            opacity: 1,
+            scale,
+            patch: {
+              x: Math.round((doc.width - pixels.width * scale) / 2),
+              y: Math.round((doc.height - pixels.height * scale) / 2),
+              width: pixels.width,
+              height: pixels.height,
+              data: pixels.data,
+            },
+          };
+          const frame = createFrame([createLayer(caption.trim() || `Story ${index + 1}`, [op])]);
+          const cleanCaption = caption.trim().slice(0, MAX_FRAME_CAPTION_LENGTH);
+          return cleanCaption ? { ...frame, presentation: { caption: cleanCaption } } : frame;
+        });
+      if (frames.length === 0) return;
+      set({ playing: false, playbackFrame: null });
+      execute(addStoryboardFramesCommand(doc, frames));
+      get().dismissHint();
+      set((state) => ({
+        activeLayerId: reconcileActiveLayer(get().doc, state.activeLayerId),
+        selection: [],
+        selectDraft: null,
+      }));
     },
 
     duplicateFrame: () => {

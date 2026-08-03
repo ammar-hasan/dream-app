@@ -722,3 +722,65 @@ shape people actually watch, without losing any artwork.
   vertical video, and play a complete uncropped, captioned result on a phone;
   generate a connected-AI image and see real pixels on both the canvas and in
   the self-contained Real Code app.
+
+## Slice 28 — Voice-to-storyboard animation ✅
+
+Personas: Zainab and George — turn one spoken idea into a complete, visible and
+recoverable animation without assembling frames by hand.
+
+- ✅ A deterministic English/Arabic planner turns one story into two to six
+  moments without contacting a provider or mutating the document. Every moment
+  is editable, removable, addable, replannable and individually readable aloud.
+- ✅ Adult Story and Little Dreamer Tell a story entry points share one
+  confirmable flow. Kid dictation plans immediately, kid action names speak on
+  hover/focus/touch, and global “make a story about…” / «اصنع لي قصة عن…»
+  commands open a prefilled plan without colliding with narration commands.
+- ✅ The active image-capable provider paints frames sequentially with the full
+  story in each continuity prompt; an image-less setup visibly falls back to
+  Dream AI. Results are held until all requests succeed, then captions and real
+  raster frames commit as one History command.
+- ✅ Blank canvases become only the story; static art is preserved as frame 1;
+  existing animations are appended. New storyboards loop and play at 1 fps,
+  and one Undo/Redo removes/restores the complete batch.
+- ✅ One whole Dream AI storyboard consumes one daily try, while image-capable
+  BYOK providers remain unlimited. Unit, component, browser and accessibility
+  coverage prove planning, provider failure, preserved art and one-step undo.
+
+## Slice 29 — Private synchronized Presenter window ✅
+
+Persona need: keep speaker notes and controls genuinely private when the
+audience is watching a projected or shared window.
+
+- ✅ Presenter opens a same-session second window. The audience stage contains
+  no notes; closing the console leaves the slideshow running, while leaving
+  Present or switching to App closes it.
+- ✅ The console renders current and next slide previews, private notes,
+  elapsed session time, authored timing and a live remaining-time countdown.
+- ✅ Previous, Next, Auto, keyboard navigation and audience-side navigation
+  stay synchronized. The presenter can focus the audience window, close only
+  the console or exit the complete session.
+- ✅ A blocked popup produces a friendly audience-safe message rather than an
+  in-window notes fallback. Theme, RTL, responsive layout and serious/critical
+  browser accessibility checks apply in the second window too.
+- Acceptance met: present a two-slide deck, open Presenter, control the audience
+  from the private console, and verify notes never enter the audience DOM.
+
+## Slice 30 — Phone timeline task focus ✅
+
+Persona need: let a phone user work with one interpretation of shared frames at
+a time without losing the frame strip or basic frame editing.
+
+- ✅ The adult phone timeline presents Animate, Slides and App as explicit
+  task choices while keeping live frames and add/duplicate/reorder/delete in
+  view for every task.
+- ✅ Animate contains playback, narration, fps, Loop and Onion; Slides contains
+  the current frame's Slide settings; App presents one large Link action until
+  links exist, then Preview app.
+- ✅ Wider layouts retain the complete timeline and Little Dreamer retains its
+  simpler animation-only controls with no extra reading-dependent choice.
+- ✅ A real 390 × 844 production-build interaction test proves every task,
+  prevents the chooser from overflowing, and scans all three states for
+  serious or critical accessibility violations. All three rendered states
+  received a principal-design visual review.
+- Acceptance met: switch among all three phone tasks, keep the same two frames
+  editable throughout, and enter Design's Link tool directly from App.

@@ -82,6 +82,7 @@ export const en: Record<string, string> = {
   'kid.play': 'Play!',
   'kid.stop': 'Stop!',
   'kid.ai': 'Ask Dream!',
+  'storyboard.kid': 'Tell a story!',
   'kid.playGame': 'Play my game!',
 
   // --- Tool options panel ---------------------------------------------------
@@ -223,6 +224,10 @@ export const en: Record<string, string> = {
 
   // --- Timeline -----------------------------------------------------------------
   'timeline.frames': 'Frames',
+  'timeline.taskLabel': 'Timeline tools',
+  'timeline.animateTask': 'Animate',
+  'timeline.slidesTask': 'Slides',
+  'timeline.appTask': 'App',
   'timeline.showFrames': 'Show frames',
   'timeline.hideFrames': 'Hide frames',
   'timeline.play': 'Play',
@@ -269,12 +274,25 @@ export const en: Record<string, string> = {
   'present.auto': 'Auto',
   'present.presenter': 'Presenter',
   'present.presenterTitle': 'Presenter view',
+  'present.loading': 'Opening presenter view…',
+  'present.presenterBlocked':
+    'The presenter window was blocked. Allow pop-ups for Dream and try again.',
+  'present.closeConsole': 'Close presenter window',
   'present.currentSlide': 'Current slide {n}',
+  'present.currentPreview': 'Current slide preview',
   'present.nextSlide': 'Next: slide {n}',
+  'present.nextPreview': 'Next slide preview',
   'present.endOfDeck': 'End of deck',
   'present.noNotes': 'No notes for this slide.',
   'present.manual': 'Manual advance',
   'present.timed': 'Advances in {seconds} seconds',
+  'present.timing': 'Presentation timing',
+  'present.elapsed': 'Session time',
+  'present.remaining': 'Time left',
+  'present.noTimer': 'Manual',
+  'present.previous': 'Previous slide',
+  'present.next': 'Next slide',
+  'present.focusAudience': 'Show audience window',
 
   // --- Voice narration -----------------------------------------------------------
   'narration.record': 'Record narration',
@@ -451,6 +469,32 @@ export const en: Record<string, string> = {
   'ai.keyNote':
     'Keys live only in this tab’s memory unless “remember key” is ticked. They are never sent anywhere but your AI.',
 
+  // --- Storyboard ---------------------------------------------------------------------
+  'storyboard.short': 'Story',
+  'storyboard.toolbarHint': 'Turn a spoken or typed story into animation frames',
+  'storyboard.title': 'Make a story',
+  'storyboard.hint':
+    'Talk or type. Dream makes a small plan first—nothing changes until you check it and press Make animation.',
+  'storyboard.story': 'What happens in your story?',
+  'storyboard.placeholder': 'A little moon wakes up, meets a fox, then they dance under the stars…',
+  'storyboard.empty': 'Tell me a little story first.',
+  'storyboard.plan': 'Plan my frames',
+  'storyboard.review': 'Your storyboard',
+  'storyboard.replan': 'Plan again',
+  'storyboard.count': '{count} frames',
+  'storyboard.confirmHint': 'Check or change every moment. Your drawing is still untouched.',
+  'storyboard.frame': 'Frame {n}',
+  'storyboard.speak': 'Read frame {n} aloud',
+  'storyboard.remove': 'Remove frame {n}',
+  'storyboard.newScene': 'A new moment in the story',
+  'storyboard.add': 'Add a frame',
+  'storyboard.provider': '{provider} will paint {count} reviewed frames.',
+  'storyboard.painting': 'Painting frame {current} of {total}…',
+  'storyboard.needScenes': 'Keep at least two moments so the story can move.',
+  'storyboard.make': 'Make animation',
+  'storyboard.working': 'Making your story…',
+  'storyboard.done': 'Your story is moving! Undo removes all the new frames.',
+
   // --- Dialogs -----------------------------------------------------------------------
   'newDoc.title': 'New document',
   'newDoc.name': 'Name',
@@ -566,6 +610,7 @@ export const en: Record<string, string> = {
   'voice.nothingToRedo': 'Nothing to redo.',
   'voice.layerEmpty': 'This layer is already empty.',
   'voice.newFrame': 'New frame!',
+  'voice.storyboard': 'Here’s your storyboard — check it, then make it move!',
   'voice.playing': 'Playing!',
   'voice.playGame': 'Let’s play your game!',
   'voice.previewApp': 'Here’s your app!',

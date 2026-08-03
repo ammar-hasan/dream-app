@@ -31,7 +31,9 @@ never per document.
 - **Brush sizes:** three sizes shown as dots — **Small 6 px, Medium 16 px,
   Big 32 px**.
 - **The kid panel:** big Undo!/Redo! buttons; a Play!/Stop! button when
-  frames exist; "Ask Dream!" (the AI Create box with a giant mic); the
+  frames exist; an always-visible "Tell a story!" journey with a giant mic,
+  automatic planning after dictation, read-aloud moments and spoken action
+  names; "Ask Dream!" (the AI Create box with a giant mic); the
   stamp picker as a giant grid (with "Start with a picture" scenes) when
   the stamp tool is active.
 - **The kid toolbar:** the Dream mark, Undo/Redo, the mic, "Play my game!"
@@ -87,6 +89,7 @@ didn't understand. Say 'help'…" and changes nothing.
 | redo             | "redo"                                                                                                                                                 | إعادة، أعد                                                                       | one redo step                                                                                    |
 | clear            | "clear", "erase everything", "start over"                                                                                                              | امسح، نظف                                                                        | asks "Clear this layer? Say yes…" — spoken yes confirms ("All clear!"), anything else cancels    |
 | new frame        | "new frame", "add frame"                                                                                                                               | إطار جديد، فريم جديد                                                             | enables animation if needed, adds a frame                                                        |
+| make a story     | "make a story about…", "make an animation with…"                                                                                                       | اصنع لي قصة عن…                                                                  | opens a locally planned, editable storyboard prefilled from the rest of the spoken request       |
 | play / stop      | "play", "animate" / "stop", "pause"                                                                                                                    | شغّل / أوقف                                                                      | plays the animation (needs frames) / stops playback and any game                                 |
 | play my game     | "play my game", "play flappy", "play maze", "play catch"                                                                                               | العب لعبتي، المتاهة، الطيران                                                     | switches to Play (optionally switching template) and starts a run                                |
 | preview my app   | "preview my app", "test the app"                                                                                                                       | عاين التطبيق                                                                     | opens the app preview (needs frames)                                                             |
@@ -117,7 +120,8 @@ Arabic: أحمر، برتقالي، أصفر، أخضر، فيروزي، سما�
 1. Confirmation answers (yes/no) — only for very short utterances.
 2. Help, undo, redo, then **narration phrases** — they contain stop and
    clear words ("stop recording" isn't stop; «امسح الصوت» isn't clear) —
-   then clear, new frame.
+   then the make-a-story phrases, clear and new frame. "Tell the story" stays
+   narration; it never creates a storyboard.
 3. **Mirror phrases before play words** — "شغّل التناظر" turns mirroring
    on, it never starts playback.
 4. App preview/export, the make-real code export, stop, game intents,

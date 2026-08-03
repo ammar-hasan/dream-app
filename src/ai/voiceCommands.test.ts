@@ -71,6 +71,19 @@ describe('parseVoiceCommand — animation', () => {
     expect(parseVoiceCommand('pause it')).toEqual({ kind: 'stop' });
   });
 
+  it('opens a storyboard and keeps the spoken story for confirmation', () => {
+    expect(parseVoiceCommand('make a story')).toEqual({ kind: 'storyboard' });
+    expect(parseVoiceCommand('make a story about a moon who meets a fox')).toEqual({
+      kind: 'storyboard',
+      prompt: 'a moon who meets a fox',
+    });
+    expect(parseVoiceCommand('make an animation with a dancing rocket')).toEqual({
+      kind: 'storyboard',
+      prompt: 'a dancing rocket',
+    });
+    expect(parseVoiceCommand('tell the story')).toEqual({ kind: 'record-narration' });
+  });
+
   it('parses the narration commands', () => {
     expect(parseVoiceCommand('record narration')).toEqual({ kind: 'record-narration' });
     expect(parseVoiceCommand('record my voice')).toEqual({ kind: 'record-narration' });
@@ -210,6 +223,14 @@ describe('parseVoiceCommand — Arabic vocabulary (locale "ar")', () => {
     expect(parseVoiceCommand('إطار جديد', 'ar')).toEqual({ kind: 'new-frame' });
     expect(parseVoiceCommand('شَغِّل', 'ar')).toEqual({ kind: 'play' });
     expect(parseVoiceCommand('أوقف', 'ar')).toEqual({ kind: 'stop' });
+  });
+
+  it('opens an Arabic storyboard with the spoken idea intact', () => {
+    expect(parseVoiceCommand('اصنع قصة', 'ar')).toEqual({ kind: 'storyboard' });
+    expect(parseVoiceCommand('اصنع لي قصة عن قمر يقابل ثعلبا', 'ar')).toEqual({
+      kind: 'storyboard',
+      prompt: 'قمر يقابل ثعلبا',
+    });
   });
 
   it('"العب لعبتي" routes to the game; "أوقف اللعبة" still stops', () => {

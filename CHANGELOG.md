@@ -7,6 +7,38 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Phone timeline task focus** (slice 30): the adult phone timeline now keeps
+  frames and their add/duplicate/reorder/delete actions visible while an
+  Animate / Slides / App switch reveals only the controls for the current
+  job. Animate contains playback, narration, speed, looping and onion skin;
+  Slides exposes the current slide settings; App offers linking first and
+  preview once links exist. Desktop behavior and Little Dreamer's simpler
+  animation path stay unchanged. A 390 px interaction test, serious/critical
+  accessibility scan and three-state visual review cover the responsive flow.
+
+- **Private synchronized Presenter window** (slice 29): Presenter now opens a
+  true second-window console instead of placing speaker notes over the audience
+  stage. It shows current and next slide previews, private notes, session time,
+  authored timing and a live countdown; Previous, Next and Auto control the
+  audience in sync, with actions to focus the audience, close only the console
+  or exit the show. Keyboard control follows whichever window has focus.
+  Closing or blocking the popup never interrupts the audience and never exposes
+  notes; blocked popups get a friendly instruction. The console reuses both
+  themes, RTL and the automated accessibility floor.
+
+- **Voice-to-storyboard animation** (slice 28): Story in the adult toolbar and
+  the large Little Dreamer “Tell a story!” action turn one English or Arabic
+  spoken/typed idea into two to six reviewable moments. Planning is local,
+  deterministic and document-safe; moments can be edited, added, removed,
+  replanned and read aloud before confirmation. Kid dictation plans
+  immediately and action names are spoken. The active image-capable provider,
+  or a clearly named Dream AI fallback, paints the reviewed sequence in order
+  with whole-story continuity instructions. The all-or-nothing captioned frame
+  batch preserves existing art, starts a new flipbook slowly, dismisses
+  first-run onboarding before showing the result, and is removed by one Undo.
+  One complete Dream AI story spends one free try; BYOK painting is unlimited.
+  Global English/Arabic story commands open the same prefilled plan.
+
 - **Social-ready video export** (slice 27): WebM and natively supported MP4
   exports can now be Original, Vertical 9:16, Square 1:1 or Landscape 16:9 at
   720p. Dream contains the complete canvas without cropping or stretching,
@@ -127,7 +159,7 @@ All notable changes to Dream are documented here. The format is based on
   experience map, visual identity, integrations, and an acceptance
   checklist — detailed enough to rebuild Dream from the spec alone, in any
   stack. AGENTS.md rule 12 makes spec updates part of every behavior change.
-  (The checklist began at 90 points and now contains 111.)
+  (The checklist began at 90 points and now contains 121.)
 - Play mode game templates: **Flappy Dream** (flap through scrolling gates,
   one hit ends the run, 3 shields in kid mode) and **Maze Runner** (seeded,
   always-solvable generated mazes with level-ups) join **Catch!** behind a

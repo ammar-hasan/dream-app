@@ -56,6 +56,32 @@ test('Dream AI generates a new layer from a prompt', async ({ page }) => {
   await expect(page.locator('.layer-list > li')).toHaveCount(layerCount + 1);
 });
 
+test('a reviewed story becomes painted animation frames and one undo removes the batch', async ({
+  page,
+}) => {
+  await bootApp(page);
+  await page.getByRole('button', { name: /^Story/ }).click();
+  const dialog = page.getByRole('dialog', { name: 'Make a story' });
+  await dialog
+    .getByLabel('What happens in your story?')
+    .fill('Moon wakes up, then Fox waves hello');
+  await dialog.getByRole('button', { name: 'Plan my frames' }).click();
+  await expect(dialog.getByRole('textbox', { name: 'Frame 1' })).toHaveValue('Moon wakes up');
+  await expect(dialog.getByRole('textbox', { name: 'Frame 2' })).toHaveValue('Fox waves hello');
+  await expect(page.locator('.timeline-bar')).toHaveCount(0);
+
+  await dialog.getByRole('textbox', { name: 'Frame 2' }).fill('Fox smiles and waves');
+  await dialog.getByRole('button', { name: 'Make animation' }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.locator('.timeline-frame:not(.timeline-add)')).toHaveCount(2);
+  await expect(page.locator('.timeline-frame-caption')).toHaveCount(2);
+  await expect(page.getByRole('button', { name: 'Pause' })).toBeVisible();
+  await expect(page.locator('.hint-card')).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(page.locator('.timeline-bar')).toHaveCount(0);
+});
+
 test('connected OpenAI-compatible image generation paints returned PNG pixels', async ({
   page,
 }) => {
@@ -157,12 +183,73 @@ test('slide settings reach Presenter view with notes', async ({ page }) => {
   await page.getByRole('tab', { name: 'Present' }).click();
   await page.getByRole('button', { name: 'Auto' }).click();
   await expect(page.locator('.present-counter')).toHaveText('2 / 2', { timeout: 2000 });
+  const popupPromise = page.waitForEvent('popup');
   await page.getByRole('button', { name: 'Presenter' }).click();
+  const presenterPage = await popupPromise;
 
-  const presenter = page.locator('.presenter-panel');
+  const presenter = presenterPage.locator('.presenter-console');
   await expect(presenter).toContainText('Ask everyone what they notice.');
   await expect(presenter).toContainText('Advances in 4 seconds');
   await expect(presenter).toContainText('End of deck');
+  await expect(presenter.locator('.presenter-preview-canvas')).toHaveCount(1);
+  await expect(presenterPage.getByRole('button', { name: 'Show audience window' })).toBeVisible();
+  await expect(page.getByText('Ask everyone what they notice.')).toHaveCount(0);
+
+  await presenterPage.getByRole('button', { name: 'Auto' }).click();
+  await presenterPage.getByRole('button', { name: 'Previous slide' }).click();
+  await expect(page.locator('.present-counter')).toHaveText('1 / 2');
+  await expect(presenter).toContainText('Current slide 1');
+  await expect(presenter.locator('.presenter-preview-canvas')).toHaveCount(2);
+});
+
+test('blocked Presenter popup never exposes private notes on the audience stage', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    window.open = () => null;
+  });
+  await bootApp(page);
+  await page.getByRole('button', { name: /^Animate/ }).click();
+  await page.getByRole('button', { name: 'Slide settings' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Slide settings' });
+  await dialog.getByLabel('Speaker notes').fill('Private reminder for me only.');
+  await dialog.getByRole('button', { name: 'Save' }).click();
+  await page.getByRole('tab', { name: 'Present' }).click();
+  await page.getByRole('button', { name: 'Presenter' }).click();
+
+  await expect(page.getByRole('alert')).toContainText('Allow pop-ups for Dream');
+  await expect(page.getByText('Private reminder for me only.')).toHaveCount(0);
+  await expect(page.locator('.present-counter')).toHaveText('1 / 1');
+});
+
+test('phone timeline keeps frames visible while focusing one task at a time', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await bootApp(page);
+  await page.getByRole('button', { name: /^Animate/ }).click();
+  await page.getByRole('button', { name: 'Add frame' }).click();
+
+  const tasks = page.getByRole('group', { name: 'Timeline tools' });
+  await expect(tasks).toBeVisible();
+  await expect(tasks.getByRole('button', { name: 'App' })).toBeVisible();
+  const [taskBox, viewportWidth] = await Promise.all([
+    tasks.boundingBox(),
+    page.evaluate(() => window.innerWidth),
+  ]);
+  expect(taskBox && taskBox.x >= 0 && taskBox.x + taskBox.width <= viewportWidth).toBe(true);
+  await expect(page.getByRole('button', { name: 'Frame 1' })).toBeVisible();
+  await expect(page.getByLabel('Frames per second')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Slide settings' })).toBeHidden();
+
+  await tasks.getByRole('button', { name: 'Slides' }).click();
+  await expect(page.getByRole('button', { name: 'Slide settings' })).toBeVisible();
+  await expect(page.getByLabel('Frames per second')).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Duplicate this frame' })).toBeVisible();
+
+  await tasks.getByRole('button', { name: 'App' }).click();
+  const appAction = page.getByRole('button', { name: /Link your frames/ });
+  await expect(appAction).toBeVisible();
+  await appAction.click();
+  await expect(page.getByRole('tab', { name: 'Design' })).toHaveAttribute('aria-selected', 'true');
 });
 
 test('MP4 export appears only when native recording is supported', async ({ page }) => {
@@ -205,6 +292,7 @@ test('kid mode swaps in the big rail and back', async ({ page }) => {
   await page.getByRole('button', { name: 'Little Dreamer mode' }).click();
   await expect(page.locator('.tool-rail.kid-rail')).toBeVisible();
   await expect(page.locator('.kid-panel')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Tell a story!' })).toBeVisible();
   await page.getByRole('button', { name: 'Little Dreamer mode' }).click();
   await expect(page.locator('.tool-rail.kid-rail')).toHaveCount(0);
   await expect(page.locator('.tool-rail')).toBeVisible();

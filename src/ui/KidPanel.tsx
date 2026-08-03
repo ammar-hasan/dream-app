@@ -9,7 +9,7 @@ import { useT } from './i18n';
 import { useSpeakName } from './useSpeakName';
 import { AiPanel } from './AiPanel';
 import { StampPicker } from './StampPicker';
-import { PauseIcon, PlayIcon, RedoIcon, SparkleIcon, UndoIcon } from './icons';
+import { PauseIcon, PlayIcon, RedoIcon, SparkleIcon, StoryIcon, UndoIcon } from './icons';
 
 export function KidPanel() {
   const t = useT();
@@ -65,6 +65,18 @@ export function KidPanel() {
             <span>{playing ? t('kid.stop') : t('kid.play')}</span>
           </button>
         )}
+
+        <button
+          type="button"
+          className="btn kid-big-btn kid-story-btn"
+          aria-label={t('storyboard.kid')}
+          onPointerEnter={speak('storyboard.kid')}
+          onFocus={speak('storyboard.kid')}
+          onClick={() => useDreamStore.getState().openStoryboard()}
+        >
+          <StoryIcon />
+          <span>{t('storyboard.kid')}</span>
+        </button>
 
         <button
           type="button"

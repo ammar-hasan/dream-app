@@ -125,6 +125,48 @@ describe('frame CRUD', () => {
   });
 });
 
+describe('storyboard frame batch', () => {
+  const pixels = (value: number) => ({
+    width: 2,
+    height: 2,
+    data: new Uint8ClampedArray(16).fill(value),
+  });
+
+  it('adds painted captioned frames and one undo removes the whole storyboard', () => {
+    store().addStoryboardFrames([
+      { pixels: pixels(10), caption: 'Moon wakes' },
+      { pixels: pixels(20), caption: 'Fox waves' },
+    ]);
+    expect(store().doc.frames).toHaveLength(2);
+    expect(store().doc.frames?.map((frame) => frame.presentation?.caption)).toEqual([
+      'Moon wakes',
+      'Fox waves',
+    ]);
+    expect(store().doc.frames?.[0].layers[0].operations[0]).toMatchObject({
+      kind: 'image',
+      scale: 40,
+    });
+    expect(store().doc.layers).toBe(store().doc.frames?.[0].layers);
+
+    store().undo();
+    expect(store().doc.frames).toBeUndefined();
+    expect(store().doc.layers[0].operations).toHaveLength(0);
+    store().redo();
+    expect(store().doc.frames).toHaveLength(2);
+  });
+
+  it('preserves a drawing ahead of the generated story', () => {
+    drawStroke();
+    store().addStoryboardFrames([{ pixels: pixels(30), caption: 'A new moment' }]);
+    expect(store().doc.frames).toHaveLength(2);
+    expect(store().doc.frames?.[0].layers[0].operations[0].kind).toBe('stroke');
+    expect(store().doc.frames?.[1].layers[0].operations[0].kind).toBe('image');
+    store().undo();
+    expect(store().doc.frames).toBeUndefined();
+    expect(store().doc.layers[0].operations[0].kind).toBe('stroke');
+  });
+});
+
 describe('frame switching + drawing', () => {
   it('each frame keeps its own layer stack; doc.layers mirrors the active one', () => {
     store().toggleAnimation();

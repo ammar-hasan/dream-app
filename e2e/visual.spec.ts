@@ -10,6 +10,16 @@ import { bootApp } from './helpers';
  */
 test('welcome state matches the visual baseline', async ({ page }) => {
   await bootApp(page);
+  const toolbar = page.locator('.toolbar');
+  const settings = page.getByRole('button', { name: 'Settings' });
+  await expect(settings).toBeVisible();
+  const [settingsBox, viewportWidth, scrollLeft] = await Promise.all([
+    settings.boundingBox(),
+    page.evaluate(() => window.innerWidth),
+    toolbar.evaluate((element) => element.scrollLeft),
+  ]);
+  expect(scrollLeft).toBe(0);
+  expect(settingsBox && settingsBox.x + settingsBox.width <= viewportWidth).toBe(true);
   await expect(page).toHaveScreenshot('welcome.png', {
     fullPage: true,
     animations: 'disabled',

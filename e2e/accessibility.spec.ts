@@ -35,8 +35,11 @@ test('slide settings and Presenter view have no serious automated violations', a
 
   await page.getByRole('button', { name: 'Cancel' }).click();
   await page.getByRole('tab', { name: 'Present' }).click();
+  const popupPromise = page.waitForEvent('popup');
   await page.getByRole('button', { name: 'Presenter' }).click();
+  const presenterPage = await popupPromise;
   expect(await seriousViolations(page)).toEqual([]);
+  expect(await seriousViolations(presenterPage)).toEqual([]);
 });
 
 test('social-video caption controls have no serious automated violations', async ({ page }) => {
@@ -44,5 +47,30 @@ test('social-video caption controls have no serious automated violations', async
   await page.getByRole('button', { name: /^Animate/ }).click();
   await page.getByRole('button', { name: 'Export' }).click();
   await page.getByRole('button', { name: 'WebM video' }).click();
+  expect(await seriousViolations(page)).toEqual([]);
+});
+
+test('voice-first storyboard planning has no serious automated violations', async ({ page }) => {
+  await bootApp(page);
+  await page.getByRole('button', { name: /^Story/ }).click();
+  const dialog = page.getByRole('dialog', { name: 'Make a story' });
+  expect(await seriousViolations(page)).toEqual([]);
+  await dialog
+    .getByLabel('What happens in your story?')
+    .fill('Moon wakes up, then Fox waves hello');
+  await dialog.getByRole('button', { name: 'Plan my frames' }).click();
+  expect(await seriousViolations(page)).toEqual([]);
+});
+
+test('phone timeline task views have no serious automated violations', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await bootApp(page);
+  await page.getByRole('button', { name: /^Animate/ }).click();
+
+  const tasks = page.getByRole('group', { name: 'Timeline tools' });
+  expect(await seriousViolations(page)).toEqual([]);
+  await tasks.getByRole('button', { name: 'Slides' }).click();
+  expect(await seriousViolations(page)).toEqual([]);
+  await tasks.getByRole('button', { name: 'App' }).click();
   expect(await seriousViolations(page)).toEqual([]);
 });

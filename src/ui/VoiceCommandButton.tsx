@@ -40,6 +40,7 @@ function executorStore(announceDone?: (message: string) => void): VoiceExecutorS
     clearLayer: s.clearLayer,
     toggleAnimation: s.toggleAnimation,
     addFrame: s.addFrame,
+    openStoryboard: s.openStoryboard,
     play: s.play,
     pause: s.pause,
     setMode: s.setMode,

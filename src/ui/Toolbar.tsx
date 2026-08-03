@@ -20,7 +20,15 @@ import { useSpeakName } from './useSpeakName';
 import { SettingsMenu } from './SettingsMenu';
 import { VoiceCommandButton } from './VoiceCommandButton';
 import { KID_TOOLS } from './ToolRail';
-import { DreamMark, GamepadIcon, RedoIcon, SparkleIcon, StarIcon, UndoIcon } from './icons';
+import {
+  DreamMark,
+  GamepadIcon,
+  RedoIcon,
+  SparkleIcon,
+  StarIcon,
+  StoryIcon,
+  UndoIcon,
+} from './icons';
 
 const MODES = ['draw', 'design', 'play', 'present'] as const;
 
@@ -235,6 +243,15 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
           onClick={() => useDreamStore.getState().toggleAnimation()}
         >
           {t('toolbar.animate')}
+        </button>
+        <button
+          type="button"
+          className="btn"
+          data-tooltip={t('storyboard.toolbarHint')}
+          onClick={() => useDreamStore.getState().openStoryboard()}
+        >
+          <StoryIcon />
+          {t('storyboard.short')}
         </button>
         <button
           type="button"

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { useKeyboardShortcuts } from './ui/useKeyboardShortcuts';
 import { useAutosave, useRestoreLastDocument } from './ui/usePersistence';
 import { useImagePaste } from './ui/useImagePaste';
@@ -20,7 +20,6 @@ import { KidPanel } from './ui/KidPanel';
 import { LayersPanel } from './ui/LayersPanel';
 import { StatusBar } from './ui/StatusBar';
 import { TimelineBar } from './ui/TimelineBar';
-import { PresentView } from './ui/PresentView';
 import { PlayView } from './ui/PlayView';
 import { PlayPanel } from './ui/PlayPanel';
 import { NewDocumentDialog } from './ui/NewDocumentDialog';
@@ -28,8 +27,14 @@ import { OpenDialog } from './ui/OpenDialog';
 import { ResizeDialog } from './ui/ResizeDialog';
 import { ExportDialog } from './ui/ExportDialog';
 import { UpdateToast } from './ui/UpdateToast';
+import { StoryboardDialog } from './ui/StoryboardDialog';
 
 type Dialog = 'new' | 'open' | 'resize' | 'export' | null;
+
+const PresentView = lazy(async () => {
+  const module = await import('./ui/PresentView');
+  return { default: module.PresentView };
+});
 
 export default function App() {
   const [dialog, setDialog] = useState<Dialog>(null);
@@ -38,6 +43,8 @@ export default function App() {
   const mode = useDreamStore((s) => s.mode);
   const pendingHotspot = useDreamStore((s) => s.pendingHotspot);
   const aiPanelOpen = useDreamStore((s) => s.aiPanelOpen);
+  const storyboardOpen = useDreamStore((s) => s.storyboardOpen);
+  const storyboardPrompt = useDreamStore((s) => s.storyboardPrompt);
   const kidMode = useUiPrefs((s) => s.kidMode);
   const theme = useUiPrefs((s) => s.theme);
   const comfortMode = useUiPrefs((s) => s.comfortMode);
@@ -75,7 +82,13 @@ export default function App() {
   }, [splash]);
 
   // Present mode replaces the whole editor: slides only, no editing.
-  if (mode === 'present') return <PresentView />;
+  if (mode === 'present') {
+    return (
+      <Suspense fallback={<div className="present-view" />}>
+        <PresentView />
+      </Suspense>
+    );
+  }
 
   return (
     <div className={`app${kidMode ? ' kid-mode' : ''}`}>
@@ -119,6 +132,13 @@ export default function App() {
       {dialog === 'resize' && <ResizeDialog onClose={() => setDialog(null)} />}
       {dialog === 'export' && <ExportDialog onClose={() => setDialog(null)} />}
       {pendingHotspot && <LinkDialog />}
+      {storyboardOpen && (
+        <StoryboardDialog
+          key={storyboardPrompt}
+          initialPrompt={storyboardPrompt}
+          onClose={() => useDreamStore.getState().closeStoryboard()}
+        />
+      )}
       <UpdateToast />
       {splash !== 'gone' && (
         <div className={`splash${splash === 'fade' ? ' fade' : ''}`} aria-hidden="true">

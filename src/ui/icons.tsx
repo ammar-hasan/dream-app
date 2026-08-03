@@ -122,6 +122,15 @@ export const TextIcon = (p: IconProps) => (
   </svg>
 );
 
+/** Open storybook with a small sparkle: voice/text → storyboard animation. */
+export const StoryIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M4 5.5c3.2-.8 5.8-.2 8 1.7v12c-2.2-1.9-4.8-2.5-8-1.7Z" />
+    <path d="M20 5.5c-3.2-.8-5.8-.2-8 1.7v12c2.2-1.9 4.8-2.5 8-1.7Z" />
+    <path d="m17 2 .5 1.2 1.2.5-1.2.5L17 5.4l-.5-1.2-1.2-.5 1.2-.5Z" />
+  </svg>
+);
+
 export const PanIcon = (p: IconProps) => (
   <svg {...base(p)}>
     <path d="M8 12V6.5a1.5 1.5 0 0 1 3 0V11" />

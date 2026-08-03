@@ -237,6 +237,20 @@ play button, everything called "frames".
   on/off. Editing pauses while playing. Space toggles play **when the
   timeline has focus** (click any frame first); everywhere else Space stays
   hold-to-pan.
+- **Phone task focus**: at phone width the frame strip and frame-editing
+  actions stay visible, while an Animate / Slides / App choice shows only the
+  controls needed for that job. App leads to linking first and preview once
+  links exist. Desktop keeps the complete timeline; Little Dreamer keeps its
+  simpler animation-only path.
+- **Story to animation**: choose Story, tap Little Dreamer's large “Tell a
+  story!”, or say “make a story about…” / «اصنع لي قصة عن…». Dream locally
+  plans two to six numbered moments before touching the canvas. Edit, add,
+  remove, replan or hear each moment aloud, then confirm once. The active
+  image-capable provider (or the clearly named built-in fallback) paints the
+  sequence with whole-story continuity; only a completely successful batch
+  lands, captions retain the reviewed words, existing artwork is preserved,
+  and one Undo removes all generated frames. A whole built-in story costs one
+  daily try; image-capable BYOK stays unlimited.
 - **Voice narration**: the timeline's mic button records one voice take over
   the playing animation — tap, talk ("once upon a time…"), tap to save.
   Re-recording replaces the take after a gentle confirm (kid mode skips the
@@ -272,8 +286,10 @@ play button, everything called "frames".
   click to advance, ← to go back, Esc to exit, slide counter at the bottom.
   Each slide can enter with no transition, a fade or a slide, advance after
   1–60 seconds, and carry presenter-only speaker notes. **Auto** follows those
-  durations (pausing on manual slides); **Presenter** reveals notes, timing and
-  what comes next without putting notes on the artwork.
+  durations (pausing on manual slides); **Presenter** opens a synchronized
+  second window with current/next previews, private notes, elapsed/remaining
+  timing and audience controls. Notes never enter the audience window; popup
+  blocking is explained without falling back to an unsafe overlay.
   No editing while presenting. A document without frames is a one-slide deck.
   Present is session-only — a project saved mid-presentation reopens in Draw.
 
@@ -287,7 +303,8 @@ like the workspace mode, live outside undo.
 ## The AI panel (Dream AI + BYOK)
 
 The sparkle button in the toolbar (or the `A` key) opens the AI panel — a
-friendly assistant you talk to, with three tabs. Everything it does lands
+friendly assistant you talk to, with three tabs. Story-to-animation is its
+fifth capability and lives beside Animate. Everything it does lands
 on the document through the same undoable history as your own strokes.
 
 - **Create**: describe what you want ("a sleepy fox under a starry sky")

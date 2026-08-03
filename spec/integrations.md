@@ -45,6 +45,14 @@ Rules:
    provider is unlimited.
 6. Errors are surfaced in plain language (see the message list in
    `features/ai.md`); provider plumbing details never reach the user.
+7. A confirmed storyboard sends one image-generation request per reviewed
+   moment, in story order, at the exact document dimensions. Every request
+   includes the complete story, the current moment and its position in the
+   sequence, with instructions to preserve recurring visual identity and omit
+   lettering. All responses are collected before the document changes. An
+   image-capable BYOK provider handles the sequence without a Dream AI charge;
+   otherwise the named built-in fallback paints the whole storyboard for one
+   free try.
 
 ## The agent surface (dream-mcp)
 

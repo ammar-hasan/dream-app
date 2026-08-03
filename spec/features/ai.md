@@ -1,7 +1,7 @@
 # The AI panel (Dream AI + BYOK)
 
 **Purpose.** A friendly assistant you talk to, opened with the sparkle
-button or the **A** key. Three actions — **Create, Edit, Feedback** — and
+button or the **A** key. Three panel actions — **Create, Edit, Feedback** — and
 everything it does lands on the document through the same undoable history
 as your own strokes.
 
@@ -112,14 +112,29 @@ The summary always says what it sees: "I see N marks on L layers, covering
 about X% of the canvas. The colors feel warm and cosy / cool and calm /
 nicely balanced."
 
+### Story to animation
+
+**Story** is the assistant's fifth capability and lives beside Animate rather
+than inside the panel. One English or Arabic story is planned locally into two
+to six editable moments before any provider call or document change. Each
+reviewed moment can be read aloud; the user explicitly confirms before the
+active image-capable provider paints the sequence. The provider is reminded of
+the complete story for every moment so recurring characters and colors remain
+coherent. All pictures must succeed before the complete captioned frame batch
+lands as one undoable change. Full behavior is in `features/animation.md`.
+
 ### The free tier
 
 **20 free Dream AI tries per day** (local calendar day, rolls over at
-midnight), counted across Create/Edit/Feedback **and the make-real code
-export** (`features/app-mode.md`) and shown subtly in the
+midnight), counted across Create/Edit/Feedback, **one complete built-in
+storyboard**, and the **make-real code export** (`features/app-mode.md`) and
+shown subtly in the
 panel ("N free tries left today"). At zero: "That is all the free dreams
 for today! Add your own AI in Settings below for unlimited magic."
-Connecting your own provider makes the counter disappear — unlimited.
+Connecting your own provider makes the counter disappear — unlimited when it
+can paint. An active assistant without image creation falls back to Dream AI
+for a storyboard, so that storyboard uses one built-in try and says which
+painter will be used before confirmation.
 
 ## Code generation (make real)
 
@@ -177,7 +192,9 @@ for both image fields is `gpt-image-2`.
 ## Kid mode
 
 The AI panel simplifies to a single Create box with a giant mic and a big
-"Make it!" button — no tabs, no settings.
+"Make it!" button — no tabs, no settings. A separate always-visible **Tell a
+story!** control opens the confirmable story-to-animation journey with the same
+giant dictation control and read-aloud moments.
 
 ## Edge cases
 

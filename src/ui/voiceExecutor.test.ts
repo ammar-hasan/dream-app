@@ -23,6 +23,7 @@ function makeStore(overrides: Partial<VoiceExecutorStore> = {}) {
     clearLayer: vi.fn(),
     toggleAnimation: vi.fn(),
     addFrame: vi.fn(),
+    openStoryboard: vi.fn(),
     play: vi.fn(),
     pause: vi.fn(),
     setMode: vi.fn(),
@@ -127,6 +128,15 @@ describe('executeVoiceCommand', () => {
     executeVoiceCommand({ kind: 'stop' }, animated, () => {});
     expect(animated.pause).toHaveBeenCalledOnce();
     expect(animated.stopGame).toHaveBeenCalledOnce();
+  });
+
+  it('opens the confirmable storyboard flow with a spoken idea', () => {
+    const store = makeStore();
+    expect(
+      executeVoiceCommand({ kind: 'storyboard', prompt: 'a moon who meets a fox' }, store, () => {})
+        ?.message,
+    ).toBe('Here’s your storyboard — check it, then make it move!');
+    expect(store.openStoryboard).toHaveBeenCalledWith('a moon who meets a fox');
   });
 
   it('"play my game" switches to Play mode and starts a run', () => {

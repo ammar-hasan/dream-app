@@ -38,13 +38,30 @@ frame is duplicated.
 - **On-screen caption:** optional short viewer-facing text shared with video
   export. It is burned into shaped video exports but does not appear over a
   live slideshow.
-- **Speaker notes:** optional presenter-only plain text. Notes never appear over the
-  audience canvas; they are revealed only when Presenter view is on.
+- **Speaker notes:** optional presenter-only plain text. Notes never appear in
+  the audience window or over its canvas; they exist only in the separate
+  Presenter window.
 
 The **Auto** session toggle follows each slide's duration. It pauses on an
 untimed slide and at the end of the deck. The **Presenter** session toggle
-opens a presenter panel with the current slide number, its notes, its timing and
-the next slide number. Neither toggle is saved with the project.
+opens a separate synchronized window, leaving the audience stage clean. The
+private window contains:
+
+- the current slide preview, number and speaker notes;
+- session elapsed time, the current slide's authored timing and a live
+  remaining-time countdown when that slide is timed;
+- the next slide's number and visual preview, or an unmistakable end-of-deck
+  state;
+- Previous, Next and Auto controls that drive the audience window, plus actions
+  to bring the audience window forward, close only the Presenter window, or
+  exit the whole presentation.
+
+Keyboard navigation also works while the Presenter window has focus. Slide
+changes from click, keyboard, Auto or either window stay synchronized. Closing
+the Presenter window leaves the audience presentation running; leaving Present
+or switching to App closes it. If the browser blocks the extra window, the
+audience stage shows a friendly request to allow Dream pop-ups and no notes are
+exposed there. Presenter and Auto remain session-only and are never saved.
 
 ## App flavor
 
@@ -66,6 +83,8 @@ flavor it behaves like an app, not a slideshow — full hotspot semantics in
 - Entering Present stops any animation playback.
 - The flavor toggle choice is session state — every Present session opens
   in Slideshow flavor.
+- The Presenter window is optional. A blocked or manually closed window never
+  pauses or changes the audience slideshow.
 - Under reduced-motion, transitions render instantly (see
   `../visual-identity.md`).
 - Old projects have no slide settings and therefore remain instant, manual

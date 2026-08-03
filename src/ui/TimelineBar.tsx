@@ -95,6 +95,7 @@ export function TimelineBar() {
   const kidMode = useUiPrefs((s) => s.kidMode);
   const [collapsed, setCollapsed] = useState(false);
   const [slideSettingsOpen, setSlideSettingsOpen] = useState(false);
+  const [mobileTask, setMobileTask] = useState<'animate' | 'slides' | 'app'>('animate');
 
   if (!doc.frames) return null;
 
@@ -125,6 +126,7 @@ export function TimelineBar() {
       tabIndex={0}
       role="group"
       aria-label={t('timeline.frames')}
+      data-mobile-task={kidMode ? 'animate' : mobileTask}
       onKeyDown={onKeyDown}
     >
       <button
@@ -139,9 +141,25 @@ export function TimelineBar() {
 
       {!collapsed && (
         <>
+          {!kidMode && (
+            <div className="timeline-task-switch" role="group" aria-label={t('timeline.taskLabel')}>
+              {(['animate', 'slides', 'app'] as const).map((task) => (
+                <button
+                  key={task}
+                  type="button"
+                  className={`btn${mobileTask === task ? ' primary' : ''}`}
+                  aria-pressed={mobileTask === task}
+                  onClick={() => setMobileTask(task)}
+                >
+                  {t(`timeline.${task}Task`)}
+                </button>
+              ))}
+            </div>
+          )}
+
           <button
             type="button"
-            className="btn icon-btn timeline-play"
+            className="btn icon-btn timeline-play timeline-task-animate"
             aria-label={playing ? t('timeline.pause') : t('timeline.play')}
             title={playing ? t('timeline.pause') : t('timeline.play')}
             onClick={() => store.togglePlay()}
@@ -149,7 +167,9 @@ export function TimelineBar() {
             {playing ? <PauseIcon /> : <PlayIcon />}
           </button>
 
-          <NarrationControls />
+          <div className="timeline-narration-shell timeline-task-animate">
+            <NarrationControls />
+          </div>
 
           <div className="timeline-frames">
             {frames.map((frame, i) => (
@@ -190,7 +210,7 @@ export function TimelineBar() {
           <div className="timeline-controls">
             <button
               type="button"
-              className="btn"
+              className="btn timeline-task-slides"
               data-tooltip={t('slide.edit')}
               aria-label={t('slide.edit')}
               onClick={() => setSlideSettingsOpen(true)}
@@ -199,7 +219,7 @@ export function TimelineBar() {
             </button>
             <button
               type="button"
-              className="btn"
+              className="btn timeline-frame-action"
               title={t('timeline.duplicateFrame')}
               aria-label={t('timeline.duplicateFrame')}
               onClick={() => store.duplicateFrame()}
@@ -208,7 +228,7 @@ export function TimelineBar() {
             </button>
             <button
               type="button"
-              className="btn"
+              className="btn timeline-frame-action"
               title={t('timeline.moveLeft')}
               aria-label={t('timeline.moveLeft')}
               disabled={activeIndex(frames, doc.activeFrameId) === 0}
@@ -220,7 +240,7 @@ export function TimelineBar() {
             </button>
             <button
               type="button"
-              className="btn"
+              className="btn timeline-frame-action"
               title={t('timeline.moveRight')}
               aria-label={t('timeline.moveRight')}
               disabled={activeIndex(frames, doc.activeFrameId) === frames.length - 1}
@@ -232,7 +252,7 @@ export function TimelineBar() {
             </button>
             <button
               type="button"
-              className="btn"
+              className="btn timeline-frame-action"
               title={t('timeline.deleteFrame')}
               aria-label={t('timeline.deleteFrame')}
               disabled={frames.length <= 1}
@@ -241,7 +261,7 @@ export function TimelineBar() {
               ✕
             </button>
 
-            <label className="timeline-fps" title={t('timeline.fps')}>
+            <label className="timeline-fps timeline-task-animate" title={t('timeline.fps')}>
               <input
                 type="range"
                 min={MIN_FPS}
@@ -255,7 +275,7 @@ export function TimelineBar() {
 
             <button
               type="button"
-              className={`btn${settings.loop ? ' primary' : ''}`}
+              className={`btn timeline-task-animate${settings.loop ? ' primary' : ''}`}
               title={t('timeline.loopTitle')}
               aria-pressed={settings.loop}
               onClick={() => store.setAnimation({ loop: !settings.loop })}
@@ -264,7 +284,7 @@ export function TimelineBar() {
             </button>
             <button
               type="button"
-              className={`btn${settings.onionSkin ? ' primary' : ''}`}
+              className={`btn timeline-task-animate${settings.onionSkin ? ' primary' : ''}`}
               title={t('timeline.onionTitle')}
               aria-pressed={settings.onionSkin}
               onClick={() => store.setAnimation({ onionSkin: !settings.onionSkin })}
@@ -274,6 +294,7 @@ export function TimelineBar() {
             {settings.onionSkin && (
               <>
                 <input
+                  className="timeline-task-animate"
                   type="range"
                   min={5}
                   max={80}
@@ -286,7 +307,7 @@ export function TimelineBar() {
                 />
                 <button
                   type="button"
-                  className={`btn${settings.onionNext ? ' primary' : ''}`}
+                  className={`btn timeline-task-animate${settings.onionNext ? ' primary' : ''}`}
                   title={t('timeline.onionNextTitle')}
                   aria-pressed={settings.onionNext}
                   onClick={() => store.setAnimation({ onionNext: !settings.onionNext })}
@@ -295,6 +316,22 @@ export function TimelineBar() {
                 </button>
               </>
             )}
+          </div>
+
+          <div className="timeline-mobile-app timeline-task-app">
+            <button
+              type="button"
+              className="btn primary"
+              onClick={() => {
+                if (hasHotspots(doc)) store.previewApp();
+                else {
+                  store.setMode('design');
+                  useDreamStore.getState().setTool('link');
+                }
+              }}
+            >
+              {hasHotspots(doc) ? t('link.preview') : t('timeline.appHint')}
+            </button>
           </div>
         </>
       )}

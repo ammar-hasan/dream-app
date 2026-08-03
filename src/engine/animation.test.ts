@@ -25,6 +25,7 @@ import {
 import {
   addFrameCommand,
   addOperationCommand,
+  addStoryboardFramesCommand,
   duplicateFrameCommand,
   History,
   moveFrameCommand,
@@ -143,6 +144,37 @@ describe('cloneFrame / blankFrame', () => {
     const frame = blankFrame();
     expect(frame.layers).toHaveLength(1);
     expect(frame.layers[0].operations).toHaveLength(0);
+  });
+});
+
+describe('storyboard frame batch', () => {
+  it('replaces a blank static canvas and restores it with one undo', () => {
+    const history = new History();
+    const doc = createDocument({ width: 10, height: 10 });
+    const first = createFrame();
+    const second = createFrame();
+    const made = history.execute(doc, addStoryboardFramesCommand(doc, [first, second]));
+    expect(made.frames).toEqual([first, second]);
+    expect(made.activeFrameId).toBe(first.id);
+    expect(made.layers).toBe(first.layers);
+
+    const undone = history.undo(made);
+    expect(undone.frames).toBeUndefined();
+    expect(undone.layers).toBe(doc.layers);
+    const redone = history.redo(undone);
+    expect(redone.frames).toEqual([first, second]);
+  });
+
+  it('keeps existing static artwork as the first frame', () => {
+    const history = new History();
+    const doc = createDocument({ width: 10, height: 10 });
+    const drawn = appendOperation(doc, doc.layers[0].id, stroke('original'));
+    const scene = createFrame();
+    const made = history.execute(drawn, addStoryboardFramesCommand(drawn, [scene]));
+    expect(made.frames).toHaveLength(2);
+    expect(made.frames?.[0].layers).toBe(drawn.layers);
+    expect(made.frames?.[1]).toBe(scene);
+    expect(history.undo(made).frames).toBeUndefined();
   });
 });
 

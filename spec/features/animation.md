@@ -54,6 +54,50 @@ order), the dashed `+` add button, frame controls (⧉ ←/→ ✕), a Slide set
 button, the narration mic, the fps slider, Loop and Onion toggles. Thumbnails update when their
 frame's content changes — editing frame 3 never repaints the others.
 
+On a phone, the timeline keeps the frame thumbnails, add button and frame
+controls visible, then asks which job the user is doing: **Animate**,
+**Slides** or **App**. Animate shows playback, narration, speed, looping and
+onion-skin controls; Slides shows the current frame's slide settings; App
+shows one next step to link the frames, or to preview once links exist. Only
+the chosen job's controls are visible. Little Dreamer mode stays on the
+simpler animation path and does not show this job chooser. Wider layouts keep
+the complete timeline visible together.
+
+## Story to animation
+
+**Story** in the adult toolbar and **Tell a story!** in Little Dreamer mode
+turn one spoken or typed idea into a small, reviewable flipbook:
+
+1. The user tells a story in English or Arabic. Speech recognition fills the
+   same story box where the device supports it; the control simply hides where
+   it does not. In Little Dreamer mode, finishing dictation immediately shows
+   the plan without requiring a second, reading-dependent action.
+2. Dream plans **two to six** short moments locally and deterministically. No
+   picture provider is contacted and the document does not change while
+   planning.
+3. Every planned moment is visible before creation. The user can edit it, hear
+   it read aloud, remove it (never below two), add one (never above six), or
+   plan the whole story again after changing the original words.
+4. **Make animation** paints the reviewed moments in order. Recurring
+   characters, clothes and colors are requested consistently across the whole
+   story, and pictures contain no generated lettering; the reviewed moment is
+   kept separately as that frame's caption.
+5. Nothing is added until every picture succeeds. A failure leaves the
+   document exactly as it was. On success the complete batch is one undoable
+   change: one Undo removes every generated frame and Redo restores them.
+
+On a blank static canvas, the generated moments become the complete animation.
+Existing static artwork is preserved as frame 1 before the generated moments;
+an existing animation keeps all its frames and receives the new moments after
+them. A newly created storyboard loops, starts playing at one frame per second,
+and selects its first generated frame. Existing animation timing remains the
+user's own.
+
+The active image-capable AI paints the moments. If the configured assistant
+cannot paint images, the working built-in painter is used and named before
+confirmation. One complete built-in storyboard spends one free try—not one try
+per frame; an image-capable bring-your-own provider is unlimited.
+
 ## Voice narration
 
 One **voice narration** take per document — a single track that starts at

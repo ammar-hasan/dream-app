@@ -5,7 +5,8 @@
  * Hotspot transitions are CSS opacity/transform on the canvas only.
  */
 
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { presentationFrames } from '../engine/animation';
 import { hotspotAt, hotspotTargetIndex } from '../engine/hotspots';
 import { renderDocument } from '../engine/renderer';
@@ -15,9 +16,36 @@ import { useT } from './i18n';
 import { MuteIcon, SoundIcon } from './icons';
 import { playNarration } from './narration';
 
+const PresenterConsole = lazy(async () => {
+  const module = await import('./PresenterConsole');
+  return { default: module.PresenterConsole };
+});
+
 const ADVANCE_KEYS = new Set(['ArrowRight', 'ArrowDown', ' ', 'PageDown', 'Enter']);
 const BACK_KEYS = new Set(['ArrowLeft', 'ArrowUp', 'PageUp']);
 const FX_MS = 220;
+
+function preparePresenterWindow(popup: Window, title: string) {
+  const popupDocument = popup.document;
+  popupDocument.documentElement.lang = document.documentElement.lang;
+  popupDocument.documentElement.dir = document.documentElement.dir;
+  for (const attribute of ['data-theme', 'data-comfort']) {
+    const value = document.documentElement.getAttribute(attribute);
+    if (value === null) popupDocument.documentElement.removeAttribute(attribute);
+    else popupDocument.documentElement.setAttribute(attribute, value);
+  }
+  popupDocument.head.replaceChildren();
+  const meta = popupDocument.createElement('meta');
+  meta.name = 'viewport';
+  meta.content = 'width=device-width, initial-scale=1';
+  popupDocument.head.append(meta);
+  document.querySelectorAll('link[rel="stylesheet"], style').forEach((node) => {
+    popupDocument.head.append(node.cloneNode(true));
+  });
+  popupDocument.title = title;
+  popupDocument.body.replaceChildren();
+  popupDocument.body.className = 'presenter-window-body';
+}
 
 /** Fit transform shared by the renderer and pointer hit-testing. */
 function stageTransform(viewWidth: number, viewHeight: number, doc: DreamDocument) {
@@ -38,7 +66,12 @@ export function PresentView() {
   const [, forceRedraw] = useReducer((x: number) => x + 1, 0);
   const [hovered, setHovered] = useState<string | null>(null);
   const [autoAdvance, setAutoAdvance] = useState(false);
-  const [presenter, setPresenter] = useState(false);
+  const presenterWindowRef = useRef<Window | null>(null);
+  const [presenterWindow, setPresenterWindow] = useState<Window | null>(null);
+  const [presenterBlocked, setPresenterBlocked] = useState(false);
+  const [presenterStartedAt, setPresenterStartedAt] = useState(0);
+  const [slideStartedAt, setSlideStartedAt] = useState(Date.now());
+  const [presenterClock, setPresenterClock] = useState(Date.now());
   /** 'out' fades/slides away before the swap, 'in' settles back. */
   const [fx, setFx] = useState<{ kind: 'fade' | 'slide'; phase: 'out' | 'in' } | null>(null);
   const transitionTimers = useRef<number[]>([]);
@@ -50,6 +83,7 @@ export function PresentView() {
   const frame = doc.frames?.[index];
   const narration = doc.narration;
   const narrationMuted = useDreamStore((s) => s.narrationMuted);
+  const presenterOpen = presenterWindow !== null && !presenterWindow.closed;
 
   const clearTransitionTimers = useCallback(() => {
     transitionTimers.current.forEach((timer) => window.clearTimeout(timer));
@@ -91,6 +125,88 @@ export function PresentView() {
     [doc.frames, frames.length, index, transitionTo],
   );
 
+  const closePresenter = useCallback(() => {
+    const popup = presenterWindowRef.current;
+    presenterWindowRef.current = null;
+    setPresenterWindow(null);
+    if (popup && !popup.closed) popup.close();
+  }, []);
+
+  const exit = useCallback(() => {
+    const store = useDreamStore.getState();
+    store.setMode(store.lastEditMode);
+  }, []);
+
+  const openPresenter = () => {
+    const existing = presenterWindowRef.current;
+    if (existing && !existing.closed) {
+      existing.focus();
+      return;
+    }
+    const popup = window.open('', 'dream-presenter', 'popup,width=520,height=720');
+    if (!popup) {
+      setPresenterBlocked(true);
+      return;
+    }
+    preparePresenterWindow(popup, t('present.presenterTitle'));
+    const now = Date.now();
+    presenterWindowRef.current = popup;
+    setPresenterWindow(popup);
+    setPresenterBlocked(false);
+    setPresenterStartedAt(now);
+    setSlideStartedAt(now);
+    setPresenterClock(now);
+    popup.focus();
+  };
+
+  useEffect(
+    () => () => {
+      const popup = presenterWindowRef.current;
+      presenterWindowRef.current = null;
+      if (popup && !popup.closed) popup.close();
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!presenterWindow) return;
+    const timer = window.setInterval(() => {
+      if (presenterWindow.closed) {
+        presenterWindowRef.current = null;
+        setPresenterWindow(null);
+        return;
+      }
+      setPresenterClock(Date.now());
+    }, 250);
+    return () => window.clearInterval(timer);
+  }, [presenterWindow]);
+
+  useEffect(() => {
+    if (presenterOpen) setSlideStartedAt(Date.now());
+  }, [index, presenterOpen]);
+
+  useEffect(() => {
+    if (app && presenterOpen) closePresenter();
+  }, [app, closePresenter, presenterOpen]);
+
+  useEffect(() => {
+    if (!presenterWindow || presenterWindow.closed) return;
+    const onPresenterKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        exit();
+      } else if (ADVANCE_KEYS.has(event.key)) {
+        event.preventDefault();
+        navigateTo(index + 1);
+      } else if (BACK_KEYS.has(event.key)) {
+        event.preventDefault();
+        navigateTo(index - 1);
+      }
+    };
+    presenterWindow.addEventListener('keydown', onPresenterKeyDown);
+    return () => presenterWindow.removeEventListener('keydown', onPresenterKeyDown);
+  }, [exit, index, navigateTo, presenterWindow]);
+
   // Narration: the take plays once from the start of the presentation
   // (unmuted only); leaving Present — or muting — stops it.
   useEffect(() => {
@@ -98,11 +214,6 @@ export function PresentView() {
     const playback = playNarration(narration);
     return () => playback.stop();
   }, [narration, narrationMuted]);
-
-  const exit = () => {
-    const store = useDreamStore.getState();
-    store.setMode(store.lastEditMode);
-  };
 
   // Redraw on every render (doc/index/hover changes) — same pattern as the editor.
   useEffect(() => {
@@ -211,6 +322,14 @@ export function PresentView() {
     setHovered(hotspot?.id ?? null);
   };
 
+  const presenterRemainingMs =
+    frame?.presentation?.durationMs === undefined
+      ? undefined
+      : Math.min(
+          frame.presentation.durationMs,
+          Math.max(0, frame.presentation.durationMs - (presenterClock - slideStartedAt)),
+        );
+
   return (
     <div
       className="present-view"
@@ -261,11 +380,12 @@ export function PresentView() {
             </button>
             <button
               type="button"
-              className={`btn${presenter ? ' primary' : ''}`}
-              aria-pressed={presenter}
+              className={`btn${presenterOpen ? ' primary' : ''}`}
+              aria-pressed={presenterOpen}
               onClick={(e) => {
                 e.stopPropagation();
-                setPresenter(!presenter);
+                if (presenterOpen) closePresenter();
+                else openPresenter();
               }}
             >
               {t('present.presenter')}
@@ -274,23 +394,40 @@ export function PresentView() {
         )}
       </div>
 
-      {!app && presenter && (
-        <aside className="presenter-panel" onClick={(event) => event.stopPropagation()}>
-          <h2>{t('present.presenterTitle')}</h2>
-          <strong>{t('present.currentSlide', { n: index + 1 })}</strong>
-          <p>{frame?.presentation?.notes || t('present.noNotes')}</p>
-          <div className="presenter-meta">
-            {frame?.presentation?.durationMs === undefined
-              ? t('present.manual')
-              : t('present.timed', { seconds: frame.presentation.durationMs / 1000 })}
-          </div>
-          <div className="presenter-next">
-            {index < frames.length - 1
-              ? t('present.nextSlide', { n: index + 2 })
-              : t('present.endOfDeck')}
-          </div>
-        </aside>
+      {presenterBlocked && (
+        <p className="presenter-notice" role="alert" onClick={(event) => event.stopPropagation()}>
+          {t('present.presenterBlocked')}
+        </p>
       )}
+
+      {!app &&
+        presenterOpen &&
+        presenterWindow &&
+        createPortal(
+          <Suspense
+            fallback={
+              <p className="presenter-console-loading" role="status">
+                {t('present.loading')}
+              </p>
+            }
+          >
+            <PresenterConsole
+              doc={doc}
+              frames={frames}
+              index={index}
+              autoAdvance={autoAdvance}
+              elapsedMs={presenterClock - presenterStartedAt}
+              remainingMs={presenterRemainingMs}
+              onPrevious={() => navigateTo(index - 1)}
+              onNext={() => navigateTo(index + 1)}
+              onToggleAuto={() => setAutoAdvance((current) => !current)}
+              onFocusAudience={() => window.focus()}
+              onExit={exit}
+              onClose={closePresenter}
+            />
+          </Suspense>,
+          presenterWindow.document.body,
+        )}
 
       {!app && (
         <div className="present-counter" aria-live="polite">

@@ -23,6 +23,8 @@ export interface VoiceExecutorStore {
   clearLayer(): void;
   toggleAnimation(): void;
   addFrame(): void;
+  /** Open the visible storyboard confirmation flow. */
+  openStoryboard(prompt?: string): void;
   play(): void;
   pause(): void;
   setMode(mode: WorkspaceMode): void;
@@ -105,6 +107,10 @@ export function executeVoiceCommand(
       if (!store.doc.frames) store.toggleAnimation(); // "new frame" implies animate
       store.addFrame();
       return { message: t('voice.newFrame') };
+
+    case 'storyboard':
+      store.openStoryboard(command.prompt);
+      return { message: t('voice.storyboard') };
 
     case 'play':
       if (!store.doc.frames || store.doc.frames.length === 0) {

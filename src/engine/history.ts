@@ -8,6 +8,7 @@
 
 import {
   appendOperation,
+  createFrame,
   insertLayer,
   mapLayer,
   moveLayer,
@@ -281,6 +282,39 @@ export function addFrameCommand(doc: DreamDocument, frame: Frame, index?: number
         (d.frames ?? []).filter((f) => f.id !== frame.id),
         previousActiveId ?? '',
       ),
+  };
+}
+
+/**
+ * Add a reviewed, already-painted storyboard as one undoable document edit.
+ * A blank static canvas becomes the storyboard; existing art/frames stay in
+ * front so generation never destroys the user's work.
+ */
+export function addStoryboardFramesCommand(doc: DreamDocument, frames: readonly Frame[]): Command {
+  const previousFrames = doc.frames;
+  const previousActiveId = doc.activeFrameId;
+  const previousLayers = doc.layers;
+  const keepStaticCanvas = doc.layers.some((layer) => layer.operations.length > 0);
+  const existing = doc.frames ?? (keepStaticCanvas ? [createFrame(doc.layers)] : []);
+  const storyboard = [...frames];
+  const nextFrames = [...existing, ...storyboard];
+  const firstStoryboardId = storyboard[0]?.id;
+  return {
+    label: 'Create storyboard',
+    apply: (d) => (firstStoryboardId ? withFrames(d, nextFrames, firstStoryboardId) : d),
+    revert: (d) => {
+      if (previousFrames) {
+        return withFrames(d, previousFrames, previousActiveId ?? previousFrames[0]?.id ?? '');
+      }
+      const restored: DreamDocument = {
+        ...d,
+        layers: previousLayers,
+        updatedAt: Date.now(),
+      };
+      delete restored.frames;
+      delete restored.activeFrameId;
+      return restored;
+    },
   };
 }
 
