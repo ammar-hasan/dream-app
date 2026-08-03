@@ -24,7 +24,7 @@ import {
 } from './exportAnimation';
 import { useT } from './i18n';
 
-type Format = 'png' | 'jpeg' | 'webm' | 'mp4' | 'sprite' | 'app' | 'code' | 'dream';
+type Format = 'png' | 'jpeg' | 'webm' | 'mp4' | 'sprite' | 'app' | 'share' | 'code' | 'dream';
 
 export function ExportDialog({ onClose }: { onClose: () => void }) {
   const t = useT();
@@ -33,6 +33,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
   const [progress, setProgress] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [aspect, setAspect] = useState<VideoAspectPreset>('original');
   const [captionIndex, setCaptionIndex] = useState(0);
 
@@ -51,6 +52,29 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
   };
 
   const doExport = async () => {
+    if (format === 'share') {
+      setError(null);
+      setNote(null);
+      setProgress(t('export.shareProgress'));
+      try {
+        const { createAppShareUrl } = await import('./shareLink');
+        const url = await createAppShareUrl(doc);
+        setShareUrl(url);
+        try {
+          await navigator.clipboard.writeText(url);
+          setNote(t('export.shareCopied'));
+        } catch {
+          setNote(t('export.shareCopyFallback'));
+        }
+      } catch (err) {
+        if (err instanceof Error && err.name === 'ShareLinkTooLargeError') {
+          setError(t('export.shareTooLarge'));
+        } else setError(t('export.shareFailed'));
+      } finally {
+        setProgress(null);
+      }
+      return;
+    }
     if (format === 'webm' || format === 'mp4') {
       setError(null);
       setProgress(t('export.starting'));
@@ -119,6 +143,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
           ...(supportsMp4Video() ? [{ id: 'mp4' as const, label: t('export.mp4Label') }] : []),
           { id: 'sprite' as const, label: t('export.spriteLabel') },
           { id: 'app' as const, label: t('export.appLabel') },
+          { id: 'share' as const, label: t('export.shareLabel') },
           { id: 'code' as const, label: t('export.codeLabel') },
         ]
       : []),
@@ -148,6 +173,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
                   setFormat(id);
                   setError(null);
                   setNote(null);
+                  setShareUrl(null);
                 }}
               >
                 {label}
@@ -257,6 +283,21 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
 
         {format === 'app' && <p className="dialog-note">{t('export.appNote')}</p>}
 
+        {format === 'share' && (
+          <>
+            <p className="dialog-note">{t('export.shareNote')}</p>
+            {shareUrl && (
+              <input
+                className="share-link-field"
+                readOnly
+                aria-label={t('export.shareLinkLabel')}
+                value={shareUrl}
+                onFocus={(event) => event.currentTarget.select()}
+              />
+            )}
+          </>
+        )}
+
         {format === 'code' && <p className="dialog-note">{t('export.codeNote')}</p>}
 
         {format === 'dream' && <p className="dialog-note">{t('export.dreamNote')}</p>}
@@ -278,7 +319,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
             onClick={() => void doExport()}
             disabled={progress !== null}
           >
-            {t('export.title')}
+            {t(format === 'share' ? 'export.shareAction' : 'export.title')}
           </button>
         </div>
       </div>

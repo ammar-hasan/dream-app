@@ -784,3 +784,27 @@ a time without losing the frame strip or basic frame editing.
   received a principal-design visual review.
 - Acceptance met: switch among all three phone tasks, keep the same two frames
   editable throughout, and enter Design's Link tool directly from App.
+
+## Slice 31 — Private no-backend prototype links ✅
+
+Persona need: let a creator send a clickable prototype as a URL while
+preserving Dream's local-first trust and presenter privacy.
+
+- ✅ Share app link flattens every screen and includes only viewer geometry,
+  transitions, title, dimensions and start screen. Layers, hidden content,
+  notes, captions, narration, game state and AI settings never enter the link.
+- ✅ The compressed fragment opens directly in the standalone responsive app,
+  with the same real hotspot buttons, transitions, restart and reduced-motion
+  behavior and no upload or account.
+- ✅ Copy link works as the universal path and leaves a selectable field when
+  clipboard access fails. Large visual prototypes are directed to the existing
+  Interactive app file instead of creating unreliable URLs.
+- ✅ Incoming data has strict size, image, dimension, target, geometry and
+  transition validation; supplied markup is never executed. A bad link falls
+  back to the editor with a friendly warning.
+- ✅ Share loading and creation are on demand, keeping the main production
+  bundle below its 500 kB budget. Unit and production-browser tests prove the
+  safe round-trip and private-note exclusion.
+- Acceptance met: add private notes to a two-screen prototype, copy its link,
+  open a fresh tab directly into the app, and confirm the notes and editor are
+  absent.

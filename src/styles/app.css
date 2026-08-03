@@ -219,6 +219,32 @@ body {
   min-height: 0;
 }
 
+.share-load-error {
+  position: fixed;
+  z-index: 120;
+  top: 72px;
+  left: 50%;
+  max-width: min(520px, calc(100vw - 32px));
+  padding: 12px 16px;
+  border: 1px solid var(--danger);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  transform: translateX(-50%);
+}
+
+.share-link-field {
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--input);
+  color: var(--text);
+  font: inherit;
+}
+
 /* --- Toolbar (top) ------------------------------------------------------- */
 
 .toolbar {

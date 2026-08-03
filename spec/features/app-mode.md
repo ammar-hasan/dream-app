@@ -62,6 +62,33 @@ exported file's behavior contract:
 8. The page title is the document name (HTML-escaped), defaulting to
    "Dream app".
 
+## The shareable app link
+
+Export → **Share app link** prepares a URL that opens directly as the same
+pixel-faithful interactive prototype, without an account or server-side
+project storage.
+
+1. The link contains only flattened screen pictures, working hotspot geometry,
+   transitions, the start screen, size and title. It never includes editable
+   layers, hidden artwork, speaker notes, captions, narration, game settings,
+   provider settings or API keys.
+2. Opening the link shows the prototype directly—never the editor—and retains
+   the standalone app's scaling, keyboard-accessible hotspots, transitions,
+   restart behavior and reduced-motion support.
+3. The complete viewer payload lives in the URL fragment, is compressed where
+   the browser supports it, and makes no upload or provider request. A receiver
+   who has already cached Dream can reopen it offline.
+4. **Copy link** is the universal action. The prepared URL remains visible and
+   selectable if automatic clipboard copying is unavailable.
+5. Share links are deliberately for small prototypes. Dream refuses links over
+   100,000 characters or viewer data over 2 MB and points the user to the
+   self-contained Interactive app file instead.
+6. Incoming viewer data is bounded and validated before use: only embedded PNG
+   screens of the declared size, finite in-frame hotspot geometry, valid frame
+   targets and known transitions are accepted. A damaged or unsafe link opens
+   the normal editor with a friendly warning and does not execute supplied
+   markup.
+
 ## The exported real-code file (AI)
 
 Export → **Real code (AI) (.html)** downloads `{name}-code.html`: the app
@@ -123,6 +150,9 @@ code file (same frames requirement).
 - Exporting with zero frames is impossible (the option needs frames);
   exporting with zero hotspots produces a working but inert single-screen
   file.
+- A share link may be unavailable for a visually large project even though the
+  Interactive app file remains available; this is a transport limit, not lost
+  work.
 - A document with hotspots but animation off can't exist — hotspots live
   on frames.
 - Very large hotspot rectangles and edge-to-edge screens clamp cleanly

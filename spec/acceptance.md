@@ -370,6 +370,20 @@ holds.
       controls appear, and App offers linking before links exist or preview
       afterward; wider layouts remain unchanged and Little Dreamer has no job
       chooser.
+122.  GIVEN a small framed prototype WHEN Share app link is copied and opened
+      in a fresh tab THEN the URL opens directly as the responsive standalone
+      app at the authored start screen, with working keyboard-accessible
+      hotspots and no editor chrome or network upload.
+123.  GIVEN a shared prototype whose project has layers, hidden art, speaker
+      notes, captions, narration, game or AI settings WHEN its viewer payload
+      is inspected or opened THEN it contains only flattened PNG screens,
+      valid hotspots, transitions, title, size and start screen; none of the
+      private or editable project material is present.
+124.  GIVEN a share payload that is damaged, unsafe, over 2 MB when expanded or
+      would create a URL over 100,000 characters WHEN Dream handles it THEN it
+      never executes supplied markup or overwrites work: an incoming bad link
+      falls back to the editor with a friendly warning, and an outgoing large
+      prototype is directed to the Interactive app file.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

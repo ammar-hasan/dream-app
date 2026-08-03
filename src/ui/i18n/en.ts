@@ -543,6 +543,17 @@ export const en: Record<string, string> = {
   'export.appLabel': 'Interactive app (.html)',
   'export.appNote':
     'One self-contained HTML file: your frames as screens, your links as tappable hotspots. Opens anywhere, works offline.',
+  'export.shareLabel': 'Share app link',
+  'export.shareNote':
+    'A self-contained link for small prototypes. It includes only flattened screens and working links — never layers, speaker notes, narration or AI settings. Use Interactive app for larger projects.',
+  'export.shareAction': 'Copy link',
+  'export.shareProgress': 'Preparing link…',
+  'export.shareCopied': 'Share link copied — send it to anyone.',
+  'export.shareCopyFallback': 'Select and copy the link below.',
+  'export.shareTooLarge':
+    'This prototype is too visual for a reliable link. Export the Interactive app file instead.',
+  'export.shareFailed': 'Dream could not prepare this link. Try the Interactive app file instead.',
+  'export.shareLinkLabel': 'Share link',
   'export.codeLabel': 'Real code (AI) (.html)',
   'export.codeNote':
     'AI rewrites your app as real, readable HTML/CSS/JS — screens as semantic markup, your links wired as buttons. Dream AI builds a clean local version; connect your own AI for richer code.',
@@ -565,6 +576,7 @@ export const en: Record<string, string> = {
   'export.starting': 'Starting…',
   'export.progress': 'Frame {done} of {total}…',
   'export.failed': 'Export failed.',
+  'share.invalid': 'This Dream share link is damaged or unsafe, so it was not opened.',
   'common.cancel': 'Cancel',
   'common.create': 'Create',
   'common.save': 'Save',

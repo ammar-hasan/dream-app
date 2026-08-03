@@ -159,6 +159,10 @@ phrases, precedence rules and the color vocabulary — is in
    app (.html)** — one file that opens anywhere, offline. 6. Or Export →
    **Real code (AI) (.html)** — the same app as readable, commented code
    (AI-generated with your own provider, or locally by Dream AI).
+3. For a small prototype, Export → **Share app link** → **Copy link**. Opening
+   it goes straight to the viewer-only app; private project structure and
+   presenter material are absent. If the visuals exceed the safe link size,
+   Dream points back to the Interactive app file.
 
 ### BYOK setup
 

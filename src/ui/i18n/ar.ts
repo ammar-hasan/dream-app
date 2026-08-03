@@ -535,6 +535,17 @@ export const ar: Record<string, string> = {
   'export.appLabel': 'تطبيق تفاعلي (.html)',
   'export.appNote':
     'ملف HTML واحد مستقل: إطاراتك كشاشات وروابطك كنقاط لمس. يفتح في أي مكان ويعمل دون إنترنت.',
+  'export.shareLabel': 'مشاركة رابط التطبيق',
+  'export.shareNote':
+    'رابط مستقل للنماذج الصغيرة. يتضمن الشاشات المسطحة والروابط العاملة فقط — ولا يتضمن الطبقات أو ملاحظات المتحدث أو التعليق الصوتي أو إعدادات الذكاء. استخدم ملف التطبيق التفاعلي للمشاريع الأكبر.',
+  'export.shareAction': 'نسخ الرابط',
+  'export.shareProgress': 'جارٍ تجهيز الرابط…',
+  'export.shareCopied': 'نُسخ رابط المشاركة — أرسله إلى أي شخص.',
+  'export.shareCopyFallback': 'حدد الرابط أدناه وانسخه.',
+  'export.shareTooLarge':
+    'هذا النموذج غني بالصور ولا يناسب رابطًا موثوقًا. صدّر ملف التطبيق التفاعلي بدلًا منه.',
+  'export.shareFailed': 'تعذّر على دريم تجهيز الرابط. جرّب ملف التطبيق التفاعلي بدلًا منه.',
+  'export.shareLinkLabel': 'رابط المشاركة',
   'export.codeLabel': 'كود حقيقي (بالذكاء الاصطناعي) (.html)',
   'export.codeNote':
     'يحوّل الذكاء الاصطناعي تطبيقك إلى كود HTML/CSS/JS حقيقي مقروء — الشاشات ترميز دلالي وروابطك أزرار تعمل. ذكاء دريم يبني نسخة محلية نظيفة؛ صِل ذكاءك الخاص لكود أغنى.',
@@ -557,6 +568,7 @@ export const ar: Record<string, string> = {
   'export.starting': 'جارٍ البدء…',
   'export.progress': 'إطار {done} من {total}…',
   'export.failed': 'فشل التصدير.',
+  'share.invalid': 'رابط مشاركة دريم تالف أو غير آمن، لذلك لم يُفتح.',
   'common.cancel': 'إلغاء',
   'common.create': 'إنشاء',
   'common.save': 'حفظ',

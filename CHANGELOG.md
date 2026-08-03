@@ -7,6 +7,17 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Private no-backend prototype links** (slice 31): animated app prototypes
+  can now be copied as a compressed, self-contained URL that opens directly in
+  the standalone viewer. The link carries only flattened PNG screens, valid
+  hotspots, title, size and start screen—never editable/hidden layers, speaker
+  notes, captions, narration, game state or AI settings. Incoming data is
+  strictly bounded and validated before safe viewer HTML is rebuilt; malformed
+  links fall back to Dream with a friendly warning. Links over 100,000
+  characters or 2 MB expanded are refused in favor of the Interactive app
+  file, and clipboard failure leaves a selectable URL. The codec is loaded only
+  on demand so the production entry bundle remains below 500 kB.
+
 - **Phone timeline task focus** (slice 30): the adult phone timeline now keeps
   frames and their add/duplicate/reorder/delete actions visible while an
   Animate / Slides / App switch reveals only the controls for the current
@@ -159,7 +170,7 @@ All notable changes to Dream are documented here. The format is based on
   experience map, visual identity, integrations, and an acceptance
   checklist — detailed enough to rebuild Dream from the spec alone, in any
   stack. AGENTS.md rule 12 makes spec updates part of every behavior change.
-  (The checklist began at 90 points and now contains 121.)
+  (The checklist began at 90 points and now contains 124.)
 - Play mode game templates: **Flappy Dream** (flap through scrolling gates,
   one hit ends the run, 3 shields in kid mode) and **Maze Runner** (seeded,
   always-solvable generated mazes with level-ups) join **Catch!** behind a

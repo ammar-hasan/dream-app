@@ -120,6 +120,13 @@ Cross-cutting takeaways:
    reaching critical mass across browsers, making client-side model inference
    practical; a future Dream could run generative models fully offline.
    (https://webgpu.com/ — critical-mass news · https://aicompetence.org/ — WebGPU inference)
+6. **Native compression is ready; native sharing is not universal yet** — gzip
+   Compression Streams have broad cross-browser availability, while the Web
+   Share API still has material browser gaps and secure-context requirements.
+   _Dream:_ compress viewer-only app data into the URL fragment, make Copy link
+   the universal action, and keep native sharing optional rather than required.
+   (https://developer.mozilla.org/en-US/docs/Web/API/CompressionStream/CompressionStream ·
+   https://developer.mozilla.org/en-US/docs/Web/API/Web_Share_API)
 
 ## 4. Prioritized backlog
 
@@ -140,7 +147,7 @@ presenter, Zǐxuān the student, Ali/Fatima the hobbyists). Score: impact
 | 8   | Publish dream-mcp to MCP registries + add more tools — authoring tools and registry package ready (slice 21); public publish pending approval | Maria                 | 4      | S      |
 | 9   | ~~Slide transitions, timing, notes and a private Presenter window~~ ✅ shipped (slices 24 + 29)                                               | Sara, Zǐxuān, Victor  | 3      | M      |
 | 10  | ~~Social video shapes and frame captions~~ ✅ shipped (slice 27)                                                                              | Ahmed                 | 4      | M      |
-| 11  | Shareable prototype via URL (hash-compressed state, no backend)                                                                               | Ahmed, Sara, Zǐxuān   | 3      | L      |
+| 11  | ~~Shareable prototype via URL (compressed viewer state, no backend)~~ ✅ shipped (slice 31)                                                   | Ahmed, Sara, Zǐxuān   | 3      | L      |
 | 12  | ~~Voice-to-storyboard animation with visible bilingual confirmation~~ ✅ shipped (slice 28)                                                   | Zainab, George        | 5      | M      |
 | 13  | ~~Phone timeline task focus for animation, slides and apps~~ ✅ shipped (slice 30)                                                            | George, Ahmed, Sara   | 4      | S      |
 

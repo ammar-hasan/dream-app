@@ -455,6 +455,12 @@ IDEA.md's "create whole applications with just your drawings".
   with responsive fit-to-window scaling, touch support, keyboard-accessible
   hotspots, a Home-key restart and a small "Made with Dream" corner. The
   generator is pure TypeScript (`engine/appExport.ts`).
+- **Export → Share app link** — small prototypes become one self-contained,
+  compressed URL that opens directly in the viewer. It carries only flattened
+  PNG screens and working hotspots—not layers, hidden art, notes, narration,
+  game state or AI settings. Oversize prototypes are directed to the
+  Interactive app file, and malformed incoming links are rejected before any
+  viewer markup is built.
 - **Export → Real code (AI) (.html)** — the make-real path: instead of a
   pixel-faithful prototype, AI rewrites your app as REAL, readable code —
   screens as semantic `<section>`s, your texts as real text, links wired as

@@ -145,6 +145,51 @@ test('local real-code export embeds raster images instead of placeholder boxes',
   expect(html).not.toContain('structure-only image description');
 });
 
+test('a share link opens the viewer-only prototype without private project data', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: (value: string) => {
+          (window as unknown as { copiedDreamLink: string }).copiedDreamLink = value;
+          return Promise.resolve();
+        },
+      },
+    });
+  });
+  await bootApp(page);
+  await page.getByRole('button', { name: /^Animate/ }).click();
+  await page.getByRole('button', { name: 'Add frame' }).click();
+  await page.getByRole('button', { name: 'Slide settings' }).click();
+  const slide = page.getByRole('dialog', { name: 'Slide settings' });
+  await slide.getByLabel('Speaker notes').fill('Private launch reminder.');
+  await slide.getByRole('button', { name: 'Save' }).click();
+
+  await page.getByRole('button', { name: 'Export' }).click();
+  await page.getByRole('button', { name: 'Share app link' }).click();
+  await page.getByRole('button', { name: 'Copy link' }).click();
+  await expect(page.getByText('Share link copied — send it to anyone.')).toBeVisible();
+  const link = await page.getByLabel('Share link').inputValue();
+  expect(link).toContain('#dream-share=v1.');
+
+  const viewer = await page.context().newPage();
+  await viewer.goto(link);
+  await expect(viewer.locator('main#stage')).toHaveAttribute('aria-label', 'Untitled');
+  await expect(viewer.getByText('Made with Dream')).toBeVisible();
+  await expect(viewer.getByText('Private launch reminder.')).toHaveCount(0);
+  await expect(viewer.locator('.toolbar')).toHaveCount(0);
+});
+
+test('a damaged share link falls back to Dream without executing it', async ({ page }) => {
+  await page.goto('/#dream-share=v1.r.bm90LWpzb24');
+  await expect(page.locator('.splash')).toHaveCount(0);
+  await expect(page.getByRole('alert')).toContainText('damaged or unsafe');
+  await expect(page.locator('.hint-card')).toBeVisible();
+  await expect(page).not.toHaveURL(/dream-share/);
+});
+
 test('a game description prepares Dream Jumper offline', async ({ page }) => {
   await bootApp(page);
   await page.getByRole('tab', { name: 'Play' }).click();

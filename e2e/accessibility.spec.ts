@@ -50,6 +50,14 @@ test('social-video caption controls have no serious automated violations', async
   expect(await seriousViolations(page)).toEqual([]);
 });
 
+test('share-link export has no serious automated violations', async ({ page }) => {
+  await bootApp(page);
+  await page.getByRole('button', { name: /^Animate/ }).click();
+  await page.getByRole('button', { name: 'Export' }).click();
+  await page.getByRole('button', { name: 'Share app link' }).click();
+  expect(await seriousViolations(page)).toEqual([]);
+});
+
 test('voice-first storyboard planning has no serious automated violations', async ({ page }) => {
   await bootApp(page);
   await page.getByRole('button', { name: /^Story/ }).click();

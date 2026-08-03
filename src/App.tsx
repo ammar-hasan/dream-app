@@ -4,7 +4,7 @@ import { useAutosave, useRestoreLastDocument } from './ui/usePersistence';
 import { useImagePaste } from './ui/useImagePaste';
 import { useDreamStore } from './store/dreamStore';
 import { useUiPrefs } from './store/uiPrefs';
-import { isRtl } from './ui/i18n';
+import { isRtl, useT } from './ui/i18n';
 import { DreamMark } from './ui/icons';
 import { Toolbar } from './ui/Toolbar';
 import { ToolRail } from './ui/ToolRail';
@@ -36,7 +36,8 @@ const PresentView = lazy(async () => {
   return { default: module.PresentView };
 });
 
-export default function App() {
+export default function App({ initialShareError = false }: { initialShareError?: boolean }) {
+  const t = useT();
   const [dialog, setDialog] = useState<Dialog>(null);
   // Splash: shown until the last-document restore settles, then fades out.
   const [splash, setSplash] = useState<'show' | 'fade' | 'gone'>('show');
@@ -92,6 +93,11 @@ export default function App() {
 
   return (
     <div className={`app${kidMode ? ' kid-mode' : ''}`}>
+      {initialShareError && (
+        <div className="share-load-error" role="alert">
+          {t('share.invalid')}
+        </div>
+      )}
       <Toolbar
         onNew={() => setDialog('new')}
         onOpen={() => setDialog('open')}
