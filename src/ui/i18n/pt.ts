@@ -215,6 +215,7 @@ export const pt: Record<string, string> = {
   'components.hint':
     'Selecione objetos na tela e salve-os aqui para reutilizar em qualquer projeto.',
   'components.cardTitle': 'Dê duplo clique para inserir, ou arraste para a tela',
+  'components.insertNamed': 'Inserir {name} no centro da tela',
   'components.renameTitle': 'Dê duplo clique para renomear',
   'components.delete': 'Excluir componente',
   'components.deleteNamed': 'Excluir {name}',

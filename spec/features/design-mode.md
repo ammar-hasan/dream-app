@@ -75,9 +75,10 @@ group. No nesting, no containers.
    relative to its own content bounds.
 2. **Library panel:** live thumbnails, newest first; rename (empty names
    ignored) and delete.
-3. **Insert:** double-click places an instance at the canvas center; or
-   drag a thumbnail onto the canvas to drop it under the cursor. Every
-   instance lands on **its own new layer**. While dragging, the canvas names
+3. **Insert:** the named Insert control or a double-click places an instance at
+   the canvas center; either pointer or keyboard activation works. Dragging a
+   thumbnail onto the canvas drops it under the cursor. Every instance lands on
+   **its own new layer**. While dragging, the canvas names
    the component, highlights itself as the valid target and shows a translucent
    exact-scale preview centered at the eventual drop point; a compact thumbnail
    follows the pointer outside the canvas. The inserted instance stays selected

@@ -206,6 +206,7 @@ export const zh: Record<string, string> = {
   'components.namePlaceholder': '组件名称',
   'components.hint': '在画布上选择对象，然后将它们保存在这里以便在任何项目中重复使用。',
   'components.cardTitle': '双击插入，或拖到画布上',
+  'components.insertNamed': '在画布中心插入 {name}',
   'components.renameTitle': '双击重命名',
   'components.delete': '删除组件',
   'components.deleteNamed': '删除 {name}',

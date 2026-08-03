@@ -209,6 +209,7 @@ export const ar: Record<string, string> = {
   'components.namePlaceholder': 'اسم المكوّن',
   'components.hint': 'حدد عناصر على اللوحة ثم احفظها هنا لإعادة استخدامها في أي مشروع.',
   'components.cardTitle': 'انقر نقرًا مزدوجًا للإدراج أو اسحب إلى اللوحة',
+  'components.insertNamed': 'أدرج {name} في وسط اللوحة',
   'components.renameTitle': 'انقر نقرًا مزدوجًا لإعادة التسمية',
   'components.delete': 'حذف المكوّن',
   'components.deleteNamed': 'حذف {name}',

@@ -567,7 +567,17 @@ body {
   transition: opacity 0.12s ease;
 }
 
-.component-card:hover .component-delete {
+.component-insert {
+  position: absolute;
+  top: 2px;
+  inset-inline-start: 2px;
+  z-index: 1;
+  background: var(--panel);
+  color: var(--accent);
+}
+
+.component-card:hover .component-delete,
+.component-card:focus-within .component-delete {
   opacity: 1;
 }
 

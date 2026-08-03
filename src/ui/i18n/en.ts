@@ -211,6 +211,7 @@ export const en: Record<string, string> = {
   'components.hint':
     'Select objects on the canvas, then save them here to reuse them in any project.',
   'components.cardTitle': 'Double-click to insert, or drag onto the canvas',
+  'components.insertNamed': 'Insert {name} at canvas center',
   'components.renameTitle': 'Double-click to rename',
   'components.delete': 'Delete component',
   'components.deleteNamed': 'Delete {name}',

@@ -1267,6 +1267,22 @@ will become and where it will land before committing the copy.
 - ✅ Full release gates remain green: 857 unit tests, 97.74% engine coverage,
   49 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 55 — Components never require dragging ✅
+
+Persona need: let keyboard, switch-control and precision-limited creators reuse
+their work without needing a double-click or spatial drag gesture.
+
+- ✅ Every component card exposes a persistent, named Insert control; its native
+  button works by keyboard or pointer and explains that insertion is centered.
+- ✅ The copy preserves the established own-layer, selected-result and exact
+  undo behavior, while spatial drag-and-drop remains available beside it.
+- ✅ Keyboard focus reveals the sibling delete action just as pointer hover does,
+  so card actions do not disappear for non-pointer users.
+- ✅ Focused component coverage proves insertion state and a production-browser
+  journey activates the control with Enter after completing a real drag.
+- ✅ Full release gates remain green: 858 unit tests, 97.74% engine coverage,
+  49 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1275,8 +1291,7 @@ largest count of controls:
 1. **Direct-manipulation foundation:** cursor semantics, hover/hit feedback,
    valid/invalid targets, post-drop selection and cancellable AI progress are
    established, including provider checks, code generation and project opening;
-   continue with keyboard-equivalent placement cues and richer rotation
-   affordance.
+   continue with richer rotation affordance.
 2. **Conversational phone-first creation:** natural clarification and reference
    handling for voice now has a selected-object foundation; continue with more
    referents and corrections, a task-prioritized mobile shell, and a faithful

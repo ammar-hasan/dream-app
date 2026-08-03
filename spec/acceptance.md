@@ -560,7 +560,10 @@ holds.
       result before release; GIVEN a known Dream component THEN a compact
       pointer ghost and translucent exact-scale canvas preview show what and
       where the copy will be; WHEN it leaves, cancels or drops THEN every preview
-      clears, and an unsupported drop changes nothing.
+      clears, and an unsupported drop changes nothing. GIVEN a creator who
+      cannot or does not want to drag THEN every reusable component has a named
+      Insert control; WHEN it is activated by pointer or keyboard THEN the copy
+      appears at the canvas center on its own selected, undoable layer.
 165.  GIVEN Create, Edit or Feedback is waiting for AI WHEN the result has no
       measurable completion THEN Dream shows an announced action-specific
       activity state without a fabricated percentage and offers Cancel; WHEN

@@ -7,6 +7,12 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Keyboard-equivalent component insertion** (slice 55): every reusable
+  component now has a named, focusable Insert control that places a selected,
+  undoable copy at the canvas center. Dragging remains available for spatial
+  placement, and the delete action becomes visible when keyboard focus enters
+  the card.
+
 - **Predictive component drags** (slice 54): dragging a library component now
   carries a clean thumbnail ghost, names the item and paints a translucent
   exact-scale preview at its eventual canvas position. Leaving, cancelling or

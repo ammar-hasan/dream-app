@@ -200,6 +200,7 @@ export const fa: Record<string, string> = {
   'components.hint':
     'اشیاء را روی بوم انتخاب کنید، سپس اینجا ذخیره کنید تا در هر پروژه‌ای دوباره استفاده کنید.',
   'components.cardTitle': 'برای درج دوبار کلیک کنید یا بکشید روی بوم',
+  'components.insertNamed': 'درج {name} در مرکز بوم',
   'components.renameTitle': 'برای تغییر نام دوبار کلیک کنید',
   'components.delete': 'حذف قطعه',
   'components.deleteNamed': 'حذف {name}',

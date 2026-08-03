@@ -474,9 +474,10 @@ pro workspace — the mode is persisted per project.
   not an opaque chart: move/scale it, annotate it, animate it, save it, export
   it as SVG, or remove it with one Undo. Invalid data never touches the canvas.
 - **Components**: save any selection as a named component in the cross-project
-  library (IndexedDB). The Components panel shows live thumbnails; double-click
-  inserts at the canvas center, or drag onto the canvas to drop under the
-  cursor — a compact thumbnail follows the pointer while a translucent,
+  library (IndexedDB). The Components panel shows live thumbnails; use the named
+  Insert control by keyboard or pointer (or double-click) to place at the canvas
+  center, or drag onto the canvas to drop under the cursor — a compact thumbnail
+  follows the pointer while a translucent,
   exact-scale canvas preview names the component and shows its final position.
   Each instance lands selected on its own layer. **Instances are copies**:
   editing the component does not update already-placed instances (the simple

@@ -152,6 +152,18 @@ export function ComponentsPanel() {
             onDragEnd={() => endComponentDrag(component.id)}
             onDoubleClick={() => useDreamStore.getState().insertComponentInstance(component)}
           >
+            <button
+              type="button"
+              className="btn icon-btn small component-insert"
+              data-tooltip={t('components.insertNamed', { name: component.name })}
+              aria-label={t('components.insertNamed', { name: component.name })}
+              onClick={(event) => {
+                event.stopPropagation();
+                useDreamStore.getState().insertComponentInstance(component);
+              }}
+            >
+              <PlusIcon />
+            </button>
             <div className="component-thumb" data-tooltip={t('components.cardTitle')}>
               <ComponentThumb component={component} />
             </div>

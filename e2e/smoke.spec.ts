@@ -235,6 +235,13 @@ test('component drags preview the named copy at its exact canvas scale', async (
 
   await expect(page.locator('.layer-list > li')).toHaveCount(2);
   await expect(page.locator('.layer-list')).toContainText('Button chip');
+
+  const insert = components.getByRole('button', {
+    name: 'Insert Button chip at canvas center',
+  });
+  await insert.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.layer-list > li')).toHaveCount(3);
 });
 
 test('tooltips escape the scrolling toolbar and tool rail', async ({ page }) => {

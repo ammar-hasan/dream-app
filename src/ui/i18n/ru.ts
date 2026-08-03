@@ -197,6 +197,7 @@ export const ru: Record<string, string> = {
   'components.namePlaceholder': 'Имя компонента',
   'components.hint': 'Выделите объекты на холсте, сохраните здесь — используйте в любом проекте.',
   'components.cardTitle': 'Двойной клик — вставить, или тяните на холст',
+  'components.insertNamed': 'Вставить {name} в центр холста',
   'components.renameTitle': 'Двойной клик — переименовать',
   'components.delete': 'Удалить компонент',
   'components.deleteNamed': 'Удалить {name}',
