@@ -1467,6 +1467,28 @@ width or knowing that a desktop sidebar exists.
 - ✅ Full release gates remain green: 871 unit tests, 97.74% engine coverage,
   54 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 66 — Voice shows its work and never becomes a dead button ✅
+
+Persona need: let Zainab and George know when Dream is listening, verify what it
+heard and recover when a browser or microphone cannot recognize speech.
+
+- ✅ The toolbar mic opens a compact conversation on desktop and phone, with an
+  explicit listening state, live transcript, interpreted phrase and result.
+- ✅ Stop and Speak again remain direct; outside press and Escape dismiss the
+  surface, Escape restores focus, and opening the reviewed story journey closes
+  the voice surface before transferring attention.
+- ✅ Unsupported recognition, denied permission, unheard input and recognition
+  errors receive localized, nontechnical explanations. Typing reaches the exact
+  same localized intent rules, so the visible mic never ends in a dead end.
+- ✅ A causal five-bar listening waveform scales without moving layout, all
+  meaning is duplicated in text, dynamic results are announced and reduced
+  motion collapses the animation.
+- ✅ Production-browser coverage proves live listening/transcript/story handoff,
+  the phone fallback and typed command path, focus recovery and serious
+  accessibility scans. The rendered 390×844 fallback state was inspected.
+- ✅ Full release gates remain green: 872 unit tests, 97.74% engine coverage,
+  55 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1479,11 +1501,12 @@ largest count of controls:
    multi-item work can become opaque.
 2. **Conversational phone-first creation:** natural clarification and reference
    handling for voice now covers selected-object identity, color, size and basic
-   position plus canvas-edge targets; continue with relationships between
-   objects, broader multi-turn clarification and repair, literacy-light controls
-   and export beyond the task-prioritized shell/dock, and a faithful safe
-   creation path that does not require a child or low-literacy user to configure
-   an AI provider.
+   position plus canvas-edge targets. Listening, transcription, results, retry
+   and the identical typed fallback are now visible; continue with relationships
+   between objects, broader multi-turn clarification and repair, literacy-light
+   controls and export beyond the task-prioritized shell/dock, and a faithful
+   safe creation path that does not require a child or low-literacy user to
+   configure an AI provider.
 3. **Professional substrate:** non-destructive masks/adjustments and blend/color
    foundations, then vector paths, typography, grids, constraints and linked
    reusable systems—Design-only, preserving Draw's first-minute simplicity.

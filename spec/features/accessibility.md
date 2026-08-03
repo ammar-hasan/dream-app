@@ -78,12 +78,22 @@ is unsupported. One voice at a time (a new utterance replaces the old).
 
 ## Voice commands
 
-The mic button in the toolbar: click, speak, done. It remains visible where
-speech recognition is unsupported and explains that every tool still works by
-touch, mouse or keyboard; where spoken feedback exists, Little Dreamer also
-hears that explanation. Mic-permission denial gets a friendly message.
-Recognition listens in the UI language. Every command confirms in the status
-area and — when **voice feedback** is on (default in kid mode) — out loud.
+The mic button opens one compact conversation surface. Where recognition is
+available, it shows an unmistakable listening state and writes the growing
+transcript onscreen, then keeps the heard phrase beside Dream's result so a
+person can verify the interpretation. Speak again is direct; Stop finishes the
+current phrase. Where recognition is unavailable, permission is denied or
+nothing is heard, the same surface stays useful: it names the problem in the UI
+language and accepts a typed command through the identical intent path. The
+surface gives short examples, remains inside a phone viewport and closes on an
+outside press. Escape closes it and returns focus to the mic. Opening the
+reviewed story journey dismisses it so only one conversation asks for
+attention.
+
+Recognition listens in the UI language. Every command confirms in a
+programmatically announced status and — when **voice feedback** is on (default
+in kid mode) — out loud. The mic remains visible when recognition is
+unsupported; no browser can turn it into a silent dead control.
 
 The parser is forgiving: case-insensitive, ignores filler ("um, can you
 please undo?"), **normalizes Arabic** (diacritics and tatweel stripped,

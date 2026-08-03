@@ -395,6 +395,7 @@ test('AI Edit explains whole-layer edits and takes the user straight to selectio
 });
 
 test('voice stays visible without recognition and explains the fallback', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {
     Object.defineProperty(globalThis, 'SpeechRecognition', {
       configurable: true,
@@ -406,10 +407,24 @@ test('voice stays visible without recognition and explains the fallback', async 
     });
   });
   await bootApp(page);
-  await page.getByRole('button', { name: 'Voice commands' }).click();
-  await expect(page.getByRole('status')).toContainText(
+  const voice = page.getByRole('button', { name: 'Voice commands' });
+  await voice.click();
+  const conversation = page.getByRole('dialog', { name: 'Talk to Dream' });
+  await expect(conversation).toBeVisible();
+  await expect(conversation.getByRole('textbox', { name: 'Say it or type it' })).toBeFocused();
+  await expect(conversation.getByRole('status')).toContainText(
     'Voice commands are not available in this browser.',
   );
+
+  await conversation.getByRole('textbox', { name: 'Say it or type it' }).fill('undo');
+  await conversation.getByRole('button', { name: 'Do it' }).click();
+  await expect(conversation).toContainText('I heard');
+  await expect(conversation).toContainText('undo');
+  await expect(conversation.getByRole('status')).toHaveText('Nothing to undo.');
+
+  await page.keyboard.press('Escape');
+  await expect(conversation).toBeHidden();
+  await expect(voice).toBeFocused();
 });
 
 test('a spoken story request opens a planned storyboard', async ({ page }) => {
@@ -425,12 +440,14 @@ test('a spoken story request opens a planned storyboard', async ({ page }) => {
       start() {
         setTimeout(() => {
           const result = {
-            isFinal: true,
+            isFinal: false,
             0: { transcript: 'make a story about a moon adventure' },
           };
           this.onresult?.({ resultIndex: 0, results: { 0: result, length: 1 } });
+        }, 80);
+        setTimeout(() => {
           this.onend?.();
-        }, 0);
+        }, 160);
       }
 
       stop() {
@@ -448,8 +465,16 @@ test('a spoken story request opens a planned storyboard', async ({ page }) => {
   });
   await bootApp(page);
   await page.getByRole('button', { name: 'Voice commands' }).click();
+  const conversation = page.getByRole('dialog', { name: 'Talk to Dream' });
+  await expect(conversation).toBeVisible();
+  await expect(conversation).toContainText('Listening now…');
+  await expect(conversation.locator('.voice-wave')).toBeVisible();
+  await expect(conversation.locator('.voice-transcript')).toContainText(
+    'make a story about a moon adventure',
+  );
   const dialog = page.getByRole('dialog', { name: 'Make a story' });
   await expect(dialog).toBeVisible();
+  await expect(conversation).toBeHidden();
   await expect(dialog.getByRole('textbox', { name: 'Frame 1' })).toBeVisible();
   await expect(dialog).toContainText(/moon/i);
 });

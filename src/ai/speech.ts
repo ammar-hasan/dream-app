@@ -43,7 +43,8 @@ export function isSpeechSupported(): boolean {
 export interface DictationCallbacks {
   /** Called with the growing transcript (interim + final). */
   onText(text: string): void;
-  onError?(message: string): void;
+  /** Stable reason code; the consuming surface owns localized guidance. */
+  onError?(reason: 'not-allowed' | 'unheard'): void;
   onEnd?(): void;
 }
 
@@ -81,11 +82,7 @@ export function startDictation(
     callbacks.onText(text.trim());
   };
   recognition.onerror = (event) => {
-    const friendly =
-      event.error === 'not-allowed'
-        ? 'The microphone is off — allow it in your browser to talk to me.'
-        : 'I could not hear that. Try again?';
-    callbacks.onError?.(friendly);
+    callbacks.onError?.(event.error === 'not-allowed' ? 'not-allowed' : 'unheard');
   };
   recognition.onend = () => callbacks.onEnd?.();
 

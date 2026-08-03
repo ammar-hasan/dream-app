@@ -780,4 +780,17 @@ export const pt: Record<string, string> = {
   'voice.unknown': 'Desculpe, não entendi. Diga “ajuda” para ouvir o que eu posso fazer.',
   'voice.unavailable':
     'Os comandos de voz não estão disponíveis neste navegador. Você ainda pode usar todas as ferramentas por toque, mouse ou teclado.',
+  'voice.panelTitle': 'Fale com o Dream',
+  'voice.listeningNow': 'Ouvindo agora…',
+  'voice.ready': 'Pronto quando você estiver',
+  'voice.heard': 'Eu ouvi',
+  'voice.noTranscript': 'Não ouvi nada. Tente de novo ou digite abaixo.',
+  'voice.microphoneOff': 'O microfone está desligado. Permita no navegador ou digite abaixo.',
+  'voice.couldNotHear': 'Não consegui ouvir. Tente de novo ou digite abaixo.',
+  'voice.examples':
+    'Tente “desfazer”, “deixe isto vermelho” ou “crie uma história sobre uma aventura na Lua”.',
+  'voice.typeLabel': 'Fale ou digite',
+  'voice.typePlaceholder': 'O que você quer que o Dream faça?',
+  'voice.doIt': 'Fazer',
+  'voice.speakAgain': 'Falar de novo',
 };

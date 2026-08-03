@@ -763,4 +763,16 @@ export const en: Record<string, string> = {
   'voice.unknown': 'Sorry, I didn’t understand. Say “help” to hear what I can do.',
   'voice.unavailable':
     'Voice commands are not available in this browser. You can still use every tool by touch, mouse or keyboard.',
+  'voice.panelTitle': 'Talk to Dream',
+  'voice.listeningNow': 'Listening now…',
+  'voice.ready': 'Ready when you are',
+  'voice.heard': 'I heard',
+  'voice.noTranscript': 'I didn’t hear anything. Try again or type it below.',
+  'voice.microphoneOff': 'The microphone is off. Allow it in your browser, or type below.',
+  'voice.couldNotHear': 'I could not hear that. Try again or type below.',
+  'voice.examples': 'Try “undo”, “make it red” or “make a story about a moon adventure”.',
+  'voice.typeLabel': 'Say it or type it',
+  'voice.typePlaceholder': 'What would you like Dream to do?',
+  'voice.doIt': 'Do it',
+  'voice.speakAgain': 'Speak again',
 };

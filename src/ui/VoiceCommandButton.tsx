@@ -6,7 +6,7 @@
  * recognition is unsupported, the button explains the other input paths.
  */
 
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { isSpeechSupported, startDictation, type DictationHandle } from '../ai/speech';
 import { parseVoiceCommand } from '../ai/voiceCommands';
 import { say } from '../ai/say';
@@ -100,11 +100,47 @@ export function VoiceCommandButton() {
   const t = useT();
   const [listening, setListening] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [typedCommand, setTypedCommand] = useState('');
   const handleRef = useRef<DictationHandle | null>(null);
   const transcriptRef = useRef('');
+  const cancelledRef = useRef(false);
+  const recognitionErrorRef = useRef(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
+  const commandInputRef = useRef<HTMLInputElement>(null);
   const pendingClearRef = useRef(false);
   const executorContextRef = useRef<VoiceExecutorContext>({ lastNudge: null });
   const speechSupported = isSpeechSupported();
+
+  const closePanel = useCallback((restoreFocus = true) => {
+    cancelledRef.current = true;
+    const handle = handleRef.current;
+    handleRef.current = null;
+    handle?.stop();
+    setListening(false);
+    setPanelOpen(false);
+    if (restoreFocus) window.requestAnimationFrame(() => buttonRef.current?.focus());
+  }, []);
+
+  useEffect(() => {
+    if (!panelOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closePanel();
+    };
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (panelRef.current?.contains(target) || buttonRef.current?.contains(target)) return;
+      closePanel(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('pointerdown', onPointerDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('pointerdown', onPointerDown);
+    };
+  }, [closePanel, panelOpen]);
 
   /** Show the feedback and say it aloud when the voice preference is on. */
   const announce = (text: string) => {
@@ -114,6 +150,7 @@ export function VoiceCommandButton() {
   };
 
   const runTranscript = (text: string) => {
+    setTranscript(text);
     const command = parseVoiceCommand(text, useUiPrefs.getState().locale);
 
     // A pending "clear this layer?" confirmation intercepts yes/no first.
@@ -136,6 +173,9 @@ export function VoiceCommandButton() {
       announce(t('voice.unknown'));
       return;
     }
+    // The storyboard owns the next focused modal surface. Close this popover
+    // before opening it so two conversations never compete for attention.
+    if (command.kind === 'storyboard') setPanelOpen(false);
     const result = executeVoiceCommand(
       command,
       executorStore(announce),
@@ -147,32 +187,44 @@ export function VoiceCommandButton() {
     announce(result.message);
   };
 
-  const toggle = () => {
-    if (!speechSupported) {
-      announce(t('voice.unavailable'));
-      return;
-    }
-    if (handleRef.current) {
-      handleRef.current.stop();
-      return; // onend runs the transcript
-    }
+  const startListening = () => {
+    setPanelOpen(true);
+    setMessage(null);
+    setTranscript('');
     transcriptRef.current = '';
+    cancelledRef.current = false;
+    recognitionErrorRef.current = false;
     const handle = startDictation(
       {
         onText: (text) => {
           transcriptRef.current = text;
+          setTranscript(text);
         },
-        onError: (friendly) => {
+        onError: (reason) => {
+          recognitionErrorRef.current = true;
           executorContextRef.current.lastNudge = null;
-          announce(friendly);
+          announce(t(reason === 'not-allowed' ? 'voice.microphoneOff' : 'voice.couldNotHear'));
         },
         onEnd: () => {
           handleRef.current = null;
           setListening(false);
+          if (cancelledRef.current) {
+            cancelledRef.current = false;
+            transcriptRef.current = '';
+            return;
+          }
+          if (recognitionErrorRef.current) {
+            recognitionErrorRef.current = false;
+            transcriptRef.current = '';
+            return;
+          }
           const text = transcriptRef.current.trim();
           transcriptRef.current = '';
           if (text) runTranscript(text);
-          else executorContextRef.current.lastNudge = null;
+          else {
+            executorContextRef.current.lastNudge = null;
+            announce(t('voice.noTranscript'));
+          }
         },
       },
       { lang: speechLanguage(useUiPrefs.getState().locale) },
@@ -180,16 +232,35 @@ export function VoiceCommandButton() {
     if (handle) {
       handleRef.current = handle;
       setListening(true);
-      setMessage(null);
+      return;
     }
+    announce(t('voice.unavailable'));
+  };
+
+  const toggle = () => {
+    if (!speechSupported) {
+      setPanelOpen(true);
+      setTranscript('');
+      announce(t('voice.unavailable'));
+      window.requestAnimationFrame(() => commandInputRef.current?.focus());
+      return;
+    }
+    if (handleRef.current) {
+      handleRef.current.stop();
+      return; // onend runs the transcript
+    }
+    startListening();
   };
 
   return (
     <div className="voice-commands">
       <button
+        ref={buttonRef}
         type="button"
         className={`btn icon-btn${listening ? ' primary listening' : ''}`}
         aria-pressed={listening}
+        aria-expanded={panelOpen}
+        aria-controls="voice-conversation"
         aria-label={listening ? t('toolbar.stopListening') : t('toolbar.voiceCommands')}
         data-tooltip={
           listening
@@ -200,10 +271,85 @@ export function VoiceCommandButton() {
       >
         <MicIcon />
       </button>
-      {message && (
+      {message && !panelOpen && (
         <span className="voice-message" role="status">
           {message}
         </span>
+      )}
+      {panelOpen && (
+        <section
+          ref={panelRef}
+          id="voice-conversation"
+          className="voice-conversation"
+          role="dialog"
+          aria-label={t('voice.panelTitle')}
+        >
+          <header className="voice-conversation-header">
+            <div>
+              <strong>{t('voice.panelTitle')}</strong>
+              <span>{t(listening ? 'voice.listeningNow' : 'voice.ready')}</span>
+            </div>
+            <button type="button" className="btn" onClick={() => closePanel()}>
+              {t('common.close')}
+            </button>
+          </header>
+
+          {listening && (
+            <div className="voice-wave" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+              <i />
+              <i />
+            </div>
+          )}
+
+          {transcript && (
+            <div className="voice-transcript">
+              <span>{t('voice.heard')}</span>
+              <q>{transcript}</q>
+            </div>
+          )}
+
+          {message && (
+            <p className="voice-conversation-message" role="status">
+              {message}
+            </p>
+          )}
+
+          <p className="voice-examples">{t('voice.examples')}</p>
+
+          <form
+            className="voice-command-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              const text = typedCommand.trim();
+              if (!text) return;
+              setTypedCommand('');
+              runTranscript(text);
+            }}
+          >
+            <label htmlFor="voice-command-input">{t('voice.typeLabel')}</label>
+            <div>
+              <input
+                ref={commandInputRef}
+                id="voice-command-input"
+                value={typedCommand}
+                placeholder={t('voice.typePlaceholder')}
+                onChange={(event) => setTypedCommand(event.target.value)}
+              />
+              <button type="submit" className="btn primary" disabled={!typedCommand.trim()}>
+                {t('voice.doIt')}
+              </button>
+            </div>
+          </form>
+
+          {speechSupported && (
+            <button type="button" className="btn voice-retry" onClick={toggle}>
+              {t(listening ? 'toolbar.stopListening' : 'voice.speakAgain')}
+            </button>
+          )}
+        </section>
       )}
     </div>
   );

@@ -65,12 +65,20 @@ describe('startDictation', () => {
     expect(rec.stopped).toBe(true);
   });
 
-  it('turns mic-permission denial into a friendly message', () => {
+  it('classifies mic-permission denial for localized guidance', () => {
     g.webkitSpeechRecognition = FakeRecognition;
     const onError = vi.fn();
     startDictation({ onText: () => {}, onError });
     FakeRecognition.instances[0].onerror?.({ error: 'not-allowed' });
-    expect(onError).toHaveBeenCalledWith(expect.stringMatching(/microphone/i));
+    expect(onError).toHaveBeenCalledWith('not-allowed');
+  });
+
+  it('classifies other recognition failures without exposing browser jargon', () => {
+    g.webkitSpeechRecognition = FakeRecognition;
+    const onError = vi.fn();
+    startDictation({ onText: () => {}, onError });
+    FakeRecognition.instances[0].onerror?.({ error: 'network' });
+    expect(onError).toHaveBeenCalledWith('unheard');
   });
 
   it('notifies when the session ends', () => {

@@ -187,6 +187,16 @@ Modern interaction craft should make state legible rather than add spectacle:
   alignment is specifically suited to a discrete detent; repeated motion along
   the same guide is not a new event.
   (https://developer.apple.com/design/human-interface-guidelines/playing-haptics)
+- **Voice needs visible, repairable feedback and another input path.** Modern
+  guidance favors clear status near the action, multiple input methods and
+  programmatically announced results. Browser speech recognition is still not
+  universally available and may depend on a remote service, so Dream shows the
+  live transcript and result while preserving the same intent surface through
+  typing instead of treating speech as a binary capability.
+  (https://developer.apple.com/design/human-interface-guidelines/design-principles ·
+  https://developer.apple.com/design/human-interface-guidelines/feedback ·
+  https://www.w3.org/WAI/WCAG22/Understanding/status-messages ·
+  https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition)
 
 ## 3. Trend watch
 

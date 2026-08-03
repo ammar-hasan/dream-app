@@ -758,4 +758,16 @@ export const ar: Record<string, string> = {
   'voice.unknown': 'عذرًا، لم أفهم. قل «مساعدة» لتسمع ما أستطيع فعله.',
   'voice.unavailable':
     'الأوامر الصوتية غير متاحة في هذا المتصفح. ما زال بإمكانك استخدام كل أداة باللمس أو الفأرة أو لوحة المفاتيح.',
+  'voice.panelTitle': 'تحدث مع حُلم',
+  'voice.listeningNow': 'أستمع الآن…',
+  'voice.ready': 'جاهز عندما تكون جاهزًا',
+  'voice.heard': 'سمعت',
+  'voice.noTranscript': 'لم أسمع شيئًا. حاول مرة أخرى أو اكتب طلبك أدناه.',
+  'voice.microphoneOff': 'الميكروفون متوقف. اسمح به في متصفحك أو اكتب أدناه.',
+  'voice.couldNotHear': 'لم أسمع ذلك بوضوح. حاول مرة أخرى أو اكتب أدناه.',
+  'voice.examples': 'جرّب «تراجع» أو «اجعل هذا أحمر» أو «اصنع قصة عن مغامرة على القمر».',
+  'voice.typeLabel': 'قلها أو اكتبها',
+  'voice.typePlaceholder': 'ماذا تريد من حُلم أن يفعل؟',
+  'voice.doIt': 'نفّذ',
+  'voice.speakAgain': 'تحدث مرة أخرى',
 };

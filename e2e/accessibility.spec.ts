@@ -82,6 +82,28 @@ test('voice-first storyboard planning has no serious automated violations', asyn
   expect(await seriousViolations(page)).toEqual([]);
 });
 
+test('voice conversation and typed fallback have no serious automated violations', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(globalThis, 'SpeechRecognition', {
+      configurable: true,
+      value: undefined,
+    });
+    Object.defineProperty(globalThis, 'webkitSpeechRecognition', {
+      configurable: true,
+      value: undefined,
+    });
+  });
+  await bootApp(page);
+  await page.getByRole('button', { name: 'Voice commands' }).click();
+  const conversation = page.getByRole('dialog', { name: 'Talk to Dream' });
+  expect(await seriousViolations(page)).toEqual([]);
+  await conversation.getByRole('textbox', { name: 'Say it or type it' }).fill('undo');
+  await conversation.getByRole('button', { name: 'Do it' }).click();
+  expect(await seriousViolations(page)).toEqual([]);
+});
+
 test('phone timeline task views have no serious automated violations', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await bootApp(page);

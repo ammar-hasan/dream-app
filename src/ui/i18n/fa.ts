@@ -726,4 +726,17 @@ export const fa: Record<string, string> = {
   'voice.unknown': 'متأسفم، متوجه نشدم. بگو «راهنما» تا بگم چه کارهایی می‌تونم انجام بدم.',
   'voice.unavailable':
     'دستورهای صوتی در این مرورگر در دسترس نیستند. هنوز می‌توانی همهٔ ابزارها را با لمس، ماوس یا صفحه‌کلید استفاده کنی.',
+  'voice.panelTitle': 'با Dream حرف بزن',
+  'voice.listeningNow': 'دارم گوش می‌دهم…',
+  'voice.ready': 'هر وقت آماده‌ای',
+  'voice.heard': 'شنیدم',
+  'voice.noTranscript': 'چیزی نشنیدم. دوباره تلاش کن یا پایین بنویس.',
+  'voice.microphoneOff': 'میکروفون خاموش است. در مرورگر اجازه بده یا پایین بنویس.',
+  'voice.couldNotHear': 'نتوانستم بشنوم. دوباره تلاش کن یا پایین بنویس.',
+  'voice.examples':
+    '«واگرد»، «این را قرمز کن» یا «یک داستان دربارهٔ سفر به ماه بساز» را امتحان کن.',
+  'voice.typeLabel': 'بگو یا بنویس',
+  'voice.typePlaceholder': 'می‌خواهی Dream چه کاری انجام دهد؟',
+  'voice.doIt': 'انجام بده',
+  'voice.speakAgain': 'دوباره بگو',
 };

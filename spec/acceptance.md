@@ -657,6 +657,17 @@ holds.
       the same sheet with Dream AI visible. Escape closes either sheet and
       restores focus to its trigger; comfort targets remain at least 44 px and
       RTL preserves the logical path.
+176.  GIVEN the toolbar microphone WHEN recognition is available and listening
+      begins THEN a labelled, viewport-contained conversation shows the active
+      state and growing transcript before executing the localized phrase, then
+      presents what Dream heard beside a programmatically announced result.
+      WHEN recognition is unavailable, permission is refused or no phrase is
+      heard THEN the surface explains the exact condition and accepts a typed
+      command through the same intent rules. Speak again and Stop remain direct;
+      Escape closes and restores focus to the microphone. WHEN a story request
+      opens its reviewed journey THEN the conversation closes so only that
+      journey holds attention. Reduced motion removes waveform and entrance
+      timing without removing any state label or transcript.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

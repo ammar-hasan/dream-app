@@ -7,6 +7,13 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Visible, repairable voice conversation** (slice 66): the toolbar mic now
+  opens a phone-safe surface with a live transcript, listening waveform,
+  interpreted phrase, result, Stop and Speak again. Unsupported recognition,
+  denied permission and unheard input stay actionable through the same
+  localized intent parser via typing; Escape restores focus and all dynamic
+  results are announced accessibly.
+
 - **One-handed phone editing dock** (slice 65): adult phone creation now uses a
   six-place bottom dock that keeps the active/common tools, Controls and All
   tools visible without horizontal scrolling. Select is direct in Design; the

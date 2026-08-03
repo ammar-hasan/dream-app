@@ -136,6 +136,11 @@ Text `#0f141f` / `#ffffff`, dim text `#454d61` / `#ccd4e8`, borders
    valid drop target and a distinct double cue may reinforce refusal. Tactile
    feedback is optional, never runs continuously while drawing, never replaces
    the visible state, and stays silent when reduced motion is requested.
+10. Voice listening uses a compact five-bar waveform only while the microphone
+    is active. The bars scale rather than changing layout; the accompanying
+    state label and live transcript carry the meaning, so motion and sound are
+    never the sole signal. The conversation card enters like other popovers and
+    becomes instant under reduced motion.
 
 ## Video captions
 

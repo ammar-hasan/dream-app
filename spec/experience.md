@@ -217,6 +217,10 @@ Simplified Chinese, Brazilian Portuguese and Russian phrases, precedence rules a
 
 - Every voice command, refusal and background action reports in the
   **status area** (bottom bar) in plain words.
+- Voice also has a compact conversation surface: listening is visible, the
+  growing transcript shows what Dream hears, the interpreted phrase stays with
+  its result, and the same localized command can be typed when recognition is
+  unavailable. Results and errors are announced without moving focus.
 - Every destructive or surprising action is either undoable (almost
   everything) or asks first (voice "clear").
 - Tooltips show name + shortcut everywhere except kid mode.

@@ -142,7 +142,11 @@ RTL remain first-class product behavior.
   detected, silent where unsupported). On by default in kid mode, toggleable
   in settings for everyone.
 - **Canvas voice commands** — the mic button in the toolbar. Click, speak,
-  done: "undo", "redo", "clear" (asks for a spoken yes first), "new frame",
+  and watch Dream write what it hears before acting. A compact conversation
+  card keeps the transcript beside the result, supports Stop/Speak again, and
+  accepts the same localized commands by typing when browser recognition or
+  microphone permission is unavailable. Escape closes it and restores focus.
+  Commands include "undo", "redo", "clear" (asks for a spoken yes first), "new frame",
   "play"/"stop", "play my game", "preview my app", "export my app", "brush",
   "spray", "wand", "stamp", "eraser", "fill",
   colors ("red",
