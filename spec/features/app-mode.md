@@ -127,9 +127,12 @@ pixel-faithful picture of the app, this export is the app as source.
    the drawing's colors and words, opens on the frame active at export
    time, works fully offline, and navigates by hash so the browser Back
    button works.
-5. **The flow:** while generating, the dialog shows "Dreaming in code…";
-   on success the file downloads and a small note confirms — naming the
-   local generation when Dream AI wrote it.
+5. **The flow:** while generating, the dialog distinguishes preparing screens
+   and images, asking the AI to write, checking offline safety and an honestly
+   indeterminate longer wait. The creator can cancel at any point; the request
+   is asked to stop, the dialog becomes ready immediately and a late reply can
+   never download a file. On success the file downloads and a small note
+   confirms — naming the local generation when Dream AI wrote it.
 
 ## Discovery
 

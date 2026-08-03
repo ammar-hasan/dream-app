@@ -7,6 +7,11 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Cancellable Real Code** (slice 52): code export now names preparation,
+  provider writing, offline verification and patient-waiting stages with an
+  indeterminate loader. Cancel returns the dialog to ready, forwards request
+  cancellation and prevents a late provider reply from downloading a file.
+
 - **Cancellable provider checks** (slice 51): Test connection now announces
   honest contacting, checking and patient-waiting stages without a fake
   percentage. Cancel stops immediately, forwards cancellation to the request,

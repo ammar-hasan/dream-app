@@ -5,7 +5,7 @@
  * portable .dream project file.
  */
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { animationSettingsOf, MAX_FRAME_CAPTION_LENGTH } from '../engine/animation';
 import { canExportSvg } from '../engine/svgExport';
 import { useDreamStore } from '../store/dreamStore';
@@ -13,7 +13,7 @@ import { exportImage } from './exportImage';
 import { exportSvg } from './exportSvg';
 import { exportBrandPack } from './brandPack';
 import { exportAppHtml } from './exportApp';
-import { exportRealCodeHtml } from './exportRealCode';
+import { exportRealCodeHtml, type RealCodeStage } from './exportRealCode';
 import { downloadDreamFile } from './dreamFile';
 import {
   downloadBlob,
@@ -30,6 +30,20 @@ import { useT } from './i18n';
 type Format =
   'png' | 'jpeg' | 'svg' | 'brand' | 'webm' | 'mp4' | 'sprite' | 'app' | 'share' | 'code' | 'dream';
 
+function waitForCancellation(signal: AbortSignal): Promise<never> {
+  return new Promise((_resolve, reject) => {
+    signal.addEventListener(
+      'abort',
+      () => {
+        const error = new Error('Code generation cancelled');
+        error.name = 'AbortError';
+        reject(error);
+      },
+      { once: true },
+    );
+  });
+}
+
 export function ExportDialog({ onClose }: { onClose: () => void }) {
   const t = useT();
   const [format, setFormat] = useState<Format>('png');
@@ -40,6 +54,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [aspect, setAspect] = useState<VideoAspectPreset>('original');
   const [captionIndex, setCaptionIndex] = useState(0);
+  const codeController = useRef<AbortController | null>(null);
 
   const doc = useDreamStore((s) => s.doc);
   const animated = doc.frames !== undefined;
@@ -51,6 +66,17 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
   const [captions, setCaptions] = useState(() =>
     frames.map((frame) => frame.presentation?.caption ?? ''),
   );
+
+  useEffect(() => () => codeController.current?.abort(), []);
+
+  const codeProgress = (stage: RealCodeStage) => {
+    const key = {
+      preparing: 'export.codePreparing',
+      writing: 'export.codeWriting',
+      checking: 'export.codeChecking',
+    }[stage];
+    setProgress(t(key));
+  };
 
   const setCaption = (value: string) => {
     setCaptions((current) =>
@@ -127,17 +153,36 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
       return;
     }
     if (format === 'code') {
+      const controller = new AbortController();
+      codeController.current = controller;
       setError(null);
       setNote(null);
-      setProgress(t('export.codeProgress'));
+      setProgress(t('export.codePreparing'));
+      const patienceTimer = globalThis.setTimeout(() => {
+        if (!controller.signal.aborted && codeController.current === controller) {
+          setProgress(t('export.codeWaiting'));
+        }
+      }, 15_000);
       try {
-        const { local } = await exportRealCodeHtml(doc);
+        const { local } = await Promise.race([
+          exportRealCodeHtml(doc, {
+            signal: controller.signal,
+            onProgress: (stage) => {
+              if (!controller.signal.aborted) codeProgress(stage);
+            },
+          }),
+          waitForCancellation(controller.signal),
+        ]);
         setProgress(null);
         // Stay open with a small note — the file is already downloading.
         setNote(t(local ? 'export.codeDoneLocal' : 'export.codeDone'));
       } catch (err) {
         setProgress(null);
-        setError(err instanceof Error ? err.message : t('export.failed'));
+        if (controller.signal.aborted) setNote(t('export.codeCancelled'));
+        else setError(err instanceof Error ? err.message : t('export.failed'));
+      } finally {
+        globalThis.clearTimeout(patienceTimer);
+        if (codeController.current === controller) codeController.current = null;
       }
       return;
     }
@@ -185,6 +230,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
         role="dialog"
         aria-modal="true"
         aria-label={t('export.title')}
+        aria-busy={progress !== null}
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="dialog-title">{t('export.title')}</h2>
@@ -197,6 +243,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
                 key={id}
                 type="button"
                 className={`btn preset${format === id ? ' active' : ''}`}
+                disabled={progress !== null}
                 onClick={() => {
                   setFormat(id);
                   setError(null);
@@ -374,7 +421,17 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
 
         {format === 'dream' && <p className="dialog-note">{t('export.dreamNote')}</p>}
 
-        {progress && (
+        {progress && format === 'code' && (
+          <div className="ai-progress">
+            <div className="ai-progress-track" role="progressbar" aria-label={progress}>
+              <span />
+            </div>
+            <div className="ai-progress-copy">
+              <span>{progress}</span>
+            </div>
+          </div>
+        )}
+        {progress && format !== 'code' && (
           <p className="dialog-note">
             {format === 'webm' || format === 'mp4' ? t('export.recording', { progress }) : progress}
           </p>
@@ -383,7 +440,13 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
         {error && <p className="dialog-note">{error}</p>}
 
         <div className="dialog-actions">
-          <button className="btn" onClick={onClose} disabled={progress !== null}>
+          <button
+            className="btn"
+            onClick={
+              progress && format === 'code' ? () => codeController.current?.abort() : onClose
+            }
+            disabled={progress !== null && format !== 'code'}
+          >
             {t('common.cancel')}
           </button>
           <button

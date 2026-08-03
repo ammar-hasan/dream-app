@@ -589,6 +589,11 @@ export const ru: Record<string, string> = {
   'export.codeNote':
     'AI перепишет ваше приложение в чистый HTML/CSS/JS: экраны — семантическая разметка, ссылки — кнопки. Dream AI готовит локально, ваш AI даст больше.',
   'export.codeProgress': 'Превращаю мечту в код…',
+  'export.codePreparing': 'Подготавливаем экраны и изображения…',
+  'export.codeWriting': 'Ваш ИИ пишет приложение…',
+  'export.codeChecking': 'Проверяем, что код работает без сети…',
+  'export.codeWaiting': 'Всё ещё пишем — сложному приложению может понадобиться минута.',
+  'export.codeCancelled': 'Остановлено. Файл с кодом не скачан.',
   'export.codeDone': 'Код скачан — откройте в редакторе и изменяйте как хотите.',
   'export.codeDoneLocal': 'Код скачан (Dream AI, локально). Ваш AI — для расширенного кода.',
   'export.codeNoChat':

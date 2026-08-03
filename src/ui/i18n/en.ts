@@ -624,6 +624,11 @@ export const en: Record<string, string> = {
   'export.codeNote':
     'AI rewrites your app as real, readable HTML/CSS/JS — screens as semantic markup, your links wired as buttons. Dream AI builds a clean local version; connect your own AI for richer code.',
   'export.codeProgress': 'Dreaming in code…',
+  'export.codePreparing': 'Preparing your screens and images…',
+  'export.codeWriting': 'Your AI is writing the app…',
+  'export.codeChecking': 'Checking that the code works offline…',
+  'export.codeWaiting': 'Still writing — richer apps can take a minute.',
+  'export.codeCancelled': 'Stopped. No code file was downloaded.',
   'export.codeDone': 'Your code is downloading — open it in any editor and make it yours.',
   'export.codeDoneLocal':
     'Your code is downloading — generated locally by Dream AI. Connect your own AI for richer code.',

@@ -529,7 +529,9 @@ IDEA.md's "create whole applications with just your drawings".
   (connect your own AI for richer code). The file downloads as
   `{name}-code.html`, commented and beginner-friendly, starting with "Made
   with Dream — where drawings come alive." The builder, extractor and
-  template are pure TypeScript (`ai/makeReal.ts`).
+  template are pure TypeScript (`ai/makeReal.ts`). Real Code names its prepare,
+  write and offline-check stages, stays cancellable, and never downloads a late
+  provider reply after cancellation.
 - **Discovery** — with two or more frames and no links yet, the timeline
   shows a gentle "Link your frames to make an app →" hint that activates the
   Link tool. Kid mode skips it (Play mode stays the kid path); voice learned

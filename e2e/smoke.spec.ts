@@ -602,6 +602,50 @@ test('local real-code export embeds raster images instead of placeholder boxes',
   expect(html).not.toContain('structure-only image description');
 });
 
+test('real-code generation can be cancelled without downloading a late reply', async ({ page }) => {
+  await page.route('**/chat/completions', async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    await route
+      .fulfill({
+        status: 200,
+        json: {
+          choices: [{ message: { content: '<!doctype html><html><body>late app</body></html>' } }],
+        },
+      })
+      .catch(() => {});
+  });
+  let downloaded = false;
+  page.on('download', () => {
+    downloaded = true;
+  });
+
+  await bootApp(page);
+  await page.getByRole('button', { name: 'AI helper', exact: true }).click();
+  const panel = page.locator('.ai-panel');
+  await panel.getByRole('button', { name: /Settings:/ }).click();
+  await panel.locator('.ai-settings-body select').selectOption('openai-compatible');
+  await panel.getByLabel('Base URL').fill('https://api.openai.com/v1');
+  await panel.getByLabel('Model', { exact: true }).fill('gpt-4o-mini');
+  await panel.getByLabel('API key').fill('sk-e2e-not-a-secret');
+  await panel.getByRole('button', { name: 'Save' }).click();
+  await panel.getByRole('button', { name: 'Close AI helper' }).click();
+
+  await page.getByRole('button', { name: /^Animate/ }).click();
+  await page.getByRole('button', { name: 'Export' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Export' });
+  await dialog.getByRole('button', { name: 'Real code (AI) (.html)' }).click();
+  await dialog.getByRole('button', { name: 'Export' }).click();
+  await expect(
+    dialog.getByRole('progressbar', { name: 'Your AI is writing the app…' }),
+  ).toBeVisible();
+  await dialog.getByRole('button', { name: 'Cancel' }).click();
+
+  await expect(dialog.getByRole('progressbar')).toHaveCount(0);
+  await expect(dialog).toContainText('Stopped. No code file was downloaded.');
+  await page.waitForTimeout(800);
+  expect(downloaded).toBe(false);
+});
+
 test('a share link opens the viewer-only prototype without private project data', async ({
   page,
 }) => {

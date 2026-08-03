@@ -35,6 +35,19 @@ export interface RealCodeDeps {
   download?: (blob: Blob, fileName: string) => void;
   /** Defaults to the browser PNG codec; tests inject a deterministic encoder. */
   encodeRaster?: (patch: RasterPatch) => Promise<string>;
+  /** Lets the export dialog stop remote generation and reject late results. */
+  signal?: AbortSignal;
+  /** Reports honest phases; none of them imply a made-up percentage. */
+  onProgress?: (stage: RealCodeStage) => void;
+}
+
+export type RealCodeStage = 'preparing' | 'writing' | 'checking';
+
+function throwIfCancelled(signal?: AbortSignal): void {
+  if (!signal?.aborted) return;
+  const error = new Error('Code generation cancelled');
+  error.name = 'AbortError';
+  throw error;
 }
 
 async function encodeImageAssets(
@@ -76,19 +89,31 @@ export async function generateRealCodeHtml(
   deps: RealCodeDeps = {},
 ): Promise<RealCodeResult> {
   const provider = deps.provider ?? getActiveProvider();
+  throwIfCancelled(deps.signal);
+  deps.onProgress?.('preparing');
   const assets = await encodeImageAssets(doc, deps.encodeRaster ?? browserRasterCodec.encode);
+  throwIfCancelled(deps.signal);
   const app = buildAppDescription(doc, assets);
+  deps.onProgress?.('writing');
   if (provider.id === 'mock') {
-    return { html: buildTemplateAppHtml(app), local: true };
+    const html = buildTemplateAppHtml(app);
+    throwIfCancelled(deps.signal);
+    deps.onProgress?.('checking');
+    return { html, local: true };
   }
   if (!provider.capabilities.chat) {
     throw new Error(t('export.codeNoChat'));
   }
   const { system, user } = buildMakeRealPrompt(app);
-  const reply = await provider.chat([
-    { role: 'system', text: system },
-    { role: 'user', text: user },
-  ]);
+  const reply = await provider.chat(
+    [
+      { role: 'system', text: system },
+      { role: 'user', text: user },
+    ],
+    { doc, signal: deps.signal },
+  );
+  throwIfCancelled(deps.signal);
+  deps.onProgress?.('checking');
   const html = extractHtmlFromReply(reply);
   if (!html) throw new Error(t('export.codeNotCode'));
   const check = validateGeneratedHtml(html);
@@ -101,10 +126,12 @@ export async function exportRealCodeHtml(
   doc: DreamDocument,
   deps: RealCodeDeps = {},
 ): Promise<{ local: boolean; fileName: string }> {
+  throwIfCancelled(deps.signal);
   if (!isBYOKActive() && !consumeFreeTry()) {
     throw new Error(t('ai.freeOver'));
   }
   const { html, local } = await generateRealCodeHtml(doc, deps);
+  throwIfCancelled(deps.signal);
   const fileName = codeFileName(doc.name);
   (deps.download ?? downloadBlob)(new Blob([html], { type: 'text/html' }), fileName);
   return { local, fileName };

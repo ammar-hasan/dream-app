@@ -99,6 +99,39 @@ describe('generateRealCodeHtml', () => {
     expect(messages[1].text).toContain('"name":"My App"');
   });
 
+  it('forwards cancellation and rejects a late provider reply', async () => {
+    let finish: ((reply: string) => void) | undefined;
+    const provider = fakeProvider('');
+    provider.chat = vi.fn(
+      () =>
+        new Promise<string>((resolve) => {
+          finish = resolve;
+        }),
+    );
+    const controller = new AbortController();
+    const download = vi.fn();
+    const stages: string[] = [];
+    const result = exportRealCodeHtml(doc(), {
+      provider,
+      download,
+      signal: controller.signal,
+      onProgress: (stage) => stages.push(stage),
+    });
+
+    await vi.waitFor(() => expect(provider.chat).toHaveBeenCalledOnce());
+    const context = (provider.chat as ReturnType<typeof vi.fn>).mock.calls[0][1] as {
+      signal?: AbortSignal;
+    };
+    expect(context.signal).toBe(controller.signal);
+    expect(stages).toEqual(['preparing', 'writing']);
+
+    controller.abort();
+    finish?.('<!doctype html><html><body>late app</body></html>');
+    await expect(result).rejects.toMatchObject({ name: 'AbortError' });
+    expect(download).not.toHaveBeenCalled();
+    expect(stages).not.toContain('checking');
+  });
+
   it('rejects a reply that is not code, kindly', async () => {
     const provider = fakeProvider('Sorry, I cannot do that.');
     await expect(generateRealCodeHtml(doc(), { provider })).rejects.toThrow(

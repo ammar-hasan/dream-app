@@ -1215,6 +1215,23 @@ contradict a cancellation.
 - ✅ Full release gates remain green: 853 unit tests, 97.74% engine coverage,
   47 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 52 — Real Code stays observable and cancellable ✅
+
+Persona need: let an app creator understand a slow code-generation wait, leave
+it immediately and trust that a provider cannot surprise them with a download
+after they said stop.
+
+- ✅ Real Code distinguishes screen/image preparation, provider writing,
+  offline-safety checking and a patient longer wait without a fake percentage.
+- ✅ An indeterminate loader remains visible and accessible while the active
+  format is fixed, preventing the dialog from changing meaning mid-operation.
+- ✅ Cancel makes the dialog ready immediately, forwards request cancellation,
+  confirms no file downloaded and rejects late replies before download.
+- ✅ Focused generation and production-browser coverage prove signal forwarding,
+  stage order, immediate cancellation and late-download rejection.
+- ✅ Full release gates remain green: 854 unit tests, 97.74% engine coverage,
+  48 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1222,8 +1239,8 @@ largest count of controls:
 
 1. **Direct-manipulation foundation:** cursor semantics, hover/hit feedback,
    valid/invalid targets, post-drop selection and cancellable AI progress are
-   established, including provider checks; continue with drag ghosts and extend
-   the same progress contract to project loading and code generation.
+   established, including provider checks and code generation; continue with
+   drag ghosts and extend the same progress contract to project loading.
 2. **Conversational phone-first creation:** natural clarification and reference
    handling for voice now has a selected-object foundation; continue with more
    referents and corrections, a task-prioritized mobile shell, and a faithful

@@ -583,6 +583,12 @@ holds.
       Cancel; WHEN cancelled THEN Settings becomes ready, the network request is
       asked to stop, settings remain exact and a late hello cannot replace the
       cancellation result with success.
+169.  GIVEN Real Code is preparing or waiting for an AI WHEN generation has no
+      measurable completion THEN Dream names preparing, writing, offline-check
+      and patient-waiting stages with an indeterminate loader; WHEN the creator
+      cancels THEN the dialog becomes ready immediately, asks the request to
+      stop, confirms no file downloaded and prevents a late reply from starting
+      a download.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

@@ -610,6 +610,11 @@ export const zh: Record<string, string> = {
   'export.codeNote':
     'AI 将你的应用重写为真实、可读的 HTML/CSS/JS — 将屏幕转换成语义标记，并将链接连为按钮。Dream AI 在本地生成干净版本；连接你自己的 AI 可获得更丰富的代码。',
   'export.codeProgress': '代码梦创作中…',
+  'export.codePreparing': '正在准备屏幕和图片…',
+  'export.codeWriting': '你的 AI 正在编写应用…',
+  'export.codeChecking': '正在检查代码能否离线运行…',
+  'export.codeWaiting': '仍在编写——内容丰富的应用可能需要一分钟。',
+  'export.codeCancelled': '已停止。没有下载代码文件。',
   'export.codeDone': '你的代码正在下载 — 用任意编辑器打开并自由修改。',
   'export.codeDoneLocal':
     '你的代码正在下载 — 由 Dream AI 本地生成。连接你自己的 AI 可获得更丰富的代码。',
