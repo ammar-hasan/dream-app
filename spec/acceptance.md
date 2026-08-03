@@ -408,6 +408,11 @@ holds.
       WebM or MP4 THEN the shown duration, progress total and downloaded video
       cover that inclusive range only, while every source frame and its order
       remain unchanged and reopening Export defaults to the full animation.
+      WHILE real-time recording is active THEN completed-frame progress is
+      determinate, delivery controls stay fixed and Cancel or Escape remains
+      available; stopping ends the recorder and narration mix immediately,
+      downloads no partial video, preserves caption edits and leaves every
+      frame and delivery choice intact.
 126.  GIVEN a narration take and a trimmed video beginning after frame 1 WHEN
       it is exported THEN the take begins at the selected frame's matching
       time offset and ends with the video, keeping voice synchronized with the

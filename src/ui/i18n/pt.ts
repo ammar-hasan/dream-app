@@ -653,6 +653,8 @@ export const pt: Record<string, string> = {
   'export.codeChecking': 'Verificando se o código funciona offline…',
   'export.codeWaiting': 'Ainda escrevendo — aplicativos mais ricos podem levar um minuto.',
   'export.codeCancelled': 'Interrompido. Nenhum arquivo de código foi baixado.',
+  'export.videoCancelled':
+    'Interrompido. Nenhum vídeo foi baixado; suas edições de legenda foram mantidas.',
   'export.codeDone': 'Seu código está baixando — abra em qualquer editor e faça seu.',
   'export.codeDoneLocal':
     'Seu código está baixando — gerado localmente pelo Dream AI. Conecte sua IA para código mais rico.',

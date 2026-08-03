@@ -241,6 +241,45 @@ describe('exportAnimationWebM', () => {
     expect(blob.size).toBeGreaterThan(0);
   });
 
+  it('stops the recorder immediately and returns no partial video when cancelled', async () => {
+    const doc = animatedDoc(3);
+    const { canvas } = fakeCanvas();
+    const started = { value: false };
+    const stopped = { value: false };
+    const progress: [number, number][] = [];
+    const controller = new AbortController();
+    let finishWait: (() => void) | undefined;
+
+    const result = exportAnimationWebM(
+      doc,
+      {
+        fps: 1,
+        signal: controller.signal,
+        onProgress: (done, total) => progress.push([done, total]),
+      },
+      {
+        isTypeSupported: () => true,
+        createCanvas: () => canvas,
+        createRecorder: () => fakeRecorder(started, stopped),
+        wait: () =>
+          new Promise<void>((resolve) => {
+            finishWait = resolve;
+          }),
+      },
+    );
+
+    expect(started.value).toBe(true);
+    expect(progress).toEqual([]);
+    controller.abort();
+    await expect(result).rejects.toMatchObject({ name: 'AbortError' });
+    expect(stopped.value).toBe(true);
+    expect(progress).toEqual([]);
+
+    finishWait?.();
+    await Promise.resolve();
+    expect(progress).toEqual([]);
+  });
+
   it('renders each frame into the canvas (background painted per frame)', async () => {
     const doc = animatedDoc(2);
     const { canvas, ctx } = fakeCanvas();

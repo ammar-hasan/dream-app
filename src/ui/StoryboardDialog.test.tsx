@@ -223,7 +223,7 @@ describe('StoryboardDialog', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Moon wakes');
     expect(screen.getByLabelText('Frame 1').closest('li')).toHaveClass('is-current');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    fireEvent.keyDown(window, { key: 'Escape' });
     await waitFor(() => expect(screen.queryByRole('progressbar')).not.toBeInTheDocument());
     expect(screen.getByRole('status')).toHaveTextContent('Stopped. Nothing was changed.');
     expect(requestSignal?.aborted).toBe(true);

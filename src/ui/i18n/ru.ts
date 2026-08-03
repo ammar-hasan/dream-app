@@ -604,6 +604,7 @@ export const ru: Record<string, string> = {
   'export.codeChecking': 'Проверяем, что код работает без сети…',
   'export.codeWaiting': 'Всё ещё пишем — сложному приложению может понадобиться минута.',
   'export.codeCancelled': 'Остановлено. Файл с кодом не скачан.',
+  'export.videoCancelled': 'Остановлено. Видеофайл не скачан; изменения подписей сохранены.',
   'export.codeDone': 'Код скачан — откройте в редакторе и изменяйте как хотите.',
   'export.codeDoneLocal': 'Код скачан (Dream AI, локально). Ваш AI — для расширенного кода.',
   'export.codeNoChat':

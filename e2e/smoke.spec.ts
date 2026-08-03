@@ -1088,6 +1088,40 @@ test('social video export saves synchronized captions as one undoable edit', asy
   await expect(page.locator('.timeline-frame-caption')).toHaveCount(0);
 });
 
+test('video export can be cancelled without downloading a partial recording', async ({ page }) => {
+  let downloads = 0;
+  page.on('download', () => {
+    downloads += 1;
+  });
+  await bootApp(page);
+  await page.getByRole('button', { name: /^Animate/ }).click();
+  for (let frame = 0; frame < 7; frame += 1) {
+    await page.getByRole('button', { name: 'Add frame' }).click();
+  }
+  await page.getByLabel('Frames per second').fill('1');
+  await page.getByRole('button', { name: 'Export' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Export' });
+  await dialog.getByRole('button', { name: 'WebM video' }).click();
+  await dialog.getByLabel('Frame 1 of 8').fill('Keep this caption');
+  await dialog.getByRole('button', { name: 'Export' }).click();
+
+  await expect(dialog.getByRole('progressbar', { name: /Recording/ })).toBeVisible();
+  await expect(dialog.getByRole('button', { name: 'Cancel' })).toBeEnabled();
+  await dialog.getByRole('button', { name: 'Cancel' }).click();
+
+  await expect(dialog.getByRole('progressbar')).toHaveCount(0);
+  await expect(dialog).toContainText('Stopped. No video file was downloaded.');
+  await expect(dialog.getByLabel('Frame 1 of 8')).toHaveValue('Keep this caption');
+
+  await dialog.getByRole('button', { name: 'Export' }).click();
+  await expect(dialog.getByRole('progressbar', { name: /Recording/ })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(dialog.getByRole('progressbar')).toHaveCount(0);
+  await expect(dialog).toContainText('Stopped. No video file was downloaded.');
+  await page.waitForTimeout(1_500);
+  expect(downloads).toBe(0);
+});
+
 test('kid mode swaps in the big rail and back', async ({ page }) => {
   await bootApp(page);
   await page.getByRole('button', { name: 'Little Dreamer mode' }).click();

@@ -176,6 +176,12 @@ The Export dialog offers, for animated documents:
   frame timing/progress flow, includes narration when present, and downloads
   as `{name}.mp4` for Original. No transcode or relabeled WebM fallback is allowed: an MP4
   download is always a real MP4 container.
+- **Stopping video:** WebM and MP4 show determinate completed-frame progress
+  throughout their real-time recording. Export settings are held steady while
+  it runs, but Cancel and Escape remain available. Stopping ends the recorder
+  and any narration mix immediately and never downloads a partial file. Caption
+  edits made before Export remain as the one intended undoable document edit;
+  frames, trim and every other delivery choice remain unchanged.
 - **Sprite sheet** — all frames in one PNG grid: up to **8 columns**
   (columns = the smallest of: frame count, 8, and the ceiling of the square
   root of the frame count), rows as needed, each cell the full document

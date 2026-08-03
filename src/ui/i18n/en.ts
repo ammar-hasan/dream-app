@@ -639,6 +639,7 @@ export const en: Record<string, string> = {
   'export.codeChecking': 'Checking that the code works offline…',
   'export.codeWaiting': 'Still writing — richer apps can take a minute.',
   'export.codeCancelled': 'Stopped. No code file was downloaded.',
+  'export.videoCancelled': 'Stopped. No video file was downloaded. Your caption edits are kept.',
   'export.codeDone': 'Your code is downloading — open it in any editor and make it yours.',
   'export.codeDoneLocal':
     'Your code is downloading — generated locally by Dream AI. Connect your own AI for richer code.',

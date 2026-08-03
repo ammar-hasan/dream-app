@@ -625,6 +625,7 @@ export const zh: Record<string, string> = {
   'export.codeChecking': '正在检查代码能否离线运行…',
   'export.codeWaiting': '仍在编写——内容丰富的应用可能需要一分钟。',
   'export.codeCancelled': '已停止。没有下载代码文件。',
+  'export.videoCancelled': '已停止。未下载视频文件；你的字幕修改已保留。',
   'export.codeDone': '你的代码正在下载 — 用任意编辑器打开并自由修改。',
   'export.codeDoneLocal':
     '你的代码正在下载 — 由 Dream AI 本地生成。连接你自己的 AI 可获得更丰富的代码。',

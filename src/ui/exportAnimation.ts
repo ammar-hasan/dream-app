@@ -252,8 +252,46 @@ export interface VideoExportOptions {
   /** Inclusive zero-based frame range; omitted means the complete animation. */
   startFrame?: number;
   endFrame?: number;
-  /** Called with (frames rendered so far, total frames). */
+  /** Called with (frame holds recorded so far, total frames). */
   onProgress?: (done: number, total: number) => void;
+  /** Stops recording without returning a partial video. */
+  signal?: AbortSignal;
+}
+
+function videoExportCancelled(): Error {
+  const error = new Error('Video export cancelled');
+  error.name = 'AbortError';
+  return error;
+}
+
+function throwIfVideoCancelled(signal?: AbortSignal): void {
+  if (signal?.aborted) throw videoExportCancelled();
+}
+
+function waitForVideoValue<T>(
+  request: Promise<T>,
+  signal?: AbortSignal,
+  discard?: (value: T) => void,
+): Promise<T> {
+  if (!signal) return request;
+  if (signal.aborted) return Promise.reject(videoExportCancelled());
+  return new Promise<T>((resolve, reject) => {
+    const cancel = () => reject(videoExportCancelled());
+    signal.addEventListener('abort', cancel, { once: true });
+    request.then(
+      (value) => {
+        signal.removeEventListener('abort', cancel);
+        if (signal.aborted) {
+          discard?.(value);
+          reject(videoExportCancelled());
+        } else resolve(value);
+      },
+      (error: unknown) => {
+        signal.removeEventListener('abort', cancel);
+        reject(error);
+      },
+    );
+  });
 }
 
 export function videoFrameRange(
@@ -278,6 +316,7 @@ async function exportAnimationVideo(
   format: 'webm' | 'mp4',
   deps: VideoExportDeps = {},
 ): Promise<Blob> {
+  throwIfVideoCancelled(options.signal);
   const allFrames = doc.frames ?? [];
   if (allFrames.length === 0) throw new Error('Nothing to export — add some frames first.');
   const range = videoFrameRange(allFrames.length, options.startFrame, options.endFrame);
@@ -321,12 +360,19 @@ async function exportAnimationVideo(
   let finish: (() => Promise<void>) | undefined;
   if (doc.narration) {
     const createSession = deps.createRecorderWithNarration ?? defaultRecorderWithNarration;
-    const session = await createSession(
-      canvas,
-      mimeType,
-      doc.narration,
-      SOCIAL_VIDEO_CAPTURE_FPS,
-      range.start / options.fps,
+    const session = await waitForVideoValue(
+      createSession(
+        canvas,
+        mimeType,
+        doc.narration,
+        SOCIAL_VIDEO_CAPTURE_FPS,
+        range.start / options.fps,
+      ),
+      options.signal,
+      (late) => {
+        const cleanup = late.finish?.();
+        void cleanup?.catch(() => {});
+      },
     );
     recorder = session.recorder;
     finish = session.finish;
@@ -343,14 +389,20 @@ async function exportAnimationVideo(
   recorder.start();
 
   const frameMs = 1000 / options.fps;
-  for (let i = 0; i < frames.length; i += 1) {
-    renderVideoFrame(doc, frames[i], ctx, aspect);
-    options.onProgress?.(i + 1, frames.length);
-    await wait(frameMs);
+  try {
+    for (let i = 0; i < frames.length; i += 1) {
+      throwIfVideoCancelled(options.signal);
+      renderVideoFrame(doc, frames[i], ctx, aspect);
+      await waitForVideoValue(wait(frameMs), options.signal);
+      options.onProgress?.(i + 1, frames.length);
+    }
+    throwIfVideoCancelled(options.signal);
+  } finally {
+    recorder.stop();
+    await stopped;
+    await finish?.();
   }
-  recorder.stop();
-  await stopped;
-  await finish?.();
+  throwIfVideoCancelled(options.signal);
   return new Blob(chunks, { type: mimeType });
 }
 

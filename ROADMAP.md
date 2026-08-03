@@ -1333,6 +1333,22 @@ control while several remote pictures are painted one after another.
 - ✅ Full release gates remain green: 863 unit tests, 97.74% engine coverage,
   50 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 59 — Video recording can stop safely ✅
+
+Persona need: let Ahmed and every social-video creator stop a long delivery
+without waiting helplessly or discovering a misleading partial download.
+
+- ✅ WebM and supported MP4 expose determinate completed-frame progress while
+  freezing the settings that define the active recording.
+- ✅ Cancel and Escape stay available, stop the recorder and narration mix
+  immediately, and never assemble or download a partial video.
+- ✅ Cancellation feedback says that caption edits remain, while frames, trim,
+  aspect and every other delivery choice stay untouched.
+- ✅ Unit coverage proves prompt recorder cleanup and no later frames after an
+  abort; a production-browser journey proves no download after cancellation.
+- ✅ Full release gates remain green: 864 unit tests, 97.74% engine coverage,
+  51 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1341,8 +1357,8 @@ largest count of controls:
 1. **Direct-manipulation foundation:** cursor semantics, hover/hit feedback,
    valid/invalid targets, post-drop selection and cancellable AI progress are
    established, including provider checks, code generation, project opening and
-   item-level story progress; continue with batch delivery and other operations
-   where multi-item work can become opaque.
+   item-level story/video progress; continue with other operations where
+   multi-item work can become opaque.
 2. **Conversational phone-first creation:** natural clarification and reference
    handling for voice now has a selected-object foundation; continue with more
    position/relational referents and corrections, a task-prioritized mobile

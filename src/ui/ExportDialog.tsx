@@ -55,6 +55,8 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
   const [aspect, setAspect] = useState<VideoAspectPreset>('original');
   const [captionIndex, setCaptionIndex] = useState(0);
   const codeController = useRef<AbortController | null>(null);
+  const videoController = useRef<AbortController | null>(null);
+  const [videoProgress, setVideoProgress] = useState<{ done: number; total: number } | null>(null);
 
   const doc = useDreamStore((s) => s.doc);
   const animated = doc.frames !== undefined;
@@ -67,7 +69,25 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
     frames.map((frame) => frame.presentation?.caption ?? ''),
   );
 
-  useEffect(() => () => codeController.current?.abort(), []);
+  useEffect(
+    () => () => {
+      codeController.current?.abort();
+      videoController.current?.abort();
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!progress || (format !== 'code' && format !== 'webm' && format !== 'mp4')) return;
+    const stopOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      if (format === 'code') codeController.current?.abort();
+      else videoController.current?.abort();
+    };
+    globalThis.addEventListener('keydown', stopOnEscape);
+    return () => globalThis.removeEventListener('keydown', stopOnEscape);
+  }, [format, progress]);
 
   const codeProgress = (stage: RealCodeStage) => {
     const key = {
@@ -109,8 +129,12 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
       return;
     }
     if (format === 'webm' || format === 'mp4') {
+      const controller = new AbortController();
+      videoController.current = controller;
       setError(null);
+      setNote(null);
       setProgress(t('export.starting'));
+      setVideoProgress({ done: 0, total: trimEnd - trimStart + 1 });
       try {
         useDreamStore.getState().setFrameCaptions(captions);
         const exportDoc = useDreamStore.getState().doc;
@@ -120,13 +144,24 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
           aspect,
           startFrame: trimStart,
           endFrame: trimEnd,
-          onProgress: (done, total) => setProgress(t('export.progress', { done, total })),
+          signal: controller.signal,
+          onProgress: (done, total) => {
+            if (!controller.signal.aborted) {
+              setProgress(t('export.progress', { done, total }));
+              setVideoProgress({ done, total });
+            }
+          },
         });
         downloadBlob(blob, videoFileName(exportDoc.name, format, aspect));
         onClose();
       } catch (err) {
         setProgress(null);
-        setError(err instanceof Error ? err.message : t('export.failed'));
+        if (controller.signal.aborted) setNote(t('export.videoCancelled'));
+        else setError(err instanceof Error ? err.message : t('export.failed'));
+      } finally {
+        setProgress(null);
+        setVideoProgress(null);
+        if (videoController.current === controller) videoController.current = null;
       }
       return;
     }
@@ -232,6 +267,14 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
         aria-label={t('export.title')}
         aria-busy={progress !== null}
         onClick={(e) => e.stopPropagation()}
+        onKeyDown={(event) => {
+          if (event.key !== 'Escape') return;
+          event.stopPropagation();
+          if (progress && format === 'code') codeController.current?.abort();
+          else if (progress && (format === 'webm' || format === 'mp4'))
+            videoController.current?.abort();
+          else if (!progress) onClose();
+        }}
       >
         <h2 className="dialog-title">{t('export.title')}</h2>
 
@@ -282,6 +325,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
                     type="button"
                     className={`btn preset${aspect === id ? ' active' : ''}`}
                     aria-pressed={aspect === id}
+                    disabled={progress !== null}
                     onClick={() => setAspect(id)}
                   >
                     {t(`export.aspect.${id}`)}
@@ -307,13 +351,14 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
                   total: frames.length,
                 })}
                 placeholder={t('export.captionPlaceholder')}
+                disabled={progress !== null}
                 onChange={(event) => setCaption(event.target.value)}
               />
               <div className="video-caption-actions">
                 <button
                   type="button"
                   className="btn"
-                  disabled={captionIndex === 0}
+                  disabled={progress !== null || captionIndex === 0}
                   onClick={() => setCaptionIndex((index) => Math.max(0, index - 1))}
                 >
                   {t('export.captionPrevious')}
@@ -321,7 +366,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
                 <button
                   type="button"
                   className="btn"
-                  disabled={captionIndex >= frames.length - 1}
+                  disabled={progress !== null || captionIndex >= frames.length - 1}
                   onClick={() => setCaptionIndex((index) => Math.min(frames.length - 1, index + 1))}
                 >
                   {t('export.captionNext')}
@@ -329,7 +374,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
                 <button
                   type="button"
                   className="btn"
-                  disabled={!captions[captionIndex]?.trim()}
+                  disabled={progress !== null || !captions[captionIndex]?.trim()}
                   onClick={() =>
                     setCaptions((current) => current.map(() => current[captionIndex] ?? ''))
                   }
@@ -348,6 +393,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
                 <span>{t('export.trimStart')}</span>
                 <select
                   value={trimStart}
+                  disabled={progress !== null}
                   onChange={(event) => {
                     const next = Number(event.target.value);
                     setTrimStart(next);
@@ -365,6 +411,7 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
                 <span>{t('export.trimEnd')}</span>
                 <select
                   value={trimEnd}
+                  disabled={progress !== null}
                   onChange={(event) => setTrimEnd(Number(event.target.value))}
                 >
                   {frames.map((_, index) => (
@@ -431,10 +478,29 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
             </div>
           </div>
         )}
-        {progress && format !== 'code' && (
-          <p className="dialog-note">
-            {format === 'webm' || format === 'mp4' ? t('export.recording', { progress }) : progress}
-          </p>
+        {progress && (format === 'webm' || format === 'mp4') && videoProgress && (
+          <div className="ai-progress determinate-progress">
+            <div
+              className="ai-progress-track"
+              role="progressbar"
+              aria-label={t('export.recording', { progress })}
+              aria-valuemin={0}
+              aria-valuemax={videoProgress.total}
+              aria-valuenow={videoProgress.done}
+            >
+              <span
+                style={{
+                  transform: `scaleX(${videoProgress.done / Math.max(1, videoProgress.total)})`,
+                }}
+              />
+            </div>
+            <div className="ai-progress-copy">
+              <span>{t('export.recording', { progress })}</span>
+            </div>
+          </div>
+        )}
+        {progress && format !== 'code' && format !== 'webm' && format !== 'mp4' && (
+          <p className="dialog-note">{progress}</p>
         )}
         {note && <p className="dialog-note">{note}</p>}
         {error && <p className="dialog-note">{error}</p>}
@@ -442,10 +508,15 @@ export function ExportDialog({ onClose }: { onClose: () => void }) {
         <div className="dialog-actions">
           <button
             className="btn"
-            onClick={
-              progress && format === 'code' ? () => codeController.current?.abort() : onClose
+            onClick={() => {
+              if (progress && format === 'code') codeController.current?.abort();
+              else if (progress && (format === 'webm' || format === 'mp4'))
+                videoController.current?.abort();
+              else onClose();
+            }}
+            disabled={
+              progress !== null && format !== 'code' && format !== 'webm' && format !== 'mp4'
             }
-            disabled={progress !== null && format !== 'code'}
           >
             {t('common.cancel')}
           </button>

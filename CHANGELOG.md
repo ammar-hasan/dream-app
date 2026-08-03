@@ -7,6 +7,11 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Cancellable video recording** (slice 59): WebM and supported MP4 export now
+  use determinate progress and keep Cancel/Escape available throughout the
+  real-time recording. Stopping releases the recorder and audio mix, downloads
+  no partial file, and truthfully preserves caption edits.
+
 - **Cancellable storyboard batches** (slice 58): story creation now shows the
   exact scene and completed-frame progress, marks current/completed moments, and
   keeps Cancel and Escape available. Stopping asks the painter to abort and

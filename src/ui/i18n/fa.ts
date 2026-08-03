@@ -609,6 +609,7 @@ export const fa: Record<string, string> = {
   'export.codeChecking': 'در حال بررسی اجرای آفلاین کد…',
   'export.codeWaiting': 'هنوز در حال نوشتنیم — برنامه‌های غنی‌تر ممکن است یک دقیقه زمان ببرند.',
   'export.codeCancelled': 'متوقف شد. هیچ فایل کدی دانلود نشد.',
+  'export.videoCancelled': 'متوقف شد. هیچ فایل ویدیویی دانلود نشد. ویرایش‌های زیرنویس شما حفظ شد.',
   'export.codeDone':
     'کد شما در حال دانلود است — آن را در هر ویرایشگری باز کنید و به دلخواه خود تغییر دهید.',
   'export.codeDoneLocal':

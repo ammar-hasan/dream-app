@@ -110,6 +110,17 @@ export function StoryboardDialog({
     return () => requestController.current?.abort();
   }, []);
 
+  useEffect(() => {
+    if (!busy) return;
+    const stopOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      requestController.current?.abort();
+    };
+    globalThis.addEventListener('keydown', stopOnEscape);
+    return () => globalThis.removeEventListener('keydown', stopOnEscape);
+  }, [busy]);
+
   const applyPlan = (value: string) => {
     const next = planStoryboard(value, locale);
     if (!next) {
@@ -322,7 +333,7 @@ export function StoryboardDialog({
         )}
 
         {busy && (
-          <div className="ai-progress storyboard-progress" role="status">
+          <div className="ai-progress determinate-progress storyboard-progress" role="status">
             <div
               className="ai-progress-track"
               role="progressbar"

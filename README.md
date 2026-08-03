@@ -314,6 +314,9 @@ play button, everything called "frames".
   previous/next or copy one to all, and the captions are burned into the video
   over a readable safe-area backing. Export saves the batch as one undoable
   edit; shaped filenames include `-vertical`, `-square` or `-landscape`.
+  Determinate frame progress stays visible during the real-time recording;
+  Cancel or Escape stops and releases it immediately without downloading a
+  partial video, while keeping the creator's caption edits.
 - **Present mode**: the mode pill is now Draw / Design / Play / Present. Present
   turns frames into slides: full-viewport rendering, arrow keys / Space /
   click to advance, ← to go back, Esc to exit, slide counter at the bottom.
