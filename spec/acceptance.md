@@ -571,6 +571,12 @@ holds.
       a named refusal THEN a distinct double cue reinforces the visible refusal.
       Repeated drag events, drawing, unsupported hardware, the off setting and
       reduced motion produce no tactile cue and never change document content.
+167.  GIVEN visible artwork is selected WHEN the person says a localized form
+      of “delete it” or “duplicate it” THEN “it” resolves only to that selection,
+      the deletion or offset copy is one undoable action, and Dream names the
+      result; GIVEN no selection or a locked selection THEN Dream gives specific
+      guidance and changes neither the layer, brush nor undo history. “Delete
+      everything” remains the separately confirmed whole-layer action.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

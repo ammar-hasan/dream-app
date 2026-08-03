@@ -45,6 +45,8 @@ export interface VoiceExecutorStore {
   setColor(color: Color): void;
   setSize(size: number): void;
   scaleSelection(factor: number): void;
+  deleteSelection(): void;
+  duplicateSelection(): void;
   setSymmetry(mode: SymmetryMode): void;
   /** True while a narration take is being recorded. */
   narrationRecording: boolean;
@@ -172,6 +174,18 @@ export function executeVoiceCommand(
       if (!store.doc.narration) return { message: t('voice.narrationNone') };
       store.deleteNarration();
       return { message: t('voice.narrationDeleted') };
+
+    case 'delete-selection':
+      if (store.selectionCount === 0) return { message: t('voice.selectionNeeded') };
+      if (!store.selectionTransformable) return { message: t('voice.selectionLocked') };
+      store.deleteSelection();
+      return { message: t('voice.selectionDeleted') };
+
+    case 'duplicate-selection':
+      if (store.selectionCount === 0) return { message: t('voice.selectionNeeded') };
+      if (!store.selectionTransformable) return { message: t('voice.selectionLocked') };
+      store.duplicateSelection();
+      return { message: t('voice.selectionDuplicated') };
 
     case 'tool':
       store.setTool(command.tool);

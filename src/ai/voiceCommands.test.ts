@@ -32,6 +32,13 @@ describe('parseVoiceCommand — history & document', () => {
     expect(parseVoiceCommand('start over')).toEqual({ kind: 'clear' });
   });
 
+  it('keeps selected-object delete and duplicate distinct from clearing everything', () => {
+    expect(parseVoiceCommand('delete it')).toEqual({ kind: 'delete-selection' });
+    expect(parseVoiceCommand('please copy that')).toEqual({ kind: 'duplicate-selection' });
+    expect(parseVoiceCommand('make another one')).toEqual({ kind: 'duplicate-selection' });
+    expect(parseVoiceCommand('delete everything')).toEqual({ kind: 'clear' });
+  });
+
   it('parses confirmations and cancellations', () => {
     expect(parseVoiceCommand('yes')).toEqual({ kind: 'confirm' });
     expect(parseVoiceCommand('yeah sure')).toEqual({ kind: 'confirm' });
@@ -208,6 +215,11 @@ describe('parseVoiceCommand — unknown input', () => {
 });
 
 describe('parseVoiceCommand — Arabic vocabulary (locale "ar")', () => {
+  it('parses selected-object references', () => {
+    expect(parseVoiceCommand('احذف هذا', 'ar')).toEqual({ kind: 'delete-selection' });
+    expect(parseVoiceCommand('انسخ هذا', 'ar')).toEqual({ kind: 'duplicate-selection' });
+  });
+
   it('parses undo/redo/clear with polite filler', () => {
     expect(parseVoiceCommand('تراجع', 'ar')).toEqual({ kind: 'undo' });
     expect(parseVoiceCommand('يا حلم من فضلك تراجع', 'ar')).toEqual({ kind: 'undo' });
@@ -351,6 +363,11 @@ describe('parseVoiceCommand — Arabic vocabulary (locale "ar")', () => {
 });
 
 describe('parseVoiceCommand — Persian vocabulary (locale "fa")', () => {
+  it('parses selected-object references', () => {
+    expect(parseVoiceCommand('این را حذف کن', 'fa')).toEqual({ kind: 'delete-selection' });
+    expect(parseVoiceCommand('این را کپی کن', 'fa')).toEqual({ kind: 'duplicate-selection' });
+  });
+
   it('parses core creation, recovery and calligraphy-adjacent tools', () => {
     expect(parseVoiceCommand('لطفاً واگرد', 'fa')).toEqual({ kind: 'undo' });
     expect(parseVoiceCommand('قلم مو', 'fa')).toEqual({ kind: 'tool', tool: 'brush' });
@@ -385,6 +402,11 @@ describe('parseVoiceCommand — Persian vocabulary (locale "fa")', () => {
 });
 
 describe('parseVoiceCommand — Simplified Chinese vocabulary (locale "zh")', () => {
+  it('parses selected-object references without spaces', () => {
+    expect(parseVoiceCommand('请删除这个', 'zh')).toEqual({ kind: 'delete-selection' });
+    expect(parseVoiceCommand('复制选中内容', 'zh')).toEqual({ kind: 'duplicate-selection' });
+  });
+
   it('parses recovery, confirmation and creation without word spaces', () => {
     expect(parseVoiceCommand('请帮我撤销', 'zh')).toEqual({ kind: 'undo' });
     expect(parseVoiceCommand('重做', 'zh')).toEqual({ kind: 'redo' });
@@ -426,6 +448,11 @@ describe('parseVoiceCommand — Simplified Chinese vocabulary (locale "zh")', ()
 });
 
 describe('parseVoiceCommand — Brazilian Portuguese vocabulary (locale "pt")', () => {
+  it('parses selected-object references', () => {
+    expect(parseVoiceCommand('apagar isso', 'pt')).toEqual({ kind: 'delete-selection' });
+    expect(parseVoiceCommand('copiar isso', 'pt')).toEqual({ kind: 'duplicate-selection' });
+  });
+
   it('parses recovery, confirmation and creation with polite filler', () => {
     expect(parseVoiceCommand('por favor, desfaça', 'pt')).toEqual({ kind: 'undo' });
     expect(parseVoiceCommand('refazer', 'pt')).toEqual({ kind: 'redo' });
@@ -473,6 +500,11 @@ describe('parseVoiceCommand — Brazilian Portuguese vocabulary (locale "pt")', 
 });
 
 describe('parseVoiceCommand — Russian vocabulary (locale "ru")', () => {
+  it('parses selected-object references', () => {
+    expect(parseVoiceCommand('удали это', 'ru')).toEqual({ kind: 'delete-selection' });
+    expect(parseVoiceCommand('скопируй это', 'ru')).toEqual({ kind: 'duplicate-selection' });
+  });
+
   it('parses recovery, confirmation and creation with polite filler', () => {
     expect(parseVoiceCommand('пожалуйста, отменить', 'ru')).toEqual({ kind: 'undo' });
     expect(parseVoiceCommand('повторить', 'ru')).toEqual({ kind: 'redo' });

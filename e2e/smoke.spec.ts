@@ -331,8 +331,10 @@ test('a spoken story request opens a planned storyboard', async ({ page }) => {
   await expect(dialog).toContainText(/moon/i);
 });
 
-test('voice resolves “make it bigger” to the visible selection', async ({ page }) => {
+test('voice resolves natural “it” actions to the visible selection', async ({ page }) => {
   await page.addInitScript(() => {
+    let request = 0;
+    const transcripts = ['make it bigger', 'duplicate it', 'delete it'];
     class FakeRecognition {
       lang = '';
       interimResults = false;
@@ -343,7 +345,7 @@ test('voice resolves “make it bigger” to the visible selection', async ({ pa
 
       start() {
         setTimeout(() => {
-          const result = { isFinal: true, 0: { transcript: 'make it bigger' } };
+          const result = { isFinal: true, 0: { transcript: transcripts[request++] ?? '' } };
           this.onresult?.({ resultIndex: 0, results: { 0: result, length: 1 } });
           this.onend?.();
         }, 0);
@@ -386,6 +388,17 @@ test('voice resolves “make it bigger” to the visible selection', async ({ pa
 
   await page.getByRole('button', { name: 'Undo', exact: true }).click();
   await expect.poll(() => nonWhitePixels(page)).toBeLessThanOrEqual(before);
+
+  await page.getByRole('button', { name: 'Voice commands' }).click();
+  await expect(page.getByRole('status')).toContainText('Made a copy of the selected part.');
+  const withCopy = await nonWhitePixels(page);
+  expect(withCopy).toBeGreaterThan(before);
+
+  await page.getByRole('button', { name: 'Voice commands' }).click();
+  await expect(page.getByRole('status')).toContainText(
+    'Deleted the selected part. Say undo if you need it back.',
+  );
+  await expect.poll(() => nonWhitePixels(page)).toBeLessThan(withCopy);
 });
 
 test('tabular science data becomes a grouped scalable plot in one undo', async ({ page }) => {

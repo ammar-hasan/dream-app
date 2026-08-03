@@ -63,6 +63,8 @@ function executorStore(announceDone?: (message: string) => void): VoiceExecutorS
     setColor: s.setColor,
     setSize: s.setSize,
     scaleSelection: s.scaleSelection,
+    deleteSelection: s.deleteSelection,
+    duplicateSelection: s.duplicateSelection,
     setSymmetry: s.setSymmetry,
     narrationRecording: sharedNarrationRecorder().state === 'recording',
     // Async: the mic permission prompt resolves later; a denial is announced

@@ -704,7 +704,10 @@ export const en: Record<string, string> = {
   'voice.smaller': 'Smaller brush!',
   'voice.selectionBigger': 'Made the selected part bigger.',
   'voice.selectionSmaller': 'Made the selected part smaller.',
-  'voice.selectionLocked': 'That selection is locked. Unlock it before changing its size.',
+  'voice.selectionDeleted': 'Deleted the selected part. Say undo if you need it back.',
+  'voice.selectionDuplicated': 'Made a copy of the selected part.',
+  'voice.selectionNeeded': 'Select something first, then say delete it or duplicate it.',
+  'voice.selectionLocked': 'That selection is locked. Unlock it before changing it.',
   'voice.mirrorOn': 'Mirror on!',
   'voice.mirrorOff': 'Mirror off.',
   'voice.saved': 'Saved!',
@@ -716,7 +719,7 @@ export const en: Record<string, string> = {
   'voice.narrationNeedsFrames': 'Add some frames first, then tell your story!',
   'voice.narrationAlready': 'Already recording — say “stop recording” when you’re done.',
   'voice.help':
-    'You can say: brush, pencil, spray, eraser, fill, wand, stamp, a color like red or blue, bigger, smaller, mirror on, mirror off, undo, redo, clear, new frame, play, play my game, preview my app, export my app, export real code, record narration, stop recording, delete narration, stop, save, and help.',
+    'You can say: brush, pencil, spray, eraser, fill, wand, stamp, a color like red or blue, bigger, smaller, delete it, duplicate it, mirror on, mirror off, undo, redo, clear, new frame, play, play my game, preview my app, export my app, export real code, record narration, stop recording, delete narration, stop, save, and help.',
   'voice.unknown': 'Sorry, I didn’t understand. Say “help” to hear what I can do.',
   'voice.unavailable':
     'Voice commands are not available in this browser. You can still use every tool by touch, mouse or keyboard.',

@@ -686,7 +686,10 @@ export const zh: Record<string, string> = {
   'voice.smaller': '变小画笔！',
   'voice.selectionBigger': '已放大选中的部分。',
   'voice.selectionSmaller': '已缩小选中的部分。',
-  'voice.selectionLocked': '选中的内容已锁定。请先解锁再调整大小。',
+  'voice.selectionDeleted': '已删除选中的部分。需要恢复时请说“撤销”。',
+  'voice.selectionDuplicated': '已复制选中的部分。',
+  'voice.selectionNeeded': '请先选择内容，然后说“删除它”或“复制它”。',
+  'voice.selectionLocked': '选中的内容已锁定。请先解锁再更改。',
   'voice.mirrorOn': '镜像开启！',
   'voice.mirrorOff': '镜像关闭。',
   'voice.saved': '已保存！',
@@ -698,7 +701,7 @@ export const zh: Record<string, string> = {
   'voice.narrationNeedsFrames': '先添加一些帧，然后再讲故事！',
   'voice.narrationAlready': '已经在录音了 — 结束时说“停止录音”。',
   'voice.help':
-    '你可以说：画笔、铅笔、喷枪、橡皮擦、填充、魔棒、印章、红色或蓝色、变大、变小、打开镜像、关闭镜像、撤销、重做、清空、新建帧、播放、玩我的游戏、预览应用、导出应用、导出代码、录制旁白、停止录音、删除旁白、停止、保存和帮助。',
+    '你可以说：画笔、铅笔、喷枪、橡皮擦、填充、魔棒、印章、红色或蓝色、变大、变小、删除它、复制它、打开镜像、关闭镜像、撤销、重做、清空、新建帧、播放、玩我的游戏、预览应用、导出应用、导出代码、录制旁白、停止录音、删除旁白、停止、保存和帮助。',
   'voice.unknown': '抱歉，我没听懂。说“帮助”可以听听我会做什么。',
   'voice.unavailable': '此浏览器无法使用语音命令。你仍可通过触摸、鼠标或键盘使用所有工具。',
 };

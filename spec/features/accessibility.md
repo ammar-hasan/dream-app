@@ -91,10 +91,13 @@ correction such as “no, undo that” or “yes, make it red,” the answer wor
 not swallow the requested action; Dream follows Undo or the color request.
 
 Voice uses visible selection as conversational context. With artwork selected,
-“make it bigger” and “make it smaller” refer to that artwork, scale it about its
-shared center, and say what changed. With no selection the same words retain
-their familiar brush-size meaning. A locked selection gets a specific refusal;
-Dream never claims to have resized it and never falls through to the brush.
+“make it bigger” and “make it smaller” scale that artwork about its shared
+center; “delete it” removes only that artwork; and “duplicate it” makes and
+selects an offset copy. Every action is undoable and says what changed. With no
+selection, size words retain their familiar brush-size meaning while delete and
+duplicate explain that something must be selected first. A locked selection
+gets a specific refusal; Dream never changes a locked selection or silently
+falls through to changing the whole layer.
 
 ### The complete intent table
 
@@ -116,6 +119,7 @@ Dream never claims to have resized it and never falls through to the brush.
 | fill + color     | "fill red"                                                                                                                                             | —                                                                                | sets the color AND activates the fill tool                                                       |
 | mirror on/off    | "mirror on", "mirror off", "symmetry on"                                                                                                               | شغّل التناظر، أطفئ التناظر                                                       | vertical symmetry on / off (mirror phrases never trigger "play")                                 |
 | bigger / smaller | "bigger", "make it bigger", "thicker" / "smaller", "make it smaller", "thinner"                                                                        | أكبر / أصغر                                                                      | selected artwork scales gently about its center; with no selection, brush size ×~1.5 or ÷~1.5    |
+| delete / copy it | "delete it", "remove that" / "duplicate it", "copy that"                                                                                               | احذف هذا / انسخ هذا                                                              | deletes only the selection / makes and selects an offset copy; both are undoable                 |
 | save             | "save"                                                                                                                                                 | احفظ                                                                             | saves now                                                                                        |
 | help             | "help", "commands"                                                                                                                                     | مساعدة، أوامر                                                                    | speaks the full command list                                                                     |
 | confirm / cancel | "yes", "yeah sure" / "no", "cancel"                                                                                                                    | نعم / لا، ألغِ                                                                   | answers the clear confirmation only when all meaningful words are answer words                   |
@@ -197,6 +201,9 @@ keeps it silent. Every tactile cue repeats an already-visible interaction state.
   already empty.", "Nothing to play yet — add some frames first.").
 - With no selection, "Bigger" at brush size 64 stays 64 and "smaller" at 1
   stays 1. With a locked selection, both refuse and leave brush and art exact.
+- “Delete it” and “duplicate it” require a visible editable selection. Missing
+  and locked selections get named guidance; neither phrase clears a layer or
+  changes the brush.
 - A pending "clear?" confirmation is cancelled by any non-yes utterance. A
   command within that correction (such as “no, undo”) then runs normally.
 - Spoken names never fire where synthesis is missing — the UI simply

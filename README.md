@@ -148,7 +148,8 @@ RTL remain first-class product behavior.
   colors ("red",
   "blue", … a friendly vocabulary including "fill red"), "mirror on"/
   "mirror off", "bigger"/"smaller", "export real code", "record narration"/
-  "stop recording"/"delete narration", "save" and "help"
+  "stop recording"/"delete narration", selected-object “delete it”/“duplicate
+  it”, "save" and "help"
   (speaks the command list). The pipeline is a pure parser
   (`ai/voiceCommands.ts`, case-insensitive, filler-tolerant — "um, can you
   please undo?") plus a thin executor (`ui/voiceExecutor.ts`) against a
@@ -156,8 +157,10 @@ RTL remain first-class product behavior.
   when **voice feedback** is on, out loud. Without SpeechRecognition the mic
   remains visible and explains the touch, mouse and keyboard alternatives.
   Visible selection supplies context: “make it bigger/smaller” scales selected
-  artwork about its shared center as one undoable action; without a selection
-  it keeps changing brush size, and a locked selection is refused truthfully.
+  artwork, “delete it” removes only the selection, and “duplicate it” makes an
+  offset selected copy; every action is undoable. Without a selection, size
+  words keep changing brush size while object actions explain how to select;
+  locked selections are refused truthfully.
   Answer words also preserve corrections: “no, undo that” reaches Undo, while a
   standalone “no” still safely answers a pending destructive confirmation.
   The vocabulary is **per-locale**: with

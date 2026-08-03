@@ -40,6 +40,10 @@ export type VoiceCommand =
   | { kind: 'stop-recording' }
   /** "delete narration": remove the saved take. */
   | { kind: 'delete-narration' }
+  /** "delete it": remove the visible selection, never the whole layer. */
+  | { kind: 'delete-selection' }
+  /** "duplicate it": copy the visible selection and select the copy. */
+  | { kind: 'duplicate-selection' }
   | { kind: 'tool'; tool: ToolId }
   /** "mirror on" / "mirror off": toggle vertical mirror symmetry. */
   | { kind: 'mirror'; on: boolean }
@@ -192,6 +196,8 @@ export interface VoiceVocabulary {
   narrationRecordPhrases: string[];
   narrationStopPhrases: string[];
   narrationDeletePhrases: string[];
+  selectionDeletePhrases: string[];
+  selectionDuplicatePhrases: string[];
   /** Outcome-level animation creation phrases; trailing words become the story. */
   storyboardPhrases: string[];
 }
@@ -251,6 +257,21 @@ const EN_VOCAB: VoiceVocabulary = {
     'erase narration',
     'remove narration',
     'delete my voice',
+  ],
+  selectionDeletePhrases: [
+    'delete it',
+    'delete that',
+    'remove it',
+    'remove that',
+    'erase it',
+    'erase that',
+  ],
+  selectionDuplicatePhrases: [
+    'duplicate it',
+    'duplicate that',
+    'copy it',
+    'copy that',
+    'make another one',
   ],
   storyboardPhrases: [
     'make a story about',
@@ -357,6 +378,8 @@ const AR_VOCAB: VoiceVocabulary = {
   narrationRecordPhrases: ['سجل صوتي', 'سجل الصوت', 'سجل تعليق', 'احك القصة', 'احكي القصة'],
   narrationStopPhrases: ['اوقف التسجيل', 'اوقفي التسجيل', 'انهي التسجيل', 'انهاء التسجيل'],
   narrationDeletePhrases: ['امسح الصوت', 'احذف الصوت', 'امسح التسجيل', 'احذف التسجيل', 'امسح صوتي'],
+  selectionDeletePhrases: ['احذف هذا', 'احذفها', 'امسح هذا', 'احذف التحديد'],
+  selectionDuplicatePhrases: ['كرر هذا', 'كررها', 'انسخ هذا', 'انسخ التحديد'],
   storyboardPhrases: [
     'اصنع قصة عن',
     'اصنع لي قصة عن',
@@ -462,6 +485,8 @@ const FA_VOCAB: VoiceVocabulary = {
   narrationRecordPhrases: ['ضبط روایت', 'صدام را ضبط کن', 'صدام رو ضبط کن', 'داستان را ضبط کن'],
   narrationStopPhrases: ['ضبط را متوقف کن', 'ضبط رو متوقف کن', 'پایان ضبط'],
   narrationDeletePhrases: ['روایت را پاک کن', 'صدا را پاک کن', 'ضبط را حذف کن'],
+  selectionDeletePhrases: ['این را حذف کن', 'این رو حذف کن', 'انتخاب را حذف کن'],
+  selectionDuplicatePhrases: ['این را کپی کن', 'این رو کپی کن', 'انتخاب را کپی کن', 'تکرارش کن'],
   storyboardPhrases: [
     'یک داستان درباره',
     'داستانی درباره',
@@ -551,6 +576,8 @@ const ZH_VOCAB: VoiceVocabulary = {
   narrationRecordPhrases: ['录制旁白', '录制我的声音', '开始录音', '讲述故事'],
   narrationStopPhrases: ['停止录音', '结束录音', '录音完成'],
   narrationDeletePhrases: ['删除旁白', '删除录音', '清除旁白'],
+  selectionDeletePhrases: ['删除它', '删除这个', '删除选中内容'],
+  selectionDuplicatePhrases: ['复制它', '复制这个', '复制选中内容'],
   storyboardPhrases: ['制作一个故事', '制作故事', '创作一个故事', '制作一个动画', '制作动画'],
 };
 
@@ -670,6 +697,8 @@ const PT_VOCAB: VoiceVocabulary = {
     'excluir gravação',
     'apagar minha voz',
   ],
+  selectionDeletePhrases: ['excluir isso', 'apagar isso', 'remover isso', 'excluir seleção'],
+  selectionDuplicatePhrases: ['duplicar isso', 'copiar isso', 'duplicar seleção'],
   storyboardPhrases: [
     'crie uma história sobre',
     'criar uma história sobre',
@@ -800,6 +829,8 @@ const RU_VOCAB: VoiceVocabulary = {
     'стереть озвучку',
     'стереть мой голос',
   ],
+  selectionDeletePhrases: ['удалить это', 'удали это', 'удалить выделенное'],
+  selectionDuplicatePhrases: ['дублировать это', 'скопируй это', 'дублировать выделенное'],
   storyboardPhrases: [
     'создай историю о',
     'создать историю о',
@@ -853,6 +884,11 @@ function mergeVocabulary(base: VoiceVocabulary, extra: VoiceVocabulary): VoiceVo
     narrationRecordPhrases: [...base.narrationRecordPhrases, ...extra.narrationRecordPhrases],
     narrationStopPhrases: [...base.narrationStopPhrases, ...extra.narrationStopPhrases],
     narrationDeletePhrases: [...base.narrationDeletePhrases, ...extra.narrationDeletePhrases],
+    selectionDeletePhrases: [...base.selectionDeletePhrases, ...extra.selectionDeletePhrases],
+    selectionDuplicatePhrases: [
+      ...base.selectionDuplicatePhrases,
+      ...extra.selectionDuplicatePhrases,
+    ],
     storyboardPhrases: [...base.storyboardPhrases, ...extra.storyboardPhrases],
   };
 }
@@ -1050,6 +1086,13 @@ export function parseVoiceCommand(transcript: string, locale = 'en'): VoiceComma
   }
   if (hasPhrase(normalized, ...vocab.narrationRecordPhrases)) {
     return { kind: 'record-narration' };
+  }
+
+  if (hasPhrase(normalized, ...vocab.selectionDeletePhrases)) {
+    return { kind: 'delete-selection' };
+  }
+  if (hasPhrase(normalized, ...vocab.selectionDuplicatePhrases)) {
+    return { kind: 'duplicate-selection' };
   }
 
   const isClearAll = has(tokens, vocab.clear) || hasPhrase(normalized, ...vocab.clearPhrases);

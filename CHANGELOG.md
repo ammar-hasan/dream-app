@@ -7,6 +7,12 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Natural selected-object voice actions** (slice 50): “delete it” and
+  “duplicate it” now resolve only to visible selected artwork, remain undoable,
+  and name their result. Missing and locked selections get specific guidance,
+  “delete everything” keeps its separate confirmation, and natural equivalents
+  work across all six languages.
+
 - **Sparse touch feedback** (slice 49): supported devices now give one short
   tactile cue for the first visible valid canvas drop target and a distinct
   double cue for a visible refusal. The setting defaults on, is optional,

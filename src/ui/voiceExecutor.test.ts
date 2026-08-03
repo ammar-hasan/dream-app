@@ -39,6 +39,8 @@ function makeStore(overrides: Partial<VoiceExecutorStore> = {}) {
     setColor: vi.fn(),
     setSize: vi.fn(),
     scaleSelection: vi.fn(),
+    deleteSelection: vi.fn(),
+    duplicateSelection: vi.fn(),
     setSymmetry: vi.fn(),
     narrationRecording: false,
     startNarration: vi.fn(),
@@ -278,6 +280,30 @@ describe('executeVoiceCommand', () => {
     expect(executeVoiceCommand({ kind: 'bigger' }, locked, () => {})?.message).toMatch(/locked/i);
     expect(locked.scaleSelection).not.toHaveBeenCalled();
     expect(locked.setSize).not.toHaveBeenCalled();
+  });
+
+  it('delete/duplicate resolve “it” only to an editable visible selection', () => {
+    const empty = makeStore();
+    expect(executeVoiceCommand({ kind: 'delete-selection' }, empty, () => {})?.message).toMatch(
+      /select something first/i,
+    );
+    expect(empty.deleteSelection).not.toHaveBeenCalled();
+
+    const selected = makeStore({ selectionCount: 2, selectionTransformable: true });
+    expect(executeVoiceCommand({ kind: 'delete-selection' }, selected, () => {})?.message).toMatch(
+      /deleted/i,
+    );
+    expect(selected.deleteSelection).toHaveBeenCalledOnce();
+    expect(
+      executeVoiceCommand({ kind: 'duplicate-selection' }, selected, () => {})?.message,
+    ).toMatch(/copy/i);
+    expect(selected.duplicateSelection).toHaveBeenCalledOnce();
+
+    const locked = makeStore({ selectionCount: 1, selectionTransformable: false });
+    expect(executeVoiceCommand({ kind: 'duplicate-selection' }, locked, () => {})?.message).toMatch(
+      /locked/i,
+    );
+    expect(locked.duplicateSelection).not.toHaveBeenCalled();
   });
 
   it('save triggers the save callback; help speaks the command list', () => {

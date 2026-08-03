@@ -1178,6 +1178,25 @@ only way to understand what happened.
 - ✅ Full release gates remain green: 845 unit tests, 97.74% engine coverage,
   46 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 50 — Voice acts on the selected “it” ✅
+
+Persona need: let a person continue speaking about visible artwork after
+selecting it, without risking that a natural delete phrase clears unrelated
+work or that a copy command silently changes a hidden tool setting.
+
+- ✅ “Delete it” and “duplicate it” resolve only to the visible selection;
+  deletion and the offset selected copy are each one undoable document action.
+- ✅ “Delete everything” remains the separately confirmed whole-layer action,
+  while a missing or locked selection receives specific spoken/visible guidance
+  and changes nothing.
+- ✅ Natural equivalents work in English, Arabic, Persian, Simplified Chinese,
+  Brazilian Portuguese and Russian, and every locale’s Help names them.
+- ✅ Pure parser and executor coverage proves intent separation and safety; a
+  production-browser journey draws, selects, scales, copies and deletes through
+  the microphone path while checking rendered canvas changes.
+- ✅ Full release gates remain green: 852 unit tests, 97.74% engine coverage,
+  46 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
