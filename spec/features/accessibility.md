@@ -78,9 +78,10 @@ kid mode) — out loud.
 The parser is forgiving: case-insensitive, ignores filler ("um, can you
 please undo?"), **normalizes Arabic** (diacritics and tatweel stripped,
 alef forms unified), and normalizes Arabic-keyboard yeh/kaf variants in
-Persian. **English commands always work**, even under Arabic or Persian,
-because each locale vocabulary merges into the English base. Unknown input
-gets a kind local-language fallback and changes nothing.
+Persian. Simplified Chinese matches complete terms inside naturally unspaced
+Mandarin utterances. **English commands always work** under every additional
+language because each locale vocabulary merges into the English base. Unknown
+input gets a kind local-language fallback and changes nothing.
 
 ### The complete intent table
 
@@ -114,6 +115,14 @@ Persian provides the same complete intent surface. Canonical phrases include
 names cover the same palette, and a fill-tool phrase plus a color performs
 both choices in one command.
 
+Simplified Chinese provides the same complete intent surface without requiring
+spaces between words. Canonical phrases include 撤销 / 重做, 清空, 添加帧,
+制作一个故事…, 播放 / 停止, 玩迷宫, 预览应用, 导出应用, 导出真实代码,
+录制旁白 / 停止录音 / 删除旁白, 画笔 / 铅笔 / 橡皮擦 / 填充 / 魔棒 /
+印章 / 文字, 打开镜像 / 关闭镜像, 大一点 / 小一点, 保存, 帮助 and
+确认 / 取消. Polite prefixes may surround a command, and English remains
+available.
+
 ### The color vocabulary (22 words)
 
 red `#ef4444`, orange `#f97316`, yellow `#facc15`, green `#22c55e`,
@@ -125,6 +134,8 @@ Arabic: أحمر، برتقالي، أصفر، أخضر، فيروزي، سما�
 وردي/زهري، بني، أسود، أبيض، رمادي، ذهبي.
 Persian: قرمز، نارنجی، زرد، سبز، فیروزه‌ای، آسمانی، آبی، بنفش،
 صورتی، قهوه‌ای، مشکی/سیاه، سفید، خاکستری، طلایی.
+Simplified Chinese: 红色、橙色、黄色、绿色、青绿色、天蓝色、蓝色、紫色、
+粉色、棕色、黑色、白色、灰色、金色.
 
 ### Precedence rules (the parser's decision order)
 

@@ -471,6 +471,89 @@ const FA_VOCAB: VoiceVocabulary = {
   ],
 };
 
+/** Simplified Chinese additions (简体中文), merged into the English base. */
+const ZH_VOCAB: VoiceVocabulary = {
+  filler: new Set([
+    '请',
+    '请你',
+    '麻烦',
+    '帮我',
+    '一下',
+    '现在',
+    '梦梦',
+    '我要',
+    '我想',
+    '使用',
+    '选择',
+  ]),
+  colors: {
+    红色: COLOR_WORDS.red,
+    橙色: COLOR_WORDS.orange,
+    黄色: COLOR_WORDS.yellow,
+    绿色: COLOR_WORDS.green,
+    青绿色: COLOR_WORDS.teal,
+    天蓝色: COLOR_WORDS.sky,
+    蓝色: COLOR_WORDS.blue,
+    紫色: COLOR_WORDS.purple,
+    粉色: COLOR_WORDS.pink,
+    棕色: COLOR_WORDS.brown,
+    黑色: COLOR_WORDS.black,
+    白色: COLOR_WORDS.white,
+    灰色: COLOR_WORDS.gray,
+    金色: COLOR_WORDS.gold,
+  },
+  tools: {
+    画笔: 'brush',
+    铅笔: 'pencil',
+    橡皮擦: 'eraser',
+    喷枪: 'spray',
+    直线: 'line',
+    矩形: 'rectangle',
+    正方形: 'rectangle',
+    椭圆: 'ellipse',
+    圆形: 'ellipse',
+    填充: 'fill',
+    油漆桶: 'fill',
+    魔棒: 'wand',
+    套索: 'lasso',
+    印章: 'stamp',
+    吸管: 'eyedropper',
+    文字: 'text',
+  },
+  yes: new Set(['是', '是的', '好的', '好', '确认', '确定']),
+  no: new Set(['不', '不要', '取消', '算了']),
+  bigger: new Set(['变大', '大一点', '加粗', '更粗']),
+  smaller: new Set(['变小', '小一点', '变细', '更细']),
+  clear: new Set(['清空', '清除']),
+  play: new Set(['播放', '开始动画', '玩']),
+  stop: new Set(['停止', '暂停']),
+  undo: new Set(['撤销', '退回']),
+  redo: new Set(['重做', '恢复']),
+  help: new Set(['帮助', '语音命令']),
+  save: new Set(['保存']),
+  game: new Set(['游戏', '我的游戏']),
+  templates: {
+    catch: new Set(['接物', '接东西']),
+    flappy: new Set(['飞行', '小鸟']),
+    maze: new Set(['迷宫']),
+    platformer: new Set(['平台跳跃', '跳跃者']),
+  },
+  app: new Set(['应用', '原型']),
+  appPreview: new Set(['预览', '试用', '打开', '看看']),
+  appExport: new Set(['导出', '下载', '分享']),
+  code: new Set(['代码', 'html']),
+  mirror: new Set(['镜像', '对称']),
+  clearPhrases: ['全部清空', '清空画布', '重新开始'],
+  newFramePhrases: ['新建帧', '添加帧', '下一帧', '再加一帧'],
+  mirrorOnPhrases: ['打开镜像', '开启镜像', '打开对称', '开启对称'],
+  mirrorOffPhrases: ['关闭镜像', '关掉镜像', '关闭对称', '关掉对称'],
+  codePhrases: ['导出代码', '生成代码', '变成代码', '生成真实代码'],
+  narrationRecordPhrases: ['录制旁白', '录制我的声音', '开始录音', '讲述故事'],
+  narrationStopPhrases: ['停止录音', '结束录音', '录音完成'],
+  narrationDeletePhrases: ['删除旁白', '删除录音', '清除旁白'],
+  storyboardPhrases: ['制作一个故事', '制作故事', '创作一个故事', '制作一个动画', '制作动画'],
+};
+
 function union<T>(a: Set<T>, b: Set<T>): Set<T> {
   return new Set([...a, ...b]);
 }
@@ -519,7 +602,33 @@ function mergeVocabulary(base: VoiceVocabulary, extra: VoiceVocabulary): VoiceVo
 const LOCALE_VOCABULARIES: Record<string, VoiceVocabulary> = {
   ar: mergeVocabulary(EN_VOCAB, AR_VOCAB),
   fa: mergeVocabulary(EN_VOCAB, FA_VOCAB),
+  zh: mergeVocabulary(EN_VOCAB, ZH_VOCAB),
 };
+
+function vocabularyTerms(vocab: VoiceVocabulary): string[] {
+  return [
+    ...Object.keys(vocab.colors),
+    ...Object.keys(vocab.tools),
+    ...vocab.yes,
+    ...vocab.no,
+    ...vocab.bigger,
+    ...vocab.smaller,
+    ...vocab.clear,
+    ...vocab.play,
+    ...vocab.stop,
+    ...vocab.undo,
+    ...vocab.redo,
+    ...vocab.help,
+    ...vocab.save,
+    ...vocab.game,
+    ...Object.values(vocab.templates).flatMap((words) => [...words]),
+    ...vocab.app,
+    ...vocab.appPreview,
+    ...vocab.appExport,
+    ...vocab.code,
+    ...vocab.mirror,
+  ];
+}
 
 /** The vocabulary for a UI locale; unknown locales get plain English. */
 export function vocabularyFor(locale: string): VoiceVocabulary {
@@ -611,7 +720,7 @@ function storyboardRequest(
     const prompt = normalized
       .slice(index + phrase.length)
       .trim()
-      .replace(/^(?:about|where|with|of|عن|حول|فيها|درباره|که|با)\s+/u, '')
+      .replace(/^(?:about|where|with|of|عن|حول|فيها|درباره|که|با|关于|讲述|内容是)\s*/u, '')
       .trim();
     return prompt ? { matched: true, prompt } : { matched: true };
   }
@@ -633,13 +742,25 @@ export function parseVoiceCommand(transcript: string, locale = 'en'): VoiceComma
     .replace(/[^\p{L}\p{N}' ]+/gu, ' ')
     .trim();
   const tokens = new Set(tokenize(transcript, vocab.filler, locale));
+  if (locale === 'zh') {
+    for (const term of vocabularyTerms(vocab)) {
+      if (/\p{Script=Han}/u.test(term) && normalized.includes(term)) tokens.add(term);
+    }
+  }
   if (tokens.size === 0) return null;
 
   // Confirmations are tiny sentences ("yes", "no thanks") — match them first,
   // but only when the raw message is a word or two, so "yes, make it red"
   // still falls through to the color command.
   const rawWordCount = normalized.split(/\s+/).filter((w) => w !== '').length;
-  if (rawWordCount <= 2) {
+  if (locale === 'zh') {
+    const confirmation = [...vocab.filler]
+      .sort((a, b) => b.length - a.length)
+      .reduce((text, word) => text.replaceAll(word, ''), normalized)
+      .replace(/\s+/g, '');
+    if (vocab.yes.has(confirmation)) return { kind: 'confirm' };
+    if (vocab.no.has(confirmation)) return { kind: 'cancel' };
+  } else if (rawWordCount <= 2) {
     if (has(tokens, vocab.yes)) return { kind: 'confirm' };
     if (has(tokens, vocab.no)) return { kind: 'cancel' };
   }

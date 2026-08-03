@@ -155,6 +155,7 @@ presenter, Zǐxuān the student, Ali/Fatima the hobbyists). Score: impact
 | 15  | ~~Persian-first RTL, voice, calligraphy nib and script typography~~ ✅ shipped (slice 33)                                                     | Fatima                | 5      | M      |
 | 16  | ~~Scientific connectors, notation and truthful scalable SVG delivery~~ ✅ shipped (slice 34)                                                  | Zǐxuān, Sara          | 5      | M      |
 | 17  | ~~Paste CSV/TSV into grouped native line, scatter or bar plots~~ ✅ shipped (slice 35)                                                        | Zǐxuān                | 5      | M      |
+| 18  | ~~Complete Simplified Chinese UI, unspaced voice commands, story planning and offline game language~~ ✅ shipped (slice 36)                   | Zǐxuān                | 5      | M      |
 
 Deliberately deferred: **general vector-path editing** (slice 34 exports
 genuinely scalable native marks without introducing a second editing medium), **real-time

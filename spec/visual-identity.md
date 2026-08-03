@@ -133,5 +133,6 @@ never move, crop or stretch the artwork beneath them.
   lovely. Keep going!"
 - Arabic carries the same friendly register (تراجع!، تمام!، أحسنت), never
   stiff formal translation. Persian is concise, conversational Iranian
-  Persian. All strings in every locale follow the parity rule
+  Persian. Simplified Chinese uses concise, natural Mainland wording rather
+  than English-shaped sentences. All strings in every locale follow the parity rule
   (`features/internationalization.md`).

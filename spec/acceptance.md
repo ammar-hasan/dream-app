@@ -334,12 +334,12 @@ holds.
       response-format option is sent, and the returned picture fills Dream's
       exact canvas dimensions; a separately configured compatible endpoint
       continues to receive its requested model and canvas size.
-114.  GIVEN an English, Arabic or Persian story WHEN it is planned THEN two to six
-      numbered moments appear locally without an AI request or document
-      mutation, and each moment can be edited, heard aloud, added, removed or
-      regenerated from revised story words before confirmation; Little
-      Dreamer dictation plans immediately and its storyboard actions speak
-      their names.
+114.  GIVEN an English, Arabic, Persian or Simplified Chinese story WHEN it is
+      planned THEN two to six numbered moments appear locally without an AI
+      request or document mutation, and each moment can be edited, heard aloud,
+      added, removed or regenerated from revised story words before
+      confirmation; Little Dreamer dictation plans immediately and its
+      storyboard actions speak their names.
 115.  GIVEN a reviewed storyboard WHEN Make animation is confirmed THEN the
       active image-capable provider, or the visibly named built-in fallback,
       paints each moment in order with whole-story continuity instructions;
@@ -448,6 +448,25 @@ holds.
       saved, animated or exported as SVG THEN its title, axes, grid, labels,
       series and data marks behave as one scalable group on one new layer; one
       Undo removes the complete insertion.
+141.  GIVEN Simplified Chinese is chosen in Settings WHEN the workspace
+      updates THEN every product string has a non-empty Chinese value, the
+      document language becomes `zh`, layout remains left-to-right, and the
+      choice persists without reload.
+142.  GIVEN the Simplified Chinese UI WHEN dictation, spoken labels or the
+      global microphone is used THEN recognition and speech request Mainland
+      Mandarin and all feedback is Chinese where the browser supports it.
+143.  GIVEN an unspaced Chinese command such as “请帮我撤销”, “填充红色”,
+      “关闭镜像”, “玩迷宫”, “预览应用”, “导出真实代码” or “停止录音” WHEN
+      it is heard THEN the matching recovery, creation, game, delivery or
+      narration action occurs without colliding with adjacent intents; English
+      commands continue to work.
+144.  GIVEN a Chinese story with Chinese punctuation and sequence words WHEN
+      it is planned locally THEN those moments split into two to six editable
+      frames; a single idea receives natural Chinese beginning/next labels.
+145.  GIVEN a Chinese game description WHEN it names a supported game,
+      difficulty, speed, quantity, lives or Chinese-named layers THEN the
+      visible template, settings and cast update deterministically without a
+      network request.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 
@@ -467,10 +486,10 @@ holds.
    → "record narration" → tell it aloud → "stop recording" → "save".
 6. **Sara (15):** Design mode → draw logo elements → align/distribute →
    save as component → new project → insert the component → export SVG.
-7. **Zǐxuān (28):** paste experiment data → insert a grouped line plot →
-   annotate it with a reversible-reaction connector, chemical subscripts and
-   symbols → export a scalable SVG → duplicate frames to animate the result →
-   link explanatory screens into an app.
+7. **Zǐxuān (28):** switch to 简体中文 → paste experiment data → insert a
+   grouped line plot → annotate it with a reversible-reaction connector,
+   chemical subscripts and symbols → export a scalable SVG → duplicate frames
+   to animate the result → link explanatory screens into an app.
 8. **Maria (32):** export `.dream` → agent reads it, adds a layer with a shape
    and text, renders a PNG, exports the app HTML via the dream-mcp tools →
    re-import the `.dream` unchanged elsewhere.

@@ -27,6 +27,10 @@ const TEMPLATE_TERMS: Record<GameTemplateId, readonly string[]> = {
     'تجنب',
     'تفادى',
     'تسقط',
+    '接住',
+    '收集',
+    '躲避',
+    '掉落',
   ],
   flappy: [
     'flap',
@@ -42,8 +46,13 @@ const TEMPLATE_TERMS: Record<GameTemplateId, readonly string[]> = {
     'رفرف',
     'بوابة',
     'بوابات',
+    '飞行',
+    '拍打',
+    '翅膀',
+    '管道',
+    '闸门',
   ],
-  maze: ['maze', 'labyrinth', 'exit', 'explore', 'متاهة', 'مخرج', 'استكشف'],
+  maze: ['maze', 'labyrinth', 'exit', 'explore', 'متاهة', 'مخرج', 'استكشف', '迷宫', '出口', '探索'],
   platformer: [
     'platform',
     'platformer',
@@ -54,6 +63,10 @@ const TEMPLATE_TERMS: Record<GameTemplateId, readonly string[]> = {
     'اقفز',
     'اركض',
     'العلم',
+    '平台',
+    '跑跳',
+    '跳过',
+    '旗帜',
   ],
 };
 
@@ -77,19 +90,98 @@ const ROLE_TERMS: Record<CastRole, readonly string[]> = {
     'لاعب',
     'قط',
     'صاروخ',
+    '主角',
+    '玩家',
+    '接球者',
+    '猫',
+    '火箭',
   ],
-  good: ['good', 'star', 'coin', 'apple', 'prize', 'نجمة', 'عملة', 'تفاحة', 'جائزة'],
-  bad: ['bad', 'rock', 'bomb', 'enemy', 'spike', 'صخرة', 'قنبلة', 'عدو', 'شوكة'],
-  obstacle: ['obstacle', 'gate', 'pipe', 'cloud', 'عائق', 'بوابة', 'سحابة'],
-  background: ['background', 'backdrop', 'scene', 'sky', 'خلفية', 'مشهد', 'سماء'],
+  good: [
+    'good',
+    'star',
+    'coin',
+    'apple',
+    'prize',
+    'نجمة',
+    'عملة',
+    'تفاحة',
+    'جائزة',
+    '星星',
+    '金币',
+    '苹果',
+    '奖励',
+  ],
+  bad: [
+    'bad',
+    'rock',
+    'bomb',
+    'enemy',
+    'spike',
+    'صخرة',
+    'قنبلة',
+    'عدو',
+    'شوكة',
+    '石头',
+    '炸弹',
+    '敌人',
+    '尖刺',
+  ],
+  obstacle: [
+    'obstacle',
+    'gate',
+    'pipe',
+    'cloud',
+    'عائق',
+    'بوابة',
+    'سحابة',
+    '障碍',
+    '闸门',
+    '管道',
+    '云朵',
+  ],
+  background: [
+    'background',
+    'backdrop',
+    'scene',
+    'sky',
+    'خلفية',
+    'مشهد',
+    'سماء',
+    '背景',
+    '场景',
+    '天空',
+  ],
 };
 
-const EASY_TERMS = ['easy', 'gentle', 'calm', 'for a kid', 'سهل', 'هادئ', 'للطفل'];
-const HARD_TERMS = ['hard', 'difficult', 'challenge', 'intense', 'صعب', 'تحدي', 'سريع جدا'];
-const FAST_TERMS = ['fast', 'quick', 'speedy', 'سريع'];
-const SLOW_TERMS = ['slow', 'relaxed', 'بطيء', 'بهدوء'];
-const BUSY_TERMS = ['busy', 'lots', 'many', 'often', 'كثير', 'متكرر'];
-const SPARSE_TERMS = ['few', 'rare', 'spaced out', 'قليل', 'متباعد'];
+const EASY_TERMS = [
+  'easy',
+  'gentle',
+  'calm',
+  'for a kid',
+  'سهل',
+  'هادئ',
+  'للطفل',
+  '简单',
+  '温和',
+  '轻松',
+  '给孩子',
+];
+const HARD_TERMS = [
+  'hard',
+  'difficult',
+  'challenge',
+  'intense',
+  'صعب',
+  'تحدي',
+  'سريع جدا',
+  '困难',
+  '挑战',
+  '激烈',
+];
+const FAST_TERMS = ['fast', 'quick', 'speedy', 'سريع', '快速', '快一点'];
+const SLOW_TERMS = ['slow', 'relaxed', 'بطيء', 'بهدوء', '慢速', '缓慢', '慢一点'];
+const BUSY_TERMS = ['busy', 'lots', 'many', 'often', 'كثير', 'متكرر', '很多', '频繁'];
+const SPARSE_TERMS = ['few', 'rare', 'spaced out', 'قليل', 'متباعد', '少量', '稀少'];
 
 function normalize(value: string): string {
   return value
@@ -142,11 +234,18 @@ function settingsFromPrompt(text: string): Partial<GameSettings> {
     ثلاثة: 3,
     اربع: 4,
     خمسة: 5,
+    一: 1,
+    二: 2,
+    三: 3,
+    四: 4,
+    五: 5,
   };
   const livesPattern =
-    /(?:\b([1-9])\b|\b(one|two|three|four|five|واحد|اثنان|ثلاثة|اربع|خمسة)\b)\s*(?:lives?|shields?|hearts?|حياة|محاولات|دروع)/u;
+    /(?:\b([1-9])\b|\b(one|two|three|four|five|واحد|اثنان|ثلاثة|اربع|خمسة)\b|([一二三四五]))\s*(?:lives?|shields?|hearts?|حياة|محاولات|دروع|条命|生命|护盾|红心)/u;
   const lives = text.match(livesPattern);
-  if (lives) settings.lives = lives[1] ? Number(lives[1]) : numberWords[lives[2] ?? ''];
+  if (lives) {
+    settings.lives = lives[1] ? Number(lives[1]) : numberWords[lives[2] ?? lives[3] ?? ''];
+  }
   return settings;
 }
 
@@ -180,7 +279,7 @@ function castFromPrompt(
   return cast;
 }
 
-/** Plan one supported game from a short English or Arabic request. */
+/** Plan one supported game from a short supported-language request. */
 export function planGameFromPrompt(
   prompt: string,
   layers: readonly Pick<Layer, 'id' | 'name'>[],

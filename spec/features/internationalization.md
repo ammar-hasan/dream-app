@@ -5,11 +5,12 @@ product — including voice — works in any language, including right-to-left.
 
 ## Locales
 
-| Id   | Label   | Direction     |
-| ---- | ------- | ------------- |
-| `en` | English | left-to-right |
-| `ar` | العربية | right-to-left |
-| `fa` | فارسی   | right-to-left |
+| Id   | Label    | Direction     |
+| ---- | -------- | ------------- |
+| `en` | English  | left-to-right |
+| `ar` | العربية  | right-to-left |
+| `fa` | فارسی    | right-to-left |
+| `zh` | 简体中文 | left-to-right |
 
 Default: `en`. The settings gear switches language **instantly at runtime**
 (no reload); the choice persists per user.
@@ -43,13 +44,16 @@ Default: `en`. The settings gear switches language **instantly at runtime**
 ## Voice and speech across locales
 
 - The voice-command vocabulary is **per-locale** (see the full intent table
-  in `accessibility.md`): Arabic and Persian commands work in their matching
-  UI — and **English keeps working** because every additional vocabulary
-  merges into the English base.
+  in `accessibility.md`): Arabic, Persian and Simplified Chinese commands work
+  in their matching UI — and **English keeps working** because every
+  additional vocabulary merges into the English base.
 - Arabic transcripts are normalized before matching: diacritics and
   tatweel stripped, alef variants unified.
 - Persian transcripts normalize Arabic keyboard variants of yeh and kaf;
   recognition requests Iranian Persian.
+- Simplified Chinese recognition requests Mainland Mandarin. Commands match
+  natural unspaced Chinese utterances without requiring users to speak one
+  word at a time.
 - Speech recognition listens in the UI language for canvas commands.
 - Spoken tool names and voice feedback speak in the UI language.
 
@@ -60,3 +64,5 @@ Copy is warm, plain and encouraging in every locale (see
 friendly register — "تراجع!" for "Took that back!", not a literal or
 formal translation. Persian copy uses concise, conversational Iranian
 Persian rather than Arabic wording or stiff word-for-word translation.
+Simplified Chinese uses familiar Mainland product language, compact labels and
+natural encouragement rather than translated English sentence structure.

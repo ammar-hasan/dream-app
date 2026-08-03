@@ -40,6 +40,14 @@ describe('planStoryboard', () => {
     ]);
   });
 
+  it('splits Chinese punctuation and sequence language without requiring a provider', () => {
+    expect(planStoryboard('月亮醒来，然后遇见狐狸。最后他们在星空下跳舞', 'zh')?.scenes).toEqual([
+      { description: '月亮醒来' },
+      { description: '遇见狐狸' },
+      { description: '他们在星空下跳舞' },
+    ]);
+  });
+
   it('turns one idea into a two-frame beginning and next moment', () => {
     expect(planStoryboard('A sleepy fox under the moon')?.scenes).toEqual([
       { description: 'The beginning: A sleepy fox under the moon' },
@@ -52,6 +60,10 @@ describe('planStoryboard', () => {
     expect(planStoryboard('روباهی زیر ماه', 'fa')?.scenes).toEqual([
       { description: 'شروع: روباهی زیر ماه' },
       { description: 'لحظه بعد: روباهی زیر ماه' },
+    ]);
+    expect(planStoryboard('月光下的小狐狸', 'zh')?.scenes).toEqual([
+      { description: '开头：月光下的小狐狸' },
+      { description: '接下来：月光下的小狐狸' },
     ]);
   });
 

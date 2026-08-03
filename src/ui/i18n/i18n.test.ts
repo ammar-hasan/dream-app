@@ -6,6 +6,7 @@ import { DEFAULT_LOCALE, isLocale, isRtl, LOCALES, speechLanguage, t, translate 
 import { en } from './en';
 import { ar } from './ar';
 import { fa } from './fa';
+import { zh } from './zh';
 
 afterEach(() => {
   useUiPrefs.getState().setLocale('en');
@@ -13,13 +14,13 @@ afterEach(() => {
 
 describe('dictionaries', () => {
   it('every locale covers exactly the English keys', () => {
-    for (const dictionary of [ar, fa]) {
+    for (const dictionary of [ar, fa, zh]) {
       expect(Object.keys(dictionary).sort()).toEqual(Object.keys(en).sort());
     }
   });
 
   it('has no empty translations', () => {
-    for (const dict of [en, ar, fa]) {
+    for (const dict of [en, ar, fa, zh]) {
       for (const value of Object.values(dict)) {
         expect(value.trim().length).toBeGreaterThan(0);
       }
@@ -27,7 +28,7 @@ describe('dictionaries', () => {
   });
 
   it('preserves every interpolation placeholder in every locale', () => {
-    for (const dictionary of [ar, fa]) {
+    for (const dictionary of [ar, fa, zh]) {
       for (const [key, source] of Object.entries(en)) {
         const sourceVars = [...source.matchAll(/\{[^}]+\}/g)].map((match) => match[0]).sort();
         const translatedVars = [...dictionary[key].matchAll(/\{[^}]+\}/g)]
@@ -63,6 +64,7 @@ describe('locale registry', () => {
     expect(isLocale('en')).toBe(true);
     expect(isLocale('ar')).toBe(true);
     expect(isLocale('fa')).toBe(true);
+    expect(isLocale('zh')).toBe(true);
     expect(isLocale('fr')).toBe(false);
   });
 
@@ -70,6 +72,7 @@ describe('locale registry', () => {
     expect(isRtl('ar')).toBe(true);
     expect(isRtl('fa')).toBe(true);
     expect(isRtl('en')).toBe(false);
+    expect(isRtl('zh')).toBe(false);
     expect(LOCALES.find((l) => l.id === 'ar')?.dir).toBe('rtl');
     expect(LOCALES.find((l) => l.id === 'fa')?.dir).toBe('rtl');
     expect(LOCALES.find((l) => l.id === DEFAULT_LOCALE)?.dir).toBe('ltr');
@@ -79,6 +82,7 @@ describe('locale registry', () => {
     expect(speechLanguage('en')).toBe('en-US');
     expect(speechLanguage('ar')).toBe('ar-SA');
     expect(speechLanguage('fa')).toBe('fa-IR');
+    expect(speechLanguage('zh')).toBe('zh-CN');
   });
 });
 
@@ -90,5 +94,8 @@ describe('t()', () => {
     expect(t('voice.tool', { tool: t('tools.brush') })).toBe('فرشاة!');
     useUiPrefs.getState().setLocale('fa');
     expect(t('toolbar.save')).toBe('ذخیره');
+    useUiPrefs.getState().setLocale('zh');
+    expect(t('toolbar.save')).toBe('保存');
+    expect(t('plot.ready', { rows: 4, series: 2 })).toBe('4 行 · 2 条序列已就绪');
   });
 });

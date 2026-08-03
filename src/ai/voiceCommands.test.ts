@@ -380,3 +380,44 @@ describe('parseVoiceCommand — Persian vocabulary (locale "fa")', () => {
     expect(parseVoiceCommand('ذخيره', 'fa')).toEqual({ kind: 'save' });
   });
 });
+
+describe('parseVoiceCommand — Simplified Chinese vocabulary (locale "zh")', () => {
+  it('parses recovery, confirmation and creation without word spaces', () => {
+    expect(parseVoiceCommand('请帮我撤销', 'zh')).toEqual({ kind: 'undo' });
+    expect(parseVoiceCommand('重做', 'zh')).toEqual({ kind: 'redo' });
+    expect(parseVoiceCommand('请你清空画布', 'zh')).toEqual({ kind: 'clear' });
+    expect(parseVoiceCommand('请确认', 'zh')).toEqual({ kind: 'confirm' });
+    expect(parseVoiceCommand('不要', 'zh')).toEqual({ kind: 'cancel' });
+    expect(parseVoiceCommand('添加帧', 'zh')).toEqual({ kind: 'new-frame' });
+  });
+
+  it('parses tools, colors, sizing and symmetry', () => {
+    expect(parseVoiceCommand('请用铅笔', 'zh')).toEqual({ kind: 'tool', tool: 'pencil' });
+    expect(parseVoiceCommand('填充红色', 'zh')).toEqual({
+      kind: 'fill-color',
+      color: COLOR_WORDS.red,
+      name: '红色',
+    });
+    expect(parseVoiceCommand('画笔大一点', 'zh')).toEqual({ kind: 'bigger' });
+    expect(parseVoiceCommand('关闭镜像', 'zh')).toEqual({ kind: 'mirror', on: false });
+  });
+
+  it('keeps games, apps, code and narration as distinct outcomes', () => {
+    expect(parseVoiceCommand('玩迷宫', 'zh')).toEqual({ kind: 'play-game', template: 'maze' });
+    expect(parseVoiceCommand('预览我的应用', 'zh')).toEqual({ kind: 'preview-app' });
+    expect(parseVoiceCommand('导出应用', 'zh')).toEqual({ kind: 'export-app' });
+    expect(parseVoiceCommand('导出真实代码', 'zh')).toEqual({ kind: 'export-code' });
+    expect(parseVoiceCommand('录制旁白', 'zh')).toEqual({ kind: 'record-narration' });
+    expect(parseVoiceCommand('停止录音', 'zh')).toEqual({ kind: 'stop-recording' });
+    expect(parseVoiceCommand('删除旁白', 'zh')).toEqual({ kind: 'delete-narration' });
+  });
+
+  it('opens a Chinese storyboard with its subject intact and keeps English available', () => {
+    expect(parseVoiceCommand('制作一个故事，关于月亮和狐狸', 'zh')).toEqual({
+      kind: 'storyboard',
+      prompt: '月亮和狐狸',
+    });
+    expect(parseVoiceCommand('undo', 'zh')).toEqual({ kind: 'undo' });
+    expect(parseVoiceCommand('今天天气怎么样', 'zh')).toBeNull();
+  });
+});

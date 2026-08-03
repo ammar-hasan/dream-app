@@ -7,6 +7,16 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Complete Simplified Chinese journey** (slice 36): 简体中文 now covers the
+  entire product with exact key and placeholder parity, persistent instant LTR
+  switching and Mainland Mandarin speech selection. Natural unspaced Chinese
+  commands cover tools, colors, recovery, animation, games, apps, code export
+  and narration while English remains available; Chinese punctuation and
+  sequence words create local story moments, and Chinese game descriptions
+  choose templates, settings and named-layer roles offline. A production
+  browser proof reaches the native scientific-plot workflow in Chinese rather
+  than stopping at the Settings menu.
+
 - **Native scientific data plots** (slice 35): Design mode can turn a small
   labeled CSV or TSV table into a line, scatter or grouped-bar figure. Parsing
   is bounded and explicit, with quoted labels, row/series confirmation and

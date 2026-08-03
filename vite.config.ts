@@ -45,6 +45,17 @@ function dreamServiceWorker(): Plugin {
 
 export default defineConfig({
   plugins: [react(), dreamServiceWorker()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (/\/src\/ui\/i18n\/(?:ar|fa|zh)\.ts$/.test(id)) {
+            return 'locales';
+          }
+        },
+      },
+    },
+  },
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],

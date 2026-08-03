@@ -38,6 +38,20 @@ describe('planGameFromPrompt', () => {
     });
   });
 
+  it('understands a Chinese game request, settings and named-layer roles', () => {
+    const chineseLayers = [
+      { id: 'rocket-zh', name: '火箭' },
+      { id: 'clouds-zh', name: '云朵' },
+    ];
+    expect(planGameFromPrompt('让火箭缓慢飞行，穿过闸门和云朵，给我三条命', chineseLayers)).toEqual(
+      {
+        template: 'flappy',
+        settings: { fallSpeed: 110, lives: 3 },
+        cast: { hero: 'rocket-zh', obstacle: 'clouds-zh' },
+      },
+    );
+  });
+
   it('chooses the platformer for run-and-jump language', () => {
     expect(
       planGameFromPrompt('Cat should run and jump over Rocks to reach the flag', layers),

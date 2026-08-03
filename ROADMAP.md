@@ -900,3 +900,30 @@ same canvas where he diagrams, annotates, animates and explains the science.
   cover both the input and the publication-shaped result.
 - Acceptance met: paste a two-series reaction dataset, insert a clean line
   figure, move it as one group, export it as SVG and remove it with one Undo.
+
+## Slice 36 — Complete Simplified Chinese journey ✅
+
+Persona: Zǐxuān, Chinese chemistry researcher — create, explain and deliver in
+his own language instead of navigating an English product around a science
+feature.
+
+- ✅ 简体中文 covers every product string with exact key and interpolation
+  parity, switches instantly and persistently, remains left-to-right and
+  requests Mainland Mandarin for recognition and speech.
+- ✅ Natural unspaced Chinese commands cover the complete tool, color,
+  recovery, animation, game, app, code-export and narration surface. Polite
+  phrases work, adjacent intents retain their precedence, and English remains
+  available under the Chinese UI.
+- ✅ Chinese punctuation plus 然后/接着/随后/之后/最后 split local story plans;
+  a single idea gets natural 开头/接下来 moments before any provider call.
+- ✅ Chinese game descriptions choose all four templates, difficulty, speed,
+  quantity, one-to-five lives and Chinese-named layer roles with the same
+  deterministic offline planner.
+- ✅ The full table was generated through the user-authorized OpenAI platform
+  key in memory, then structurally validated and read end to end; critical
+  command, science, recovery and delivery language received manual review.
+  Focused unit tests and a production-browser journey prove the registered
+  language reaches Plot data rather than merely appearing in Settings.
+- Acceptance met: switch to 简体中文, paste experiment data into a recognized
+  plot, use an unspaced Chinese command/story/game request and keep the same
+  offline, recoverable outcomes and English fallback commands.

@@ -12,17 +12,19 @@ import { useUiPrefs } from '../../store/uiPrefs';
 import { en } from './en';
 import { ar } from './ar';
 import { fa } from './fa';
+import { zh } from './zh';
 
-export type Locale = 'en' | 'ar' | 'fa';
+export type Locale = 'en' | 'ar' | 'fa' | 'zh';
 
 /** Shown in the settings language picker; `dir` drives the root `dir` attr. */
 export const LOCALES: { id: Locale; label: string; dir: 'ltr' | 'rtl' }[] = [
   { id: 'en', label: 'English', dir: 'ltr' },
   { id: 'ar', label: 'العربية', dir: 'rtl' },
   { id: 'fa', label: 'فارسی', dir: 'rtl' },
+  { id: 'zh', label: '简体中文', dir: 'ltr' },
 ];
 
-const DICTIONARIES: Record<Locale, Record<string, string>> = { en, ar, fa };
+const DICTIONARIES: Record<Locale, Record<string, string>> = { en, ar, fa, zh };
 
 export const DEFAULT_LOCALE: Locale = 'en';
 
@@ -38,6 +40,7 @@ export function isRtl(locale: string): boolean {
 export function speechLanguage(locale: string): string {
   if (locale === 'ar') return 'ar-SA';
   if (locale === 'fa') return 'fa-IR';
+  if (locale === 'zh') return 'zh-CN';
   return 'en-US';
 }
 

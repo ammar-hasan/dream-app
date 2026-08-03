@@ -453,6 +453,20 @@ test('Persian RTL includes a real calligraphy drawing path', async ({ page }) =>
   expect(await nonWhitePixels(page)).toBeGreaterThan(before + 100);
 });
 
+test('Simplified Chinese is complete, LTR and reaches the science workflow', async ({ page }) => {
+  await bootApp(page);
+  await page.getByRole('button', { name: 'Settings' }).click();
+  await page.locator('.settings-popover select').selectOption('zh');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'zh');
+  await expect(page.getByRole('tab', { name: '设计' })).toBeVisible();
+  await page.getByRole('tab', { name: '设计' }).click();
+  await page.getByRole('button', { name: '绘制数据…' }).click();
+  const plot = page.getByRole('dialog', { name: '创建数据图表' });
+  await expect(plot).toContainText('4 行 · 1 条序列已就绪');
+  await expect(plot.getByRole('button', { name: '插入图表' })).toBeEnabled();
+});
+
 test('the dark theme toggle flips data-theme', async ({ page }) => {
   await bootApp(page);
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
