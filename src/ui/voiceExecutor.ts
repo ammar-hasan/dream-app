@@ -45,6 +45,7 @@ export interface VoiceExecutorStore {
   setTool(tool: ToolId): void;
   setColor(color: Color): void;
   setSize(size: number): void;
+  setStabilization(stabilization: number): void;
   scaleSelection(factor: number): void;
   nudgeSelection(dx: number, dy: number): void;
   centerSelection(): void;
@@ -257,6 +258,12 @@ export function executeVoiceCommand(
       // "Mirror on" means the vertical axis — quad is a canvas-select away.
       store.setSymmetry(command.on ? 'vertical' : 'off');
       return { message: t(command.on ? 'voice.mirrorOn' : 'voice.mirrorOff') };
+
+    case 'stabilization':
+      store.setStabilization(command.on ? 60 : 0);
+      return {
+        message: t(command.on ? 'voice.stabilizationOn' : 'voice.stabilizationOff'),
+      };
 
     case 'color':
       if (command.selection) {

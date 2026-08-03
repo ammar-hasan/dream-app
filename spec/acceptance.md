@@ -721,6 +721,11 @@ holds.
       stay fixed, the live preview equals the released mark, pressure and the
       calligraphy nib remain coherent, and one Undo removes the complete mark.
       The setting changes future strokes only; Spray is unchanged.
+184.  GIVEN the voice conversation in any supported language WHEN a person says
+      or types the local equivalent of “steady my stroke” or “natural stroke”
+      THEN the same visible Steady stroke control becomes 60% or 0%, the
+      announced result names the change, only future Brush, Pencil and Eraser
+      marks are affected, and no document change or Undo step is created.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 
@@ -728,9 +733,9 @@ holds.
    planned moments aloud → confirm → the painted, captioned flipbook plays →
    one Undo removes the whole story → stamp a rocket → say "play my game" →
    the rocket catches stars.
-2. **Victor (85):** comfort mode on → everything bigger and calmer → turn up
-   Steady stroke → draw with reduced wobble → undo → save → reopen tomorrow:
-   the drawing is there.
+2. **Victor (85):** comfort mode on → everything bigger and calmer → say
+   “steady my stroke” and see the control change → draw with reduced wobble →
+   undo → save → reopen tomorrow: the drawing is there.
 3. **Ali (30):** choose and tune a brush preset including Steady stroke → stylus pressure strokes → layers → import a photo →
    Vintage preset → crop → export JPEG q92.
 4. **Fatima (21):** Persian UI → full RTL → choose the steady Calligraphy nib →

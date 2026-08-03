@@ -184,7 +184,10 @@ small wobbles while the start and current pointer endpoint stay fixed, so the
 mark remains directly controlled rather than drifting away from the gesture.
 The live preview and released mark use the same path; pressure and calligraphic
 width continue to follow it. The setting affects only future strokes, every
-result remains one undoable mark, and Spray keeps its natural sampled path.
+result remains one undoable mark, and Spray keeps its natural sampled path. A
+person may also say or type “steady my stroke” to choose 60% assistance or
+“natural stroke” to return to 0%; these use the same visible control rather than
+creating a hidden voice-only state.
 
 ## Zoom & pan
 

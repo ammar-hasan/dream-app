@@ -273,6 +273,36 @@ describe('parseVoiceCommand — tools, colors, sizes', () => {
     expect(parseVoiceCommand('symmetry off')).toEqual({ kind: 'mirror', on: false });
     expect(parseVoiceCommand('mirror')).toEqual({ kind: 'mirror', on: true });
   });
+
+  it('parses steady and natural stroke assistance in every locale', () => {
+    expect(parseVoiceCommand('steady my stroke')).toEqual({ kind: 'stabilization', on: true });
+    expect(parseVoiceCommand('natural stroke')).toEqual({ kind: 'stabilization', on: false });
+    expect(parseVoiceCommand('ثبت الخط', 'ar')).toEqual({ kind: 'stabilization', on: true });
+    expect(parseVoiceCommand('خط طبيعي', 'ar')).toEqual({ kind: 'stabilization', on: false });
+    expect(parseVoiceCommand('خط را ثابت کن', 'fa')).toEqual({
+      kind: 'stabilization',
+      on: true,
+    });
+    expect(parseVoiceCommand('خط طبیعی', 'fa')).toEqual({ kind: 'stabilization', on: false });
+    expect(parseVoiceCommand('稳定笔触', 'zh')).toEqual({ kind: 'stabilization', on: true });
+    expect(parseVoiceCommand('自然笔触', 'zh')).toEqual({ kind: 'stabilization', on: false });
+    expect(parseVoiceCommand('estabilizar meu traço', 'pt')).toEqual({
+      kind: 'stabilization',
+      on: true,
+    });
+    expect(parseVoiceCommand('traço natural', 'pt')).toEqual({
+      kind: 'stabilization',
+      on: false,
+    });
+    expect(parseVoiceCommand('сгладить линии', 'ru')).toEqual({
+      kind: 'stabilization',
+      on: true,
+    });
+    expect(parseVoiceCommand('естественный штрих', 'ru')).toEqual({
+      kind: 'stabilization',
+      on: false,
+    });
+  });
 });
 
 describe('parseVoiceCommand — unknown input', () => {

@@ -221,7 +221,9 @@ and the language picker.
   marks using mouse, touch or pen, plus Fine ink, Soft marker, Bold paint and
   Calligraphy presets that set the visible size, opacity, tip and steadiness
   together. Brush, pencil and eraser share an optional 0–100% Steady stroke
-  control that visibly smooths future paths without moving their endpoints.
+  control that visibly smooths future paths without moving their endpoints;
+  “steady my stroke” and “natural stroke” reach the same visible setting by
+  voice or typed command.
 - Spray (airbrush) with a density slider; deterministic per-stroke seeds
 - Line, rectangle and ellipse tools with Shift-to-constrain (45° lines,
   squares, circles), plain/arrow/two-way line ends, and an optional fill-shapes
@@ -476,7 +478,8 @@ tool rail and the options panel (Little Dreamer mode stays untouched).
   redraw (viewport, export, thumbnails) paints the identical mist
   (`engine/spray.ts`).
 - Voice commands learned **"spray"**, **"wand"**, **"lasso"** and
-  **"mirror on" / "mirror off"**.
+  **"mirror on" / "mirror off"**, plus **"steady my stroke" / "natural
+  stroke"** without hiding the resulting setting.
 
 ## Design mode
 

@@ -1637,6 +1637,25 @@ Fatima refine calligraphy without forcing artificial smoothing on anyone.
 - ✅ Full release gates remain green: 894 unit tests, 97.54% engine coverage,
   61 browser journeys, 25 MCP tests and four honest agent evals.
 
+## Slice 74 — Voice-accessible steady strokes ✅
+
+Persona need: let Victor ask for steadier drawing without precise slider use,
+while preserving one inspectable setting for every input method and language.
+
+- ✅ Spoken and typed “steady my stroke” and “natural stroke” requests set the
+  existing visible control to 60% and 0%; they never create a hidden parallel
+  preference or document-history step.
+- ✅ Arabic, Persian, Simplified Chinese, Brazilian Portuguese and Russian have
+  native phrases, recognition vocabulary hints, localized results and updated
+  Help alongside the always-available English phrases.
+- ✅ The identical typed conversation remains the complete fallback when
+  recognition is absent or denied, including on a phone viewport.
+- ✅ Parser and executor tests cover both outcomes and every language; a
+  production-browser journey observes the visible slider change in the
+  recognition-free fallback.
+- ✅ Full release gates remain green: 896 unit tests, 97.54% engine coverage,
+  61 browser journeys, 25 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the

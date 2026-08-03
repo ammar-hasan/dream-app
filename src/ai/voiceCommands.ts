@@ -57,6 +57,8 @@ export type VoiceCommand =
   | { kind: 'tool'; tool: ToolId }
   /** "mirror on" / "mirror off": toggle vertical mirror symmetry. */
   | { kind: 'mirror'; on: boolean }
+  /** Turn future-stroke assistance on to a useful default, or restore natural input. */
+  | { kind: 'stabilization'; on: boolean }
   | { kind: 'color'; color: Color; name: string; selection?: true }
   /** "fill red": pick the color AND the fill bucket in one breath. */
   | { kind: 'fill-color'; color: Color; name: string }
@@ -200,6 +202,8 @@ export interface VoiceVocabulary {
   newFramePhrases: string[];
   mirrorOnPhrases: string[];
   mirrorOffPhrases: string[];
+  stabilizationOnPhrases: string[];
+  stabilizationOffPhrases: string[];
   /** Whole-phrase ways to ask for the code export ("make it real"). */
   codePhrases: string[];
   /** "record narration" — checked early: they contain stop/clear words. */
@@ -249,6 +253,8 @@ const EN_VOCAB: VoiceVocabulary = {
   newFramePhrases: ['new frame', 'add frame', 'another frame', 'next frame'],
   mirrorOnPhrases: ['mirror on', 'symmetry on', 'mirroring on'],
   mirrorOffPhrases: ['mirror off', 'symmetry off', 'mirroring off'],
+  stabilizationOnPhrases: ['steady my stroke', 'smooth my lines', 'steady brush'],
+  stabilizationOffPhrases: ['natural stroke', 'natural lines', 'turn smoothing off'],
   codePhrases: [
     'make real',
     'make it real',
@@ -421,6 +427,8 @@ const AR_VOCAB: VoiceVocabulary = {
   newFramePhrases: ['اطار جديد', 'فريم جديد', 'اضف اطار', 'اطار اخر'],
   mirrorOnPhrases: ['شغل التناظر', 'فعل التناظر', 'شغل المراية', 'تناظر شغال'],
   mirrorOffPhrases: ['اطف التناظر', 'اطفي التناظر', 'اطفي المراية', 'بدون تناظر'],
+  stabilizationOnPhrases: ['ثبت الخط', 'نعم الخط', 'خلي الخط ثابت'],
+  stabilizationOffPhrases: ['خط طبيعي', 'بدون تثبيت الخط'],
   codePhrases: ['كود حقيقي', 'صدر كود حقيقي', 'صدر الكود', 'حوله الي كود'],
   narrationRecordPhrases: ['سجل صوتي', 'سجل الصوت', 'سجل تعليق', 'احك القصة', 'احكي القصة'],
   narrationStopPhrases: ['اوقف التسجيل', 'اوقفي التسجيل', 'انهي التسجيل', 'انهاء التسجيل'],
@@ -550,6 +558,8 @@ const FA_VOCAB: VoiceVocabulary = {
   newFramePhrases: ['فریم جدید', 'فریم اضافه کن', 'یک فریم دیگر', 'فریم بعدی'],
   mirrorOnPhrases: ['آینه روشن', 'تقارن روشن', 'قرینه کن', 'آینه را روشن کن'],
   mirrorOffPhrases: ['آینه خاموش', 'تقارن خاموش', 'قرینه را بردار', 'آینه را خاموش کن'],
+  stabilizationOnPhrases: ['خط را ثابت کن', 'خط صاف', 'لرزش خط را بگیر'],
+  stabilizationOffPhrases: ['خط طبیعی', 'تثبیت خط خاموش'],
   codePhrases: ['کد واقعی', 'خروجی کد', 'به کد تبدیل کن', 'واقعیش کن'],
   narrationRecordPhrases: ['ضبط روایت', 'صدام را ضبط کن', 'صدام رو ضبط کن', 'داستان را ضبط کن'],
   narrationStopPhrases: ['ضبط را متوقف کن', 'ضبط رو متوقف کن', 'پایان ضبط'],
@@ -663,6 +673,8 @@ const ZH_VOCAB: VoiceVocabulary = {
   newFramePhrases: ['新建帧', '添加帧', '下一帧', '再加一帧'],
   mirrorOnPhrases: ['打开镜像', '开启镜像', '打开对称', '开启对称'],
   mirrorOffPhrases: ['关闭镜像', '关掉镜像', '关闭对称', '关掉对称'],
+  stabilizationOnPhrases: ['稳定笔触', '平滑线条'],
+  stabilizationOffPhrases: ['自然笔触', '关闭笔画稳定'],
   codePhrases: ['导出代码', '生成代码', '变成代码', '生成真实代码'],
   narrationRecordPhrases: ['录制旁白', '录制我的声音', '开始录音', '讲述故事'],
   narrationStopPhrases: ['停止录音', '结束录音', '录音完成'],
@@ -790,6 +802,8 @@ const PT_VOCAB: VoiceVocabulary = {
   newFramePhrases: ['novo quadro', 'adicionar quadro', 'outro quadro', 'próximo quadro'],
   mirrorOnPhrases: ['ligar espelhamento', 'espelhamento ligado', 'ligar simetria'],
   mirrorOffPhrases: ['desligar espelhamento', 'espelhamento desligado', 'desligar simetria'],
+  stabilizationOnPhrases: ['estabilizar meu traço', 'suavizar minhas linhas', 'traço estável'],
+  stabilizationOffPhrases: ['traço natural', 'desligar estabilização'],
   codePhrases: [
     'código real',
     'codigo real',
@@ -950,6 +964,8 @@ const RU_VOCAB: VoiceVocabulary = {
   newFramePhrases: ['новый кадр', 'добавить кадр', 'ещё кадр', 'следующий кадр'],
   mirrorOnPhrases: ['включить отражение', 'включить зеркало', 'включить симметрию'],
   mirrorOffPhrases: ['выключить отражение', 'выключить зеркало', 'выключить симметрию'],
+  stabilizationOnPhrases: ['стабилизировать штрих', 'сгладить линии', 'ровный штрих'],
+  stabilizationOffPhrases: ['естественный штрих', 'выключить стабилизацию'],
   codePhrases: ['настоящий код', 'экспортировать код', 'экспорт кода', 'превратить в код'],
   narrationRecordPhrases: [
     'записать озвучку',
@@ -1037,6 +1053,8 @@ function mergeVocabulary(base: VoiceVocabulary, extra: VoiceVocabulary): VoiceVo
     newFramePhrases: [...base.newFramePhrases, ...extra.newFramePhrases],
     mirrorOnPhrases: [...base.mirrorOnPhrases, ...extra.mirrorOnPhrases],
     mirrorOffPhrases: [...base.mirrorOffPhrases, ...extra.mirrorOffPhrases],
+    stabilizationOnPhrases: [...base.stabilizationOnPhrases, ...extra.stabilizationOnPhrases],
+    stabilizationOffPhrases: [...base.stabilizationOffPhrases, ...extra.stabilizationOffPhrases],
     codePhrases: [...base.codePhrases, ...extra.codePhrases],
     narrationRecordPhrases: [...base.narrationRecordPhrases, ...extra.narrationRecordPhrases],
     narrationStopPhrases: [...base.narrationStopPhrases, ...extra.narrationStopPhrases],
@@ -1105,6 +1123,8 @@ function vocabularyTerms(vocab: VoiceVocabulary): string[] {
     ...vocab.appExport,
     ...vocab.code,
     ...vocab.mirror,
+    ...vocab.stabilizationOnPhrases,
+    ...vocab.stabilizationOffPhrases,
   ];
 }
 
@@ -1348,6 +1368,12 @@ export function parseVoiceCommand(transcript: string, locale = 'en'): VoiceComma
   }
   if (hasPhrase(normalized, ...vocab.mirrorOnPhrases)) {
     return { kind: 'mirror', on: true };
+  }
+  if (hasPhrase(normalized, ...vocab.stabilizationOffPhrases)) {
+    return { kind: 'stabilization', on: false };
+  }
+  if (hasPhrase(normalized, ...vocab.stabilizationOnPhrases)) {
+    return { kind: 'stabilization', on: true };
   }
 
   // Make-real code export: "export real code", "make it real", "كود حقيقي" —

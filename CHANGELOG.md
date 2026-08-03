@@ -7,6 +7,11 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Voice-accessible steady strokes** (slice 74): spoken or typed steady and
+  natural-stroke requests now set the same visible control to 60% or 0% in all
+  six languages. Recognition hints, localized results, Help and the no-speech
+  typed fallback agree; no hidden state or document-history step is created.
+
 - **Optional steady strokes** (slice 73): Brush, Pencil and Eraser now expose a
   localized 0–100% stabilization control. Zero preserves natural input; higher
   values visibly reduce small wobble while anchoring both endpoints, keeping

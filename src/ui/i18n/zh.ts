@@ -750,6 +750,8 @@ export const zh: Record<string, string> = {
   'voice.selectionLocked': '选中的内容已锁定。请先解锁再更改。',
   'voice.mirrorOn': '镜像开启！',
   'voice.mirrorOff': '镜像关闭。',
+  'voice.stabilizationOn': '笔画稳定已开启！',
+  'voice.stabilizationOff': '已恢复自然笔触。',
   'voice.saved': '已保存！',
   'voice.narrationStarted': '开始录音 — 讲你的故事吧！',
   'voice.narrationSaved': '你的故事已保存！',
@@ -759,7 +761,7 @@ export const zh: Record<string, string> = {
   'voice.narrationNeedsFrames': '先添加一些帧，然后再讲故事！',
   'voice.narrationAlready': '已经在录音了 — 结束时说“停止录音”。',
   'voice.help':
-    '你可以说：画笔、铅笔、喷枪、橡皮擦、填充、魔棒、印章、红色或蓝色、变大、变小、移动它、把这个向左移动、再来一次、把这个放到中间、把这个放到顶部、删除它、复制它、打开镜像、关闭镜像、撤销、重做、清空、新建帧、播放、玩我的游戏、预览应用、导出应用、导出代码、录制旁白、停止录音、删除旁白、停止、保存和帮助。',
+    '你可以说：画笔、铅笔、喷枪、橡皮擦、填充、魔棒、印章、红色或蓝色、变大、变小、稳定笔触、自然笔触、移动它、把这个向左移动、再来一次、把这个放到中间、把这个放到顶部、删除它、复制它、打开镜像、关闭镜像、撤销、重做、清空、新建帧、播放、玩我的游戏、预览应用、导出应用、导出代码、录制旁白、停止录音、删除旁白、停止、保存和帮助。',
   'voice.unknown': '抱歉，我没听懂。说“帮助”可以听听我会做什么。',
   'voice.unavailable': '此浏览器无法使用语音命令。你仍可通过触摸、鼠标或键盘使用所有工具。',
   'voice.panelTitle': '与 Dream 对话',

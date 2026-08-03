@@ -675,6 +675,16 @@ test('voice stays visible without recognition and explains the fallback', async 
   await expect(conversation).toContainText('undo');
   await expect(conversation.getByRole('status')).toHaveText('Nothing to undo.');
 
+  await conversation.getByRole('textbox', { name: 'Say it or type it' }).fill('steady my stroke');
+  await conversation.getByRole('button', { name: 'Do it' }).click();
+  await expect(conversation.getByRole('status')).toHaveText('Steady stroke on!');
+  await expect(page.getByLabel('Steady stroke')).toHaveValue('60');
+
+  await conversation.getByRole('textbox', { name: 'Say it or type it' }).fill('natural stroke');
+  await conversation.getByRole('button', { name: 'Do it' }).click();
+  await expect(conversation.getByRole('status')).toHaveText('Natural stroke on.');
+  await expect(page.getByLabel('Steady stroke')).toHaveValue('0');
+
   await page.keyboard.press('Escape');
   await expect(conversation).toBeHidden();
   await expect(voice).toBeFocused();

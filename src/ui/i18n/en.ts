@@ -768,6 +768,8 @@ export const en: Record<string, string> = {
   'voice.selectionLocked': 'That selection is locked. Unlock it before changing it.',
   'voice.mirrorOn': 'Mirror on!',
   'voice.mirrorOff': 'Mirror off.',
+  'voice.stabilizationOn': 'Steady stroke on!',
+  'voice.stabilizationOff': 'Natural stroke on.',
   'voice.saved': 'Saved!',
   'voice.narrationStarted': 'Recording — tell your story!',
   'voice.narrationSaved': 'Your story is saved!',
@@ -777,7 +779,7 @@ export const en: Record<string, string> = {
   'voice.narrationNeedsFrames': 'Add some frames first, then tell your story!',
   'voice.narrationAlready': 'Already recording — say “stop recording” when you’re done.',
   'voice.help':
-    'You can say: brush, pencil, spray, eraser, fill, wand, stamp, a color like red or blue, bigger, smaller, move it, move it left, again, center it, put it at the top, delete it, duplicate it, mirror on, mirror off, undo, redo, clear, new frame, play, play my game, preview my app, export my app, export real code, record narration, stop recording, delete narration, stop, save, and help.',
+    'You can say: brush, pencil, spray, eraser, fill, wand, stamp, a color like red or blue, bigger, smaller, steady my stroke, natural stroke, move it, move it left, again, center it, put it at the top, delete it, duplicate it, mirror on, mirror off, undo, redo, clear, new frame, play, play my game, preview my app, export my app, export real code, record narration, stop recording, delete narration, stop, save, and help.',
   'voice.unknown': 'Sorry, I didn’t understand. Say “help” to hear what I can do.',
   'voice.unavailable':
     'Voice commands are not available in this browser. You can still use every tool by touch, mouse or keyboard.',

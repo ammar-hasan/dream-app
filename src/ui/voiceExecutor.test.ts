@@ -40,6 +40,7 @@ function makeStore(overrides: Partial<VoiceExecutorStore> = {}) {
     setTool: vi.fn(),
     setColor: vi.fn(),
     setSize: vi.fn(),
+    setStabilization: vi.fn(),
     scaleSelection: vi.fn(),
     nudgeSelection: vi.fn(),
     centerSelection: vi.fn(),
@@ -286,6 +287,19 @@ describe('executeVoiceCommand', () => {
       'Mirror off.',
     );
     expect(store.setSymmetry).toHaveBeenCalledWith('off');
+  });
+
+  it('steady and natural voice intents change the same visible stroke setting', () => {
+    const store = makeStore();
+    expect(executeVoiceCommand({ kind: 'stabilization', on: true }, store, () => {})?.message).toBe(
+      'Steady stroke on!',
+    );
+    expect(store.setStabilization).toHaveBeenCalledWith(60);
+
+    expect(
+      executeVoiceCommand({ kind: 'stabilization', on: false }, store, () => {})?.message,
+    ).toBe('Natural stroke on.');
+    expect(store.setStabilization).toHaveBeenLastCalledWith(0);
   });
 
   it('bigger/smaller step the brush size and clamp to 1..64', () => {

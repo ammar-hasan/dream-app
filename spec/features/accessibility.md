@@ -141,38 +141,40 @@ duplication, clearing, export or another non-nudge action.
 
 ### The complete intent table
 
-| Intent           | English examples                                                                                                                                       | Arabic examples                                                                  | What it does                                                                                     |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| undo             | "undo", "oops"                                                                                                                                         | تراجع، رجوع                                                                      | one undo step; "Nothing to undo." when empty                                                     |
-| redo             | "redo"                                                                                                                                                 | إعادة، أعد                                                                       | one redo step                                                                                    |
-| clear            | "clear", "erase everything", "start over"                                                                                                              | امسح، نظف                                                                        | asks "Clear this layer? Say yes…" — spoken yes confirms ("All clear!"), anything else cancels    |
-| new frame        | "new frame", "add frame"                                                                                                                               | إطار جديد، فريم جديد                                                             | enables animation if needed, adds a frame                                                        |
-| make a story     | "make a story about…", "make an animation with…"                                                                                                       | اصنع لي قصة عن…                                                                  | opens a locally planned, editable storyboard prefilled from the rest of the spoken request       |
-| play / stop      | "play", "animate" / "stop", "pause"                                                                                                                    | شغّل / أوقف                                                                      | plays the animation (needs frames) / stops playback and any game                                 |
-| play my game     | "play my game", "play flappy", "play maze", "play catch"                                                                                               | العب لعبتي، المتاهة، الطيران                                                     | switches to Play (optionally switching template) and starts a run                                |
-| preview my app   | "preview my app", "test the app"                                                                                                                       | عاين التطبيق                                                                     | opens the app preview (needs frames)                                                             |
-| export my app    | "export my app", "share the app"                                                                                                                       | صدّر التطبيق                                                                     | downloads the standalone HTML app                                                                |
-| export real code | "export real code", "make it real"                                                                                                                     | صدّر كود حقيقي                                                                   | downloads the AI-generated real-code app (needs frames)                                          |
-| narration        | "record narration" / "stop recording" / "delete narration"                                                                                             | سجّل صوتي / أوقف التسجيل / امسح الصوت                                            | records a voice take over the playing animation (needs frames) / stops and saves it / deletes it |
-| tools            | "brush", "pencil", "spray", "eraser", "fill", "wand", "lasso", "stamp", "line", "rectangle"/"square", "ellipse"/"circle", "eyedropper", "text", "move" | فرشاة، قلم، رش، ممحاة، دلو، عصا سحرية، لاسو، طابع، خط، مستطيل، بيضاوي، قطارة، نص | activates the tool                                                                               |
-| colors           | "red", "blue", … / "make it red"                                                                                                                       | أحمر، أزرق، … / اجعل هذا أحمر                                                    | bare color sets the current color; a referential color recolors selected vector artwork          |
-| fill + color     | "fill red"                                                                                                                                             | —                                                                                | sets the color AND activates the fill tool                                                       |
-| mirror on/off    | "mirror on", "mirror off", "symmetry on"                                                                                                               | شغّل التناظر، أطفئ التناظر                                                       | vertical symmetry on / off (mirror phrases never trigger "play")                                 |
-| bigger / smaller | "bigger", "make it bigger", "thicker" / "smaller", "make it smaller", "thinner"                                                                        | أكبر / أصغر                                                                      | selected artwork scales gently about its center; with no selection, brush size ×~1.5 or ÷~1.5    |
-| move / center it | "move it left/right/up/down", "center it"                                                                                                              | حرّك هذا لليسار/اليمين/الأعلى/الأسفل، ضع هذا في المنتصف                          | nudges the selection by 10 px or centers it on the canvas; each is one undoable action           |
-| clarify movement | "move it" → "left/right/up/down"                                                                                                                       | حرّك هذا ← يسار/يمين/أعلى/أسفل                                                   | asks which way without moving, then accepts one spoken, typed or visible direction choice        |
-| place at edge    | "put it at the top", "move it to the right edge"                                                                                                       | ضع هذا عند الحافة العلوية / اليمنى                                               | places the selection's shared bounds flush with that canvas edge as one undoable action          |
-| continue nudge   | "again", "a little more"                                                                                                                               | مرة أخرى، قليلًا بعد                                                             | immediately repeats only the last successful directional 10 px nudge; otherwise refuses safely   |
-| delete / copy it | "delete it", "remove that" / "duplicate it", "copy that"                                                                                               | احذف هذا / انسخ هذا                                                              | deletes only the selection / makes and selects an offset copy; both are undoable                 |
-| save             | "save"                                                                                                                                                 | احفظ                                                                             | saves now                                                                                        |
-| help             | "help", "commands"                                                                                                                                     | مساعدة، أوامر                                                                    | speaks the full command list                                                                     |
-| confirm / cancel | "yes", "yeah sure" / "no", "cancel"                                                                                                                    | نعم / لا، ألغِ                                                                   | answers the clear confirmation only when all meaningful words are answer words                   |
+| Intent            | English examples                                                                                                                                       | Arabic examples                                                                  | What it does                                                                                     |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| undo              | "undo", "oops"                                                                                                                                         | تراجع، رجوع                                                                      | one undo step; "Nothing to undo." when empty                                                     |
+| redo              | "redo"                                                                                                                                                 | إعادة، أعد                                                                       | one redo step                                                                                    |
+| clear             | "clear", "erase everything", "start over"                                                                                                              | امسح، نظف                                                                        | asks "Clear this layer? Say yes…" — spoken yes confirms ("All clear!"), anything else cancels    |
+| new frame         | "new frame", "add frame"                                                                                                                               | إطار جديد، فريم جديد                                                             | enables animation if needed, adds a frame                                                        |
+| make a story      | "make a story about…", "make an animation with…"                                                                                                       | اصنع لي قصة عن…                                                                  | opens a locally planned, editable storyboard prefilled from the rest of the spoken request       |
+| play / stop       | "play", "animate" / "stop", "pause"                                                                                                                    | شغّل / أوقف                                                                      | plays the animation (needs frames) / stops playback and any game                                 |
+| play my game      | "play my game", "play flappy", "play maze", "play catch"                                                                                               | العب لعبتي، المتاهة، الطيران                                                     | switches to Play (optionally switching template) and starts a run                                |
+| preview my app    | "preview my app", "test the app"                                                                                                                       | عاين التطبيق                                                                     | opens the app preview (needs frames)                                                             |
+| export my app     | "export my app", "share the app"                                                                                                                       | صدّر التطبيق                                                                     | downloads the standalone HTML app                                                                |
+| export real code  | "export real code", "make it real"                                                                                                                     | صدّر كود حقيقي                                                                   | downloads the AI-generated real-code app (needs frames)                                          |
+| narration         | "record narration" / "stop recording" / "delete narration"                                                                                             | سجّل صوتي / أوقف التسجيل / امسح الصوت                                            | records a voice take over the playing animation (needs frames) / stops and saves it / deletes it |
+| tools             | "brush", "pencil", "spray", "eraser", "fill", "wand", "lasso", "stamp", "line", "rectangle"/"square", "ellipse"/"circle", "eyedropper", "text", "move" | فرشاة، قلم، رش، ممحاة، دلو، عصا سحرية، لاسو، طابع، خط، مستطيل، بيضاوي، قطارة، نص | activates the tool                                                                               |
+| colors            | "red", "blue", … / "make it red"                                                                                                                       | أحمر، أزرق، … / اجعل هذا أحمر                                                    | bare color sets the current color; a referential color recolors selected vector artwork          |
+| fill + color      | "fill red"                                                                                                                                             | —                                                                                | sets the color AND activates the fill tool                                                       |
+| mirror on/off     | "mirror on", "mirror off", "symmetry on"                                                                                                               | شغّل التناظر، أطفئ التناظر                                                       | vertical symmetry on / off (mirror phrases never trigger "play")                                 |
+| stroke assistance | "steady my stroke", "natural stroke"                                                                                                                   | ثبّت الخط، خط طبيعي                                                              | sets the visible Steady stroke control to 60% or 0%; affects future strokes only                 |
+| bigger / smaller  | "bigger", "make it bigger", "thicker" / "smaller", "make it smaller", "thinner"                                                                        | أكبر / أصغر                                                                      | selected artwork scales gently about its center; with no selection, brush size ×~1.5 or ÷~1.5    |
+| move / center it  | "move it left/right/up/down", "center it"                                                                                                              | حرّك هذا لليسار/اليمين/الأعلى/الأسفل، ضع هذا في المنتصف                          | nudges the selection by 10 px or centers it on the canvas; each is one undoable action           |
+| clarify movement  | "move it" → "left/right/up/down"                                                                                                                       | حرّك هذا ← يسار/يمين/أعلى/أسفل                                                   | asks which way without moving, then accepts one spoken, typed or visible direction choice        |
+| place at edge     | "put it at the top", "move it to the right edge"                                                                                                       | ضع هذا عند الحافة العلوية / اليمنى                                               | places the selection's shared bounds flush with that canvas edge as one undoable action          |
+| continue nudge    | "again", "a little more"                                                                                                                               | مرة أخرى، قليلًا بعد                                                             | immediately repeats only the last successful directional 10 px nudge; otherwise refuses safely   |
+| delete / copy it  | "delete it", "remove that" / "duplicate it", "copy that"                                                                                               | احذف هذا / انسخ هذا                                                              | deletes only the selection / makes and selects an offset copy; both are undoable                 |
+| save              | "save"                                                                                                                                                 | احفظ                                                                             | saves now                                                                                        |
+| help              | "help", "commands"                                                                                                                                     | مساعدة، أوامر                                                                    | speaks the full command list                                                                     |
+| confirm / cancel  | "yes", "yeah sure" / "no", "cancel"                                                                                                                    | نعم / لا، ألغِ                                                                   | answers the clear confirmation only when all meaningful words are answer words                   |
 
 Persian provides the same complete intent surface. Canonical phrases include
 واگرد / بازانجام, پاک کن, فریم جدید, یک داستان درباره…, پخش / توقف,
 بازی من, پیش‌نمایش برنامه, خروجی برنامه, کد واقعی, ضبط روایت / پایان ضبط /
 ضبط را حذف کن, قلم‌مو / مداد / پاک‌کن / سطل / عصا / مهر / متن, آینه روشن /
-آینه خاموش, بزرگ‌تر / کوچک‌تر, ذخیره, راهنما and بله / نه. Persian color
+آینه خاموش, خط را ثابت کن / خط طبیعی, بزرگ‌تر / کوچک‌تر, ذخیره, راهنما and
+بله / نه. Persian color
 names cover the same palette, and a fill-tool phrase plus a color performs
 both choices in one command.
 
@@ -180,9 +182,9 @@ Simplified Chinese provides the same complete intent surface without requiring
 spaces between words. Canonical phrases include 撤销 / 重做, 清空, 添加帧,
 制作一个故事…, 播放 / 停止, 玩迷宫, 预览应用, 导出应用, 导出真实代码,
 录制旁白 / 停止录音 / 删除旁白, 画笔 / 铅笔 / 橡皮擦 / 填充 / 魔棒 /
-印章 / 文字, 打开镜像 / 关闭镜像, 大一点 / 小一点, 保存, 帮助 and
-确认 / 取消. Polite prefixes may surround a command, and English remains
-available.
+印章 / 文字, 打开镜像 / 关闭镜像, 稳定笔触 / 自然笔触, 大一点 /
+小一点, 保存, 帮助 and 确认 / 取消. Polite prefixes may surround a command,
+and English remains available.
 
 ### The color vocabulary (22 words)
 
@@ -202,7 +204,7 @@ desfazer / refazer, limpar, novo quadro, criar uma história sobre…, tocar /
 parar, jogar labirinto, pré-visualizar meu app, exportar meu app, código real,
 gravar narração / parar gravação / excluir narração, pincel / lápis / borracha /
 preencher / varinha / carimbo / texto, ligar / desligar espelhamento, maior /
-menor, salvar, ajuda and sim / não. Its color words include vermelho, laranja,
+menor, estabilizar meu traço / traço natural, salvar, ajuda and sim / não. Its color words include vermelho, laranja,
 amarelo, verde, turquesa, azul, roxo/violeta, rosa, marrom, preto, branco,
 cinza, ciano, magenta and dourado.
 
@@ -211,7 +213,8 @@ Russian provides the same complete surface with phrases such as отменить
 остановить, играть в лабиринт, показать приложение, экспортировать приложение,
 настоящий код, записать озвучку / остановить запись / удалить озвучку, кисть /
 карандаш / ластик / заливка / палочка / штамп / текст, включить / выключить
-отражение, больше / меньше, сохранить, помощь and да / нет. Its color words
+отражение, стабилизировать штрих / естественный штрих, больше / меньше,
+сохранить, помощь and да / нет. Its color words
 include красный, оранжевый, жёлтый, зелёный, бирюзовый, голубой, синий,
 фиолетовый, розовый, коричневый, чёрный, белый, серый, циан, пурпурный and
 золотой; common instrumental forms work in fill commands.
@@ -224,8 +227,10 @@ include красный, оранжевый, жёлтый, зелёный, бир
    clear words ("stop recording" isn't stop; «امسح الصوت» isn't clear) —
    then the make-a-story phrases, clear and new frame. "Tell the story" stays
    narration; it never creates a storyboard.
-3. **Mirror phrases before play words** — "شغّل التناظر" turns mirroring
-   on, it never starts playback.
+3. **Mirror and stroke-assistance phrases before tool and play words** —
+   "شغّل التناظر" turns mirroring on rather than starting playback, and a
+   natural-stroke request changes its visible setting rather than choosing a
+   line tool.
 4. App preview/export, the make-real code export, stop, game intents,
    play, save.
 5. Bigger/smaller, bare "mirror" (→ on), "fill + color", tool words,
