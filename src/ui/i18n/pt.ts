@@ -466,8 +466,10 @@ export const pt: Record<string, string> = {
   'ai.editPlaceholder': 'Deixe mais quente e suave…',
   'ai.selectedOnly': 'Só a parte selecionada',
   'ai.selectedOnlyTitle': 'Usa a caixa de seleção do modo Design',
-  'ai.editTip':
-    'Dica: selecione algo com a ferramenta Selecionar em Design para editar só essa parte.',
+  'ai.editTip': 'Nenhuma parte selecionada — Editar altera toda a camada ativa.',
+  'ai.selectPart': 'Selecionar uma parte',
+  'ai.selectPartTitle':
+    'Vai para Design e Selecionar; clique em um objeto ou arraste ao redor dele',
   'ai.editIt': 'Editar!',
   'ai.erase': 'Apagar isto',
   'ai.working': 'Trabalhando…',
@@ -715,4 +717,6 @@ export const pt: Record<string, string> = {
   'voice.help':
     'Você pode dizer: pincel, lápis, spray, borracha, preencher, varinha, carimbo, uma cor como vermelho ou azul, maior, menor, espelhamento ligado, espelhamento desligado, desfazer, refazer, limpar, novo quadro, tocar, jogar meu jogo, pré-visualizar meu app, exportar meu app, exportar código real, gravar narração, parar gravação, excluir narração, parar, salvar, e ajuda.',
   'voice.unknown': 'Desculpe, não entendi. Diga “ajuda” para ouvir o que eu posso fazer.',
+  'voice.unavailable':
+    'Os comandos de voz não estão disponíveis neste navegador. Você ainda pode usar todas as ferramentas por toque, mouse ou teclado.',
 };

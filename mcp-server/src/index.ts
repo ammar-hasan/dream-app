@@ -148,6 +148,57 @@ const TOOLS: Tool[] = [
     },
   },
   {
+    name: 'dream.add_stroke',
+    description:
+      'Add a brush, pencil or eraser freehand stroke to a layer of a .dream project (default: top layer of the active frame).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: string('Path to the .dream file'),
+        points: {
+          type: 'array',
+          minItems: 2,
+          maxItems: 10000,
+          description: 'Ordered freehand samples in document pixels',
+          items: {
+            type: 'object',
+            properties: {
+              x: { type: 'number', description: 'X coordinate in document pixels' },
+              y: { type: 'number', description: 'Y coordinate in document pixels' },
+              pressure: optional({
+                type: 'number',
+                minimum: 0,
+                maximum: 1,
+                description: 'Optional stylus pressure from 0 to 1',
+              }),
+            },
+            required: ['x', 'y'],
+          },
+        },
+        tool: optional({
+          type: 'string',
+          enum: ['brush', 'pencil', 'eraser'],
+          description: 'Freehand tool (default brush)',
+        }),
+        color: optional(string('Stroke color, #rgb or #rrggbb (default #1f2937)')),
+        size: optional({
+          type: 'number',
+          exclusiveMinimum: 0,
+          maximum: 8192,
+          description: 'Stroke width in document pixels (default 8)',
+        }),
+        opacity: optional({
+          type: 'number',
+          minimum: 0,
+          maximum: 1,
+          description: 'Brush opacity from 0 to 1 (default 1)',
+        }),
+        layer: optional(string('Target layer id or name (default: top layer)')),
+      },
+      required: ['path', 'points'],
+    },
+  },
+  {
     name: 'dream.add_shape',
     description:
       'Add a line, rectangle or ellipse to a layer of a .dream project (default: top layer of the active frame).',
@@ -239,6 +290,24 @@ const argsSchema = {
     index: z.number().optional(),
   }),
   'dream.remove_layer': z.object({ path: z.string(), layer: z.string() }),
+  'dream.add_stroke': z.object({
+    path: z.string(),
+    points: z
+      .array(
+        z.object({
+          x: z.number().finite(),
+          y: z.number().finite(),
+          pressure: z.number().finite().min(0).max(1).optional(),
+        }),
+      )
+      .min(2)
+      .max(10000),
+    tool: z.enum(['brush', 'pencil', 'eraser']).optional(),
+    color: z.string().optional(),
+    size: z.number().finite().positive().max(8192).optional(),
+    opacity: z.number().finite().min(0).max(1).optional(),
+    layer: z.string().optional(),
+  }),
   'dream.add_text': z.object({
     path: z.string(),
     text: z.string(),
@@ -301,6 +370,10 @@ async function callTool(name: ToolName, args: unknown): Promise<CallToolResult> 
     case 'dream.remove_layer': {
       const { path, layer } = argsSchema[name].parse(args);
       return asJson(await tools.removeLayer(path, layer));
+    }
+    case 'dream.add_stroke': {
+      const { path, ...options } = argsSchema[name].parse(args);
+      return asJson(await tools.addStroke(path, options));
     }
     case 'dream.add_text': {
       const { path, ...options } = argsSchema[name].parse(args);

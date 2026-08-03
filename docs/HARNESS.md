@@ -71,8 +71,8 @@ Dream ships its own MCP server (`mcp-server/`, wired into this repo via
 `.mcp.json`), so the agents developing Dream use Dream's own developer
 surface: they create, edit, render and export `.dream` files with
 `dream.create_project`, `dream.add_layer`, `dream.update_layer`,
-`dream.remove_layer`, `dream.add_shape`, `dream.add_text`, `dream.render_png`
-and friends — the same tools external users get. That means every agent session also
+`dream.remove_layer`, `dream.add_stroke`, `dream.add_shape`, `dream.add_text`,
+`dream.render_png` and friends — the same tools external users get. That means every agent session also
 exercises the slice-14 developer surface for real. The `dogfood-mcp` skill
 is the verification ritual: `npm run check:mcp`, `node mcp-server/examples/demo.mjs`,
 then a live tool round-trip against a real file. If the MCP server breaks,

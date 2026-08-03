@@ -2440,6 +2440,11 @@ body {
   margin-bottom: 8px;
 }
 
+.ai-select-part {
+  align-self: flex-start;
+  margin-bottom: 4px;
+}
+
 .ai-note {
   margin: 4px 0;
   font-size: 12px;
@@ -2888,6 +2893,25 @@ textarea:focus-visible,
   transform: translate(-50%, 0);
 }
 
+/* Toolbars and rails scroll, so ordinary absolutely positioned tips are
+   clipped at their edges. Modern browsers can anchor a fixed tip to its
+   control: it keeps the data-attribute/CSS contract while escaping every
+   scrolling ancestor. The rules above remain the graceful fallback. */
+@supports (position-area: bottom) {
+  [data-tooltip] {
+    anchor-scope: --dream-tooltip;
+    anchor-name: --dream-tooltip;
+  }
+
+  [data-tooltip]::after {
+    position: fixed;
+    position-anchor: --dream-tooltip;
+    position-area: bottom;
+    inset: auto;
+    margin-top: 8px;
+  }
+}
+
 /* Rail buttons: tip floats beside the rail instead of below the button. */
 .tool-rail [data-tooltip]::after {
   left: auto;
@@ -2901,6 +2925,20 @@ textarea:focus-visible,
   transform: translateY(-50%) scale(1);
 }
 
+@supports (position-area: bottom) {
+  .tool-rail [data-tooltip]::after {
+    position-area: inline-end center;
+    inset: auto;
+    margin: 0 0 0 10px;
+    transform: scale(0.94);
+  }
+
+  .tool-rail [data-tooltip]:hover::after,
+  .tool-rail [data-tooltip]:focus-visible::after {
+    transform: scale(1);
+  }
+}
+
 /* Zoom pill: tips open upward. */
 .zoom-pill [data-tooltip]::after {
   top: auto;
@@ -2911,6 +2949,14 @@ textarea:focus-visible,
 .zoom-pill [data-tooltip]:hover::after,
 .zoom-pill [data-tooltip]:focus-visible::after {
   transform: translate(-50%, 0);
+}
+
+@supports (position-area: bottom) {
+  .zoom-pill [data-tooltip]::after {
+    position-area: top;
+    inset: auto;
+    margin: 0 0 8px;
+  }
 }
 
 .kid-mode [data-tooltip]::after {

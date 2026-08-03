@@ -21,6 +21,7 @@ byte-compatible with the browser app, and vice versa.
 | `dream.add_layer`      | Add a new top layer to the active frame, with an optional `name`.                                                                |
 | `dream.update_layer`   | Rename, show/hide, set opacity, lock/unlock or move a layer to a zero-based stack index.                                         |
 | `dream.remove_layer`   | Remove a layer by id or name from the active frame; refuses to remove the final layer.                                           |
+| `dream.add_stroke`     | Append a validated brush/pencil/eraser polyline with optional pressure, style and target layer.                                  |
 | `dream.add_text`       | Append a text op: `text`, `x`, `y`, optional `size`, `color`, `fontFamily`, `layer` (id or name; default: top layer).            |
 | `dream.add_shape`      | Append a line/rectangle/ellipse with endpoints, optional size/color/opacity/fill, and an optional target `layer`.                |
 | `dream.render_png`     | Flatten the document (or one `frame` index) to a PNG file.                                                                       |
@@ -76,8 +77,8 @@ node examples/demo.mjs
 ```
 
 creates a project in a tmp dir, adds/renames a layer, safely removes a scratch
-layer, draws a rectangle, adds text, reads the summary and renders a PNG — the
-exact functions the MCP tools call.
+layer, draws a rectangle and pressure stroke, adds text, reads the summary and
+renders a PNG — the exact functions the MCP tools call.
 
 ## Registry publication
 
@@ -116,6 +117,10 @@ The npm package must be public before the Registry will accept its metadata.
 - Layer authoring targets the active frame; update/remove preserve its mirrored
   active stack, a layer can be addressed by id or name, and the final layer is
   never removable.
+- Freehand authoring accepts 2–10,000 finite points, optional pressure samples,
+  brush/pencil/eraser tools, color, size, opacity and an id/name layer target.
+  Pressure uses the same width floor as pen input; pencil and eraser remain
+  fully opaque like the app.
 - `dream.export_app` needs an animated document (frames are the screens);
   documents without frames get a clear error.
 - Rendering uses the headless skia build — text uses the fonts bundled with

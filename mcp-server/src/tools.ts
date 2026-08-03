@@ -23,7 +23,16 @@ import {
 } from '../../src/engine/document';
 import { hotspotTargetIndex } from '../../src/engine/hotspots';
 import { decodeProject, encodeProject } from '../../src/engine/projectFile';
-import type { DreamDocument, Layer, ShapeKind, ShapeOp, TextOp } from '../../src/engine/types';
+import { pressureWidth } from '../../src/engine/tools/stroke';
+import { DEFAULT_SETTINGS } from '../../src/engine/tools/types';
+import type {
+  DreamDocument,
+  Layer,
+  ShapeKind,
+  ShapeOp,
+  StrokeOp,
+  TextOp,
+} from '../../src/engine/types';
 import { nodeRasterCodec, renderLayersToPng, renderLayersToPngDataUrl } from './nodeCodec';
 
 /** Load and decode a .dream file. */
@@ -322,6 +331,93 @@ export interface AddTextResult {
   opId: string;
   layerId: string;
   layerName: string;
+}
+
+export interface StrokePointInput {
+  x: number;
+  y: number;
+  /** Optional stylus-pressure sample, 0..1. */
+  pressure?: number;
+}
+
+export interface AddStrokeOptions {
+  points: StrokePointInput[];
+  tool?: 'brush' | 'pencil' | 'eraser';
+  color?: string;
+  size?: number;
+  opacity?: number;
+  /** Layer id or name; default: the top layer of the active frame. */
+  layer?: string;
+}
+
+const MAX_STROKE_POINTS = 10_000;
+
+/** dream.add_stroke — append an ordinary freehand stroke to a layer. */
+export async function addStroke(
+  projectPath: string,
+  options: AddStrokeOptions,
+): Promise<AddTextResult> {
+  if (!Array.isArray(options.points) || options.points.length < 2) {
+    throw new Error('points must contain at least 2 samples');
+  }
+  if (options.points.length > MAX_STROKE_POINTS) {
+    throw new Error(`points must contain at most ${MAX_STROKE_POINTS} samples`);
+  }
+  for (const [index, point] of options.points.entries()) {
+    if (!point || !Number.isFinite(point.x) || !Number.isFinite(point.y)) {
+      throw new Error(`point ${index} coordinates must be finite`);
+    }
+    if (
+      point.pressure !== undefined &&
+      (!Number.isFinite(point.pressure) || point.pressure < 0 || point.pressure > 1)
+    ) {
+      throw new Error(`point ${index} pressure must be between 0 and 1`);
+    }
+  }
+  const tool = options.tool ?? 'brush';
+  if (!['brush', 'pencil', 'eraser'].includes(tool)) {
+    throw new Error(`Invalid stroke tool: ${tool}`);
+  }
+  const color = normalizeHex(options.color ?? DEFAULT_SETTINGS.color);
+  if (!color) throw new Error(`Invalid color: ${options.color}`);
+  const size = options.size ?? DEFAULT_SETTINGS.size;
+  if (!Number.isFinite(size) || size <= 0 || size > MAX_DIMENSION) {
+    throw new Error(`size must be greater than 0 and at most ${MAX_DIMENSION}`);
+  }
+  const opacity = options.opacity ?? DEFAULT_SETTINGS.opacity;
+  if (!Number.isFinite(opacity) || opacity < 0 || opacity > 1) {
+    throw new Error('opacity must be between 0 and 1');
+  }
+
+  const doc = await loadProject(projectPath);
+  const layer = options.layer
+    ? doc.layers.find(
+        (candidate) => candidate.id === options.layer || candidate.name === options.layer,
+      )
+    : doc.layers[doc.layers.length - 1];
+  if (!layer) {
+    throw new Error(
+      options.layer
+        ? `No layer with id or name "${options.layer}" in the active frame`
+        : 'The document has no layers',
+    );
+  }
+
+  const op: StrokeOp = {
+    kind: 'stroke',
+    id: genId('op'),
+    tool,
+    points: options.points.map(({ x, y }) => ({ x, y })),
+    color,
+    size,
+    // Match the drawing engine: pencil and eraser are always fully opaque.
+    opacity: tool === 'brush' ? opacity : 1,
+  };
+  if (options.points.some((point) => point.pressure !== undefined)) {
+    op.widths = options.points.map((point) => pressureWidth(point.pressure ?? 1));
+  }
+  await saveProject(projectPath, appendOperation(doc, layer.id, op));
+  return { opId: op.id, layerId: layer.id, layerName: layer.name };
 }
 
 /** dream.add_text — append a text operation to a layer. Pure document edit. */

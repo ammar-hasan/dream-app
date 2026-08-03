@@ -96,6 +96,74 @@ Cross-cutting takeaways:
     _Dream:_ Speech synthesis (`say.ts`) can voice any label; locale-aware
     strings keep wording natural.
 
+### 10/10 persona and interaction benchmark (2026)
+
+The product-idea personas are examples of deeper jobs, not feature requests.
+Current authoritative guidance and professional workflows raise these bars:
+
+1. **Older creators need more than larger controls.** Age-related vision,
+   dexterity, hearing and short-term-memory changes require strong contrast,
+   low precision demand, persistent orientation, restrained distraction and
+   multiple input paths. Dream's comfort mode is a foundation, not the finish.
+   (https://www.w3.org/WAI/older-users/)
+2. **Child-centric AI explains itself at the moment of action and is tested
+   with diverse children.** A kid-facing prompt box is not enough; safety,
+   culturally appropriate language, visible confirmation and representative
+   child research belong to the experience.
+   (https://www.unicef.org/digitalimpact/stories/child-centric-ai)
+3. **Professional image work is non-destructive.** Current Photoshop guidance
+   treats adjustment layers and editable masks as the flexible default for
+   color/tonal changes and local refinements. Dream's baked filters and box-only
+   edits are useful but do not yet meet Ali's expected substrate.
+   (https://helpx.adobe.com/photoshop/desktop/create-manage-layers/color-adjustment-fill-layers/create-adjustment-layers.html ·
+   https://helpx.adobe.com/ca/photoshop/desktop/create-manage-layers/color-adjustment-fill-layers/use-layer-masks-to-target-adjustment-or-fill-layers.html)
+4. **Professional product design is system design.** Responsive auto layout,
+   variables/tokens, component properties/variants and high-fidelity prototype
+   state are baseline productivity concepts. Dream's copied components and
+   manual alignment cover composition, not Aleksandr's full job.
+   (https://help.figma.com/hc/en-us/articles/360040451373-Explore-auto-layout-properties ·
+   https://help.figma.com/hc/en-us/articles/15339657135383-Guide-to-variables-in-Figma ·
+   https://help.figma.com/hc/en-us/articles/5579474826519-Explore-component-properties)
+5. **Scientific figures are integrity-bearing deliverables.** Journal guidance
+   expects labelled units, accessible color, legible/editable text, scale bars,
+   high-resolution images, editable vector output and transparent manipulation
+   practices. A pleasant chart alone is not publication readiness.
+   (https://research-figure-guide.nature.com/figures/preparing-figures-our-specifications/ ·
+   https://www.nature.com/ncomms/editorial-policies/image-integrity)
+6. **Agent-native means discoverable typed workflows, not only callable
+   functions.** MCP's current model includes tools, resources and prompts;
+   tools can declare output schemas and side-effect annotations so clients and
+   humans can reason about actions. Dream's local tool set is a starting point.
+   (https://modelcontextprotocol.io/docs/learn/server-concepts ·
+   https://modelcontextprotocol.io/specification/2025-06-18/server/tools)
+7. **Short-video delivery is mobile and format-aware.** Current YouTube guidance
+   treats square or vertical videos up to three minutes as Shorts; the creator's
+   real job also includes readable safe areas, audio/caption control, size and a
+   low-friction upload/share handoff.
+   (https://support.google.com/youtube/answer/15424877)
+
+Modern interaction craft should make state legible rather than add spectacle:
+
+- **Drag in one motion, show a translucent preview, highlight only valid drop
+  targets, keep the result selected and provide an alternative to every drag.**
+  Failed drops need visible recovery, and known transfer work needs progress.
+  (https://developer.apple.com/design/human-interface-guidelines/drag-and-drop)
+- **Pointers communicate outcome.** Select, crosshair, text, open/closed-hand
+  pan, resize/rotate, copy/link and not-allowed states should follow the active
+  interaction rather than remain a static cursor per tool.
+  (https://developer.apple.com/design/human-interface-guidelines/pointing-devices)
+- **Motion is brief, causal and cancellable.** It follows the gesture, explains
+  state, never delays frequent work and collapses under reduced motion.
+  (https://developer.apple.com/design/human-interface-guidelines/motion)
+- **Loading shows something immediately.** Use determinate progress when the
+  work is countable, indeterminate activity when it is not, allow unrelated
+  work where safe, and never leave a blank or apparently frozen surface.
+  (https://developer.apple.com/design/human-interface-guidelines/loading)
+- **Haptics are sparse, optional and redundant.** A short pulse may reinforce a
+  snap, successful drop or game collision on supported hardware, but must match
+  visible/audio feedback and must never buzz continuously while drawing.
+  (https://developer.apple.com/design/human-interface-guidelines/playing-haptics)
+
 ## 3. Trend watch
 
 1. **MCP ecosystem goes mainstream** — the Model Context Protocol hit its
@@ -137,31 +205,32 @@ Victor the senior user, Maria the teacher, Ahmed the developer, Sara the
 presenter, Zǐxuān the student, Ali/Fatima the hobbyists). Score: impact
 1–5; Effort: S/M/L.
 
-| #   | Feature                                                                                                                                                   | Personas              | Impact | Effort |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- | ------ | ------ |
-| 1   | ~~AI "make real" code export — turn an app-mode drawing into runnable code~~ ✅ shipped (slice 18)                                                        | Maria, Ahmed, Sara    | 5      | M      |
-| 2   | ~~More game templates + conversational game generation~~ ✅ shipped (slices 22–23)                                                                        | Zainab, George        | 5      | M      |
-| 3   | ~~Stamps, stickers, and coloring-page starters~~ ✅ shipped (slice 16)                                                                                    | Zainab, George        | 4      | S      |
-| 4   | ~~Voice narration recording for animations and Present mode~~ ✅ shipped (slice 19)                                                                       | Zainab, Ahmed, Victor | 4      | M      |
-| 5   | ~~Generative fill / inpainting via BYOK providers~~ ✅ shipped (slice 20)                                                                                 | Ali, Fatima, Sara     | 4      | M      |
-| 6   | ~~Localized voice-command vocabularies, Arabic-first~~ ✅ shipped (slice 16)                                                                              | Zainab, George, Ahmed | 4      | S      |
-| 7   | ~~Senior comfort toggle (larger UI, higher contrast, slower animations)~~ ✅ shipped (slice 16)                                                           | Victor                | 4      | S      |
-| 8   | Publish dream-mcp to MCP registries + add more tools — authoring/layer tools and registry package ready (slices 21 + 41); public publish pending approval | Maria                 | 4      | S      |
-| 9   | ~~Slide transitions, timing, notes and a private Presenter window~~ ✅ shipped (slices 24 + 29)                                                           | Sara, Zǐxuān, Victor  | 3      | M      |
-| 10  | ~~Social video shapes and frame captions~~ ✅ shipped (slice 27)                                                                                          | Ahmed                 | 4      | M      |
-| 11  | ~~Shareable prototype via URL (compressed viewer state, no backend)~~ ✅ shipped (slice 31)                                                               | Ahmed, Sara, Zǐxuān   | 3      | L      |
-| 12  | ~~Voice-to-storyboard animation with visible bilingual confirmation~~ ✅ shipped (slice 28)                                                               | Zainab, George        | 5      | M      |
-| 13  | ~~Phone timeline task focus for animation, slides and apps~~ ✅ shipped (slice 30)                                                                        | George, Ahmed, Sara   | 4      | S      |
-| 14  | ~~Non-destructive frame-range trimming with synchronized narration~~ ✅ shipped (slice 32)                                                                | Ahmed                 | 4      | S      |
-| 15  | ~~Persian-first RTL, voice, calligraphy nib and script typography~~ ✅ shipped (slice 33)                                                                 | Fatima                | 5      | M      |
-| 16  | ~~Scientific connectors, notation and truthful scalable SVG delivery~~ ✅ shipped (slice 34)                                                              | Zǐxuān, Sara          | 5      | M      |
-| 17  | ~~Paste CSV/TSV into grouped native line, scatter or bar plots~~ ✅ shipped (slice 35)                                                                    | Zǐxuān                | 5      | M      |
-| 18  | ~~Complete Simplified Chinese UI, unspaced voice commands, story planning and offline game language~~ ✅ shipped (slice 36)                               | Zǐxuān                | 5      | M      |
-| 19  | ~~Complete Brazilian Portuguese UI, voice commands, story planning and offline game language~~ ✅ shipped (slice 37)                                      | Maria                 | 4      | M      |
-| 20  | ~~Complete Russian UI, voice commands, story planning and offline game language~~ ✅ shipped (slice 38)                                                   | Aleksandr             | 4      | M      |
-| 21  | ~~Compact brush presets that expose rather than hide their size, opacity and tip~~ ✅ shipped (slice 39)                                                  | Ali, Aleksandr        | 4      | S      |
-| 22  | ~~One-click brand pack with exact multi-size PNGs and truthful optional SVG~~ ✅ shipped (slice 40)                                                       | Sara, Aleksandr       | 4      | S      |
-| 23  | ~~Agent-safe layer rename/configure/reorder/removal through dream-mcp~~ ✅ shipped (slice 41)                                                             | Maria                 | 4      | S      |
+| #   | Feature                                                                                                                                                               | Personas              | Impact | Effort |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- | ------ | ------ |
+| 1   | ~~AI "make real" code export — turn an app-mode drawing into runnable code~~ ✅ shipped (slice 18)                                                                    | Maria, Ahmed, Sara    | 5      | M      |
+| 2   | ~~More game templates + conversational game generation~~ ✅ shipped (slices 22–23)                                                                                    | Zainab, George        | 5      | M      |
+| 3   | ~~Stamps, stickers, and coloring-page starters~~ ✅ shipped (slice 16)                                                                                                | Zainab, George        | 4      | S      |
+| 4   | ~~Voice narration recording for animations and Present mode~~ ✅ shipped (slice 19)                                                                                   | Zainab, Ahmed, Victor | 4      | M      |
+| 5   | ~~Generative fill / inpainting via BYOK providers~~ ✅ shipped (slice 20)                                                                                             | Ali, Fatima, Sara     | 4      | M      |
+| 6   | ~~Localized voice-command vocabularies, Arabic-first~~ ✅ shipped (slice 16)                                                                                          | Zainab, George, Ahmed | 4      | S      |
+| 7   | ~~Senior comfort toggle (larger UI, higher contrast, slower animations)~~ ✅ shipped (slice 16)                                                                       | Victor                | 4      | S      |
+| 8   | Publish dream-mcp to MCP registries + add more tools — authoring/layer/stroke tools and registry package ready (slices 21 + 41 + 43); public publish pending approval | Maria                 | 4      | S      |
+| 9   | ~~Slide transitions, timing, notes and a private Presenter window~~ ✅ shipped (slices 24 + 29)                                                                       | Sara, Zǐxuān, Victor  | 3      | M      |
+| 10  | ~~Social video shapes and frame captions~~ ✅ shipped (slice 27)                                                                                                      | Ahmed                 | 4      | M      |
+| 11  | ~~Shareable prototype via URL (compressed viewer state, no backend)~~ ✅ shipped (slice 31)                                                                           | Ahmed, Sara, Zǐxuān   | 3      | L      |
+| 12  | ~~Voice-to-storyboard animation with visible bilingual confirmation~~ ✅ shipped (slice 28)                                                                           | Zainab, George        | 5      | M      |
+| 13  | ~~Phone timeline task focus for animation, slides and apps~~ ✅ shipped (slice 30)                                                                                    | George, Ahmed, Sara   | 4      | S      |
+| 14  | ~~Non-destructive frame-range trimming with synchronized narration~~ ✅ shipped (slice 32)                                                                            | Ahmed                 | 4      | S      |
+| 15  | ~~Persian-first RTL, voice, calligraphy nib and script typography~~ ✅ shipped (slice 33)                                                                             | Fatima                | 5      | M      |
+| 16  | ~~Scientific connectors, notation and truthful scalable SVG delivery~~ ✅ shipped (slice 34)                                                                          | Zǐxuān, Sara          | 5      | M      |
+| 17  | ~~Paste CSV/TSV into grouped native line, scatter or bar plots~~ ✅ shipped (slice 35)                                                                                | Zǐxuān                | 5      | M      |
+| 18  | ~~Complete Simplified Chinese UI, unspaced voice commands, story planning and offline game language~~ ✅ shipped (slice 36)                                           | Zǐxuān                | 5      | M      |
+| 19  | ~~Complete Brazilian Portuguese UI, voice commands, story planning and offline game language~~ ✅ shipped (slice 37)                                                  | Maria                 | 4      | M      |
+| 20  | ~~Complete Russian UI, voice commands, story planning and offline game language~~ ✅ shipped (slice 38)                                                               | Aleksandr             | 4      | M      |
+| 21  | ~~Compact brush presets that expose rather than hide their size, opacity and tip~~ ✅ shipped (slice 39)                                                              | Ali, Aleksandr        | 4      | S      |
+| 22  | ~~One-click brand pack with exact multi-size PNGs and truthful optional SVG~~ ✅ shipped (slice 40)                                                                   | Sara, Aleksandr       | 4      | S      |
+| 23  | ~~Agent-safe layer rename/configure/reorder/removal through dream-mcp~~ ✅ shipped (slice 41)                                                                         | Maria                 | 4      | S      |
+| 24  | ~~Pressure-aware brush/pencil/eraser authoring through dream-mcp~~ ✅ shipped (slice 43)                                                                              | Maria                 | 4      | S      |
 
 Deliberately deferred: **general vector-path editing** (slice 34 exports
 genuinely scalable native marks without introducing a second editing medium), **real-time

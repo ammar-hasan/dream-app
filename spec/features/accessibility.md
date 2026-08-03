@@ -69,11 +69,12 @@ is unsupported. One voice at a time (a new utterance replaces the old).
 
 ## Voice commands
 
-The mic button in the toolbar: click, speak, done. The button **hides
-where speech recognition is unsupported**; mic-permission denial gets a
-friendly message. Recognition listens in the UI language. Every command
-confirms in the status area and — when **voice feedback** is on (default in
-kid mode) — out loud.
+The mic button in the toolbar: click, speak, done. It remains visible where
+speech recognition is unsupported and explains that every tool still works by
+touch, mouse or keyboard; where spoken feedback exists, Little Dreamer also
+hears that explanation. Mic-permission denial gets a friendly message.
+Recognition listens in the UI language. Every command confirms in the status
+area and — when **voice feedback** is on (default in kid mode) — out loud.
 
 The parser is forgiving: case-insensitive, ignores filler ("um, can you
 please undo?"), **normalizes Arabic** (diacritics and tatweel stripped,

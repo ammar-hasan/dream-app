@@ -457,7 +457,9 @@ export const en: Record<string, string> = {
   'ai.editPlaceholder': 'Make it warmer and softer…',
   'ai.selectedOnly': 'Selected part only',
   'ai.selectedOnlyTitle': 'Uses the Design-mode selection box',
-  'ai.editTip': 'Tip: pick something with the Select tool in Design mode to edit just that part.',
+  'ai.editTip': 'Nothing is selected — Edit changes the whole active layer.',
+  'ai.selectPart': 'Select a part',
+  'ai.selectPartTitle': 'Switches to Design and Select; click an object or drag around it',
   'ai.editIt': 'Edit it!',
   'ai.erase': 'Erase this',
   'ai.working': 'Working…',
@@ -701,4 +703,6 @@ export const en: Record<string, string> = {
   'voice.help':
     'You can say: brush, pencil, spray, eraser, fill, wand, stamp, a color like red or blue, bigger, smaller, mirror on, mirror off, undo, redo, clear, new frame, play, play my game, preview my app, export my app, export real code, record narration, stop recording, delete narration, stop, save, and help.',
   'voice.unknown': 'Sorry, I didn’t understand. Say “help” to hear what I can do.',
+  'voice.unavailable':
+    'Voice commands are not available in this browser. You can still use every tool by touch, mouse or keyboard.',
 };

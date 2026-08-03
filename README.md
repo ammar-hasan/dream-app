@@ -48,7 +48,8 @@ outside the token blocks.
   (`prefers-color-scheme`). Dark theme is the same tokens remapped under
   `[data-theme='dark']`.
 - **Micro-delight** — sliding workspace-mode pill, styled tooltips
-  (name + shortcut, pure CSS via `data-tooltip`), dialog fade/scale-in,
+  (name + shortcut, pure CSS via `data-tooltip`, anchored beyond scrolling
+  toolbar/rail edges), dialog fade/scale-in,
   a gentle ambient drift behind the canvas, a pulsing splash while the
   last document restores, and a welcome card on the empty canvas. All
   motion is transform/opacity-only and disabled under
@@ -152,8 +153,9 @@ RTL remain first-class product behavior.
   (`ai/voiceCommands.ts`, case-insensitive, filler-tolerant — "um, can you
   please undo?") plus a thin executor (`ui/voiceExecutor.ts`) against a
   minimal store interface. Every command confirms in the status area and,
-  when **voice feedback** is on, out loud. The button hides where
-  SpeechRecognition is unsupported. The vocabulary is **per-locale**: with
+  when **voice feedback** is on, out loud. Without SpeechRecognition the mic
+  remains visible and explains the touch, mouse and keyboard alternatives.
+  The vocabulary is **per-locale**: with
   the UI in Arabic the parser also understands Arabic commands (تراجع،
   إعادة، امسح، إطار جديد، شغّل، أوقف، فرشاة، ممحاة، طابع، العب لعبتي،
   سجّل صوتي، أوقف التسجيل، امسح الصوت،
@@ -611,7 +613,7 @@ library. Encode/decode is pure and codec-agnostic in
 `mcp-server/` is a standalone Node package (not part of the webapp build)
 exposing `.dream` files to agents over stdio MCP: `dream.read_project`,
 `dream.create_project`, `dream.list_layers`, `dream.add_layer`,
-`dream.update_layer`, `dream.remove_layer`, `dream.add_text`,
+`dream.update_layer`, `dream.remove_layer`, `dream.add_stroke`, `dream.add_text`,
 `dream.add_shape`, `dream.render_png` (real PNGs via `@napi-rs/canvas`) and
 `dream.export_app`.
 Setup and client config (Claude Code, Codex) are in

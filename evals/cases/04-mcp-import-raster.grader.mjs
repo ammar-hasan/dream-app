@@ -1,26 +1,26 @@
-/** Grader for a working dream.add_stroke MCP authoring tool. */
+/** Grader for a working dream.import_raster MCP authoring tool. */
 export async function grade(ctx) {
   const reasons = [];
 
-  if (!ctx.grep('mcp-server/src/tools.ts', /export async function addStroke\(/)) {
-    reasons.push('mcp-server/src/tools.ts does not export addStroke');
+  if (!ctx.grep('mcp-server/src/tools.ts', /export async function importRaster\(/)) {
+    reasons.push('mcp-server/src/tools.ts does not export importRaster');
   }
   const index = ctx.read('mcp-server/src/index.ts') ?? '';
-  const mentions = (index.match(/dream\.add_stroke/g) ?? []).length;
+  const mentions = (index.match(/dream\.import_raster/g) ?? []).length;
   if (mentions < 3) {
     reasons.push(
-      `mcp-server/src/index.ts mentions dream.add_stroke ${mentions} time(s) — ` +
+      `mcp-server/src/index.ts mentions dream.import_raster ${mentions} time(s) — ` +
         'expected ≥3 (tool definition, args schema, dispatch)',
     );
   }
-  if (!ctx.grep('mcp-server/README.md', /dream\.add_stroke/)) {
-    reasons.push('mcp-server/README.md does not document dream.add_stroke');
+  if (!ctx.grep('mcp-server/README.md', /dream\.import_raster/)) {
+    reasons.push('mcp-server/README.md does not document dream.import_raster');
   }
-  if (!/addStroke/.test(ctx.read('mcp-server/src/tools.test.ts') ?? '')) {
-    reasons.push('mcp-server/src/tools.test.ts was not updated to cover addStroke');
+  if (!/importRaster/.test(ctx.read('mcp-server/src/tools.test.ts') ?? '')) {
+    reasons.push('mcp-server/src/tools.test.ts was not updated to cover importRaster');
   }
-  if (!ctx.grep('spec/integrations.md', /dream\.add_stroke/)) {
-    reasons.push('the living integration spec does not define dream.add_stroke');
+  if (!ctx.grep('spec/integrations.md', /dream\.import_raster/)) {
+    reasons.push('the living integration spec does not define dream.import_raster');
   }
 
   if (reasons.length > 0) return { pass: false, reasons };
@@ -51,19 +51,18 @@ const os = require('node:os');
 const path = require('node:path');
 (async () => {
   const tools = await import(${JSON.stringify(toolsUrl)});
-  if (typeof tools.addStroke !== 'function') throw new Error('built tools.js has no addStroke export');
+  if (typeof tools.importRaster !== 'function') throw new Error('built tools.js has no importRaster export');
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dream-eval-04-'));
   const file = path.join(dir, 'case.dream');
+  const png = path.join(dir, 'pixel.png');
+  fs.writeFileSync(png, Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAABHNCSVQICAgIfAhkiAAAAAFzUkdCAK7OHOkAAAAUSURBVAiZY6yxevufgYGBgYkBCgAn5wKm8Nhy+QAAAABJRU5ErkJggg==', 'base64'));
   await tools.createProject(file, { width: 64, height: 48 });
-  const result = await tools.addStroke(file, {
-    points: [{ x: 4, y: 5, pressure: 0.25 }, { x: 30, y: 22, pressure: 0.8 }],
-    color: '#00aaff', size: 5, opacity: 0.75
-  });
+  const result = await tools.importRaster(file, { source: png, x: 7, y: 9, name: 'Reference' });
   const doc = await tools.loadProject(file);
   const layer = doc.layers.find((candidate) => candidate.id === result.layerId);
   const op = layer && layer.operations.find((candidate) => candidate.id === result.opId);
-  if (!op || op.kind !== 'stroke' || op.points.length !== 2 || op.color !== '#00aaff') {
-    throw new Error('addStroke did not persist the expected Dream stroke');
+  if (!op || op.kind !== 'image' || result.width !== 2 || result.height !== 2) {
+    throw new Error('importRaster did not persist the expected Dream image');
   }
   console.log('behavioral check OK');
 })().catch((err) => {

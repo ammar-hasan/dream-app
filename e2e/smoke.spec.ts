@@ -56,6 +56,118 @@ test('switching to Design mode reveals the design panels', async ({ page }) => {
   await expect(page.locator('.components-panel')).toBeVisible();
 });
 
+test('tooltips escape the scrolling toolbar and tool rail', async ({ page }) => {
+  await bootApp(page);
+
+  const ai = page.getByRole('button', { name: 'AI helper', exact: true });
+  await ai.hover();
+  await expect
+    .poll(() =>
+      ai.evaluate((element) => {
+        const tip = getComputedStyle(element, '::after');
+        return [tip.content, tip.opacity, tip.position, tip.getPropertyValue('position-area')];
+      }),
+    )
+    .toEqual(['"AI helper (A)"', '1', 'fixed', 'bottom']);
+
+  const brush = page.getByRole('button', { name: 'Brush', exact: true });
+  await brush.hover();
+  await expect
+    .poll(() =>
+      brush.evaluate((element) => {
+        const tip = getComputedStyle(element, '::after');
+        return [tip.content, tip.opacity, tip.position, tip.getPropertyValue('position-area')];
+      }),
+    )
+    .toEqual(['"Brush (B)"', '1', 'fixed', 'center end']);
+});
+
+test('AI Edit explains whole-layer edits and takes the user straight to selection', async ({
+  page,
+}) => {
+  await bootApp(page);
+  await drawStroke(page);
+  await page.getByRole('button', { name: 'AI helper', exact: true }).click();
+  const panel = page.locator('.ai-panel');
+  await panel.getByRole('tab', { name: 'Edit' }).click();
+  await expect(panel).toContainText('Nothing is selected — Edit changes the whole active layer.');
+
+  await panel.getByRole('button', { name: 'Select a part' }).click();
+  await expect(page.getByRole('tab', { name: 'Design' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('button', { name: 'Select', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+
+  const canvas = page.locator('.viewport-canvas');
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('viewport canvas has no box');
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(panel.getByRole('checkbox', { name: 'Selected part only' })).toBeEnabled();
+  await expect(panel.getByRole('checkbox', { name: 'Selected part only' })).toBeChecked();
+  await expect(panel.getByRole('button', { name: 'Select a part' })).toHaveCount(0);
+});
+
+test('voice stays visible without recognition and explains the fallback', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(globalThis, 'SpeechRecognition', {
+      configurable: true,
+      value: undefined,
+    });
+    Object.defineProperty(globalThis, 'webkitSpeechRecognition', {
+      configurable: true,
+      value: undefined,
+    });
+  });
+  await bootApp(page);
+  await page.getByRole('button', { name: 'Voice commands' }).click();
+  await expect(page.getByRole('status')).toContainText(
+    'Voice commands are not available in this browser.',
+  );
+});
+
+test('a spoken story request opens a planned storyboard', async ({ page }) => {
+  await page.addInitScript(() => {
+    class FakeRecognition {
+      lang = '';
+      interimResults = false;
+      continuous = false;
+      onresult: ((event: unknown) => void) | null = null;
+      onerror: ((event: unknown) => void) | null = null;
+      onend: (() => void) | null = null;
+
+      start() {
+        setTimeout(() => {
+          const result = {
+            isFinal: true,
+            0: { transcript: 'make a story about a moon adventure' },
+          };
+          this.onresult?.({ resultIndex: 0, results: { 0: result, length: 1 } });
+          this.onend?.();
+        }, 0);
+      }
+
+      stop() {
+        this.onend?.();
+      }
+    }
+    Object.defineProperty(globalThis, 'SpeechRecognition', {
+      configurable: true,
+      value: FakeRecognition,
+    });
+    Object.defineProperty(globalThis, 'webkitSpeechRecognition', {
+      configurable: true,
+      value: FakeRecognition,
+    });
+  });
+  await bootApp(page);
+  await page.getByRole('button', { name: 'Voice commands' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Make a story' });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole('textbox', { name: 'Frame 1' })).toBeVisible();
+  await expect(dialog).toContainText(/moon/i);
+});
+
 test('tabular science data becomes a grouped scalable plot in one undo', async ({ page }) => {
   await bootApp(page);
   const before = await nonWhitePixels(page);

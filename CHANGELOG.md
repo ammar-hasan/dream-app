@@ -7,6 +7,19 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Interaction truth and discoverability** (slice 44): tooltips now escape
+  scrolling toolbar and rail boundaries; AI Edit explains whole-layer behavior
+  and can enter Design + Select in one action; the global voice mic remains
+  visible when recognition is unavailable and explains the working alternatives.
+  Browser tests cover both tooltip containers, the selection handoff, voice
+  fallback and an actual spoken-story request.
+
+- **Agent freehand authoring** (slice 43): dream-mcp agents can now append
+  ordinary brush, pencil or eraser strokes with bounded geometry, style,
+  optional pressure samples and id/name layer targeting. The same pressure
+  floor, opaque pencil/eraser behavior and active-frame mirroring as the app
+  are covered by real-file and rendered-protocol tests.
+
 - **Truthful AI provider state** (slice 42): choosing a new own-AI provider
   now stays visibly selected while setup is incomplete, blocks creation until
   Save, and explains the required next step. Switching back to a previously

@@ -145,11 +145,13 @@ are roughly ordered by dependency, not by a fixed schedule.
   filler-tolerant) + thin executor in `ui/voiceExecutor.ts` against a minimal
   store interface; feedback is shown in the toolbar and spoken aloud when
   voice feedback is on (default in kid mode, toggleable for adults).
-- ✅ Graceful degradation: the mic button hides where SpeechRecognition is
-  unsupported, and mic-permission denial gets a friendly message.
-- Deviation: the command vocabulary is English-only for now — the parser is
-  deliberately a dumb keyword matcher, so localized vocabularies can be
-  added per locale later without touching the executor.
+- ✅ Graceful degradation: the global mic stays discoverable where
+  SpeechRecognition is unsupported and explains the touch/mouse/keyboard
+  fallback; mic-permission denial gets a friendly message.
+- ✅ Localized command vocabularies now cover English, Arabic, Persian,
+  Simplified Chinese, Brazilian Portuguese and Russian. The forgiving parser
+  remains deliberately bounded and locale-aware; conversational clarification
+  and reference resolution are still future depth.
 
 ## Slice 9 — Kid mode ✅
 
@@ -349,7 +351,7 @@ MCP in her development flow and APIs in her applications.
   `npm run check` never touches it; `npm run check:mcp` and a separate CI job
   cover it). Tools: `dream.read_project`, `dream.create_project`,
   `dream.list_layers`, `dream.add_layer`, `dream.update_layer`,
-  `dream.remove_layer`, `dream.add_text`, `dream.add_shape`,
+  `dream.remove_layer`, `dream.add_stroke`, `dream.add_text`, `dream.add_shape`,
   `dream.render_png`, `dream.export_app`. The server
   compiles the REAL engine in from
   `src/engine` (no reimplementation); rendering and PNG payloads run on
@@ -369,8 +371,8 @@ MCP in her development flow and APIs in her applications.
   round-trips (true of browser canvases too); opaque pixels round-trip
   exactly.
 - Future: remote MCP (HTTP transport), websocket collaboration on a shared
-  document, a plugin API (custom tools/panels), more MCP tools (freehand
-  strokes, raster import, component library access, AI edits).
+  document, a plugin API (custom tools/panels), more MCP tools (raster import,
+  component library access, AI edits).
 
 ## Slice 16 — Research quick wins: stamps, comfort mode, Arabic voice ✅
 
@@ -1020,8 +1022,7 @@ not merely append more content whenever a draft changes.
   validation, ordering, deletion and animated write-through; its demo and live
   MCP surface exercise the shipped tools.
 - ✅ The completed remove-layer agent eval advanced to the next missing
-  freehand-stroke authoring task, so its deterministic grader still fails the
-  current tree honestly.
+  freehand-stroke authoring task before this slice began.
 - Acceptance met locally: create a project, add a draft and scratch layer,
   configure/reorder the draft, remove the scratch layer, reopen/render the same
   project and retain one protected base layer.
@@ -1043,3 +1044,61 @@ prompt before spending time, a free try or API credit.
   without persisting the test key in the repository.
 - Acceptance met: the visible provider and guidance match the next Create
   action, and an unfinished connection can never fall through to offline art.
+
+## Slice 43 — Agent freehand authoring ✅
+
+Persona need: let Maria's agent sketch and revise ordinary drawn paths instead
+of being limited to geometric shapes and text.
+
+- ✅ `dream.add_stroke` appends brush, pencil or eraser marks to the top active
+  layer or an exact id/name target using 2–10,000 finite ordered samples.
+- ✅ Optional pressure samples use the same bounded width multipliers as pen
+  input. Color, size and opacity are validated before any write; pencil and
+  eraser remain fully opaque like their human-operated equivalents.
+- ✅ Animated documents keep the active-frame mirror coherent and return the
+  operation id plus stable layer facts for the agent's next action.
+- ✅ Real-file tests cover pressure, defaults, id/name targeting, tool semantics,
+  every invalid input class and animation. The example and live MCP protocol
+  render the authored path into a real PNG.
+- Acceptance met: an agent creates, reopens and renders a portable freehand
+  mark while malformed or oversized input leaves the project unchanged.
+
+## Slice 44 — Interaction truth and discoverability 🚧
+
+Persona need: let every creator understand available actions and prerequisites
+at the point of use, independent of prior product knowledge or browser support.
+
+- ✅ Styled tooltips escape scrolling toolbar and rail boundaries instead of
+  becoming fully opaque while remaining physically clipped.
+- ✅ AI Edit states that no selection means a whole-layer edit and offers one
+  direct **Select a part** action that enters Design with Select active.
+- ✅ The global voice mic remains visible without speech recognition and
+  explains the working touch, mouse and keyboard paths.
+- ✅ Production-browser coverage proves toolbar/rail tooltip state, the complete
+  selection handoff, unavailable voice feedback and a successful spoken story.
+- ✅ Local release gates are green: main checks, 97.74% engine coverage,
+  42 browser journeys, 24 MCP tests, four honest agent evals and both MCP
+  core/protocol round-trips.
+- ⏳ Deployed-main verification remains before completion.
+
+## Strict 10/10 priority sequence
+
+The next slices are ranked against the personas' latent jobs, not by adding the
+largest count of controls:
+
+1. **Direct-manipulation foundation:** complete cursor semantics, hover/hit
+   feedback, drag ghosts, valid/invalid targets, post-drop selection and
+   consistent progress/cancellation.
+2. **Conversational phone-first creation:** natural clarification and reference
+   handling for voice, a task-prioritized mobile shell, and a faithful safe
+   creation path that does not require a child or low-literacy user to configure
+   an AI provider.
+3. **Professional substrate:** non-destructive masks/adjustments and blend/color
+   foundations, then vector paths, typography, grids, constraints and linked
+   reusable systems—Design-only, preserving Draw's first-minute simplicity.
+4. **Outcome-grade delivery:** publication preflight for scientific figures,
+   professional brand/print export, and short-video audio/caption/safe-zone
+   control.
+5. **Agent completeness:** typed structured MCP results, side-effect annotations,
+   resources/prompts and remaining content operations; public registry release
+   still requires explicit approval.

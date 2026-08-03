@@ -115,6 +115,9 @@ Text `#0f141f` / `#ffffff`, dim text `#454d61` / `#ccd4e8`, borders
    hover, score pops float and fade (800 ms), bad hits shake (320 ms).
 5. Presentation and exported-app transitions: 220–250 ms, fade or
    horizontal slide (±4% / full-width respectively).
+6. Adult tooltips reveal after a short hover or keyboard focus, use the
+   tooltip color tokens, and remain fully visible beyond any scrolling toolbar,
+   rail or panel boundary. Little Dreamer uses spoken names instead.
 
 ## Video captions
 

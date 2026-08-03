@@ -20,6 +20,7 @@ import type { FillOp, StrokeOp } from '../../src/engine/types';
 import {
   addLayer,
   addShape,
+  addStroke,
   addText,
   createProject,
   exportApp,
@@ -245,6 +246,113 @@ describe('dream-mcp tools', () => {
     activeFrame = doc.frames?.find((frame) => frame.id === doc.activeFrameId);
     expect(doc.layers).toEqual(activeFrame?.layers);
     expect(doc.layers).toHaveLength(1);
+  });
+
+  it('add_stroke persists an ordinary pressure-sensitive brush stroke', async () => {
+    const strokePath = join(dir, 'stroke.dream');
+    await createProject(strokePath, { width: 80, height: 60 });
+
+    const result = await addStroke(strokePath, {
+      points: [
+        { x: 4, y: 5, pressure: 0.25 },
+        { x: 30, y: 22, pressure: 0.8 },
+      ],
+      color: '#0af',
+      size: 5,
+      opacity: 0.75,
+    });
+    const doc = await loadProject(strokePath);
+    const layer = doc.layers.find((candidate) => candidate.id === result.layerId);
+    expect(result.layerName).toBe('Layer 1');
+    expect(layer?.operations.find((candidate) => candidate.id === result.opId)).toMatchObject({
+      kind: 'stroke',
+      tool: 'brush',
+      points: [
+        { x: 4, y: 5 },
+        { x: 30, y: 22 },
+      ],
+      widths: [0.25, 0.8],
+      color: '#00aaff',
+      size: 5,
+      opacity: 0.75,
+    });
+  });
+
+  it('add_stroke targets layers by id or name and preserves tool opacity semantics', async () => {
+    const strokePath = join(dir, 'stroke-targets.dream');
+    await createProject(strokePath, { width: 80, height: 60 });
+    const ink = await addLayer(strokePath, { name: 'Ink' });
+    const points = [
+      { x: 1, y: 2 },
+      { x: 8, y: 9 },
+    ];
+
+    const pencil = await addStroke(strokePath, {
+      points,
+      tool: 'pencil',
+      opacity: 0.2,
+      layer: 'Layer 1',
+    });
+    const eraser = await addStroke(strokePath, { points, tool: 'eraser', layer: ink.layerId });
+    const doc = await loadProject(strokePath);
+    expect(doc.layers[0].operations.find((op) => op.id === pencil.opId)).toMatchObject({
+      tool: 'pencil',
+      opacity: 1,
+    });
+    expect(doc.layers[1].operations.find((op) => op.id === eraser.opId)).toMatchObject({
+      tool: 'eraser',
+      opacity: 1,
+    });
+  });
+
+  it('add_stroke validates every input class before writing', async () => {
+    const strokePath = join(dir, 'stroke-errors.dream');
+    await createProject(strokePath, { width: 80, height: 60 });
+    const points = [
+      { x: 1, y: 2 },
+      { x: 8, y: 9 },
+    ];
+
+    await expect(addStroke(strokePath, { points: [points[0]!] })).rejects.toThrow('at least 2');
+    await expect(
+      addStroke(strokePath, { points: Array.from({ length: 10_001 }, () => points[0]!) }),
+    ).rejects.toThrow('at most 10000');
+    await expect(
+      addStroke(strokePath, { points: [points[0]!, { x: Number.NaN, y: 3 }] }),
+    ).rejects.toThrow('coordinates must be finite');
+    await expect(
+      addStroke(strokePath, { points: [points[0]!, { x: 3, y: 4, pressure: 1.1 }] }),
+    ).rejects.toThrow('pressure must be between 0 and 1');
+    await expect(addStroke(strokePath, { points, tool: 'spray' as 'brush' })).rejects.toThrow(
+      'Invalid stroke tool',
+    );
+    await expect(addStroke(strokePath, { points, color: 'red' })).rejects.toThrow('Invalid color');
+    await expect(addStroke(strokePath, { points, size: 0 })).rejects.toThrow('greater than 0');
+    await expect(addStroke(strokePath, { points, size: 8193 })).rejects.toThrow('at most 8192');
+    await expect(addStroke(strokePath, { points, opacity: -0.1 })).rejects.toThrow(
+      'between 0 and 1',
+    );
+    await expect(addStroke(strokePath, { points, layer: 'missing' })).rejects.toThrow(
+      'No layer with id or name "missing"',
+    );
+    expect((await loadProject(strokePath)).layers[0].operations).toHaveLength(0);
+  });
+
+  it('add_stroke writes through to the animated active-frame mirror', async () => {
+    const strokePath = join(dir, 'stroke-animated.dream');
+    await createProject(strokePath, { width: 80, height: 60 });
+    await saveProject(strokePath, enableAnimation(await loadProject(strokePath)));
+
+    await addStroke(strokePath, {
+      points: [
+        { x: 2, y: 3 },
+        { x: 12, y: 14 },
+      ],
+    });
+    const doc = await loadProject(strokePath);
+    const activeFrame = doc.frames?.find((frame) => frame.id === doc.activeFrameId);
+    expect(doc.layers).toEqual(activeFrame?.layers);
+    expect(doc.layers[0].operations[0]).toMatchObject({ kind: 'stroke', tool: 'brush' });
   });
 
   it('add_shape appends a normalized shape to a named layer', async () => {

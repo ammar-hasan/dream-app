@@ -21,12 +21,16 @@ together on screen.
 - **Top toolbar, left to right:** the Dream mark + "Dream" title + document
   name (a `•` while unsaved) · New, Open, Save, Import, Resize, Export ·
   the **workspace switch** (Draw / Design / Play / Present, a sliding
-  pill) · Animate toggle · Story · AI sparkle · voice mic (only where speech
-  recognition exists) · Undo, Redo · kid-mode star · settings gear.
+  pill) · Animate toggle · Story · AI sparkle · voice mic · Undo, Redo ·
+  kid-mode star · settings gear. Where speech recognition is unavailable,
+  the mic remains discoverable and explains the touch, mouse and keyboard
+  paths instead of disappearing.
 - **Left tool rail (in order):** Select*, Lasso*, Link*, Move, Brush,
   Pencil, Spray, Eraser, Line, Rectangle, Ellipse, Fill, Magic wand,
   Stamps, Color picker, Text, Crop, Pan, Zoom. (*Design mode only.) Every
-  button has a styled tooltip with its name and shortcut.
+  button has a styled tooltip with its name and shortcut. Tooltips float
+  beyond scrolling toolbar and rail boundaries rather than being clipped by
+  them.
 - **Right panel:** tool options, plus per mode (matrix below).
 - **Bottom:** the timeline bar (when frames exist) and the status bar
   (pointer x,y · document size · active tool · zoom %).

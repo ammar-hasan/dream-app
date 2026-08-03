@@ -81,6 +81,13 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
   const selectionRegion = editRegionForSelection(doc, layer, selection);
   const canEditSelection = selectionRegion !== null;
 
+  const startSelecting = () => {
+    const store = useDreamStore.getState();
+    store.setMode('design');
+    store.setTool('select');
+    setSelectedOnly(true);
+  };
+
   // Hand the registry browser image codecs; rebuild persisted BYOK providers
   // so generation and inpainting keep working after a reload.
   useEffect(() => {
@@ -342,7 +349,7 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
             />
             <DictateButton onText={setEditPrompt} disabled={busy !== null} />
           </div>
-          <label className="checkbox-field option-row" title={t('ai.selectedOnlyTitle')}>
+          <label className="checkbox-field option-row" data-tooltip={t('ai.selectedOnlyTitle')}>
             <input
               type="checkbox"
               checked={selectedOnly && canEditSelection}
@@ -351,7 +358,19 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
             />
             {t('ai.selectedOnly')}
           </label>
-          {!canEditSelection && <p className="ai-note">{t('ai.editTip')}</p>}
+          {!canEditSelection && (
+            <>
+              <p className="ai-note">{t('ai.editTip')}</p>
+              <button
+                type="button"
+                className="btn ai-select-part"
+                data-tooltip={t('ai.selectPartTitle')}
+                onClick={startSelecting}
+              >
+                {t('ai.selectPart')}
+              </button>
+            </>
+          )}
           <button
             type="button"
             className="btn primary ai-go"

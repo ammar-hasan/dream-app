@@ -267,8 +267,10 @@ holds.
     those appear as undo steps — but frame add/duplicate/delete/reorder do.
 93. GIVEN a project saved in Play or Present mode WHEN reopened THEN it
     opens in Draw.
-94. GIVEN a hidden feature (no speech recognition, no audio, no
-    recorder) THEN its button simply isn't there — never an error.
+94. GIVEN no speech recognition THEN the global voice button remains visible
+    and explains that touch, mouse and keyboard still work; prompt-only
+    dictation controls hide because their text field is the visible fallback.
+    GIVEN no audio recorder THEN the narration button simply isn't there.
 95. GIVEN reduced-motion OS preference THEN every animation and
     transition in the app and its exports is effectively instant.
 96. GIVEN the dark theme THEN every surface, panel, dialog and tooltip
@@ -527,6 +529,18 @@ holds.
       next step says to Save; WHEN a saved provider is chosen again THEN it
       becomes active immediately, while the free provider identifies itself
       as a bounded offline scene maker rather than open-ended generation.
+160.  GIVEN an agent supplies 2–10,000 finite points WHEN it adds a brush,
+      pencil or eraser stroke to the top active layer or a layer targeted by id
+      or name THEN the ordinary stroke, normalized color, size, opacity and
+      optional pressure widths persist in the active frame and mirrored stack;
+      invalid counts, samples, pressure, style or target change nothing.
+161.  GIVEN an adult hovers or keyboard-focuses a named control inside a
+      scrolling toolbar or tool rail THEN its styled tooltip becomes fully
+      visible beyond that container rather than being clipped at its edge.
+162.  GIVEN AI Edit has no selection THEN it says that Edit affects the whole
+      active layer; WHEN Select a part is chosen THEN Design opens with Select
+      active, and clicking an object or dragging a marquee enables selected-only
+      editing without closing the assistant.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 
@@ -552,8 +566,8 @@ holds.
    chemical subscripts and symbols → export a scalable SVG → duplicate frames
    to animate the result → link explanatory screens into an app.
 8. **Maria (32):** switch to Português (Brasil) → export `.dream` → agent reads
-   it, adds/configures/reorders a layer, removes a scratch layer, adds a shape
-   and text, renders a PNG, exports the app HTML via the dream-mcp tools →
+   it, adds/configures/reorders a layer, removes a scratch layer, draws a
+   pressure stroke, adds a shape and text, renders a PNG, exports the app HTML via the dream-mcp tools →
    re-import the `.dream` unchanged elsewhere.
 9. **Aleksandr (25):** switch to Русский → keyboard-only: tool keys, marquee,
    snap-align, Cmd+D, nudge, group — a full layout without touching the mouse.

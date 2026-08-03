@@ -447,7 +447,9 @@ export const zh: Record<string, string> = {
   'ai.editPlaceholder': '让它更暖、更柔和…',
   'ai.selectedOnly': '仅限选中部分',
   'ai.selectedOnlyTitle': '使用设计模式的选区框',
-  'ai.editTip': '提示：在设计模式下用选择工具选中一部分以只编辑该部位。',
+  'ai.editTip': '尚未选择局部——“编辑”会更改整个活动图层。',
+  'ai.selectPart': '选择一个局部',
+  'ai.selectPartTitle': '切换到设计模式和选择工具；单击对象或拖框圈选',
   'ai.editIt': '编辑它！',
   'ai.erase': '擦掉这个',
   'ai.working': '处理中…',
@@ -683,4 +685,5 @@ export const zh: Record<string, string> = {
   'voice.help':
     '你可以说：画笔、铅笔、喷枪、橡皮擦、填充、魔棒、印章、红色或蓝色、变大、变小、打开镜像、关闭镜像、撤销、重做、清空、新建帧、播放、玩我的游戏、预览应用、导出应用、导出代码、录制旁白、停止录音、删除旁白、停止、保存和帮助。',
   'voice.unknown': '抱歉，我没听懂。说“帮助”可以听听我会做什么。',
+  'voice.unavailable': '此浏览器无法使用语音命令。你仍可通过触摸、鼠标或键盘使用所有工具。',
 };

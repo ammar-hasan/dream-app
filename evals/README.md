@@ -33,12 +33,12 @@ the feature has since shipped for real and the eval should be retired.
 
 ## The cases
 
-| Case                 | Task                                | Exercises                                   |
-| -------------------- | ----------------------------------- | ------------------------------------------- |
-| `01-filter-preset`   | Add a "Sunset" filter preset        | engine data + i18n parity + test update     |
-| `02-voice-zoom`      | "zoom in / zoom out" voice commands | pure parser + executor + en/ar vocabularies |
-| `03-game-hero-speed` | A `heroSpeed` Catch! setting        | document model + game core + store + panel  |
-| `04-mcp-add-stroke`  | A `dream.add_stroke` MCP tool       | standalone package: core + wiring + docs    |
+| Case                   | Task                                | Exercises                                   |
+| ---------------------- | ----------------------------------- | ------------------------------------------- |
+| `01-filter-preset`     | Add a "Sunset" filter preset        | engine data + i18n parity + test update     |
+| `02-voice-zoom`        | "zoom in / zoom out" voice commands | pure parser + executor + en/ar vocabularies |
+| `03-game-hero-speed`   | A `heroSpeed` Catch! setting        | document model + game core + store + panel  |
+| `04-mcp-import-raster` | A `dream.import_raster` MCP tool    | standalone package: binary input + protocol |
 
 ## Add an eval
 

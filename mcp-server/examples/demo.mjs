@@ -1,7 +1,7 @@
 /**
  * End-to-end demo of the dream-mcp tool cores (no MCP client needed):
- * creates a .dream project in a tmp dir, adds text, reads the summary back
- * and renders a flattened PNG. Run after `npm run build`:
+ * creates a .dream project in a tmp dir, adds vector marks and text, reads the
+ * summary back and renders a flattened PNG. Run after `npm run build`:
  *
  *   node examples/demo.mjs
  */
@@ -12,6 +12,7 @@ import { join } from 'node:path';
 import {
   addLayer,
   addShape,
+  addStroke,
   addText,
   createProject,
   readProject,
@@ -58,7 +59,22 @@ console.log(
   }),
 );
 
-console.log('\n6) dream.add_text');
+console.log('\n6) dream.add_stroke');
+console.log(
+  await addStroke(project, {
+    points: [
+      { x: 38, y: 128, pressure: 0.35 },
+      { x: 72, y: 148, pressure: 0.65 },
+      { x: 122, y: 112, pressure: 1 },
+    ],
+    color: '#ffb86b',
+    size: 8,
+    opacity: 0.9,
+    layer: 'Agent artwork',
+  }),
+);
+
+console.log('\n7) dream.add_text');
 console.log(
   await addText(project, {
     text: 'Made by an agent via MCP',
@@ -70,10 +86,10 @@ console.log(
   }),
 );
 
-console.log('\n7) dream.read_project');
+console.log('\n8) dream.read_project');
 console.log(await readProject(project));
 
-console.log('\n8) dream.render_png');
+console.log('\n9) dream.render_png');
 console.log(await renderPng(project, join(dir, 'hello-agent.png')));
 
 console.log(`\nDemo artifacts in ${dir}`);

@@ -6,47 +6,65 @@ not merely the presence of a named control.
 
 ## Executive verdict
 
-- **Living-spec parity: PASS — zero known behavior delta.** The complete
-  product spec was checked against the shipping behavior, data contracts,
-  interaction map and test surface. Gaps found during the audit were corrected:
-  presentation behavior was added across the feature, experience, schema and
-  acceptance contracts; the AI storage contract now includes the edits model;
-  narration is named as outside undo; and `.dream` forward compatibility now
-  distinguishes document content from disposable envelope extensions.
-- **Persona readiness: 7 of 10 fully ready, 3 partially ready.** Dream already
-  gives every persona a credible path, but the universal “anyone” promise is
-  stricter than a feature checklist. The largest gaps are broader professional
-  art/design depth and a publicly installable agent surface.
-- **Principal UX verdict: strong product architecture, incomplete universal
-  usability.** Progressive disclosure, local-first trust and universal undo are
-  excellent foundations. The phone timeline and presenter privacy now follow
-  their users' real tasks; mobile top-bar density, uneven voice reach and
-  advanced-workflow discoverability still keep the experience from fully
-  serving the stated 5-to-95, literacy-optional ambition today.
+- **10/10 persona readiness: 0 of 10.** Dream provides credible end-to-end
+  outcomes for every persona, but “the example task can be completed” is not a
+  10/10 standard. The stricter bar includes the underlying job, expected quality,
+  constraints, emotional need, recovery, and delivery into the person's real
+  next context.
+- **Contract parity: provisional, not self-certifying.** The previous audit
+  called parity complete while deployed tooltips were clipped, AI selection was
+  discoverable only through prior mode knowledge, and the voice contract
+  contradicted the product's no-dead-ends rule. Those gaps are corrected in the
+  current release candidate and covered in a production-browser gate; parity is
+  claimed only after the full release gates and deployed proof pass.
+- **Principal UX verdict: the architecture is strong; interaction quality and
+  professional depth are not yet universal.** Progressive disclosure,
+  local-first trust and exact undo are excellent foundations. Natural voice,
+  phone-first control density, direct-manipulation feedback, non-destructive
+  professional editing and outcome-grade export remain the largest gaps.
 
 ## Evidence and method
 
-The audit covered the entire living spec (vision, concepts, interaction map,
-all feature areas, visual identity, integrations, all data contracts and all
-159 acceptance criteria), the product roadmap/research backlog, the automated
-test inventory, and rendered desktop and phone states. A persona passes only
-when their intended outcome is realistically achievable end to end with a
-suitable input method and usable output—not when an adjacent feature exists.
+The audit covers the entire product idea, living spec, product roadmap,
+automated test inventory, and rendered desktop and phone states. It also
+benchmarks the personas' real contexts against current accessibility,
+professional art/design, scientific-publishing, agent-protocol and short-video
+expectations. A score is earned only when five layers hold together:
 
-## Persona readiness
+1. **Functional job:** the literal outcome can be completed end to end.
+2. **Human constraint:** age, literacy, language, input device, connectivity and
+   confidence are respected without a helper.
+3. **Quality bar:** the result is credible in the person's real professional,
+   educational, client or advocacy context.
+4. **Control and trust:** state is visible, errors are recoverable, long work
+   explains its progress, and export does not surprise.
+5. **Emotional outcome:** the person feels capable and expressive—not patronized,
+   blocked by jargon or forced into a workflow built for somebody else.
 
-| Persona       | What works now                                                                                                                                                     | Strict gap                                                                                                                                                                               | Verdict   |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| Zainab, 5     | Little Dreamer mode, large visual tools, spoken names, starter scenes, four gentle games, and spoken-story → reviewed, read-aloud animation                        | No blocking gap for her stated cute-animation-and-game outcome: dictation plans automatically, actions speak their names and one confirmation creates the complete recoverable story     | **Ready** |
-| Victor, 85    | Comfort mode, stronger contrast, 44 px targets, plain drawing, undo, autosave/reopen and reduced motion                                                            | No blocking outcome gap for his stated goal; the adult toolbar remains dense, but Draw plus comfort mode provides a complete imagination-to-saved-canvas journey                         | **Ready** |
-| Ali, 30       | Four transparent brush presets, stylus pressure, layers, image import, filters, crop/resize, selection masks, generative editing and lossless PNG/JPEG             | Professional art depth remains thin: no tilt, custom brush engine, blend modes, non-destructive masks/adjustments or color-management workflow                                           | Partial   |
-| Fatima, 21    | Complete Persian RTL UI, Iranian Persian speech/commands/story planning, a directional broad calligraphy nib, stylus pressure, symmetry and Persian-script text    | No blocking gap for her stated calligraphy-exploration outcome: mouse, touch or pen can make authentic thick/thin marks, mirrored work remains one-step recoverable and PNG preserves it | **Ready** |
-| George, 45    | Spoken labels, forgiving English voice, story-to-reviewed-animation, read-aloud moments, narration, saving and games on touch devices                              | No blocking gap for his stated spoken-animation outcome. On a phone he sees one timeline job at a time and can create, review, play, narrate and save without assembling frames by hand  | **Ready** |
-| Sara, 15      | Design mode, selection, snapping, align/distribute, groups, reusable components, honest SVG and one-ZIP multi-size brand delivery                                  | No blocking gap for her stated freelance-logo outcome: she can construct, reuse, align and hand off source/large/small PNGs plus scalable SVG in one action; PDF remains optional depth  | **Ready** |
-| Zǐxuān, 28    | Complete Simplified Chinese UI/voice/story/game language; native data plots, scientific notation/connectors, precise layout, scalable SVG, animation and app links | No blocking gap for his stated science-image/animation/app outcome: he can create and deliver the complete journey in Chinese; structure drawing and statistics remain specialist depth  | **Ready** |
-| Maria, 32     | Complete Portuguese journey; portable `.dream`; stable engine; local MCP read/render/export, shape/text authoring and safe layer management                        | The MCP package is registry-ready but not publicly installable; agent editing still lacks strokes, raster import, links, components and AI edits                                         | Partial   |
-| Aleksandr, 25 | Complete Russian UI/voice/story/game language; keyboard shortcuts, selection/layout tools, components, layers, reusable assets and one-ZIP batch delivery          | Productivity stops short of a broad professional design tool: no vector paths, symbols/linked components, constraints, grids or extensibility                                            | Partial   |
-| Ahmed, 42     | Draw-to-animation, narration, shaped/trimmed WebM or native MP4, burned-in captions, presentations, private links and offline app files                            | No blocking gap for his stated draw → animate → social-video outcome; direct platform publishing could shorten delivery but is not required to produce and share the finished video      | **Ready** |
+A 10/10 means the person would choose Dream for this job, finish without hidden
+workarounds, trust the result, and enthusiastically recommend it to someone with
+the same need.
+
+## Persona 10/10 evaluation
+
+Scores describe today's release candidate against the latent 10/10 job, not
+against the much smaller question “does a related feature exist?”
+
+| Persona       | Underlying intent and 10/10 expectation                                                                                                                                                           | Current strengths                                                                                       | What prevents a 10/10                                                                                                                                                                                         | Score |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----: |
+| Zainab, 5     | Feel creative and powerful without reading or adult help: talk naturally, see a safe delightful story with consistent characters, change it, play it immediately, and recover every accident.     | Little Dreamer, spoken names, reviewed voice story, starters, four games, one-step Undo.                | Voice is still command-shaped and browser-dependent; the offline painter cannot faithfully create arbitrary characters; no child-safety/guardian controls or real-child validation.                           |   5.5 |
+| Victor, 85    | Express an idea with dignity and confidence despite possible vision, tremor or memory limits; never fear losing work or wonder what mode/tool is active.                                          | Comfort mode, contrast, 44 px targets, reduced motion, autosave, exact Undo.                            | Comfort is hidden behind Settings; the adult shell is dense; no tremor stabilization, guided first journey, persistent task orientation, or manual assistive-technology proof.                                |   5.5 |
+| Ali, 30       | Preserve the feel of real media while gaining digital control, speed and production trust: expressive input, deep brushes, non-destructive experimentation, calibrated color and reliable output. | Pressure, calligraphy, presets, layers, raster editing, selection, AI edits, PNG/JPEG.                  | No tilt/azimuth, stabilization, custom brush dynamics, blend modes, masks, adjustment layers, color profiles, soft proofing, large-canvas performance proof or professional interchange.                      |   4.0 |
+| Fatima, 21    | Explore calligraphy authentically in her own language and direction, controlling the nib and composition precisely while keeping work suitable for high-quality sharing or print.                 | Persian RTL, regional speech, broad nib, pressure, symmetry, Persian text, scalable native marks.       | Fixed nib angle, no pen tilt/rotation, path refinement, calligraphic guides, OpenType/font controls, custom brush creation, print color or high-resolution publication workflow.                              |   5.0 |
+| George, 45    | Turn a feeling into an understandable moving story on a new phone with little reading, weak technical vocabulary and minimal setup; share it confidently with family.                             | Spoken labels, story planning, narration, games, touch, offline shell, recoverable creation.            | Natural conversation stops at bounded intents; adult mobile navigation and export remain text-heavy; speech availability, generated visual fidelity and sharing handoff are not resilient enough.             |   4.0 |
+| Sara, 15      | Earn trust and income: create a distinctive logo quickly, revise it from client feedback, keep typography/colors precise, and deliver every professional file without embarrassment.              | Selection/layout, components, layers, honest SVG and one-click multi-size brand pack.                   | No vector-node editing, typography depth, transparent-background workflow, grids, brand colors/tokens, variants, PDF/print/CMYK delivery or client-review loop.                                               |   5.0 |
+| Zǐxuān, 28    | Communicate science accurately and publishably: preserve data integrity, build editable accessible figures/animations, use domain notation, and meet journal/export requirements.                 | Native grouped plots, scientific text/connectors, SVG, animation, app links, Chinese journey.           | No units/error bars/log scales/fits, chemical structures, color-blind palette checks, scale bars, provenance, image-integrity record, editable PDF/EPS, DPI/physical sizing or publication preflight.         |   4.0 |
+| Maria, 32     | Let agents reliably read, create, revise, render and ship real design assets inside coding workflows with typed contracts, transparent side effects and easy installation.                        | Portable `.dream`, stable engine, local MCP tools for read/render/export, layers, strokes, shapes/text. | Package not publicly installable; no raster/AI/link/component authoring, resources/prompts, output schemas, side-effect annotations, progress/cancellation, remote API/SDK or complete round-trip eval.       |   3.5 |
+| Aleksandr, 25 | Move at professional thought speed: direct manipulation, precise inspectors, reusable systems, responsive layout, powerful shortcuts, extensibility and polished handoff without tool friction.   | Keyboard workflows, snapping/alignment, groups/components, layers, localized UI, batch delivery.        | No vector paths, auto layout/constraints, variables/tokens, linked components/variants, grids/rulers, multi-page organization, extensibility, inspector depth or complete mouse/drag state feedback.          |   3.5 |
+| Ahmed, 42     | Turn testimony into emotionally compelling, legible, platform-ready short video while protecting authorial intent and sharing quickly from constrained devices.                                   | Flipbook, narration, captions, shaped WebM/MP4, trimming, presentation and private/offline sharing.     | No audio mix/music, caption timing/styles, scene-duration timeline, transitions for video, safe-zone preview, compression/size target, direct share/upload, thumbnail/cover workflow or long-project editing. |   5.0 |
+
+The average is **4.6/10**. That is not a dismissal of the shipped breadth; it
+is a refusal to confuse breadth with completion.
 
 ## Principal UX review
 
@@ -145,6 +163,22 @@ suitable input method and usable output—not when an adjacent feature exists.
     stays visibly pending until Save and disables creation, while returning to
     an already configured provider takes effect immediately. A prompt can no
     longer appear to target one provider while another silently handles it.
+23. **Agent drawing should remain ordinary Dream drawing.** Freehand authoring
+    persists the same bounded points, pressure widths, colors and opacity rules
+    as direct pen input. It adds no agent-only visual primitive, and malformed
+    paths fail before changing the portable project.
+24. **Discoverability must be rendered, not inferred from markup.** The tooltip
+    audit found labels reaching their visible CSS state while scrolling parents
+    clipped every pixel. Tooltips now escape toolbar and rail boundaries, and a
+    browser gate checks the actual anchored state.
+25. **A cross-mode prerequisite needs a direct route.** AI Edit now distinguishes
+    whole-layer behavior from selected-part behavior and can enter Design +
+    Select in one action. The user no longer has to reverse-engineer two modes
+    before using a checkbox already in front of them.
+26. **Voice cannot silently cease to exist.** The global mic stays visible when
+    recognition is absent, explains the remaining input paths and can speak that
+    explanation in Little Dreamer. A browser test proves both unavailable and
+    successful spoken-story paths.
 
 ### What does not yet fully serve the purpose
 
@@ -170,15 +204,48 @@ suitable input method and usable output—not when an adjacent feature exists.
    Small numeric tables now become publication-shaped native plots, but Dream
    deliberately does not run statistical tests, infer missing values, import
    specialist project files or draw chemical structures from notation.
+6. **Voice is broad but not yet conversational.** Natural phrasing works around
+   a bounded intent grammar; multi-turn clarification, reference resolution
+   (“make it bigger”), correction and offline recognition are not present.
+7. **Direct manipulation lacks one coherent feedback grammar.** The canvas has
+   basic crosshair/text/move/grab cursors and live drawing previews, but hover
+   hit feedback, open/closed-hand panning, resize/rotate cursors, valid/invalid
+   drop targets, drag ghosts and post-drop selection are uneven.
+8. **Long work often changes a button label instead of explaining progress.**
+   Story creation and video export have useful step counts, but image generation,
+   edits, provider tests, project loading and code generation need consistent
+   determinate progress where known, indeterminate activity where not, cancel
+   where safe, and meaningful partial-state placeholders.
+9. **Tactile feedback is absent.** On supported touch devices, sparse optional
+   haptics could reinforce snapping, a successful drop, destructive refusal and
+   game collisions. They must remain causal, never continuous while drawing,
+   and always accompany visible feedback.
+10. **Professional outcomes need professional substrate, not isolated tools.**
+    Non-destructive masks/adjustments, vector paths, typography/color systems,
+    publication preflight and richer agent schemas unlock several personas at
+    once; adding more decorative presets does not.
 
 ## Recommended order
 
-1. Publish the prepared MCP package only with explicit approval, then deepen
-   authoring tools in the order real agent workflows require.
-2. Validate the now-complete language journeys with native speakers and test
-   the highest-risk screen-reader and switch-control paths with real users.
-3. Add further professional depth only where repeated persona workflows justify
-   its cost in first-minute simplicity.
+1. **P0 — truth and control:** deploy the tooltip, selection and visible voice
+   fixes; keep real-browser gates for every reported failure.
+2. **P1 — Zainab + George:** make the phone shell task-first and voice genuinely
+   conversational, with visible clarification and a faithful child-safe creation
+   path that does not require BYOK setup.
+3. **P1 — interaction foundation:** complete cursor semantics, hover/hit feedback,
+   drag previews and drop targets; make long tasks explain progress and support
+   safe cancellation; add sparse optional haptics only after visual behavior is
+   exact.
+4. **P1 — professional substrate:** non-destructive masks/adjustments, blend and
+   color foundations, vector paths, typography, grids/constraints and linked
+   reusable systems—progressively disclosed in Design, never added to Draw.
+5. **P1 — outcome delivery:** publication-grade scientific export and integrity,
+   professional brand/print delivery, and a short-video audio/caption/safe-zone
+   workflow.
+6. **P1 — Maria:** finish typed MCP coverage, structured outputs and side-effect
+   annotations; publish the prepared package only after explicit approval.
+7. Validate language, child, older-adult, screen-reader, switch-control and pen
+   journeys with representative real users. Automated checks remain the floor.
 
 This audit is a release decision aid, not part of the product specification.
 It may name current implementation evidence and future options; the living spec

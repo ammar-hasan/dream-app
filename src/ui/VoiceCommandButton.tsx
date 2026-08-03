@@ -81,8 +81,7 @@ export function VoiceCommandButton() {
   const handleRef = useRef<DictationHandle | null>(null);
   const transcriptRef = useRef('');
   const pendingClearRef = useRef(false);
-
-  if (!isSpeechSupported()) return null;
+  const speechSupported = isSpeechSupported();
 
   /** Show the feedback and say it aloud when the voice preference is on. */
   const announce = (text: string) => {
@@ -119,6 +118,10 @@ export function VoiceCommandButton() {
   };
 
   const toggle = () => {
+    if (!speechSupported) {
+      announce(t('voice.unavailable'));
+      return;
+    }
     if (handleRef.current) {
       handleRef.current.stop();
       return; // onend runs the transcript
@@ -154,7 +157,11 @@ export function VoiceCommandButton() {
         className={`btn icon-btn${listening ? ' primary listening' : ''}`}
         aria-pressed={listening}
         aria-label={listening ? t('toolbar.stopListening') : t('toolbar.voiceCommands')}
-        data-tooltip={listening ? undefined : t('toolbar.voiceCommandsTitle')}
+        data-tooltip={
+          listening
+            ? undefined
+            : t(speechSupported ? 'toolbar.voiceCommandsTitle' : 'voice.unavailable')
+        }
         onClick={toggle}
       >
         <MicIcon />

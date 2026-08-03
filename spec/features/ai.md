@@ -30,6 +30,11 @@ bounding box; Dream accepts only the returned pixels inside that box, so the
 rest of the layer remains exact even if the provider strays. With no selection
 (or "Selected part only" off), the whole layer is the edit area.
 
+When no part is selected, the panel states plainly that Edit will change the
+whole active layer and offers **Select a part**. That action switches directly
+to Design with Select active; the user can click an object or drag a marquee
+without first discovering the mode/tool relationship elsewhere.
+
 Generative editing also reveals **Erase this**. One tap asks the provider to
 remove the object in the masked area and fill the space naturally with the
 surrounding background. It uses the selection when present and otherwise the
