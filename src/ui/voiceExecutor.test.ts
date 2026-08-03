@@ -42,6 +42,7 @@ function makeStore(overrides: Partial<VoiceExecutorStore> = {}) {
     scaleSelection: vi.fn(),
     nudgeSelection: vi.fn(),
     centerSelection: vi.fn(),
+    placeSelection: vi.fn(),
     recolorSelection: vi.fn(),
     deleteSelection: vi.fn(),
     duplicateSelection: vi.fn(),
@@ -375,6 +376,31 @@ describe('executeVoiceCommand', () => {
     ).toMatch(/locked/i);
     expect(locked.nudgeSelection).not.toHaveBeenCalled();
     expect(locked.centerSelection).not.toHaveBeenCalled();
+  });
+
+  it('places only an editable visible selection at a named canvas edge', () => {
+    const empty = makeStore();
+    expect(
+      executeVoiceCommand({ kind: 'place-selection', edge: 'top' }, empty, () => {})?.message,
+    ).toMatch(/select something first/i);
+    expect(empty.placeSelection).not.toHaveBeenCalled();
+
+    const selected = makeStore({ selectionCount: 1, selectionTransformable: true });
+    for (const edge of ['left', 'right', 'top', 'bottom'] as const) {
+      expect(
+        executeVoiceCommand({ kind: 'place-selection', edge }, selected, () => {})?.message,
+      ).toMatch(new RegExp(`${edge} edge`, 'i'));
+    }
+    expect(selected.placeSelection).toHaveBeenNthCalledWith(1, 'left');
+    expect(selected.placeSelection).toHaveBeenNthCalledWith(2, 'right');
+    expect(selected.placeSelection).toHaveBeenNthCalledWith(3, 'top');
+    expect(selected.placeSelection).toHaveBeenNthCalledWith(4, 'bottom');
+
+    const locked = makeStore({ selectionCount: 1, selectionTransformable: false });
+    expect(
+      executeVoiceCommand({ kind: 'place-selection', edge: 'bottom' }, locked, () => {})?.message,
+    ).toMatch(/locked/i);
+    expect(locked.placeSelection).not.toHaveBeenCalled();
   });
 
   it('save triggers the save callback; help speaks the command list', () => {

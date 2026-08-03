@@ -60,9 +60,9 @@ Default: `en`. The settings gear switches language **instantly at runtime**
   its command, story and game vocabulary uses familiar Brazilian phrasing.
 - Russian recognition requests the Russian regional language; common case
   forms and familiar Russian design terms work naturally in commands.
-- Referential position commands—left, right, up, down and canvas center—have
-  natural phrases in every supported language and keep English available in
-  every locale.
+- Referential position commands—left, right, up, down, canvas center and each
+  canvas edge—have natural phrases in every supported language and keep English
+  available in every locale.
 - Speech recognition listens in the UI language for canvas commands.
 - Spoken tool names and voice feedback speak in the UI language.
 

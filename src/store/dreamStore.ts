@@ -445,6 +445,8 @@ export interface DreamStore {
   insertDataPlot(name: string, operations: Operation[]): void;
   /** Move the selection so its bounding box is centered on the canvas. */
   centerSelection(): void;
+  /** Place one selection edge flush with the matching canvas edge. */
+  placeSelection(edge: 'left' | 'right' | 'top' | 'bottom'): void;
 
   zoomIn(): void;
   zoomOut(): void;
@@ -1859,6 +1861,26 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       const dy = Math.round(doc.height / 2 - (bounds.y + bounds.height / 2));
       if (dx === 0 && dy === 0) return;
       mutateSelection('Center selection', (ops, ids) => {
+        const wanted = new Set(ids);
+        return ops.map((op) => (wanted.has(op.id) ? translateOperation(op, dx, dy) : op));
+      });
+    },
+
+    placeSelection: (edge) => {
+      const layer = activeLayer();
+      const { doc, selection } = get();
+      if (!layer || layer.locked || selection.length === 0) return;
+      const bounds = selectionUnionBounds(layer.operations, selection);
+      if (!bounds) return;
+      const offsets = {
+        left: { x: -bounds.x, y: 0 },
+        right: { x: doc.width - (bounds.x + bounds.width), y: 0 },
+        top: { x: 0, y: -bounds.y },
+        bottom: { x: 0, y: doc.height - (bounds.y + bounds.height) },
+      };
+      const { x: dx, y: dy } = offsets[edge];
+      if (dx === 0 && dy === 0) return;
+      mutateSelection('Place selection', (ops, ids) => {
         const wanted = new Set(ids);
         return ops.map((op) => (wanted.has(op.id) ? translateOperation(op, dx, dy) : op));
       });

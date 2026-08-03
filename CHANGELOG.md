@@ -7,6 +7,12 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Spoken canvas-edge placement** (slice 61): selected artwork now understands
+  natural requests to go to the left, right, top or bottom canvas edge in every
+  supported locale. Placement uses the shared visual bounds, stays distinct
+  from 10 px nudging, is one undoable action, and refuses missing or locked
+  selections truthfully.
+
 - **Spoken selection positioning** (slice 60): natural referential commands can
   move selected artwork left, right, up or down by a predictable 10 px step, or
   center it on the canvas, in all six locales. Every result is undoable;

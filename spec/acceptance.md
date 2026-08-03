@@ -622,6 +622,12 @@ holds.
       undoable action. Dream names the result. With no selection, a locked
       selection or only a bare direction, artwork, brush and undo history remain
       unchanged and the first two cases receive specific guidance.
+172.  GIVEN visible editable artwork is selected WHEN the person says a
+      localized form of “put it at the left/right/top/bottom edge” THEN its
+      shared bounds become flush with that canvas edge as one undoable action
+      and Dream names the result; GIVEN no selection or a locked selection THEN
+      artwork, brush and undo history remain exact and Dream says what is
+      needed.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

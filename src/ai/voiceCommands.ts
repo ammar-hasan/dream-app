@@ -46,6 +46,8 @@ export type VoiceCommand =
   | { kind: 'duplicate-selection' }
   /** Move the visible selection by a predictable step, or center it on the canvas. */
   | { kind: 'move-selection'; direction: 'left' | 'right' | 'up' | 'down' | 'center' }
+  /** Place the visible selection flush with a named canvas edge. */
+  | { kind: 'place-selection'; edge: 'left' | 'right' | 'top' | 'bottom' }
   | { kind: 'tool'; tool: ToolId }
   /** "mirror on" / "mirror off": toggle vertical mirror symmetry. */
   | { kind: 'mirror'; on: boolean }
@@ -201,6 +203,7 @@ export interface VoiceVocabulary {
   selectionDeletePhrases: string[];
   selectionDuplicatePhrases: string[];
   selectionMovePhrases: Record<'left' | 'right' | 'up' | 'down' | 'center', string[]>;
+  selectionPlacePhrases: Record<'left' | 'right' | 'top' | 'bottom', string[]>;
   selectionReferences: string[];
   /** Outcome-level animation creation phrases; trailing words become the story. */
   storyboardPhrases: string[];
@@ -292,6 +295,12 @@ const EN_VOCAB: VoiceVocabulary = {
       'put it in the center',
       'put it in the centre',
     ],
+  },
+  selectionPlacePhrases: {
+    left: ['put it on the left', 'put that on the left', 'move it to the left edge'],
+    right: ['put it on the right', 'put that on the right', 'move it to the right edge'],
+    top: ['put it at the top', 'put that at the top', 'move it to the top edge'],
+    bottom: ['put it at the bottom', 'put that at the bottom', 'move it to the bottom edge'],
   },
   selectionReferences: ['it', 'that', 'this', 'selection', 'selected', 'object'],
   storyboardPhrases: [
@@ -408,6 +417,12 @@ const AR_VOCAB: VoiceVocabulary = {
     down: ['حرك هذا للاسفل', 'حرك هذا الي الاسفل', 'حرك التحديد للاسفل'],
     center: ['ضع هذا في المنتصف', 'وسط هذا', 'وسط التحديد'],
   },
+  selectionPlacePhrases: {
+    left: ['ضع هذا عند الحافة اليسرى', 'ضع هذا علي اليسار'],
+    right: ['ضع هذا عند الحافة اليمنى', 'ضع هذا علي اليمين'],
+    top: ['ضع هذا عند الحافة العلوية', 'ضع هذا في الاعلي'],
+    bottom: ['ضع هذا عند الحافة السفلية', 'ضع هذا في الاسفل'],
+  },
   selectionReferences: ['هذا', 'هذه', 'التحديد', 'المحدد'],
   storyboardPhrases: [
     'اصنع قصة عن',
@@ -523,6 +538,12 @@ const FA_VOCAB: VoiceVocabulary = {
     down: ['این را پایین ببر', 'این رو پایین ببر', 'انتخاب را پایین ببر'],
     center: ['این را وسط بگذار', 'این رو وسط بگذار', 'انتخاب را وسط بگذار'],
   },
+  selectionPlacePhrases: {
+    left: ['این را کنار چپ بگذار', 'این را در لبه چپ بگذار'],
+    right: ['این را کنار راست بگذار', 'این را در لبه راست بگذار'],
+    top: ['این را بالای بوم بگذار', 'این را در لبه بالا بگذار'],
+    bottom: ['این را پایین بوم بگذار', 'این را در لبه پایین بگذار'],
+  },
   selectionReferences: ['این', 'انتخاب', 'انتخاب شده'],
   storyboardPhrases: [
     'یک داستان درباره',
@@ -621,6 +642,12 @@ const ZH_VOCAB: VoiceVocabulary = {
     up: ['把这个向上移动', '把它移到上面', '选中内容向上移动'],
     down: ['把这个向下移动', '把它移到下面', '选中内容向下移动'],
     center: ['把这个放到中间', '把它放到中间', '选中内容居中'],
+  },
+  selectionPlacePhrases: {
+    left: ['把这个放到左边', '把它移到画布左边'],
+    right: ['把这个放到右边', '把它移到画布右边'],
+    top: ['把这个放到顶部', '把它移到画布顶部'],
+    bottom: ['把这个放到底部', '把它移到画布底部'],
   },
   selectionReferences: ['它', '这个', '选中内容'],
   storyboardPhrases: ['制作一个故事', '制作故事', '创作一个故事', '制作一个动画', '制作动画'],
@@ -750,6 +777,12 @@ const PT_VOCAB: VoiceVocabulary = {
     up: ['mova isso para cima', 'mover seleção para cima'],
     down: ['mova isso para baixo', 'mover seleção para baixo'],
     center: ['centralize isso', 'coloque isso no centro', 'centralizar seleção'],
+  },
+  selectionPlacePhrases: {
+    left: ['coloque isso na borda esquerda', 'coloque isso à esquerda'],
+    right: ['coloque isso na borda direita', 'coloque isso à direita'],
+    top: ['coloque isso no topo', 'coloque isso na borda superior'],
+    bottom: ['coloque isso embaixo', 'coloque isso na borda inferior'],
   },
   selectionReferences: ['isso', 'isto', 'seleção', 'selecionado'],
   storyboardPhrases: [
@@ -891,6 +924,12 @@ const RU_VOCAB: VoiceVocabulary = {
     down: ['перемести это вниз', 'сдвинь это вниз', 'перемести выделенное вниз'],
     center: ['помести это в центр', 'выровняй это по центру', 'выделенное по центру'],
   },
+  selectionPlacePhrases: {
+    left: ['помести это у левого края', 'поставь это слева'],
+    right: ['помести это у правого края', 'поставь это справа'],
+    top: ['помести это у верхнего края', 'поставь это сверху'],
+    bottom: ['помести это у нижнего края', 'поставь это снизу'],
+  },
   selectionReferences: ['это', 'выделение', 'выделенное'],
   storyboardPhrases: [
     'создай историю о',
@@ -956,6 +995,12 @@ function mergeVocabulary(base: VoiceVocabulary, extra: VoiceVocabulary): VoiceVo
       up: [...base.selectionMovePhrases.up, ...extra.selectionMovePhrases.up],
       down: [...base.selectionMovePhrases.down, ...extra.selectionMovePhrases.down],
       center: [...base.selectionMovePhrases.center, ...extra.selectionMovePhrases.center],
+    },
+    selectionPlacePhrases: {
+      left: [...base.selectionPlacePhrases.left, ...extra.selectionPlacePhrases.left],
+      right: [...base.selectionPlacePhrases.right, ...extra.selectionPlacePhrases.right],
+      top: [...base.selectionPlacePhrases.top, ...extra.selectionPlacePhrases.top],
+      bottom: [...base.selectionPlacePhrases.bottom, ...extra.selectionPlacePhrases.bottom],
     },
     selectionReferences: [...base.selectionReferences, ...extra.selectionReferences],
     storyboardPhrases: [...base.storyboardPhrases, ...extra.storyboardPhrases],
@@ -1175,6 +1220,11 @@ export function parseVoiceCommand(transcript: string, locale = 'en'): VoiceComma
   for (const direction of ['left', 'right', 'up', 'down', 'center'] as const) {
     if (hasPhrase(normalized, ...vocab.selectionMovePhrases[direction])) {
       return { kind: 'move-selection', direction };
+    }
+  }
+  for (const edge of ['left', 'right', 'top', 'bottom'] as const) {
+    if (hasPhrase(normalized, ...vocab.selectionPlacePhrases[edge])) {
+      return { kind: 'place-selection', edge };
     }
   }
 

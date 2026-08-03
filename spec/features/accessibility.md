@@ -93,13 +93,15 @@ not swallow the requested action; Dream follows Undo or the color request.
 Voice uses visible selection as conversational context. With artwork selected,
 “make it bigger” and “make it smaller” scale that artwork about its shared
 center; “move it left/right/up/down” nudges it by 10 px; “center it” puts it at
-the canvas center; “make it red” recolors selected vector artwork; “delete it”
-removes only that artwork; and “duplicate it” makes and selects an offset copy.
-Every action is undoable and says what changed. A bare color still changes the
-drawing color, while a referential color request requires an editable vector
-selection. Missing, locked and pixel selections get specific guidance; Dream
-never claims that unchanged pixels were recolored or silently changes a hidden
-setting. Bare directions do not guess at an object or change the document.
+the canvas center; “put it at the left/right/top/bottom edge” places its shared
+bounds flush with that canvas edge; “make it red” recolors selected vector
+artwork; “delete it” removes only that artwork; and “duplicate it” makes and
+selects an offset copy. Every action is undoable and says what changed. A bare
+color still changes the drawing color, while a referential color request
+requires an editable vector selection. Missing, locked and pixel selections get
+specific guidance; Dream never claims that unchanged pixels were recolored or
+silently changes a hidden setting. Bare directions do not guess at an object or
+change the document.
 
 ### The complete intent table
 
@@ -122,6 +124,7 @@ setting. Bare directions do not guess at an object or change the document.
 | mirror on/off    | "mirror on", "mirror off", "symmetry on"                                                                                                               | شغّل التناظر، أطفئ التناظر                                                       | vertical symmetry on / off (mirror phrases never trigger "play")                                 |
 | bigger / smaller | "bigger", "make it bigger", "thicker" / "smaller", "make it smaller", "thinner"                                                                        | أكبر / أصغر                                                                      | selected artwork scales gently about its center; with no selection, brush size ×~1.5 or ÷~1.5    |
 | move / center it | "move it left/right/up/down", "center it"                                                                                                              | حرّك هذا لليسار/اليمين/الأعلى/الأسفل، ضع هذا في المنتصف                          | nudges the selection by 10 px or centers it on the canvas; each is one undoable action           |
+| place at edge    | "put it at the top", "move it to the right edge"                                                                                                       | ضع هذا عند الحافة العلوية / اليمنى                                               | places the selection's shared bounds flush with that canvas edge as one undoable action          |
 | delete / copy it | "delete it", "remove that" / "duplicate it", "copy that"                                                                                               | احذف هذا / انسخ هذا                                                              | deletes only the selection / makes and selects an offset copy; both are undoable                 |
 | save             | "save"                                                                                                                                                 | احفظ                                                                             | saves now                                                                                        |
 | help             | "help", "commands"                                                                                                                                     | مساعدة، أوامر                                                                    | speaks the full command list                                                                     |
@@ -210,6 +213,9 @@ keeps it silent. Every tactile cue repeats an already-visible interaction state.
 - “Move it left/right/up/down” and “center it” require a visible editable
   selection. Movement uses a predictable 10 px step, centering uses the canvas
   center, every result is one undoable action, and bare directions do nothing.
+- “Put it at the left/right/top/bottom edge” requires a visible editable
+  selection and places its shared bounds exactly at that canvas edge as one
+  undoable action. It never changes a hidden alignment setting.
 - “Make it red” requires selected editable vector artwork and is one undoable
   recolor. A bare “red” remains a brush choice; raster pixels are referred to AI
   Edit rather than receiving false success feedback.

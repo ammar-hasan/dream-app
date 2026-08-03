@@ -51,6 +51,17 @@ describe('parseVoiceCommand — history & document', () => {
     expect(parseVoiceCommand('left')).toBeNull();
   });
 
+  it('distinguishes canvas-edge placement from incremental movement', () => {
+    expect(parseVoiceCommand('put it at the top')).toEqual({
+      kind: 'place-selection',
+      edge: 'top',
+    });
+    expect(parseVoiceCommand('move it to the right edge')).toEqual({
+      kind: 'place-selection',
+      edge: 'right',
+    });
+  });
+
   it('parses confirmations and cancellations', () => {
     expect(parseVoiceCommand('yes')).toEqual({ kind: 'confirm' });
     expect(parseVoiceCommand('yeah sure')).toEqual({ kind: 'confirm' });
@@ -241,6 +252,10 @@ describe('parseVoiceCommand — Arabic vocabulary (locale "ar")', () => {
       kind: 'move-selection',
       direction: 'right',
     });
+    expect(parseVoiceCommand('ضع هذا عند الحافة العلوية', 'ar')).toEqual({
+      kind: 'place-selection',
+      edge: 'top',
+    });
   });
 
   it('parses undo/redo/clear with polite filler', () => {
@@ -399,6 +414,10 @@ describe('parseVoiceCommand — Persian vocabulary (locale "fa")', () => {
       kind: 'move-selection',
       direction: 'up',
     });
+    expect(parseVoiceCommand('این را در لبه راست بگذار', 'fa')).toEqual({
+      kind: 'place-selection',
+      edge: 'right',
+    });
   });
 
   it('parses core creation, recovery and calligraphy-adjacent tools', () => {
@@ -447,6 +466,10 @@ describe('parseVoiceCommand — Simplified Chinese vocabulary (locale "zh")', ()
     expect(parseVoiceCommand('请把这个放到中间', 'zh')).toEqual({
       kind: 'move-selection',
       direction: 'center',
+    });
+    expect(parseVoiceCommand('把这个放到底部', 'zh')).toEqual({
+      kind: 'place-selection',
+      edge: 'bottom',
     });
   });
 
@@ -503,6 +526,10 @@ describe('parseVoiceCommand — Brazilian Portuguese vocabulary (locale "pt")', 
     expect(parseVoiceCommand('mova isso para baixo', 'pt')).toEqual({
       kind: 'move-selection',
       direction: 'down',
+    });
+    expect(parseVoiceCommand('coloque isso na borda esquerda', 'pt')).toEqual({
+      kind: 'place-selection',
+      edge: 'left',
     });
   });
 
@@ -565,6 +592,10 @@ describe('parseVoiceCommand — Russian vocabulary (locale "ru")', () => {
     expect(parseVoiceCommand('перемести это влево', 'ru')).toEqual({
       kind: 'move-selection',
       direction: 'left',
+    });
+    expect(parseVoiceCommand('помести это у правого края', 'ru')).toEqual({
+      kind: 'place-selection',
+      edge: 'right',
     });
   });
 

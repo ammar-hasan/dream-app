@@ -48,6 +48,7 @@ export interface VoiceExecutorStore {
   scaleSelection(factor: number): void;
   nudgeSelection(dx: number, dy: number): void;
   centerSelection(): void;
+  placeSelection(edge: 'left' | 'right' | 'top' | 'bottom'): void;
   recolorSelection(color: Color): void;
   deleteSelection(): void;
   duplicateSelection(): void;
@@ -208,6 +209,14 @@ export function executeVoiceCommand(
       const [dx, dy] = offsets[command.direction];
       store.nudgeSelection(dx, dy);
       const messageKey = `voice.selectionMoved${command.direction[0]!.toUpperCase()}${command.direction.slice(1)}`;
+      return { message: t(messageKey) };
+    }
+
+    case 'place-selection': {
+      if (store.selectionCount === 0) return { message: t('voice.selectionPlaceNeeded') };
+      if (!store.selectionTransformable) return { message: t('voice.selectionLocked') };
+      store.placeSelection(command.edge);
+      const messageKey = `voice.selectionPlaced${command.edge[0]!.toUpperCase()}${command.edge.slice(1)}`;
       return { message: t(messageKey) };
     }
 

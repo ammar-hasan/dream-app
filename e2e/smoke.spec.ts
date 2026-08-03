@@ -416,6 +416,7 @@ test('voice resolves natural “it” actions to the visible selection', async (
       'make it bigger',
       'move it right',
       'center it',
+      'put it at the top',
       'duplicate it',
       'delete it',
     ];
@@ -518,6 +519,27 @@ test('voice resolves natural “it” actions to the visible selection', async (
 
   await page.getByRole('button', { name: 'Voice commands' }).click();
   await expect(page.getByRole('status')).toContainText('Centered the selected part.');
+
+  const redTop = () =>
+    canvas.evaluate((element) => {
+      const context = (element as HTMLCanvasElement).getContext('2d');
+      if (!context) return 0;
+      const { width, height } = context.canvas;
+      const pixels = context.getImageData(0, 0, width, height).data;
+      for (let y = 0; y < height; y += 1) {
+        for (let x = 0; x < width; x += 1) {
+          const index = (y * width + x) * 4;
+          if (pixels[index]! > 200 && pixels[index + 1]! < 120 && pixels[index + 2]! < 120)
+            return y;
+        }
+      }
+      return height;
+    });
+  const beforePlacement = await redTop();
+
+  await page.getByRole('button', { name: 'Voice commands' }).click();
+  await expect(page.getByRole('status')).toContainText('Placed the selected part at the top edge.');
+  await expect.poll(() => redTop()).toBeLessThan(beforePlacement - 20);
 
   await page.getByRole('button', { name: 'Voice commands' }).click();
   await expect(page.getByRole('status')).toContainText('Made a copy of the selected part.');

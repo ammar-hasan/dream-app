@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { useDreamStore } from './dreamStore';
 import type { ShapeOp, StrokeOp } from '../engine/types';
+import { selectionUnionBounds } from '../engine/selection';
 
 const store = () => useDreamStore.getState();
 
@@ -247,6 +248,35 @@ describe('selection actions', () => {
     expect(op.from).toEqual({ x: 20, y: 10 });
     store().undo();
     expect((store().doc.layers[0].operations[0] as ShapeOp).from).toEqual({ x: 10, y: 10 });
+  });
+
+  it('places selection bounds at each canvas edge, undoably', () => {
+    drawRect();
+    enterDesign();
+    const id = store().doc.layers[0].operations[0].id;
+    store().setSelection([id]);
+    const original = selectionUnionBounds(store().doc.layers[0].operations, [id])!;
+
+    store().placeSelection('left');
+    expect(selectionUnionBounds(store().doc.layers[0].operations, [id])!.x).toBeCloseTo(0);
+    store().undo();
+
+    store().placeSelection('right');
+    const right = selectionUnionBounds(store().doc.layers[0].operations, [id])!;
+    expect(right.x + right.width).toBeCloseTo(store().doc.width);
+    store().undo();
+
+    store().placeSelection('top');
+    expect(selectionUnionBounds(store().doc.layers[0].operations, [id])!.y).toBeCloseTo(0);
+    store().undo();
+
+    store().placeSelection('bottom');
+    const bottom = selectionUnionBounds(store().doc.layers[0].operations, [id])!;
+    expect(bottom.y + bottom.height).toBeCloseTo(store().doc.height);
+    store().undo();
+
+    const restored = selectionUnionBounds(store().doc.layers[0].operations, [id])!;
+    expect(restored).toEqual(original);
   });
 
   it('scales around the selection center and is undoable', () => {

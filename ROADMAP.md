@@ -1369,6 +1369,26 @@ ordinary spatial language without learning drag mechanics or layout jargon.
 - ✅ Full release gates remain green: 866 unit tests, 97.74% engine coverage,
   51 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 61 — Voice understands canvas edges ✅
+
+Persona need: let a child or low-literacy creator express layout intent—“put it
+at the top”—without translating that thought into repeated nudges or drag
+precision.
+
+- ✅ Natural left, right, top and bottom edge requests resolve only to the
+  visible selection, with equivalent phrases in all six locales and English
+  retained everywhere.
+- ✅ The selected artwork's shared visual bounds land flush with the named
+  canvas edge as one undoable action. Edge placement remains distinct from the
+  predictable 10 px meaning of “move it right.”
+- ✅ Missing and locked selections receive truthful, task-specific guidance and
+  never change artwork, brush or history.
+- ✅ Parser, executor and store tests prove intent separation, every edge,
+  localized phrasing, exact geometry, refusal and undo. A production-browser
+  speech journey proves selected pixels move toward the requested edge.
+- ✅ Full release gates remain green: 869 unit tests, 97.74% engine coverage,
+  51 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1381,10 +1401,10 @@ largest count of controls:
    multi-item work can become opaque.
 2. **Conversational phone-first creation:** natural clarification and reference
    handling for voice now covers selected-object identity, color, size and basic
-   position; continue with relational targets, multi-turn clarification and
-   corrections, a task-prioritized mobile shell, and a faithful safe creation
-   path that does not require a child or low-literacy user to configure an AI
-   provider.
+   position plus canvas-edge targets; continue with relationships between
+   objects, multi-turn clarification and corrections, a task-prioritized mobile
+   shell, and a faithful safe creation path that does not require a child or
+   low-literacy user to configure an AI provider.
 3. **Professional substrate:** non-destructive masks/adjustments and blend/color
    foundations, then vector paths, typography, grids, constraints and linked
    reusable systems—Design-only, preserving Draw's first-minute simplicity.

@@ -77,6 +77,7 @@ function executorStore(announceDone?: (message: string) => void): VoiceExecutorS
     scaleSelection: s.scaleSelection,
     nudgeSelection: s.nudgeSelection,
     centerSelection: s.centerSelection,
+    placeSelection: s.placeSelection,
     recolorSelection: s.recolorSelection,
     deleteSelection: s.deleteSelection,
     duplicateSelection: s.duplicateSelection,
