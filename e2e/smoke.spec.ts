@@ -86,9 +86,70 @@ test('brush presets expose their complete editable settings', async ({ page }) =
   await expect(marker).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('.tool-options')).toContainText('18px');
   await expect(page.locator('.tool-options')).toContainText('55%');
+  await expect(page.getByLabel('Steady stroke')).toHaveValue('10');
 
   await page.locator('.tool-options input[type="range"]').first().fill('19');
   await expect(marker).toHaveAttribute('aria-pressed', 'false');
+});
+
+test('steady stroke visibly smooths a wobble and stays exactly undoable', async ({ page }) => {
+  await bootApp(page);
+  const canvas = page.locator('.viewport-canvas');
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('viewport canvas has no box');
+  const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  const apex = { x: center.x - 40, y: center.y + 40 };
+  const sample = (point: { x: number; y: number }) =>
+    canvas.evaluate((element, client) => {
+      const target = element as HTMLCanvasElement;
+      const rect = target.getBoundingClientRect();
+      const context = target.getContext('2d');
+      if (!context) throw new Error('no 2d context');
+      const x = Math.floor((client.x - rect.x) * (target.width / rect.width));
+      const y = Math.floor((client.y - rect.y) * (target.height / rect.height));
+      return Array.from(context.getImageData(x, y, 1, 1).data);
+    }, point);
+  const paintedNear = (point: { x: number; y: number }) =>
+    canvas.evaluate((element, client) => {
+      const target = element as HTMLCanvasElement;
+      const rect = target.getBoundingClientRect();
+      const context = target.getContext('2d');
+      if (!context) throw new Error('no 2d context');
+      const x = Math.floor((client.x - rect.x) * (target.width / rect.width)) - 6;
+      const y = Math.floor((client.y - rect.y) * (target.height / rect.height)) - 6;
+      const pixels = context.getImageData(x, y, 13, 13).data;
+      let painted = 0;
+      for (let index = 0; index < pixels.length; index += 4) {
+        if (pixels[index] < 245 || pixels[index + 1] < 245 || pixels[index + 2] < 245) painted++;
+      }
+      return painted;
+    }, point);
+  const drawWobble = async () => {
+    const points = [
+      { x: center.x - 80, y: center.y },
+      apex,
+      center,
+      { x: center.x + 40, y: center.y + 40 },
+      { x: center.x + 80, y: center.y },
+    ];
+    await page.mouse.move(points[0].x, points[0].y);
+    await page.mouse.down();
+    for (const point of points.slice(1)) await page.mouse.move(point.x, point.y);
+    await page.mouse.up();
+  };
+
+  await page.getByLabel('Steady stroke').fill('0');
+  await drawWobble();
+  await expect.poll(() => sample(apex)).not.toEqual([255, 255, 255, 255]);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(() => sample(apex)).toEqual([255, 255, 255, 255]);
+
+  await page.getByLabel('Steady stroke').fill('100');
+  await drawWobble();
+  await expect.poll(() => sample(apex)).toEqual([255, 255, 255, 255]);
+  await expect.poll(() => paintedNear({ x: center.x - 40, y: center.y + 10 })).toBeGreaterThan(0);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(() => paintedNear({ x: center.x - 40, y: center.y + 10 })).toBe(0);
 });
 
 test('undo removes the stroke', async ({ page }) => {

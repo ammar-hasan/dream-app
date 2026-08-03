@@ -15,6 +15,7 @@ beforeEach(() => {
   store().setSymmetry('off');
   store().setFillShapes(false);
   store().setBrushStyle('round');
+  store().setStabilization(0);
 });
 
 function drawStroke(from = { x: 1, y: 1 }, to = { x: 10, y: 10 }) {
@@ -75,14 +76,50 @@ describe('pressure sensitivity', () => {
     store().pointerMove({ x: 9, y: 9 }, { pressure: 1 });
     store().pointerUp({ x: 9, y: 9 });
     const op = store().doc.layers[0].operations[0] as StrokeOp;
-    // Down + move + the final point pointerUp adds → three samples.
-    expect(op.widths).toEqual([0.5, 1, 1]);
+    expect(op.widths).toEqual([0.5, 1]);
   });
 
   it('mouse gestures produce no widths (uniform rendering)', () => {
     drawStroke();
     const op = store().doc.layers[0].operations[0] as StrokeOp;
     expect(op.widths).toBeUndefined();
+  });
+});
+
+describe('stroke stabilization', () => {
+  it('smooths future strokes, clamps the setting and preserves one-step undo', () => {
+    store().setStabilization(200);
+    expect(store().settings.stabilization).toBe(100);
+    store().setTool('brush');
+    store().pointerDown({ x: 0, y: 0 });
+    store().pointerMove({ x: 10, y: 10 });
+    store().pointerMove({ x: 20, y: 0 });
+    store().pointerMove({ x: 30, y: 10 });
+    store().pointerUp({ x: 40, y: 0 });
+
+    const op = store().doc.layers[0].operations[0] as StrokeOp;
+    expect(op.points[0]).toEqual({ x: 0, y: 0 });
+    expect(op.points.at(-1)).toEqual({ x: 40, y: 0 });
+    expect(op.points[1].y).toBeLessThan(10);
+    store().undo();
+    expect(store().doc.layers[0].operations).toHaveLength(0);
+
+    store().setStabilization(-20);
+    expect(store().settings.stabilization).toBe(0);
+  });
+
+  it('releases with the exact geometry shown in the last preview', () => {
+    store().setStabilization(100);
+    store().setTool('brush');
+    store().pointerDown({ x: 0, y: 0 });
+    store().pointerMove({ x: 10, y: 10 });
+    store().pointerMove({ x: 20, y: 0 });
+    store().pointerMove({ x: 30, y: 10 });
+    store().pointerMove({ x: 40, y: 0 });
+    const preview = store().previewOp as StrokeOp;
+    store().pointerUp({ x: 40, y: 0 });
+    const committed = store().doc.layers[0].operations[0] as StrokeOp;
+    expect(committed.points).toEqual(preview.points);
   });
 });
 

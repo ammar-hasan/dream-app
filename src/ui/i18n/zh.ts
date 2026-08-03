@@ -135,6 +135,7 @@ export const zh: Record<string, string> = {
   'options.colorSwatch': '颜色 {color}',
   'options.customColor': '自定义颜色',
   'options.size': '大小',
+  'options.stabilization': '稳定笔触',
   'options.brushStyle': '笔触形状',
   'options.brushPresets': '画笔预设',
   'options.brushPreset.ink': '细墨线',

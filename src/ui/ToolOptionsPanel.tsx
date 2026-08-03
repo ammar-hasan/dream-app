@@ -20,6 +20,7 @@ const SHOW_COLOR = new Set([
 ]);
 const SHOW_SIZE = new Set(['brush', 'pencil', 'spray', 'eraser', 'line', 'rectangle', 'ellipse']);
 const SHOW_OPACITY = new Set(['brush', 'spray', 'line', 'rectangle', 'ellipse', 'fill', 'text']);
+const SHOW_STABILIZATION = new Set(['brush', 'pencil', 'eraser']);
 
 /** Tools with a usage hint; the text lives under `options.hint.<tool>`. */
 const HINT_TOOLS = new Set([
@@ -56,10 +57,28 @@ const FONT_CHOICES = [
 ];
 
 const BRUSH_PRESETS = [
-  { key: 'options.brushPreset.ink', size: 4, opacity: 1, style: 'round' },
-  { key: 'options.brushPreset.marker', size: 18, opacity: 0.55, style: 'round' },
-  { key: 'options.brushPreset.paint', size: 32, opacity: 0.85, style: 'round' },
-  { key: 'options.brushPreset.calligraphy', size: 16, opacity: 1, style: 'calligraphy' },
+  { key: 'options.brushPreset.ink', size: 4, opacity: 1, style: 'round', stabilization: 35 },
+  {
+    key: 'options.brushPreset.marker',
+    size: 18,
+    opacity: 0.55,
+    style: 'round',
+    stabilization: 10,
+  },
+  {
+    key: 'options.brushPreset.paint',
+    size: 32,
+    opacity: 0.85,
+    style: 'round',
+    stabilization: 0,
+  },
+  {
+    key: 'options.brushPreset.calligraphy',
+    size: 16,
+    opacity: 1,
+    style: 'calligraphy',
+    stabilization: 60,
+  },
 ] as const;
 
 export function ToolOptionsPanel() {
@@ -69,6 +88,7 @@ export function ToolOptionsPanel() {
   const cropDraft = useDreamStore((s) => s.cropDraft);
   const setColor = useDreamStore((s) => s.setColor);
   const setSize = useDreamStore((s) => s.setSize);
+  const setStabilization = useDreamStore((s) => s.setStabilization);
   const setBrushStyle = useDreamStore((s) => s.setBrushStyle);
   const setLineStyle = useDreamStore((s) => s.setLineStyle);
   const setOpacity = useDreamStore((s) => s.setOpacity);
@@ -175,7 +195,8 @@ export function ToolOptionsPanel() {
                 const active =
                   settings.size === preset.size &&
                   settings.opacity === preset.opacity &&
-                  settings.brushStyle === preset.style;
+                  settings.brushStyle === preset.style &&
+                  settings.stabilization === preset.stabilization;
                 return (
                   <button
                     key={preset.key}
@@ -186,6 +207,7 @@ export function ToolOptionsPanel() {
                       setSize(preset.size);
                       setOpacity(preset.opacity);
                       setBrushStyle(preset.style);
+                      setStabilization(preset.stabilization);
                     }}
                   >
                     {t(preset.key)}
@@ -225,6 +247,20 @@ export function ToolOptionsPanel() {
             <option value="arrow">{t('options.lineArrow')}</option>
             <option value="double-arrow">{t('options.lineDoubleArrow')}</option>
           </select>
+        </label>
+      )}
+
+      {SHOW_STABILIZATION.has(tool) && (
+        <label className="option-row">
+          <span className="option-label">{t('options.stabilization')}</span>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={settings.stabilization}
+            onChange={(event) => setStabilization(Number(event.target.value))}
+          />
+          <span className="option-value">{settings.stabilization}%</span>
         </label>
       )}
 

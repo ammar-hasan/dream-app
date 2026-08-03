@@ -139,6 +139,7 @@ export const pt: Record<string, string> = {
   'options.colorSwatch': 'Cor {color}',
   'options.customColor': 'Cor personalizada',
   'options.size': 'Tamanho',
+  'options.stabilization': 'Traço estável',
   'options.brushStyle': 'Ponta do pincel',
   'options.brushPresets': 'Pincéis prontos',
   'options.brushPreset.ink': 'Tinta fina',

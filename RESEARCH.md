@@ -166,6 +166,15 @@ Modern interaction craft should make state legible rather than add spectacle:
   pan, resize/rotate, copy/link and not-allowed states should follow the active
   interaction rather than remain a static cursor per tool.
   (https://developer.apple.com/design/human-interface-guidelines/pointing-devices)
+- **Stroke assistance must be visible and optional.** Procreate exposes
+  stabilization as both a professional brush property and a global
+  accessibility aid, with stronger settings trading natural texture for
+  straighter lines; it calls out inking and calligraphy directly. Adobe Fresco
+  likewise keeps smoothing beside ordinary pixel-brush controls. Dream uses one
+  exposed future-stroke setting, keeps 0% exact and anchors the pointer endpoint
+  so assistance never becomes hidden magnetic behavior.
+  (https://help.procreate.com/procreate/handbook/5.2/brushes/brush-studio-settings ·
+  https://helpx.adobe.com/fresco/desktop/draw-paint-animate-and-share/pixel-brushes.html)
 - **Motion is brief, causal and cancellable.** It follows the gesture, explains
   state, never delays frequent work and collapses under reduced motion. Current
   professional systems cluster frequent hover/press feedback around 50–220 ms
@@ -304,6 +313,7 @@ presenter, Zǐxuān the student, Ali/Fatima the hobbyists). Score: impact
 | 22  | ~~One-click brand pack with exact multi-size PNGs and truthful optional SVG~~ ✅ shipped (slice 40)                                                                   | Sara, Aleksandr       | 4      | S      |
 | 23  | ~~Agent-safe layer rename/configure/reorder/removal through dream-mcp~~ ✅ shipped (slice 41)                                                                         | Maria                 | 4      | S      |
 | 24  | ~~Pressure-aware brush/pencil/eraser authoring through dream-mcp~~ ✅ shipped (slice 43)                                                                              | Maria                 | 4      | S      |
+| 25  | ~~Optional visible stroke stabilization for brush, pencil and eraser~~ ✅ shipped (slice 73)                                                                          | Victor, Ali, Fatima   | 5      | S      |
 
 Deliberately deferred: **general vector-path editing** (slice 34 exports
 genuinely scalable native marks without introducing a second editing medium), **real-time

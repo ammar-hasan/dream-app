@@ -131,6 +131,7 @@ export const fa: Record<string, string> = {
   'options.colorSwatch': 'رنگ {color}',
   'options.customColor': 'رنگ سفارشی',
   'options.size': 'اندازه',
+  'options.stabilization': 'تثبیت خط',
   'options.brushStyle': 'نوک قلم‌مو',
   'options.brushPresets': 'قلم‌موهای آماده',
   'options.brushPreset.ink': 'جوهر ظریف',

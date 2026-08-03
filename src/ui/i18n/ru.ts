@@ -129,6 +129,7 @@ export const ru: Record<string, string> = {
   'options.colorSwatch': 'Цвет {color}',
   'options.customColor': 'Другой цвет',
   'options.size': 'Размер',
+  'options.stabilization': 'Стабилизация',
   'options.brushStyle': 'Кончик кисти',
   'options.brushPresets': 'Готовые кисти',
   'options.brushPreset.ink': 'Тонкая тушь',

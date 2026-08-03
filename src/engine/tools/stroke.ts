@@ -24,6 +24,42 @@ export function pressureWidth(pressure: number): number {
 }
 
 /**
+ * Smooth a sampled path without moving either endpoint. The centered,
+ * triangular window reduces small pointer wobbles while keeping taps,
+ * deliberate corners and the live pointer position predictable.
+ */
+export function stabilizePoints(
+  points: readonly { x: number; y: number }[],
+  amount: number,
+): { x: number; y: number }[] {
+  const strength = Math.min(1, Math.max(0, amount / 100));
+  if (strength === 0 || points.length < 3) return points.map((point) => ({ ...point }));
+
+  const radius = Math.max(1, Math.round(strength * 6));
+  const last = points.length - 1;
+  return points.map((point, index) => {
+    if (index === 0 || index === last) return { ...point };
+    let x = 0;
+    let y = 0;
+    let total = 0;
+    for (
+      let sample = Math.max(0, index - radius);
+      sample <= Math.min(last, index + radius);
+      sample++
+    ) {
+      const weight = radius + 1 - Math.abs(sample - index);
+      x += points[sample].x * weight;
+      y += points[sample].y * weight;
+      total += weight;
+    }
+    return {
+      x: point.x + (x / total - point.x) * strength,
+      y: point.y + (y / total - point.y) * strength,
+    };
+  });
+}
+
+/**
  * Width multipliers for a fixed 45-degree broad nib. A stroke parallel to
  * the nib's long edge is thin; one crossing it is broad. Optional pressure
  * continues to modulate that directional width.
@@ -46,9 +82,13 @@ export function calligraphyWidths(
 
 function toOp(tool: StrokeOp['tool'], state: StrokeState, settings: ToolSettings): StrokeOp | null {
   if (state.points.length === 0) return null;
+  const sourcePoints =
+    tool === 'brush' || tool === 'pencil' || tool === 'eraser'
+      ? stabilizePoints(state.points, settings.stabilization)
+      : state.points;
   // Duplicate a single tap so the round cap paints a visible dot.
-  const single = state.points.length === 1;
-  const points = single ? [state.points[0], state.points[0]] : state.points;
+  const single = sourcePoints.length === 1;
+  const points = single ? [sourcePoints[0], sourcePoints[0]] : sourcePoints;
   const op: StrokeOp = {
     kind: 'stroke',
     id: makeOpId(),
@@ -61,7 +101,7 @@ function toOp(tool: StrokeOp['tool'], state: StrokeState, settings: ToolSettings
   };
   const widths =
     tool === 'brush' && settings.brushStyle === 'calligraphy'
-      ? calligraphyWidths(state.points, state.widths)
+      ? calligraphyWidths(sourcePoints, state.widths)
       : state.widths;
   if (widths) {
     op.widths = single && widths.length === 1 ? [widths[0], widths[0]] : [...widths];
@@ -87,6 +127,13 @@ export function createStrokeTool(
       };
     },
     update(state: StrokeState, sample: PointerSample): void {
+      const last = state.points[state.points.length - 1];
+      if (last && last.x === sample.point.x && last.y === sample.point.y) {
+        if (state.widths && sample.pressure !== undefined) {
+          state.widths[state.widths.length - 1] = pressureWidth(sample.pressure);
+        }
+        return;
+      }
       state.points.push({ ...sample.point });
       if (state.widths) {
         // Once a stroke carries widths every point needs one; a gap in pen

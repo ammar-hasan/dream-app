@@ -292,6 +292,7 @@ export interface DreamStore {
   insertStarterScene(scene: SceneId, name: string): void;
   setColor(color: Color): void;
   setSize(size: number): void;
+  setStabilization(stabilization: number): void;
   setBrushStyle(brushStyle: ToolSettings['brushStyle']): void;
   setLineStyle(lineStyle: ToolSettings['lineStyle']): void;
   setOpacity(opacity: number): void;
@@ -629,6 +630,13 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       }),
     setColor: (color) => set((s) => ({ settings: { ...s.settings, color } })),
     setSize: (size) => set((s) => ({ settings: { ...s.settings, size } })),
+    setStabilization: (stabilization) =>
+      set((s) => ({
+        settings: {
+          ...s.settings,
+          stabilization: Math.min(100, Math.max(0, stabilization)),
+        },
+      })),
     setBrushStyle: (brushStyle) => set((s) => ({ settings: { ...s.settings, brushStyle } })),
     setLineStyle: (lineStyle) => set((s) => ({ settings: { ...s.settings, lineStyle } })),
     setOpacity: (opacity) =>

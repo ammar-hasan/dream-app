@@ -219,7 +219,9 @@ and the language picker.
   recent-colors row) and opacity — with per-point pen pressure on a stylus;
   Brush also offers a fixed-angle Calligraphy nib for directional thick/thin
   marks using mouse, touch or pen, plus Fine ink, Soft marker, Bold paint and
-  Calligraphy presets that set the visible size, opacity and tip together
+  Calligraphy presets that set the visible size, opacity, tip and steadiness
+  together. Brush, pencil and eraser share an optional 0–100% Steady stroke
+  control that visibly smooths future paths without moving their endpoints.
 - Spray (airbrush) with a density slider; deterministic per-stroke seeds
 - Line, rectangle and ellipse tools with Shift-to-constrain (45° lines,
   squares, circles), plain/arrow/two-way line ends, and an optional fill-shapes
@@ -450,6 +452,11 @@ tool rail and the options panel (Little Dreamer mode stays untouched).
   works without a stylus; pen pressure multiplies it when available. The
   resulting per-point widths are ordinary deterministic stroke data, so one
   Undo removes the gesture and every preview/export agrees.
+- **Steady stroke** — Brush, Pencil and Eraser share a visible session-only
+  0–100% control. Zero leaves sampled input exact; higher values reduce small
+  wobble while keeping the start and live pointer endpoint anchored. Preview
+  and commit use the same path, pressure remains aligned, and Spray is
+  intentionally unaffected.
 - **Filled shapes** — the "Fill shapes" toggle fills rectangles and
   ellipses with the current color (no outline — the simpler, prettier
   option; the outline tools behave as always when it's off).

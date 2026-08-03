@@ -10,9 +10,9 @@ feels immediate on a 5-year-old's tablet and a pro's pen display alike.
    exactly one undoable change on release (a mirrored gesture or a stamp is
    still **one** undo step).
 2. A single tap with a stroke tool paints a visible dot (round cap).
-3. Tool settings — color, size (1–64 px), opacity (0–1) — live in the
-   options panel and are session-only. Session defaults: color `#1f2937`,
-   size 8, opacity 1.
+3. Tool settings — color, size (1–64 px), opacity (0–1) and steady stroke
+   (0–100%) — live in the options panel and are session-only. Session defaults:
+   color `#1f2937`, size 8, opacity 1 and steady stroke 0%.
 4. All stroke tools paint with round line caps and joins.
 5. The color UI offers a 16-color palette, a custom color picker, and a
    recent-colors row (last 8, newest first, persisted per user).
@@ -36,10 +36,11 @@ one ordinary undoable stroke and reproduces identically in previews, saved
 projects and exports.
 
 Four compact presets set the complete future-brush feel in one action:
-**Fine ink** (4 px, fully opaque, round), **Soft marker** (18 px, 55%, round),
-**Bold paint** (32 px, 85%, round) and **Calligraphy** (16 px, fully opaque,
-broad nib). The exact size, opacity and tip remain visible and independently
-editable; changing any of them simply clears the preset's selected state.
+**Fine ink** (4 px, fully opaque, round, 35% steady), **Soft marker** (18 px,
+55%, round, 10% steady), **Bold paint** (32 px, 85%, round, natural) and
+**Calligraphy** (16 px, fully opaque, broad nib, 60% steady). The exact size,
+opacity, tip and steadiness remain visible and independently editable; changing
+any of them simply clears the preset's selected state.
 Presets never rewrite existing marks and are session-only like the controls
 they combine.
 
@@ -174,6 +175,16 @@ sample: effective width = size × pressure, clamped to a 0.1–1 multiplier,
 interpolated smoothly between points (segment width is the average of its
 two endpoints' multipliers, never below 0.5 px). Mouse and touch strokes
 carry no pressure data and render at uniform width.
+
+## Steady stroke
+
+Brush, pencil and eraser share a session-only **Steady stroke** control from
+0–100%. At 0%, the sampled path is unchanged. Raising it progressively reduces
+small wobbles while the start and current pointer endpoint stay fixed, so the
+mark remains directly controlled rather than drifting away from the gesture.
+The live preview and released mark use the same path; pressure and calligraphic
+width continue to follow it. The setting affects only future strokes, every
+result remains one undoable mark, and Spray keeps its natural sampled path.
 
 ## Zoom & pan
 

@@ -7,6 +7,13 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Optional steady strokes** (slice 73): Brush, Pencil and Eraser now expose a
+  localized 0–100% stabilization control. Zero preserves natural input; higher
+  values visibly reduce small wobble while anchoring both endpoints, keeping
+  live preview identical to release, preserving pressure/calligraphy and
+  remaining one-step undoable. Brush presets disclose their steadiness and
+  Spray remains untouched.
+
 - **Editable layer adjustments** (slice 72): the full color/filter set now
   saves as revisitable layer settings instead of flattening original marks.
   Exact live preview, Apply/Cancel/Reset, Undo, `.dream`, raster delivery and

@@ -136,6 +136,7 @@ export const ar: Record<string, string> = {
   'options.colorSwatch': 'اللون {color}',
   'options.customColor': 'لون مخصص',
   'options.size': 'الحجم',
+  'options.stabilization': 'تثبيت الخط',
   'options.brushStyle': 'رأس الفرشاة',
   'options.brushPresets': 'فرش جاهزة',
   'options.brushPreset.ink': 'حبر رفيع',

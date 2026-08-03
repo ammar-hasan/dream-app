@@ -55,9 +55,9 @@ against the much smaller question “does a related feature exist?”
 | Persona       | Underlying intent and 10/10 expectation                                                                                                                                                           | Current strengths                                                                                                                             | What prevents a 10/10                                                                                                                                                                                         | Score |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----: |
 | Zainab, 5     | Feel creative and powerful without reading or adult help: talk naturally, see a safe delightful story with consistent characters, change it, play it immediately, and recover every accident.     | Little Dreamer, visible voice/story review, guided movement, four games with sparse collision feedback, starters and one-step Undo.           | Voice remains mostly command-shaped and browser recognition is optional; typed/labelled fallback does not solve pre-literacy; the offline painter lacks arbitrary fidelity and no guardian controls exist.    |   5.5 |
-| Victor, 85    | Express an idea with dignity and confidence despite possible vision, tremor or memory limits; never fear losing work or wonder what mode/tool is active.                                          | Comfort mode, contrast, 44 px targets, reduced motion, autosave, exact Undo.                                                                  | Comfort is hidden behind Settings; the adult shell is dense; no tremor stabilization, guided first journey, persistent task orientation, or manual assistive-technology proof.                                |   5.5 |
-| Ali, 30       | Preserve the feel of real media while gaining digital control, speed and production trust: expressive input, deep brushes, non-destructive experimentation, calibrated color and reliable output. | Pressure, calligraphy, presets, layers with core blend modes and editable adjustments, selection, AI edits, PNG/JPEG.                         | No tilt/azimuth, stabilization, custom brush dynamics, masks or stacked adjustment layers, color profiles, soft proofing, large-canvas performance proof or professional interchange.                         |   5.0 |
-| Fatima, 21    | Explore calligraphy authentically in her own language and direction, controlling the nib and composition precisely while keeping work suitable for high-quality sharing or print.                 | Persian RTL, regional speech, broad nib, pressure, symmetry, Persian text, scalable native marks.                                             | Fixed nib angle, no pen tilt/rotation, path refinement, calligraphic guides, OpenType/font controls, custom brush creation, print color or high-resolution publication workflow.                              |   5.0 |
+| Victor, 85    | Express an idea with dignity and confidence despite possible vision, tremor or memory limits; never fear losing work or wonder what mode/tool is active.                                          | Comfort mode, contrast, 44 px targets, reduced motion, optional steady strokes, autosave and exact Undo.                                      | Comfort is hidden behind Settings; the adult shell is dense; no guided first journey, persistent task orientation, adaptive tremor profile or manual assistive-technology proof.                              |   6.0 |
+| Ali, 30       | Preserve the feel of real media while gaining digital control, speed and production trust: expressive input, deep brushes, non-destructive experimentation, calibrated color and reliable output. | Pressure, calligraphy, visible stabilization, presets, layers with core blend modes and editable adjustments, selection, AI edits, PNG/JPEG.  | No tilt/azimuth, custom brush dynamics, masks or stacked adjustment layers, color profiles, soft proofing, large-canvas performance proof or professional interchange.                                        |   5.5 |
+| Fatima, 21    | Explore calligraphy authentically in her own language and direction, controlling the nib and composition precisely while keeping work suitable for high-quality sharing or print.                 | Persian RTL, regional speech, broad nib, pressure, visible steady strokes, symmetry, Persian text and scalable native marks.                  | Fixed nib angle, no pen tilt/rotation, advanced path refinement, calligraphic guides, OpenType/font controls, custom brush creation, print color or high-resolution publication workflow.                     |   5.5 |
 | George, 45    | Turn a feeling into an understandable moving story on a new phone with little reading, weak technical vocabulary and minimal setup; share it confidently with family.                             | Task-first phone shell/dock, first-drawing edit invitation, guided voice follow-up, story planning, narration, games and recovery.            | Natural conversation stops at bounded intents; advanced panels and export remain text-heavy; generated fidelity and sharing handoff are not resilient enough.                                                 |   4.0 |
 | Sara, 15      | Earn trust and income: create a distinctive logo quickly, revise it from client feedback, keep typography/colors precise, and deliver every professional file without embarrassment.              | Selection/layout, components, layers, honest SVG and one-click multi-size brand pack.                                                         | No vector-node editing, typography depth, transparent-background workflow, grids, brand colors/tokens, variants, PDF/print/CMYK delivery or client-review loop.                                               |   5.0 |
 | Zǐxuān, 28    | Communicate science accurately and publishably: preserve data integrity, build editable accessible figures/animations, use domain notation, and meet journal/export requirements.                 | Native grouped plots, scientific text/connectors, SVG, animation, app links, Chinese journey.                                                 | No units/error bars/log scales/fits, chemical structures, color-blind palette checks, scale bars, provenance, image-integrity record, editable PDF/EPS, DPI/physical sizing or publication preflight.         |   4.0 |
@@ -65,7 +65,7 @@ against the much smaller question “does a related feature exist?”
 | Aleksandr, 25 | Move at professional thought speed: direct manipulation, precise inspectors, reusable systems, responsive layout, powerful shortcuts, extensibility and polished handoff without tool friction.   | Predictive pointer/drag states and previews, keyboard workflows, snapping/alignment, groups/components, layers, localized UI, batch delivery. | No vector paths, auto layout/constraints, variables/tokens, linked components/variants, grids/rulers, multi-page organization, extensibility or inspector depth.                                              |   4.0 |
 | Ahmed, 42     | Turn testimony into emotionally compelling, legible, platform-ready short video while protecting authorial intent and sharing quickly from constrained devices.                                   | Flipbook, narration, captions, shaped WebM/MP4, trimming, presentation and private/offline sharing.                                           | No audio mix/music, caption timing/styles, scene-duration timeline, transitions for video, safe-zone preview, compression/size target, direct share/upload, thumbnail/cover workflow or long-project editing. |   5.0 |
 
-The average is **4.7/10**. That is not a dismissal of the shipped breadth; it
+The average is **4.8/10**. That is not a dismissal of the shipped breadth; it
 is a refusal to confuse breadth with completion.
 
 ## Principal UX review
@@ -233,6 +233,12 @@ is a refusal to confuse breadth with completion.
     independently undoable under the same effect. The appearance travels
     through project, raster and agent delivery; unsupported scalable export is
     refused rather than approximated.
+37. **Assistance should reduce effort without taking the gesture away.** Steady
+    stroke is visible beside the affected tools, leaves natural input exact at
+    zero and progressively reduces small wobble for brush, pencil and eraser.
+    The pointer endpoints remain anchored and the live path is the committed
+    path, so accessibility help, inking and calligraphy share one predictable
+    control instead of a hidden correction. Drawing stays tactually silent.
 
 ### What does not yet fully serve the purpose
 
@@ -301,10 +307,10 @@ is a refusal to confuse breadth with completion.
    contract without buzzing for routine play. Destructive refusal is not yet
    covered.
 10. **Professional outcomes need the rest of the professional substrate, not
-    isolated tools.** Core blending and revisitable per-layer adjustments now
-    establish a portable compositing foundation; masks, stacked effects, vector
-    paths, typography/color systems, publication preflight and richer agent
-    schemas still unlock several personas at once.
+    isolated tools.** Core blending, revisitable per-layer adjustments and
+    visible stroke stabilization now establish a stronger media foundation;
+    masks, stacked effects, vector paths, typography/color systems, publication
+    preflight and richer agent schemas still unlock several personas at once.
 
 ## Recommended order
 
@@ -318,8 +324,8 @@ is a refusal to confuse breadth with completion.
    drag previews and drop targets; make long tasks explain progress and support
    safe cancellation; add sparse optional haptics only after visual behavior is
    exact.
-4. **P1 — professional substrate:** build on shipped blend modes and editable
-   per-layer adjustments with masks, effect stacks and color foundations, then
+4. **P1 — professional substrate:** build on shipped blend modes, editable
+   per-layer adjustments and stroke stabilization with masks, effect stacks and color foundations, then
    vector paths, typography, grids/constraints and linked reusable systems—
    progressively disclosed without crowding first-minute Draw.
 5. **P1 — outcome delivery:** publication-grade scientific export and integrity,

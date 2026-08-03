@@ -137,6 +137,7 @@ export const en: Record<string, string> = {
   'options.colorSwatch': 'Color {color}',
   'options.customColor': 'Custom color',
   'options.size': 'Size',
+  'options.stabilization': 'Steady stroke',
   'options.brushStyle': 'Brush tip',
   'options.brushPresets': 'Brush presets',
   'options.brushPreset.ink': 'Fine ink',

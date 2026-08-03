@@ -153,6 +153,10 @@ Text `#0f141f` / `#ffffff`, dim text `#454d61` / `#ccd4e8`, borders
     are at least 44 px. Its brief transform/opacity entrance becomes effectively
     instant under reduced motion, and a tactile cue never replaces the visible
     selected state.
+13. Steady-stroke feedback stays attached to the pointer: the preview shows the
+    exact path that release will keep, its start and current endpoint do not
+    drift, and drawing never vibrates continuously. Natural input at 0% has no
+    smoothing effect.
 
 ## Video captions
 

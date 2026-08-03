@@ -1614,6 +1614,29 @@ refine later.
 - ✅ Full release gates remain green: 888 unit tests, 97.54% engine coverage,
   60 browser journeys, 25 MCP tests and four honest agent evals.
 
+## Slice 73 — Optional steady strokes ✅
+
+Persona need: let Victor reduce involuntary wobble, Ali ink precisely and
+Fatima refine calligraphy without forcing artificial smoothing on anyone.
+
+- ✅ Brush, Pencil and Eraser expose one localized 0–100% Steady stroke
+  control in their existing Options surface; 0% preserves natural input and
+  Spray is deliberately unchanged.
+- ✅ The path progressively reduces small wobble while its first and current
+  pointer points stay anchored. Live preview and release use identical
+  geometry, including pressure and calligraphic width behavior.
+- ✅ Fine ink, Soft marker, Bold paint and Calligraphy include visible,
+  editable steadiness in their complete preset state. Manual changes clear the
+  selected preset instead of creating hidden settings.
+- ✅ The setting is session-only, affects future marks and creates no document
+  mutation by itself. Each resulting gesture is still one ordinary undoable,
+  portable stroke.
+- ✅ Pure path/store tests cover exact 0%, bounded settings, endpoints,
+  preview/commit parity, Spray isolation and Undo. A production-browser test
+  distinguishes the natural and smoothed pixels and proves both undo paths.
+- ✅ Full release gates remain green: 894 unit tests, 97.54% engine coverage,
+  61 browser journeys, 25 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1633,11 +1656,11 @@ largest count of controls:
    clarification and repair, literacy-light controls and export beyond the
    task-prioritized shell/dock, and a faithful safe creation path that does not
    require a child or low-literacy user to configure an AI provider.
-3. **Professional substrate:** core portable layer blending and editable
-   per-layer adjustments are established; continue with masks, effect stacks
-   and color foundations, then vector paths, typography, grids, constraints and
-   linked reusable systems—progressively disclosed without crowding first-minute
-   Draw.
+3. **Professional substrate:** core portable layer blending, editable per-layer
+   adjustments and optional stroke stabilization are established; continue
+   with masks, effect stacks and color foundations, then vector paths,
+   typography, grids, constraints and linked reusable systems—progressively
+   disclosed without crowding first-minute Draw.
 4. **Outcome-grade delivery:** publication preflight for scientific figures,
    professional brand/print export, and short-video audio/caption/safe-zone
    control.

@@ -715,6 +715,12 @@ holds.
       appearance, `.dream` and agent read/write preserve the values, raster
       delivery matches the canvas, and non-neutral effects refuse an untruthful
       scalable export.
+183.  GIVEN Brush, Pencil or Eraser and Steady stroke at 0% WHEN a person draws
+      THEN the sampled path remains natural. WHEN the value is raised THEN
+      small wobbles reduce progressively while the start and current endpoint
+      stay fixed, the live preview equals the released mark, pressure and the
+      calligraphy nib remain coherent, and one Undo removes the complete mark.
+      The setting changes future strokes only; Spray is unchanged.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 
@@ -722,12 +728,13 @@ holds.
    planned moments aloud → confirm → the painted, captioned flipbook plays →
    one Undo removes the whole story → stamp a rocket → say "play my game" →
    the rocket catches stars.
-2. **Victor (85):** comfort mode on → everything bigger and calmer →
-   draw → undo → save → reopen tomorrow: the drawing is there.
-3. **Ali (30):** choose a brush preset → stylus pressure strokes → layers → import a photo →
+2. **Victor (85):** comfort mode on → everything bigger and calmer → turn up
+   Steady stroke → draw with reduced wobble → undo → save → reopen tomorrow:
+   the drawing is there.
+3. **Ali (30):** choose and tune a brush preset including Steady stroke → stylus pressure strokes → layers → import a photo →
    Vintage preset → crop → export JPEG q92.
-4. **Fatima (21):** Persian UI → full RTL → choose the Calligraphy nib →
-   draw thick/thin lettering with mirror symmetry on → add Persian-script
+4. **Fatima (21):** Persian UI → full RTL → choose the steady Calligraphy nib →
+   tune its path and draw thick/thin lettering with mirror symmetry on → add Persian-script
    text → one undo removes the whole mirrored bloom.
 5. **George (45):** voice-first: "make an animation with a red bird that finds
    home" → hear and confirm the planned moments → the complete animation plays

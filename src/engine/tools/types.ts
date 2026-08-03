@@ -34,6 +34,7 @@ export function makeOpId(): string {
 export const DEFAULT_SETTINGS: ToolSettings = {
   color: '#1f2937',
   size: 8,
+  stabilization: 0,
   brushStyle: 'round',
   lineStyle: 'plain',
   opacity: 1,

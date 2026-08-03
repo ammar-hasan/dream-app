@@ -367,6 +367,8 @@ export interface Component {
 export interface ToolSettings {
   color: Color;
   size: number;
+  /** 0..100 smoothing applied to future brush, pencil and eraser strokes. */
+  stabilization: number;
   /** Brush tip: round is uniform; calligraphy is a fixed 45-degree broad nib. */
   brushStyle: 'round' | 'calligraphy';
   /** Line connector ends; ignored by every other tool. */

@@ -6,6 +6,7 @@ import {
   eraserTool,
   pencilTool,
   sprayTool,
+  stabilizePoints,
 } from './stroke';
 import { DEFAULT_SETTINGS } from './types';
 import type { StrokeOp } from '../types';
@@ -68,6 +69,16 @@ describe('stroke tools', () => {
     expect(preview.tool).toBe('brush');
   });
 
+  it('ignores a duplicate release sample without losing stationary pressure', () => {
+    const state = brushTool.begin(
+      { point: { x: 0, y: 0 }, shiftKey: false, pressure: 0.2 },
+      settings,
+    );
+    brushTool.update(state, { point: { x: 0, y: 0 }, shiftKey: false, pressure: 0.8 }, settings);
+    expect(state.points).toEqual([{ x: 0, y: 0 }]);
+    expect(state.widths).toEqual([0.8]);
+  });
+
   it('committed ids differ between strokes', () => {
     const a = brushTool.commit(
       brushTool.begin({ point: { x: 0, y: 0 }, shiftKey: false }, settings),
@@ -117,6 +128,46 @@ describe('pressure sensitivity', () => {
     brushTool.update(state, { point: { x: 5, y: 0 }, shiftKey: false }, settings);
     const op = brushTool.commit(state, settings) as StrokeOp;
     expect(op.widths).toEqual([0.5, 0.5]);
+  });
+});
+
+describe('stroke stabilization', () => {
+  const wobble = [
+    { x: 0, y: 0 },
+    { x: 10, y: 10 },
+    { x: 20, y: 0 },
+    { x: 30, y: 10 },
+    { x: 40, y: 0 },
+  ];
+
+  it('leaves natural input exact at zero and keeps both endpoints anchored', () => {
+    expect(stabilizePoints(wobble, 0)).toEqual(wobble);
+    const steady = stabilizePoints(wobble, 100);
+    expect(steady[0]).toEqual(wobble[0]);
+    expect(steady.at(-1)).toEqual(wobble.at(-1));
+    expect(steady[1].y).toBeLessThan(wobble[1].y);
+    expect(steady[2].y).toBeGreaterThan(wobble[2].y);
+  });
+
+  it('uses the same stabilized geometry for live preview and commit', () => {
+    const steady = { ...settings, stabilization: 100 };
+    const state = brushTool.begin({ point: wobble[0], shiftKey: false }, steady);
+    for (const point of wobble.slice(1)) {
+      brushTool.update(state, { point, shiftKey: false }, steady);
+    }
+    const preview = brushTool.preview(state, steady) as StrokeOp;
+    const committed = brushTool.commit(state, steady) as StrokeOp;
+    expect(preview.points).toEqual(committed.points);
+    expect(committed.points).not.toEqual(wobble);
+  });
+
+  it('does not alter spray paths', () => {
+    const steady = { ...settings, stabilization: 100 };
+    const state = sprayTool.begin({ point: wobble[0], shiftKey: false }, steady);
+    for (const point of wobble.slice(1)) {
+      sprayTool.update(state, { point, shiftKey: false }, steady);
+    }
+    expect((sprayTool.commit(state, steady) as StrokeOp).points).toEqual(wobble);
   });
 });
 
