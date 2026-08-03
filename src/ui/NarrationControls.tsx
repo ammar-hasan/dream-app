@@ -122,7 +122,7 @@ export function NarrationControls() {
             ? t(kidMode ? 'narration.kidStop' : 'narration.stop')
             : t(kidMode ? 'narration.kidRecord' : 'narration.record')
         }
-        title={recording ? t('narration.stop') : t('narration.recordTitle')}
+        data-tooltip={recording ? t('narration.stop') : t('narration.recordTitle')}
         onClick={onMic}
       >
         <MicIcon />
@@ -149,7 +149,7 @@ export function NarrationControls() {
             type="button"
             className="btn icon-btn"
             aria-label={narrationMuted ? t('narration.unmute') : t('narration.mute')}
-            title={narrationMuted ? t('narration.unmute') : t('narration.mute')}
+            data-tooltip={narrationMuted ? t('narration.unmute') : t('narration.mute')}
             aria-pressed={narrationMuted}
             onClick={() => store().setNarrationMuted(!narrationMuted)}
           >
@@ -159,7 +159,7 @@ export function NarrationControls() {
             type="button"
             className="btn icon-btn"
             aria-label={t('narration.delete')}
-            title={t('narration.delete')}
+            data-tooltip={t('narration.delete')}
             onClick={() => store().setNarration(null)}
           >
             <TrashIcon />

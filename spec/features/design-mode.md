@@ -23,6 +23,10 @@ Link tools, the Design panel, the Links panel and the Components panel.
    swallow a big background object). Shift adds, like the marquee.
 5. The selection shows per-object boxes plus a shared bounding box with
    handles. Esc clears the selection.
+6. Before clicking, hovering reveals the exact topmost object that Select will
+   grab. The pointer becomes an open hand over an object, diagonal resize over
+   a corner handle, and a closed hand while moving or rotating; empty canvas,
+   a locked layer and marquee creation remain visually distinct.
 
 ## Transform
 
@@ -69,7 +73,9 @@ group. No nesting, no containers.
    ignored) and delete.
 3. **Insert:** double-click places an instance at the canvas center; or
    drag a thumbnail onto the canvas to drop it under the cursor. Every
-   instance lands on **its own new layer**.
+   instance lands on **its own new layer**. While dragging, the canvas names
+   the pending copy action, highlights itself as the valid target and keeps the
+   inserted instance selected for immediate refinement.
 4. **Instances are copies.** Editing the component never updates placed
    instances; editing an instance never touches the component. (The simple
    model — no linked masters.)

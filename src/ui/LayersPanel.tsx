@@ -42,7 +42,7 @@ export function LayersPanel() {
         <button
           type="button"
           className="btn icon-btn"
-          title={t('layers.add')}
+          data-tooltip={t('layers.add')}
           aria-label={t('layers.add')}
           onClick={() => store().addLayer()}
         >
@@ -64,7 +64,7 @@ export function LayersPanel() {
                 <button
                   type="button"
                   className="btn icon-btn small"
-                  title={layer.visible ? t('layers.hide') : t('layers.show')}
+                  data-tooltip={layer.visible ? t('layers.hide') : t('layers.show')}
                   aria-label={
                     layer.visible
                       ? t('layers.hideNamed', { name: layer.name })
@@ -94,7 +94,7 @@ export function LayersPanel() {
                 ) : (
                   <span
                     className={`layer-name${layer.visible ? '' : ' hidden-layer'}`}
-                    title={t('layers.renameTitle')}
+                    data-tooltip={t('layers.renameTitle')}
                     onDoubleClick={() => {
                       setEditingId(layer.id);
                       setEditName(layer.name);
@@ -107,7 +107,7 @@ export function LayersPanel() {
                 <button
                   type="button"
                   className="btn icon-btn small"
-                  title={layer.locked ? t('layers.unlock') : t('layers.lock')}
+                  data-tooltip={layer.locked ? t('layers.unlock') : t('layers.lock')}
                   aria-label={
                     layer.locked
                       ? t('layers.unlockNamed', { name: layer.name })
@@ -141,7 +141,7 @@ export function LayersPanel() {
                     <button
                       type="button"
                       className="btn icon-btn small"
-                      title={t('layers.moveUp')}
+                      data-tooltip={t('layers.moveUp')}
                       aria-label={t('layers.moveUpNamed', { name: layer.name })}
                       disabled={index === doc.layers.length - 1}
                       onClick={() => store().moveLayer(layer.id, index + 1)}
@@ -151,7 +151,7 @@ export function LayersPanel() {
                     <button
                       type="button"
                       className="btn icon-btn small"
-                      title={t('layers.moveDown')}
+                      data-tooltip={t('layers.moveDown')}
                       aria-label={t('layers.moveDownNamed', { name: layer.name })}
                       disabled={index === 0}
                       onClick={() => store().moveLayer(layer.id, index - 1)}
@@ -161,7 +161,7 @@ export function LayersPanel() {
                     <button
                       type="button"
                       className="btn icon-btn small danger"
-                      title={t('layers.delete')}
+                      data-tooltip={t('layers.delete')}
                       aria-label={t('layers.deleteNamed', { name: layer.name })}
                       disabled={doc.layers.length <= 1}
                       onClick={() => store().deleteLayer(layer.id)}

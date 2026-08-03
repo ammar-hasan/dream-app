@@ -212,6 +212,9 @@ export const ar: Record<string, string> = {
   'components.renameTitle': 'انقر نقرًا مزدوجًا لإعادة التسمية',
   'components.delete': 'حذف المكوّن',
   'components.deleteNamed': 'حذف {name}',
+  'drop.component': 'أفلِت لوضع هذا المكوّن',
+  'drop.image': 'أفلِت لاستيراد هذه الصورة',
+  'drop.invalid': 'أفلِت صورة أو مكوّن Dream هنا',
 
   // --- Adjust panel -----------------------------------------------------------
   'adjust.title': 'تعديل',

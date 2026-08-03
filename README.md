@@ -213,8 +213,9 @@ and the language picker.
   higher-contrast tokens, composing with dark theme, kid mode and RTL
 - Layers: add, delete, rename, reorder, visibility, opacity, lock — all undoable
 - Image import: file picker, drag-and-drop onto the canvas, or paste from the
-  clipboard — each image lands centered on its own layer (scaled down to fit)
-- Move tool drags any layer's content; flip horizontal/vertical and rotate 90°
+  clipboard — each image lands centered on its own layer (scaled down to fit);
+  valid image/component drags and invalid content get distinct named targets
+- Move tool drags any layer's content with open/closed-hand feedback; flip horizontal/vertical and rotate 90°
   CW/CCW per layer (around the layer's own content, so it stays in place)
 - Adjust panel: brightness, contrast, saturation, hue, grayscale, sepia, invert,
   blur (box) and sharpen (3x3 kernel) with live preview and B&W / Vintage / Cool /
@@ -434,7 +435,9 @@ pro workspace — the mode is persisted per project.
   (strokes, shapes, text, images, fills — topmost wins). Shift-click toggles,
   drag on empty canvas rubber-band-selects. The **lasso (K)** selects with a
   freehand loop instead (bounds-center inside the polygon). The selection
-  shows per-object boxes plus a shared bounding box with handles.
+  shows per-object boxes plus a shared bounding box with handles. Before click,
+  a lighter box and contextual cursor reveal the exact object or handle the
+  next press will grab.
 - **Move / scale / rotate**: drag the selection to move it; corner handles
   scale uniformly; the handle above the box rotates. Rotation is free-form for
   strokes, lines and text anchors; selections containing rectangles, ellipses
@@ -457,7 +460,8 @@ pro workspace — the mode is persisted per project.
 - **Components**: save any selection as a named component in the cross-project
   library (IndexedDB). The Components panel shows live thumbnails; double-click
   inserts at the canvas center, or drag onto the canvas to drop under the
-  cursor — each instance lands on its own layer. **Instances are copies**:
+  cursor — the canvas previews the copy target and each instance lands selected
+  on its own layer. **Instances are copies**:
   editing the component does not update already-placed instances (the simple
   MS-Paint model; linked masters are a possible future slice).
 - Everything above is undoable through the same command history.

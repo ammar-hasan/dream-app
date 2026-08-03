@@ -58,7 +58,7 @@ const FrameThumbnail = memo(
       <button
         type="button"
         className={`timeline-frame${active ? ' active' : ''}${playingHere ? ' playing' : ''}`}
-        title={t('timeline.frame', { n: index + 1 })}
+        data-tooltip={t('timeline.frame', { n: index + 1 })}
         aria-label={t('timeline.frame', { n: index + 1 })}
         aria-pressed={active}
         onClick={onSelect}
@@ -133,7 +133,7 @@ export function TimelineBar() {
         type="button"
         className="btn icon-btn timeline-collapse"
         aria-label={collapsed ? t('timeline.showFrames') : t('timeline.hideFrames')}
-        title={collapsed ? t('timeline.showFrames') : t('timeline.hideFrames')}
+        data-tooltip={collapsed ? t('timeline.showFrames') : t('timeline.hideFrames')}
         onClick={() => setCollapsed(!collapsed)}
       >
         {collapsed ? '▴' : '▾'}
@@ -161,7 +161,7 @@ export function TimelineBar() {
             type="button"
             className="btn icon-btn timeline-play timeline-task-animate"
             aria-label={playing ? t('timeline.pause') : t('timeline.play')}
-            title={playing ? t('timeline.pause') : t('timeline.play')}
+            data-tooltip={playing ? t('timeline.pause') : t('timeline.play')}
             onClick={() => store.togglePlay()}
           >
             {playing ? <PauseIcon /> : <PlayIcon />}
@@ -187,7 +187,7 @@ export function TimelineBar() {
               type="button"
               className="timeline-frame timeline-add"
               aria-label={t('timeline.addFrame')}
-              title={t('timeline.addFrame')}
+              data-tooltip={t('timeline.addFrame')}
               onClick={() => store.addFrame()}
             >
               <PlusIcon />
@@ -220,7 +220,7 @@ export function TimelineBar() {
             <button
               type="button"
               className="btn timeline-frame-action"
-              title={t('timeline.duplicateFrame')}
+              data-tooltip={t('timeline.duplicateFrame')}
               aria-label={t('timeline.duplicateFrame')}
               onClick={() => store.duplicateFrame()}
             >
@@ -229,7 +229,7 @@ export function TimelineBar() {
             <button
               type="button"
               className="btn timeline-frame-action"
-              title={t('timeline.moveLeft')}
+              data-tooltip={t('timeline.moveLeft')}
               aria-label={t('timeline.moveLeft')}
               disabled={activeIndex(frames, doc.activeFrameId) === 0}
               onClick={() =>
@@ -241,7 +241,7 @@ export function TimelineBar() {
             <button
               type="button"
               className="btn timeline-frame-action"
-              title={t('timeline.moveRight')}
+              data-tooltip={t('timeline.moveRight')}
               aria-label={t('timeline.moveRight')}
               disabled={activeIndex(frames, doc.activeFrameId) === frames.length - 1}
               onClick={() =>
@@ -253,7 +253,7 @@ export function TimelineBar() {
             <button
               type="button"
               className="btn timeline-frame-action"
-              title={t('timeline.deleteFrame')}
+              data-tooltip={t('timeline.deleteFrame')}
               aria-label={t('timeline.deleteFrame')}
               disabled={frames.length <= 1}
               onClick={() => store.deleteFrame(doc.activeFrameId ?? '')}
@@ -261,7 +261,7 @@ export function TimelineBar() {
               ✕
             </button>
 
-            <label className="timeline-fps timeline-task-animate" title={t('timeline.fps')}>
+            <label className="timeline-fps timeline-task-animate" data-tooltip={t('timeline.fps')}>
               <input
                 type="range"
                 min={MIN_FPS}
@@ -276,7 +276,8 @@ export function TimelineBar() {
             <button
               type="button"
               className={`btn timeline-task-animate${settings.loop ? ' primary' : ''}`}
-              title={t('timeline.loopTitle')}
+              aria-label={t('timeline.loop')}
+              data-tooltip={t('timeline.loopTitle')}
               aria-pressed={settings.loop}
               onClick={() => store.setAnimation({ loop: !settings.loop })}
             >
@@ -285,7 +286,8 @@ export function TimelineBar() {
             <button
               type="button"
               className={`btn timeline-task-animate${settings.onionSkin ? ' primary' : ''}`}
-              title={t('timeline.onionTitle')}
+              aria-label={t('timeline.onion')}
+              data-tooltip={t('timeline.onionTitle')}
               aria-pressed={settings.onionSkin}
               onClick={() => store.setAnimation({ onionSkin: !settings.onionSkin })}
             >
@@ -303,12 +305,13 @@ export function TimelineBar() {
                     store.setAnimation({ onionOpacity: Number(e.target.value) / 100 })
                   }
                   aria-label={t('timeline.onionOpacity')}
-                  title={t('timeline.onionOpacity')}
+                  data-tooltip={t('timeline.onionOpacity')}
                 />
                 <button
                   type="button"
                   className={`btn timeline-task-animate${settings.onionNext ? ' primary' : ''}`}
-                  title={t('timeline.onionNextTitle')}
+                  aria-label={t('timeline.onionNext')}
+                  data-tooltip={t('timeline.onionNextTitle')}
                   aria-pressed={settings.onionNext}
                   onClick={() => store.setAnimation({ onionNext: !settings.onionNext })}
                 >

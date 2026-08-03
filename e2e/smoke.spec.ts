@@ -56,6 +56,100 @@ test('switching to Design mode reveals the design panels', async ({ page }) => {
   await expect(page.locator('.components-panel')).toBeVisible();
 });
 
+test('canvas pointers preview the object and explain direct-manipulation state', async ({
+  page,
+}) => {
+  await bootApp(page);
+  await drawStroke(page);
+  await page.getByRole('tab', { name: 'Design' }).click();
+  await page.getByRole('button', { name: 'Select', exact: true }).click();
+
+  const canvas = page.locator('.viewport-canvas');
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('viewport canvas has no box');
+  const accentPixels = () =>
+    canvas.evaluate((element) => {
+      const context = (element as HTMLCanvasElement).getContext('2d');
+      if (!context) return 0;
+      const pixels = context.getImageData(0, 0, context.canvas.width, context.canvas.height).data;
+      let count = 0;
+      for (let index = 0; index < pixels.length; index += 4) {
+        if (pixels[index]! < 200 && pixels[index + 1]! < 200 && pixels[index + 2]! > 235) {
+          count += 1;
+        }
+      }
+      return count;
+    });
+
+  await page.mouse.move(box.x + box.width - 20, box.y + 20);
+  await expect(canvas).toHaveCSS('cursor', 'default');
+  const beforeHover = await accentPixels();
+
+  const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  await page.mouse.move(center.x, center.y);
+  await expect(canvas).toHaveCSS('cursor', 'grab');
+  await expect.poll(accentPixels).toBeGreaterThan(beforeHover + 50);
+
+  await page.mouse.click(center.x, center.y);
+  await expect(page.locator('.design-panel')).toContainText('1 object selected');
+  const northWest = { x: center.x - 124, y: center.y - 4 };
+  await page.mouse.move(northWest.x, northWest.y);
+  await expect(canvas).toHaveCSS('cursor', 'nwse-resize');
+  await page.mouse.move(center.x, center.y - 26);
+  await expect(canvas).toHaveCSS('cursor', /url\(/);
+
+  await page.getByRole('button', { name: 'Pan', exact: true }).click();
+  await expect(canvas).toHaveCSS('cursor', 'grab');
+  await page.mouse.move(center.x, center.y);
+  await page.mouse.down();
+  await expect(canvas).toHaveCSS('cursor', 'grabbing');
+  await page.mouse.up();
+  await expect(canvas).toHaveCSS('cursor', 'grab');
+
+  await page.getByRole('button', { name: 'Zoom', exact: true }).click();
+  await expect(canvas).toHaveCSS('cursor', 'zoom-in');
+  await page.keyboard.down('Alt');
+  await page.mouse.move(center.x + 1, center.y);
+  await expect(canvas).toHaveCSS('cursor', 'zoom-out');
+  await page.keyboard.up('Alt');
+});
+
+test('canvas drag targets distinguish components, images and invalid content', async ({ page }) => {
+  await bootApp(page);
+  const viewport = page.locator('.viewport');
+  const dispatchDrag = (kind: 'component' | 'image' | 'invalid') =>
+    viewport.evaluate((element, dragKind) => {
+      const transfer = new DataTransfer();
+      if (dragKind === 'component') {
+        transfer.setData('application/x-dream-component', 'component-test');
+      } else if (dragKind === 'image') {
+        transfer.items.add(new File(['pixel'], 'pixel.png', { type: 'image/png' }));
+      } else {
+        transfer.setData('text/plain', 'not supported');
+      }
+      element.dispatchEvent(
+        new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer: transfer }),
+      );
+    }, kind);
+
+  await dispatchDrag('component');
+  await expect(viewport).toHaveAttribute('data-drop-state', 'component');
+  await expect(viewport.getByRole('status')).toHaveText('Release to place this component');
+
+  await dispatchDrag('image');
+  await expect(viewport).toHaveAttribute('data-drop-state', 'image');
+  await expect(viewport.getByRole('status')).toHaveText('Release to import this image');
+
+  await dispatchDrag('invalid');
+  await expect(viewport).toHaveAttribute('data-drop-state', 'invalid');
+  await expect(viewport.getByRole('status')).toHaveText('Drop an image or a Dream component here');
+
+  await viewport.evaluate((element) => {
+    element.dispatchEvent(new DragEvent('dragleave', { bubbles: true, relatedTarget: null }));
+  });
+  await expect(viewport).not.toHaveAttribute('data-drop-state');
+});
+
 test('tooltips escape the scrolling toolbar and tool rail', async ({ page }) => {
   await bootApp(page);
 
@@ -80,6 +174,30 @@ test('tooltips escape the scrolling toolbar and tool rail', async ({ page }) => 
       }),
     )
     .toEqual(['"Brush (B)"', '1', 'fixed', 'center end']);
+
+  const addLayer = page.getByRole('button', { name: 'Add layer' });
+  await addLayer.hover();
+  await expect
+    .poll(() =>
+      addLayer.evaluate((element) => {
+        const tip = getComputedStyle(element, '::after');
+        return [tip.content, tip.opacity, tip.position, tip.getPropertyValue('position-area')];
+      }),
+    )
+    .toEqual(['"Add layer"', '1', 'fixed', 'center start']);
+
+  await page.getByRole('button', { name: 'Animate' }).click();
+  const addFrame = page.getByRole('button', { name: 'Add frame' });
+  await addFrame.hover();
+  await expect
+    .poll(() =>
+      addFrame.evaluate((element) => {
+        const tip = getComputedStyle(element, '::after');
+        return [tip.content, tip.opacity, tip.position, tip.getPropertyValue('position-area')];
+      }),
+    )
+    .toEqual(['"Add frame"', '1', 'fixed', 'top']);
+  await expect(page.locator('[title]')).toHaveCount(0);
 });
 
 test('AI Edit explains whole-layer edits and takes the user straight to selection', async ({

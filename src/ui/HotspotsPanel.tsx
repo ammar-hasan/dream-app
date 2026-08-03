@@ -69,7 +69,7 @@ export function HotspotsPanel() {
               <button
                 type="button"
                 className="btn icon-btn small"
-                title={t('link.delete')}
+                data-tooltip={t('link.delete')}
                 aria-label={t('link.delete')}
                 onClick={() => store().removeHotspot(hotspot.id)}
               >

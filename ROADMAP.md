@@ -1063,7 +1063,7 @@ of being limited to geometric shapes and text.
 - Acceptance met: an agent creates, reopens and renders a portable freehand
   mark while malformed or oversized input leaves the project unchanged.
 
-## Slice 44 — Interaction truth and discoverability 🚧
+## Slice 44 — Interaction truth and discoverability ✅
 
 Persona need: let every creator understand available actions and prerequisites
 at the point of use, independent of prior product knowledge or browser support.
@@ -1079,16 +1079,39 @@ at the point of use, independent of prior product knowledge or browser support.
 - ✅ Local release gates are green: main checks, 97.74% engine coverage,
   42 browser journeys, 24 MCP tests, four honest agent evals and both MCP
   core/protocol round-trips.
-- ⏳ Deployed-main verification remains before completion.
+- ✅ GitHub Pages and all CI jobs completed successfully; a cache-bypassed public
+  browser proved both tooltips, whole-layer guidance, Design + Select handoff,
+  selected-only editing and unavailable-voice feedback on commit `6b517e7`.
+
+## Slice 45 — Predictive direct manipulation ✅
+
+Persona need: let Aleksandr—and every mouse, trackpad or stylus creator—know
+what a gesture will do before committing it, and what it is doing during drag.
+
+- ✅ Select hover previews the exact topmost object while empty canvas, objects,
+  corner resize handles, rotation, locked layers and active drags use distinct
+  pointer states.
+- ✅ Pan and whole-layer Move transition from open to closed hand; magic-wand
+  dragging, text, fill, stamp, playback and Alt-modified zoom have truthful
+  cursors.
+- ✅ Component and image drags turn the canvas into a named copy/import target;
+  unsupported content gets a named refusal state and changes nothing.
+- ✅ Every remaining panel and timeline control now uses the same unclipped
+  styled-tooltip contract as the toolbar and rail instead of native browser
+  titles; browser coverage proves all four placement directions.
+- ✅ Focused production-browser tests prove hover chrome, cursor transitions and
+  component/image/invalid drag states. Full gates remain green: 837 unit tests,
+  97.74% engine coverage, 44 browser journeys, 24 MCP tests and four honest
+  evals.
 
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
 largest count of controls:
 
-1. **Direct-manipulation foundation:** complete cursor semantics, hover/hit
-   feedback, drag ghosts, valid/invalid targets, post-drop selection and
-   consistent progress/cancellation.
+1. **Direct-manipulation foundation:** cursor semantics, hover/hit feedback,
+   valid/invalid targets and post-drop selection are now established; continue
+   with drag ghosts plus consistent progress/cancellation.
 2. **Conversational phone-first creation:** natural clarification and reference
    handling for voice, a task-prioritized mobile shell, and a faithful safe
    creation path that does not require a child or low-literacy user to configure

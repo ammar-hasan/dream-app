@@ -209,6 +209,9 @@ export const zh: Record<string, string> = {
   'components.renameTitle': '双击重命名',
   'components.delete': '删除组件',
   'components.deleteNamed': '删除 {name}',
+  'drop.component': '松开以放置此组件',
+  'drop.image': '松开以导入此图像',
+  'drop.invalid': '请将图像或 Dream 组件拖放到这里',
 
   // --- Adjust panel -----------------------------------------------------------
   'adjust.title': '调整',

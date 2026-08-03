@@ -364,6 +364,7 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
               <button
                 type="button"
                 className="btn ai-select-part"
+                aria-label={t('ai.selectPart')}
                 data-tooltip={t('ai.selectPartTitle')}
                 onClick={startSelecting}
               >

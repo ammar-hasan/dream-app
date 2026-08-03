@@ -171,7 +171,7 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
         <div className="toolbar-group">
           <DreamMark className="app-mark" />
           <span className="app-title">{t('app.title')}</span>
-          <span className="doc-name" title={docName}>
+          <span className="doc-name" data-tooltip={docName}>
             {docName}
             {isDirty ? ' •' : ''}
           </span>
@@ -239,6 +239,7 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
           <button
             type="button"
             className={`btn${animated ? ' primary' : ''}`}
+            aria-label={t('toolbar.animate')}
             aria-pressed={animated}
             data-tooltip={t('toolbar.animateTitle')}
             onClick={() => useDreamStore.getState().toggleAnimation()}
@@ -252,6 +253,7 @@ export function Toolbar({ onNew, onOpen, onResize, onExport }: ToolbarProps) {
         <button
           type="button"
           className="btn"
+          aria-label={t('storyboard.short')}
           data-tooltip={t('storyboard.toolbarHint')}
           onClick={() => useDreamStore.getState().openStoryboard()}
         >

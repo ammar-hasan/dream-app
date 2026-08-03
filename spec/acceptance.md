@@ -535,12 +535,23 @@ holds.
       optional pressure widths persist in the active frame and mirrored stack;
       invalid counts, samples, pressure, style or target change nothing.
 161.  GIVEN an adult hovers or keyboard-focuses a named control inside a
-      scrolling toolbar or tool rail THEN its styled tooltip becomes fully
-      visible beyond that container rather than being clipped at its edge.
+      scrolling toolbar, tool rail, panel or timeline THEN its styled tooltip
+      becomes fully visible toward the workspace rather than being clipped at
+      the container or viewport edge; no control falls back to a native browser
+      tooltip bubble.
 162.  GIVEN AI Edit has no selection THEN it says that Edit affects the whole
       active layer; WHEN Select a part is chosen THEN Design opens with Select
       active, and clicking an object or dragging a marquee enables selected-only
       editing without closing the assistant.
+163.  GIVEN Select is active WHEN the pointer crosses empty canvas, a topmost
+      object, a selected corner handle or a locked layer THEN hover chrome and
+      the pointer distinguish what the next press will do; WHILE moving,
+      resizing, rotating, panning or moving a whole layer THEN the pointer
+      distinguishes the active drag from its idle state.
+164.  GIVEN a dragged Dream component, image or unsupported item enters the
+      canvas THEN the canvas names and highlights the pending valid or invalid
+      result before release; WHEN it leaves or drops THEN the feedback clears,
+      and an unsupported drop changes nothing.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

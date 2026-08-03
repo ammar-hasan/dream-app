@@ -7,6 +7,14 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Predictive direct manipulation** (slice 45): Select previews the exact
+  topmost object before click; canvas cursors now distinguish objects, resize,
+  active drags, pan, zoom direction, fill, stamp, locks and playback. Component
+  and image drags receive named valid/invalid canvas feedback before release,
+  with browser coverage for pointer and drop-state transitions. Remaining
+  panel and timeline controls now use the same unclipped styled tooltips instead
+  of native browser bubbles.
+
 - **Interaction truth and discoverability** (slice 44): tooltips now escape
   scrolling toolbar and rail boundaries; AI Edit explains whole-layer behavior
   and can enter Design + Select in one action; the global voice mic remains

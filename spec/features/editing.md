@@ -8,7 +8,9 @@ Photoshop", all undoable.
 
 1. Three ways in: the **Import** button (file picker, multiple images
    allowed), **drag-and-drop** onto the canvas, **paste** from the
-   clipboard.
+   clipboard. During a drag, the canvas distinguishes an importable image from
+   unsupported content, names the result before release and refuses an invalid
+   drop without changing the project.
 2. Each image lands **centered on its own new layer**, scaled down to fit
    the canvas if larger (never upscaled), and becomes the active layer.
 3. Import is one undoable change per image. Pixels survive save/load
@@ -52,7 +54,8 @@ reorderable filter stack.
 ## Move, flip, rotate (per layer)
 
 - The **Move tool (M in Draw mode, V in Draw mode)** drags the active
-  layer's entire content. One drag = one undoable change.
+  layer's entire content. One drag = one undoable change. Its pointer is an
+  open hand before the drag and a closed hand while the layer follows it.
 - **Flip horizontal / flip vertical / rotate 90° CW / rotate 90° CCW** act
   on the active layer, around the center of **the layer's own content**, so
   the content stays in place (it does not orbit the canvas center).

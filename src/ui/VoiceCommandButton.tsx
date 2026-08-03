@@ -2,8 +2,8 @@
  * The toolbar voice-command button: click, say "undo", "red", "new frame"…
  * and Dream does it. The transcript goes through the pure parser
  * (`ai/voiceCommands`) and the executor (`voiceExecutor`); feedback is shown
- * next to the button and spoken aloud when voice feedback is on. Hidden
- * entirely where SpeechRecognition is unsupported.
+ * next to the button and spoken aloud when voice feedback is on. Where
+ * recognition is unsupported, the button explains the other input paths.
  */
 
 import { useRef, useState } from 'react';

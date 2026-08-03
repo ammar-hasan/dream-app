@@ -93,7 +93,7 @@ export function OpenDialog({ onClose }: { onClose: () => void }) {
               <button
                 type="button"
                 className="btn icon-btn small danger"
-                title={t('open.delete')}
+                data-tooltip={t('open.delete')}
                 aria-label={t('open.deleteNamed', { name: p.name })}
                 onClick={() => void remove(p.id)}
               >

@@ -11,13 +11,19 @@
  * offscreen canvas and read pixels back — the engine stays DOM-free.
  */
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { renderDocument, renderLayer, renderOperation } from '../engine/renderer';
 import { LayerCache } from '../engine/layerCache';
 import { animationSettingsOf, frameIndexAtTime, onionSkinTargets } from '../engine/animation';
 import { activeHotspots } from '../engine/hotspots';
-import { normalizeRect } from '../engine/geometry';
-import { selectedOps, selectionBounds, unionBounds } from '../engine/selection';
+import { distance, normalizeRect } from '../engine/geometry';
+import {
+  hitTestOperations,
+  selectedOps,
+  selectionBounds,
+  selectionUnionBounds,
+  unionBounds,
+} from '../engine/selection';
 import { mirrorOperations, SYMMETRY_TOOLS } from '../engine/symmetry';
 import { clampZoom, nextZoomIn, nextZoomOut, pickColor, zoomAtPoint } from '../engine/tools';
 import type { RasterSource } from '../engine/tools';
@@ -33,6 +39,16 @@ import { DreamMark } from './icons';
 
 /** Accent used for all selection chrome, matching --accent in app.css. */
 const ACCENT = '#6d7cff';
+const HANDLE_PX = 10;
+const ROTATE_GAP_PX = 22;
+
+type SelectHover =
+  | { kind: 'object'; opId: string }
+  | { kind: 'scale'; handle: 'nw' | 'ne' | 'sw' | 'se' }
+  | { kind: 'rotate' }
+  | { kind: 'locked' }
+  | null;
+type DropFeedback = 'component' | 'image' | 'invalid' | null;
 
 /** Paint a raw RGBA buffer onto the canvas at (x, y), honoring opacity. */
 function blitBuffer(
@@ -68,6 +84,10 @@ export function CanvasViewport() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const panRef = useRef<{ startX: number; startY: number; origin: Point } | null>(null);
+  const [panning, setPanning] = useState(false);
+  const [selectHover, setSelectHover] = useState<SelectHover>(null);
+  const [zoomingOut, setZoomingOut] = useState(false);
+  const [dropFeedback, setDropFeedback] = useState<DropFeedback>(null);
 
   const doc = useDreamStore((s) => s.doc);
   const activeLayerId = useDreamStore((s) => s.activeLayerId);
@@ -80,6 +100,7 @@ export function CanvasViewport() {
   const adjustPreview = useDreamStore((s) => s.adjustPreview);
   const symmetry = useDreamStore((s) => s.symmetry);
   const wandDraft = useDreamStore((s) => s.wandDraft);
+  const wandDrag = useDreamStore((s) => s.wandDrag);
   const lassoDraft = useDreamStore((s) => s.lassoDraft);
   const linkDraft = useDreamStore((s) => s.linkDraft);
   const selection = useDreamStore((s) => s.selection);
@@ -369,6 +390,24 @@ export function CanvasViewport() {
         ctx.setLineDash([]);
       }
 
+      // Before a click, reveal the exact topmost object that Select will grab.
+      // This is deliberately lighter than committed selection chrome.
+      if (selectHover?.kind === 'object' && !selection.includes(selectHover.opId)) {
+        const hovered = activeLayer.operations.find((op) => op.id === selectHover.opId);
+        if (hovered) {
+          const bounds = selectionBounds(hovered);
+          ctx.save();
+          ctx.strokeStyle = ACCENT;
+          ctx.globalAlpha = 0.82;
+          ctx.lineWidth = 1.5 * px;
+          ctx.setLineDash([3 * px, 3 * px]);
+          ctx.shadowColor = ACCENT;
+          ctx.shadowBlur = 5 * px;
+          ctx.strokeRect(bounds.x, bounds.y, bounds.width, bounds.height);
+          ctx.restore();
+        }
+      }
+
       if (selection.length > 0) {
         // Per-op boxes follow the live transform preview while dragging.
         const displayOps = selectDraft?.preview ?? selectedOps(activeLayer, selection);
@@ -556,6 +595,57 @@ export function CanvasViewport() {
     });
   };
 
+  const updateSelectHover = (point: Point) => {
+    if (playing || mode !== 'design' || tool !== 'select') {
+      setSelectHover(null);
+      return;
+    }
+    const layer = doc.layers.find((candidate) => candidate.id === activeLayerId);
+    let next: SelectHover = null;
+    if (layer?.locked) {
+      next = { kind: 'locked' };
+    } else if (layer) {
+      const bounds = selectionUnionBounds(layer.operations, selection);
+      const handleSize = HANDLE_PX / zoom;
+      if (bounds) {
+        const rotate = {
+          x: bounds.x + bounds.width / 2,
+          y: bounds.y - ROTATE_GAP_PX / zoom,
+        };
+        if (distance(point, rotate) <= handleSize) {
+          next = { kind: 'rotate' };
+        } else {
+          const handles = [
+            ['nw', { x: bounds.x, y: bounds.y }],
+            ['ne', { x: bounds.x + bounds.width, y: bounds.y }],
+            ['sw', { x: bounds.x, y: bounds.y + bounds.height }],
+            ['se', { x: bounds.x + bounds.width, y: bounds.y + bounds.height }],
+          ] as const;
+          const handle = handles.find(
+            ([, candidate]) =>
+              Math.abs(point.x - candidate.x) <= handleSize &&
+              Math.abs(point.y - candidate.y) <= handleSize,
+          )?.[0];
+          if (handle) next = { kind: 'scale', handle };
+        }
+      }
+      if (!next) {
+        const hit = hitTestOperations(layer.operations, point, 5 / zoom);
+        if (hit) next = { kind: 'object', opId: hit.id };
+      }
+    }
+    setSelectHover((current) =>
+      current?.kind === next?.kind &&
+      (current?.kind !== 'object' || current.opId === (next as { opId: string }).opId) &&
+      (current?.kind !== 'scale' ||
+        current.handle === (next as { handle: 'nw' | 'ne' | 'sw' | 'se' }).handle)
+        ? current
+        : next,
+    );
+  };
+
+  useEffect(() => setSelectHover(null), [activeLayerId, mode, playing, tool]);
+
   // --- Pointer routing ----------------------------------------------------
 
   const onPointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -563,6 +653,7 @@ export function CanvasViewport() {
     const panning = e.button === 1 || tool === 'pan' || spacePanning;
     if (panning) {
       panRef.current = { startX: e.clientX, startY: e.clientY, origin: { ...offset } };
+      setPanning(true);
       return;
     }
     if (e.button !== 0) return;
@@ -590,6 +681,7 @@ export function CanvasViewport() {
   };
 
   const onPointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    setZoomingOut(tool === 'zoom' && e.altKey);
     if (panRef.current) {
       const { startX, startY, origin } = panRef.current;
       useDreamStore.getState().setViewport({
@@ -598,6 +690,7 @@ export function CanvasViewport() {
       return;
     }
     const point = toDocPoint(e.clientX, e.clientY);
+    updateSelectHover(point);
     const pressure = e.pointerType === 'pen' ? e.pressure : undefined;
     useDreamStore.getState().pointerMove(point, { shiftKey: e.shiftKey, pressure });
   };
@@ -605,10 +698,18 @@ export function CanvasViewport() {
   const onPointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (panRef.current) {
       panRef.current = null;
+      setPanning(false);
       return;
     }
     const point = toDocPoint(e.clientX, e.clientY);
     useDreamStore.getState().pointerUp(point, { shiftKey: e.shiftKey });
+    updateSelectHover(point);
+  };
+
+  const clearPointerFeedback = () => {
+    setSelectHover(null);
+    setZoomingOut(false);
+    useDreamStore.getState().setPointerPos(null);
   };
 
   // Wheel zoom (non-passive so we can prevent page scroll).
@@ -623,19 +724,70 @@ export function CanvasViewport() {
     return () => canvas.removeEventListener('wheel', onWheel);
   }, [zoom, offset]);
 
-  const cursor =
-    tool === 'pan' || spacePanning
-      ? 'grab'
-      : tool === 'text'
-        ? 'text'
-        : tool === 'move'
-          ? 'move'
-          : tool === 'select'
-            ? 'default'
-            : 'crosshair';
+  const selectCursor = (() => {
+    if (selectDraft?.kind === 'move' || selectDraft?.kind === 'rotate') return 'grabbing';
+    if (selectDraft?.kind === 'scale') {
+      return selectDraft.handle === 'ne' || selectDraft.handle === 'sw'
+        ? 'nesw-resize'
+        : 'nwse-resize';
+    }
+    if (selectDraft?.kind === 'marquee') return 'crosshair';
+    if (selectHover?.kind === 'locked') return 'not-allowed';
+    if (selectHover?.kind === 'rotate') return 'var(--cursor-rotate)';
+    if (selectHover?.kind === 'object') return 'grab';
+    if (selectHover?.kind === 'scale') {
+      return selectHover.handle === 'ne' || selectHover.handle === 'sw'
+        ? 'nesw-resize'
+        : 'nwse-resize';
+    }
+    return 'default';
+  })();
+  const cursor = playing
+    ? 'default'
+    : panning
+      ? 'grabbing'
+      : tool === 'pan' || spacePanning
+        ? 'grab'
+        : tool === 'text'
+          ? 'text'
+          : tool === 'move'
+            ? moveDraft
+              ? 'grabbing'
+              : 'grab'
+            : tool === 'wand' && wandDrag
+              ? 'grabbing'
+              : tool === 'select'
+                ? selectCursor
+                : tool === 'zoom'
+                  ? zoomingOut
+                    ? 'zoom-out'
+                    : 'zoom-in'
+                  : tool === 'fill'
+                    ? 'cell'
+                    : tool === 'stamp'
+                      ? 'copy'
+                      : 'crosshair';
+
+  const dropKind = (transfer: DataTransfer): DropFeedback => {
+    if (transfer.types.includes('application/x-dream-component')) return 'component';
+    const files = [...transfer.items].filter((item) => item.kind === 'file');
+    if (files.some((item) => item.type.startsWith('image/'))) return 'image';
+    if ([...transfer.files].some((file) => file.type.startsWith('image/'))) return 'image';
+    return 'invalid';
+  };
+
+  const onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const kind = dropKind(e.dataTransfer);
+    e.dataTransfer.dropEffect = kind === 'invalid' ? 'none' : 'copy';
+    setDropFeedback((current) => (current === kind ? current : kind));
+  };
 
   const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    const kind = dropKind(e.dataTransfer);
+    setDropFeedback(null);
+    if (kind === 'invalid') return;
     const componentId = e.dataTransfer.getData('application/x-dream-component');
     if (componentId) {
       // Drop a component instance at the drop point (centered on the cursor).
@@ -653,8 +805,20 @@ export function CanvasViewport() {
     void importImageFiles(e.dataTransfer.files);
   };
 
+  const dropMessage = dropFeedback ? t(`drop.${dropFeedback}`) : null;
+
   return (
-    <div className="viewport" ref={wrapRef} onDragOver={(e) => e.preventDefault()} onDrop={onDrop}>
+    <div
+      className="viewport"
+      ref={wrapRef}
+      data-drop-state={dropFeedback ?? undefined}
+      onDragEnter={onDragOver}
+      onDragOver={onDragOver}
+      onDragLeave={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDropFeedback(null);
+      }}
+      onDrop={onDrop}
+    >
       <canvas
         ref={canvasRef}
         className="viewport-canvas"
@@ -662,7 +826,12 @@ export function CanvasViewport() {
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        onPointerLeave={() => useDreamStore.getState().setPointerPos(null)}
+        onPointerLeave={clearPointerFeedback}
+        onPointerCancel={() => {
+          panRef.current = null;
+          setPanning(false);
+          clearPointerFeedback();
+        }}
       />
       {pendingText && (
         <TextOverlay
@@ -678,6 +847,11 @@ export function CanvasViewport() {
             <DreamMark className="hint-mark" />
             <p className="hint-text">{t('hint.firstRun')}</p>
           </div>
+        </div>
+      )}
+      {dropMessage && (
+        <div className="drop-feedback" role="status">
+          {dropMessage}
         </div>
       )}
       {!kidMode && (

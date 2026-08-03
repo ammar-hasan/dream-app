@@ -218,6 +218,9 @@ export const pt: Record<string, string> = {
   'components.renameTitle': 'Dê duplo clique para renomear',
   'components.delete': 'Excluir componente',
   'components.deleteNamed': 'Excluir {name}',
+  'drop.component': 'Solte para posicionar este componente',
+  'drop.image': 'Solte para importar esta imagem',
+  'drop.invalid': 'Solte uma imagem ou um componente do Dream aqui',
 
   // --- Adjust panel -----------------------------------------------------------
   'adjust.title': 'Ajustar',

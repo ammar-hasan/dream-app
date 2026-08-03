@@ -101,32 +101,36 @@ export function AdjustPanel() {
         <button
           type="button"
           className="btn"
+          aria-label={t('adjust.flipH')}
           onClick={() => store().flipLayer('horizontal')}
-          title={t('adjust.flipHTitle')}
+          data-tooltip={t('adjust.flipHTitle')}
         >
           {t('adjust.flipH')}
         </button>
         <button
           type="button"
           className="btn"
+          aria-label={t('adjust.flipV')}
           onClick={() => store().flipLayer('vertical')}
-          title={t('adjust.flipVTitle')}
+          data-tooltip={t('adjust.flipVTitle')}
         >
           {t('adjust.flipV')}
         </button>
         <button
           type="button"
           className="btn"
+          aria-label={t('adjust.rotateCcwTitle')}
           onClick={() => store().rotateLayer('ccw')}
-          title={t('adjust.rotateCcwTitle')}
+          data-tooltip={t('adjust.rotateCcwTitle')}
         >
           ⟲ 90°
         </button>
         <button
           type="button"
           className="btn"
+          aria-label={t('adjust.rotateCwTitle')}
           onClick={() => store().rotateLayer('cw')}
-          title={t('adjust.rotateCwTitle')}
+          data-tooltip={t('adjust.rotateCwTitle')}
         >
           ⟳ 90°
         </button>

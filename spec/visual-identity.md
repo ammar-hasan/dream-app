@@ -118,6 +118,13 @@ Text `#0f141f` / `#ffffff`, dim text `#454d61` / `#ccd4e8`, borders
 6. Adult tooltips reveal after a short hover or keyboard focus, use the
    tooltip color tokens, and remain fully visible beyond any scrolling toolbar,
    rail or panel boundary. Little Dreamer uses spoken names instead.
+7. Canvas pointers predict the active result: open/closed hands for movable
+   content, diagonal resize at corner handles, text for type, zoom-in/out for
+   zoom, and refusal where the active layer cannot change. Hover chrome is a
+   lighter preview of the same accent selection box that appears after click.
+8. A drag entering the canvas gets immediate valid/invalid target emphasis and
+   a short result label. The feedback disappears on leave or drop and never
+   relies on color alone.
 
 ## Video captions
 

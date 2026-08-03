@@ -92,7 +92,7 @@ export function ToolOptionsPanel() {
       type="button"
       className={`swatch${settings.color === color ? ' active' : ''}`}
       style={{ background: color }}
-      title={color}
+      data-tooltip={color}
       aria-label={t('options.colorSwatch', { color })}
       onClick={() => setColor(color)}
     />
@@ -133,7 +133,7 @@ export function ToolOptionsPanel() {
             <span className="option-label">{t('options.color')}</span>
             <div className="swatches">
               {PALETTE.map(swatchButton)}
-              <label className="swatch custom-swatch" title={t('options.customColor')}>
+              <label className="swatch custom-swatch" data-tooltip={t('options.customColor')}>
                 <input
                   type="color"
                   value={settings.color}

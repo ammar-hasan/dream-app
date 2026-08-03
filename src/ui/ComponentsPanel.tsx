@@ -105,7 +105,7 @@ export function ComponentsPanel() {
         <button
           type="button"
           className="btn icon-btn"
-          title={t('components.create')}
+          data-tooltip={t('components.create')}
           aria-label={t('components.create')}
           disabled={!hasSelection}
           onClick={() => setCreating(true)}
@@ -140,7 +140,6 @@ export function ComponentsPanel() {
           <li
             key={component.id}
             className="component-card"
-            title={t('components.cardTitle')}
             draggable
             onDragStart={(e) => {
               e.dataTransfer.setData('application/x-dream-component', component.id);
@@ -148,7 +147,9 @@ export function ComponentsPanel() {
             }}
             onDoubleClick={() => useDreamStore.getState().insertComponentInstance(component)}
           >
-            <ComponentThumb component={component} />
+            <div className="component-thumb" data-tooltip={t('components.cardTitle')}>
+              <ComponentThumb component={component} />
+            </div>
             {editingId === component.id ? (
               <input
                 className="layer-rename"
@@ -164,7 +165,7 @@ export function ComponentsPanel() {
             ) : (
               <span
                 className="component-name"
-                title={t('components.renameTitle')}
+                data-tooltip={t('components.renameTitle')}
                 onDoubleClick={(e) => {
                   e.stopPropagation();
                   setEditingId(component.id);
@@ -177,7 +178,7 @@ export function ComponentsPanel() {
             <button
               type="button"
               className="btn icon-btn small danger component-delete"
-              title={t('components.delete')}
+              data-tooltip={t('components.delete')}
               aria-label={t('components.deleteNamed', { name: component.name })}
               onClick={() => void remove(component.id)}
             >

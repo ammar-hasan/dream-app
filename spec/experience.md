@@ -28,9 +28,10 @@ together on screen.
 - **Left tool rail (in order):** Select*, Lasso*, Link*, Move, Brush,
   Pencil, Spray, Eraser, Line, Rectangle, Ellipse, Fill, Magic wand,
   Stamps, Color picker, Text, Crop, Pan, Zoom. (*Design mode only.) Every
-  button has a styled tooltip with its name and shortcut. Tooltips float
-  beyond scrolling toolbar and rail boundaries rather than being clipped by
-  them.
+  button has a styled tooltip with its name and shortcut. The same styled
+  contract names panel and timeline controls. Tooltips float beyond scrolling
+  toolbar, rail, panel and timeline boundaries rather than being clipped by
+  them; native browser tooltip bubbles are not used.
 - **Right panel:** tool options, plus per mode (matrix below).
 - **Bottom:** the timeline bar (when frames exist) and the status bar
   (pointer x,y · document size · active tool · zoom %).

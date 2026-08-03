@@ -57,8 +57,9 @@ export function DesignPanel() {
             <button
               type="button"
               className="btn"
+              aria-label={t('design.group')}
               disabled={count < 2}
-              title={t('design.groupTitle')}
+              data-tooltip={t('design.groupTitle')}
               onClick={() => store().groupSelection()}
             >
               {t('design.group')}
@@ -66,8 +67,9 @@ export function DesignPanel() {
             <button
               type="button"
               className="btn"
+              aria-label={t('design.ungroup')}
               disabled={count < 2}
-              title={t('design.ungroupTitle')}
+              data-tooltip={t('design.ungroupTitle')}
               onClick={() => store().ungroupSelection()}
             >
               {t('design.ungroup')}
@@ -75,7 +77,8 @@ export function DesignPanel() {
             <button
               type="button"
               className="btn"
-              title={t('design.duplicateTitle')}
+              aria-label={t('design.duplicate')}
+              data-tooltip={t('design.duplicateTitle')}
               onClick={() => store().duplicateSelection()}
             >
               {t('design.duplicate')}
@@ -83,7 +86,8 @@ export function DesignPanel() {
             <button
               type="button"
               className="btn danger"
-              title={t('design.deleteTitle')}
+              aria-label={t('design.delete')}
+              data-tooltip={t('design.deleteTitle')}
               onClick={() => store().deleteSelection()}
             >
               {t('design.delete')}
@@ -105,7 +109,7 @@ export function DesignPanel() {
                     key={mode}
                     type="button"
                     className="btn icon-btn small"
-                    title={t(key)}
+                    data-tooltip={t(key)}
                     aria-label={t(key)}
                     onClick={() => store().alignSelection(mode)}
                   >
@@ -115,7 +119,7 @@ export function DesignPanel() {
                 <button
                   type="button"
                   className="btn icon-btn small"
-                  title={t('design.distributeH')}
+                  data-tooltip={t('design.distributeH')}
                   aria-label={t('design.distributeH')}
                   disabled={count < 3}
                   onClick={() => store().distributeSelection('horizontal')}
@@ -125,7 +129,7 @@ export function DesignPanel() {
                 <button
                   type="button"
                   className="btn icon-btn small"
-                  title={t('design.distributeV')}
+                  data-tooltip={t('design.distributeV')}
                   aria-label={t('design.distributeV')}
                   disabled={count < 3}
                   onClick={() => store().distributeSelection('vertical')}
