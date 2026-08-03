@@ -77,8 +77,10 @@ holds.
 28. GIVEN a selection dragged near the canvas center THEN it snaps at
     6 px with a visible guide line; the snap toggle disables this.
 29. GIVEN a selection of a stroke WHEN rotated via the top handle THEN any
-    angle is possible; a selection containing an image rotates in 90°
-    steps only.
+    angle is possible and Shift snaps to 15°; a selection containing an image
+    rotates in 90° steps only. DURING rotation THEN a pointer-adjacent readout
+    shows the effective angle and constraint; crossing a snapped step gives one
+    optional tactile detent without repeated vibration inside the same step.
 30. GIVEN three objects WHEN "align left" is chosen THEN their left edges
     equal the selection's left edge; "distribute horizontally" evens the
     gaps.

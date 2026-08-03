@@ -208,6 +208,9 @@ export const fa: Record<string, string> = {
   'drop.componentNamed': 'رها کنید تا {name} قرار بگیرد',
   'drop.image': 'رها کنید تا این تصویر وارد شود',
   'drop.invalid': 'یک تصویر یا قطعهٔ Dream را اینجا رها کنید',
+  'rotation.free': '{angle}° · چرخش آزاد',
+  'rotation.15': '{angle}° · چفت ۱۵°',
+  'rotation.90': '{angle}° · گام‌های ۹۰°',
   'adjust.title': 'تنظیم',
   'adjust.flipH': 'برعکس افقی',
   'adjust.flipHTitle': 'برعکس کردن لایه به صورت افقی',
@@ -650,7 +653,7 @@ export const fa: Record<string, string> = {
   'settings.comfortHint': 'متن و دکمه‌های بزرگ‌تر، کنتراست قوی‌تر',
   'settings.haptics': 'بازخورد لمسی',
   'settings.hapticsHint':
-    'لرزش‌های کوتاه برای هدف‌های رها کردن و رد شدن در دستگاه‌های پشتیبانی‌شده',
+    'لرزش‌های کوتاه برای هدف‌های رها کردن، گام‌های چرخش و رد شدن در دستگاه‌های پشتیبانی‌شده',
   'settings.language': 'زبان',
   'settings.install': 'نصب Dream',
   'settings.installHint': 'Dream را روی این دستگاه نگه دارید — به صورت آفلاین هم کار می‌کند',

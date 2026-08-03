@@ -59,7 +59,19 @@ test('switching to Design mode reveals the design panels', async ({ page }) => {
 test('canvas pointers preview the object and explain direct-manipulation state', async ({
   page,
 }) => {
+  await page.addInitScript(() => {
+    const target = window as Window & { __dreamHaptics?: Array<number | number[]> };
+    target.__dreamHaptics = [];
+    Object.defineProperty(navigator, 'vibrate', {
+      configurable: true,
+      value: (pattern: number | number[]) => {
+        target.__dreamHaptics?.push(pattern);
+        return true;
+      },
+    });
+  });
   await bootApp(page);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   await drawStroke(page);
   await page.getByRole('tab', { name: 'Design' }).click();
   await page.getByRole('button', { name: 'Select', exact: true }).click();
@@ -97,6 +109,22 @@ test('canvas pointers preview the object and explain direct-manipulation state',
   await expect(canvas).toHaveCSS('cursor', 'nwse-resize');
   await page.mouse.move(center.x, center.y - 26);
   await expect(canvas).toHaveCSS('cursor', /url\(/);
+  await page.mouse.down();
+  await page.keyboard.down('Shift');
+  await page.mouse.move(center.x + 30, center.y - 20);
+  await page.mouse.move(center.x + 30, center.y);
+  await page.mouse.move(center.x + 31, center.y + 1);
+  await expect(page.getByRole('status')).toHaveText('90° · 15° snap');
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => (window as Window & { __dreamHaptics?: Array<number | number[]> }).__dreamHaptics,
+      ),
+    )
+    .toEqual([5]);
+  await page.mouse.up();
+  await page.keyboard.up('Shift');
+  await expect(page.locator('.rotation-feedback')).toHaveCount(0);
 
   await page.getByRole('button', { name: 'Pan', exact: true }).click();
   await expect(canvas).toHaveCSS('cursor', 'grab');

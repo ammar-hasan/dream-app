@@ -223,6 +223,9 @@ export const pt: Record<string, string> = {
   'drop.componentNamed': 'Solte para posicionar {name}',
   'drop.image': 'Solte para importar esta imagem',
   'drop.invalid': 'Solte uma imagem ou um componente do Dream aqui',
+  'rotation.free': '{angle}° · Rotação livre',
+  'rotation.15': '{angle}° · Encaixe de 15°',
+  'rotation.90': '{angle}° · Passos de 90°',
 
   // --- Adjust panel -----------------------------------------------------------
   'adjust.title': 'Ajustar',
@@ -697,7 +700,8 @@ export const pt: Record<string, string> = {
   'settings.comfort': 'Modo conforto',
   'settings.comfortHint': 'Texto e botões maiores, contraste mais forte',
   'settings.haptics': 'Feedback tátil',
-  'settings.hapticsHint': 'Vibrações curtas para alvos e recusas em dispositivos compatíveis',
+  'settings.hapticsHint':
+    'Vibrações curtas para alvos, encaixes de rotação e recusas em dispositivos compatíveis',
   'settings.language': 'Idioma',
   'settings.install': 'Instalar Dream',
   'settings.installHint': 'Mantenha o Dream neste dispositivo — também funciona offline',

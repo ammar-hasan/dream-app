@@ -217,6 +217,9 @@ export const ar: Record<string, string> = {
   'drop.componentNamed': 'أفلِت لوضع {name}',
   'drop.image': 'أفلِت لاستيراد هذه الصورة',
   'drop.invalid': 'أفلِت صورة أو مكوّن Dream هنا',
+  'rotation.free': '{angle}° · دوران حر',
+  'rotation.15': '{angle}° · محاذاة 15°',
+  'rotation.90': '{angle}° · خطوات 90°',
 
   // --- Adjust panel -----------------------------------------------------------
   'adjust.title': 'تعديل',
@@ -676,7 +679,7 @@ export const ar: Record<string, string> = {
   'settings.comfort': 'وضع الراحة',
   'settings.comfortHint': 'نص وأزرار أكبر وتباين أعلى',
   'settings.haptics': 'ردود فعل لمسية',
-  'settings.hapticsHint': 'اهتزازات قصيرة لأهداف الإفلات والرفض على الأجهزة المدعومة',
+  'settings.hapticsHint': 'اهتزازات قصيرة لأهداف الإفلات ونقاط الدوران والرفض على الأجهزة المدعومة',
   'settings.language': 'اللغة',
   'settings.install': 'ثبّت دريم',
   'settings.installHint': 'احتفظ بدريم على هذا الجهاز — يعمل دون اتصال أيضًا',

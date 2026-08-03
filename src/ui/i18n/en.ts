@@ -219,6 +219,9 @@ export const en: Record<string, string> = {
   'drop.componentNamed': 'Release to place {name}',
   'drop.image': 'Release to import this image',
   'drop.invalid': 'Drop an image or a Dream component here',
+  'rotation.free': '{angle}° · Free rotation',
+  'rotation.15': '{angle}° · 15° snap',
+  'rotation.90': '{angle}° · 90° steps',
 
   // --- Adjust panel -----------------------------------------------------------
   'adjust.title': 'Adjust',
@@ -682,7 +685,8 @@ export const en: Record<string, string> = {
   'settings.comfort': 'Comfort mode',
   'settings.comfortHint': 'Bigger text and buttons, stronger contrast',
   'settings.haptics': 'Touch feedback',
-  'settings.hapticsHint': 'Tiny vibrations for drop targets and refusals on supported devices',
+  'settings.hapticsHint':
+    'Tiny vibrations for drop targets, rotation detents and refusals on supported devices',
   'settings.language': 'Language',
   'settings.install': 'Install Dream',
   'settings.installHint': 'Keep Dream on this device — it works offline too',

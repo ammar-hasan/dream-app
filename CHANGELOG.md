@@ -7,6 +7,11 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Legible rotation feedback** (slice 56): rotation now shows its effective
+  angle beside the pointer and distinguishes free, 15°-snapped and 90°-stepped
+  behavior. Optional Touch feedback adds one tiny detent when a snapped step is
+  crossed, never continuous vibration.
+
 - **Keyboard-equivalent component insertion** (slice 55): every reusable
   component now has a named, focusable Insert control that places a selected,
   undoable copy at the canvas center. Dragging remains available for spatial

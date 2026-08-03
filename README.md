@@ -456,9 +456,10 @@ pro workspace — the mode is persisted per project.
   next press will grab.
 - **Move / scale / rotate**: drag the selection to move it; corner handles
   scale uniformly; the handle above the box rotates. Rotation is free-form for
-  strokes, lines and text anchors; selections containing rectangles, ellipses
-  or raster ops (images, fills) rotate in 90° steps, because those ops have no
-  arbitrary-angle representation (documented in `engine/selection.ts`).
+  strokes, lines and text anchors (Shift snaps to 15°); selections containing
+  rectangles, ellipses or raster ops (images, fills) rotate in 90° steps. A
+  pointer-side badge reports the effective angle and constraint, with optional
+  tactile detents at snapped boundaries.
 - **Snapping**: while dragging, the selection snaps to the canvas center and
   edges and to other objects' edges/centers, with thin accent guide lines.
   Toggle it in the Design panel (on by default).

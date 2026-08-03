@@ -1283,6 +1283,23 @@ their work without needing a double-click or spatial drag gesture.
 - ✅ Full release gates remain green: 858 unit tests, 97.74% engine coverage,
   49 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 56 — Rotation explains itself ✅
+
+Persona need: let a precise visual creator trust the angle that will be
+committed without estimating from the box or discovering constraints by error.
+
+- ✅ A stable badge beside the pointer reports the effective signed angle and
+  distinguishes free rotation, Shift's 15° snap and required 90° steps.
+- ✅ The readout is driven by the same effective transform as the preview, so
+  its promise and the undoable result cannot disagree.
+- ✅ Optional Touch feedback adds a tiny detent only when a snapped step changes;
+  free rotation, repeated movement within a step, disabled feedback, unsupported
+  hardware and reduced-motion preferences remain silent.
+- ✅ Store and haptic tests cover exact modes and patterns; a production-browser
+  journey proves the 15° badge, tactile boundary and cleanup after release.
+- ✅ Full release gates remain green: 859 unit tests, 97.74% engine coverage,
+  49 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1291,7 +1308,7 @@ largest count of controls:
 1. **Direct-manipulation foundation:** cursor semantics, hover/hit feedback,
    valid/invalid targets, post-drop selection and cancellable AI progress are
    established, including provider checks, code generation and project opening;
-   continue with richer rotation affordance.
+   continue with multi-item progress where batch work can become opaque.
 2. **Conversational phone-first creation:** natural clarification and reference
    handling for voice now has a selected-object foundation; continue with more
    referents and corrections, a task-prioritized mobile shell, and a faithful

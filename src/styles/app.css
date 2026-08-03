@@ -912,6 +912,21 @@ body {
   color: var(--danger);
 }
 
+.rotation-feedback {
+  position: absolute;
+  z-index: 12;
+  pointer-events: none;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--tooltip-bg);
+  color: var(--tooltip-text);
+  box-shadow: var(--shadow-sm);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 .text-overlay-wrap {
   position: absolute;
   z-index: 30;

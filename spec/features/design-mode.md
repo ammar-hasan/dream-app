@@ -32,10 +32,13 @@ Link tools, the Design panel, the Links panel and the Components panel.
 
 - **Move:** drag the selection (one drag = one undo).
 - **Scale:** corner handles scale uniformly (aspect preserved).
-- **Rotate:** the handle above the box rotates. Strokes, lines and text
-  rotate **free-form**; a selection containing rectangles, ellipses or
-  pixel content (images, fills) rotates in **90° steps** — those have no
-  arbitrary-angle form.
+- **Rotate:** the handle above the box rotates. Strokes, lines and text rotate
+  **free-form**, with Shift snapping to 15°; a selection containing rectangles,
+  ellipses or pixel content (images, fills) rotates in **90° steps** — those
+  have no arbitrary-angle form. During the gesture, a compact readout beside
+  the pointer shows the effective angle and whether it is free, 15°-snapped or
+  90°-stepped. With Touch feedback on, crossing a snapped step gives one tiny
+  tactile detent on supported devices.
 - **Nudge:** arrow keys move the selection 1 px; Shift = 10 px.
 - **Spoken size:** while anything is selected, “make it bigger” or “make it
   smaller” understands “it” as the selected artwork and scales the group gently

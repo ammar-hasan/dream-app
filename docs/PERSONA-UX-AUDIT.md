@@ -217,8 +217,9 @@ is a refusal to confuse breadth with completion.
 7. **Direct manipulation now has a foundation, not full depth.** Predictive hit
    chrome, contextual cursors, open/closed-hand drags, named drop targets and
    post-component-drop selection, compact pointer ghosts and exact-scale
-   component placement previews and a named keyboard/pointer Insert alternative
-   are coherent. Multi-item progress and richer rotation affordance remain.
+   component placement previews, a named keyboard/pointer Insert alternative
+   and angle/constraint feedback during rotation are coherent. Multi-item
+   progress remains.
 8. **Long-work control has begun, but is not yet consistent.** Create, Edit,
    Feedback and provider connection tests now show honest staged activity,
    allow immediate cancellation and reject late results. Story creation and

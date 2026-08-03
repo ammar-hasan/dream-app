@@ -203,13 +203,27 @@ describe('transform handles', () => {
     // Rotate handle sits 22px above the top-center of the bounds (bounds y 39).
     store().pointerDown({ x: 50, y: 17 });
     expect(store().selectDraft?.kind).toBe('rotate');
+    expect(store().selectDraft?.rotation).toEqual({ angle: 0, snap: 'free' });
     store().pointerMove({ x: 60, y: 40 }); // from straight-up to right: +90°
+    expect(store().selectDraft?.rotation).toMatchObject({ snap: 'free' });
+    expect(store().selectDraft?.rotation?.angle).toBeCloseTo(Math.PI / 2);
     store().pointerUp({ x: 60, y: 40 });
     const op = store().doc.layers[0].operations[0] as StrokeOp;
     expect(op.points[0].x).toBeCloseTo(50);
     expect(op.points[0].y).toBeCloseTo(30);
     expect(op.points[1].x).toBeCloseTo(50);
     expect(op.points[1].y).toBeCloseTo(50);
+  });
+
+  it('reports the exact constrained angle for rotation feedback', () => {
+    drawRect();
+    enterDesign();
+    store().pointerDown({ x: 20, y: 20 });
+    store().pointerUp({ x: 20, y: 20 });
+    store().pointerDown({ x: 20, y: -13 });
+    store().pointerMove({ x: 40, y: 20 });
+    expect(store().selectDraft?.rotation).toMatchObject({ snap: '90' });
+    expect(store().selectDraft?.rotation?.angle).toBeCloseTo(Math.PI / 2);
   });
 });
 

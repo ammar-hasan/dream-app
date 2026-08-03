@@ -1,6 +1,6 @@
 /** Sparse, optional tactile cues for interactions that already have visual feedback. */
 
-export type HapticCue = 'target' | 'refusal';
+export type HapticCue = 'target' | 'refusal' | 'detent';
 
 interface HapticDeps {
   vibrate?: (pattern: number | number[]) => boolean;
@@ -10,6 +10,7 @@ interface HapticDeps {
 const PATTERNS: Record<HapticCue, number | number[]> = {
   target: 8,
   refusal: [8, 28, 8],
+  detent: 5,
 };
 
 /** Ask capable hardware for one short cue; unsupported or sensitive setups stay silent. */

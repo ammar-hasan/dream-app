@@ -98,6 +98,7 @@ export function CanvasViewport() {
     null,
   );
   const dropFeedbackRef = useRef<DropFeedback>(null);
+  const rotationDetentRef = useRef<string | null>(null);
 
   const doc = useDreamStore((s) => s.doc);
   const activeLayerId = useDreamStore((s) => s.activeLayerId);
@@ -690,6 +691,7 @@ export function CanvasViewport() {
     if (e.button !== 0) return;
     if (playing) return; // watching, not editing — pause first
     const point = toDocPoint(e.clientX, e.clientY);
+    rotationDetentRef.current = null;
     if (tool === 'zoom') {
       zoomAtClientPoint(e.clientX, e.clientY, e.altKey ? 'out' : 'in');
       return;
@@ -724,6 +726,17 @@ export function CanvasViewport() {
     updateSelectHover(point);
     const pressure = e.pointerType === 'pen' ? e.pressure : undefined;
     useDreamStore.getState().pointerMove(point, { shiftKey: e.shiftKey, pressure });
+    const rotation = useDreamStore.getState().selectDraft?.rotation;
+    if (rotation && rotation.snap !== 'free') {
+      const step = rotation.snap === '15' ? Math.PI / 12 : Math.PI / 2;
+      const detent = `${rotation.snap}:${Math.round(rotation.angle / step)}`;
+      if (rotationDetentRef.current !== null && rotationDetentRef.current !== detent) {
+        pulseHaptic('detent', haptics);
+      }
+      rotationDetentRef.current = detent;
+    } else {
+      rotationDetentRef.current = null;
+    }
   };
 
   const onPointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -734,6 +747,7 @@ export function CanvasViewport() {
     }
     const point = toDocPoint(e.clientX, e.clientY);
     useDreamStore.getState().pointerUp(point, { shiftKey: e.shiftKey });
+    rotationDetentRef.current = null;
     updateSelectHover(point);
   };
 
@@ -872,6 +886,16 @@ export function CanvasViewport() {
     : dropFeedback
       ? t(`drop.${dropFeedback}`)
       : null;
+  const rotationFeedback =
+    selectDraft?.kind === 'rotate' && selectDraft.rotation
+      ? {
+          text: t(`rotation.${selectDraft.rotation.snap}`, {
+            angle: String(Math.round((selectDraft.rotation.angle * 180) / Math.PI) || 0),
+          }),
+          left: offset.x + selectDraft.to.x * zoom + 14,
+          top: offset.y + selectDraft.to.y * zoom + 14,
+        }
+      : null;
 
   return (
     <div
@@ -895,6 +919,7 @@ export function CanvasViewport() {
         onPointerLeave={clearPointerFeedback}
         onPointerCancel={() => {
           panRef.current = null;
+          rotationDetentRef.current = null;
           setPanning(false);
           clearPointerFeedback();
         }}
@@ -918,6 +943,16 @@ export function CanvasViewport() {
       {dropMessage && (
         <div className="drop-feedback" role="status">
           {dropMessage}
+        </div>
+      )}
+      {rotationFeedback && (
+        <div
+          className="rotation-feedback"
+          role="status"
+          aria-live="off"
+          style={{ left: rotationFeedback.left, top: rotationFeedback.top }}
+        >
+          {rotationFeedback.text}
         </div>
       )}
       {!kidMode && (

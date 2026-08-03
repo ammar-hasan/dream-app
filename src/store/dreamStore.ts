@@ -193,6 +193,8 @@ export interface SelectDraft {
   guides: SnapGuide[];
   /** Transformed copies of the selected ops (move/scale/rotate preview). */
   preview: Operation[] | null;
+  /** Effective angle and constraint shown while rotating. */
+  rotation?: { angle: number; snap: 'free' | '15' | '90' };
   /** True once the pointer moved enough to make the gesture commitable. */
   changed: boolean;
 }
@@ -848,6 +850,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         // Handles win over content when the selection box is under the cursor.
         if (bounds) {
           if (distance(point, rotateHandlePos(bounds)) <= handleSize) {
+            const freelyRotatable = selectedOps(layer, selection).every(supportsFreeRotation);
             set({
               selectDraft: {
                 kind: 'rotate',
@@ -856,6 +859,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
                 bounds,
                 guides: [],
                 preview: null,
+                rotation: { angle: 0, snap: freelyRotatable ? 'free' : '90' },
                 changed: false,
               },
             });
@@ -1066,10 +1070,12 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
             // Shift snaps free rotation to 15° steps.
             const snapped = shift ? Math.round(angle / (Math.PI / 12)) * (Math.PI / 12) : angle;
             next.preview = ops.map((op) => rotateOperation(op, center, snapped));
+            next.rotation = { angle: snapped, snap: shift ? '15' : 'free' };
           } else {
             // Rectangle/ellipse shapes and raster ops only support 90° steps.
             const turns = Math.round(angle / (Math.PI / 2));
             next.preview = ops.map((op) => rotateOperation90(op, center, turns));
+            next.rotation = { angle: turns * (Math.PI / 2), snap: '90' };
           }
         }
         set({ selectDraft: next });

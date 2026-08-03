@@ -214,6 +214,9 @@ export const zh: Record<string, string> = {
   'drop.componentNamed': '松开以放置 {name}',
   'drop.image': '松开以导入此图像',
   'drop.invalid': '请将图像或 Dream 组件拖放到这里',
+  'rotation.free': '{angle}° · 自由旋转',
+  'rotation.15': '{angle}° · 15° 吸附',
+  'rotation.90': '{angle}° · 90° 步进',
 
   // --- Adjust panel -----------------------------------------------------------
   'adjust.title': '调整',
@@ -664,7 +667,7 @@ export const zh: Record<string, string> = {
   'settings.comfort': '舒适模式',
   'settings.comfortHint': '更大的文字与按钮、更强的对比度',
   'settings.haptics': '触觉反馈',
-  'settings.hapticsHint': '在支持的设备上为拖放目标和拒绝操作提供短促振动',
+  'settings.hapticsHint': '在支持的设备上为拖放目标、旋转卡点和拒绝操作提供短促振动',
   'settings.language': '语言',
   'settings.install': '安装 Dream',
   'settings.installHint': '将 Dream 保存在此设备上 — 也能离线使用',
