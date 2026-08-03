@@ -219,6 +219,7 @@ export const pt: Record<string, string> = {
   'components.delete': 'Excluir componente',
   'components.deleteNamed': 'Excluir {name}',
   'drop.component': 'Solte para posicionar este componente',
+  'drop.componentNamed': 'Solte para posicionar {name}',
   'drop.image': 'Solte para importar esta imagem',
   'drop.invalid': 'Solte uma imagem ou um componente do Dream aqui',
 

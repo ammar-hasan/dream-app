@@ -17,6 +17,7 @@ import {
 } from '../storage/components';
 import { PlusIcon, TrashIcon } from './icons';
 import { useT } from './i18n';
+import { beginComponentDrag, endComponentDrag } from './componentDrag';
 
 const THUMB_W = 76;
 const THUMB_H = 56;
@@ -142,9 +143,13 @@ export function ComponentsPanel() {
             className="component-card"
             draggable
             onDragStart={(e) => {
+              beginComponentDrag(component);
               e.dataTransfer.setData('application/x-dream-component', component.id);
               e.dataTransfer.effectAllowed = 'copy';
+              const thumbnail = e.currentTarget.querySelector('canvas');
+              if (thumbnail) e.dataTransfer.setDragImage(thumbnail, THUMB_W / 2, THUMB_H / 2);
             }}
+            onDragEnd={() => endComponentDrag(component.id)}
             onDoubleClick={() => useDreamStore.getState().insertComponentInstance(component)}
           >
             <div className="component-thumb" data-tooltip={t('components.cardTitle')}>

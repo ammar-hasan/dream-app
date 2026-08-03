@@ -557,8 +557,10 @@ holds.
       distinguishes the active drag from its idle state.
 164.  GIVEN a dragged Dream component, image or unsupported item enters the
       canvas THEN the canvas names and highlights the pending valid or invalid
-      result before release; WHEN it leaves or drops THEN the feedback clears,
-      and an unsupported drop changes nothing.
+      result before release; GIVEN a known Dream component THEN a compact
+      pointer ghost and translucent exact-scale canvas preview show what and
+      where the copy will be; WHEN it leaves, cancels or drops THEN every preview
+      clears, and an unsupported drop changes nothing.
 165.  GIVEN Create, Edit or Feedback is waiting for AI WHEN the result has no
       measurable completion THEN Dream shows an announced action-specific
       activity state without a fabricated percentage and offers Cancel; WHEN

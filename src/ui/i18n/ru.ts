@@ -201,6 +201,7 @@ export const ru: Record<string, string> = {
   'components.delete': 'Удалить компонент',
   'components.deleteNamed': 'Удалить {name}',
   'drop.component': 'Отпустите, чтобы разместить компонент',
+  'drop.componentNamed': 'Отпустите, чтобы разместить {name}',
   'drop.image': 'Отпустите, чтобы импортировать изображение',
   'drop.invalid': 'Перетащите сюда изображение или компонент Dream',
   'adjust.title': 'Коррекция',

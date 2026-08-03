@@ -213,6 +213,7 @@ export const ar: Record<string, string> = {
   'components.delete': 'حذف المكوّن',
   'components.deleteNamed': 'حذف {name}',
   'drop.component': 'أفلِت لوضع هذا المكوّن',
+  'drop.componentNamed': 'أفلِت لوضع {name}',
   'drop.image': 'أفلِت لاستيراد هذه الصورة',
   'drop.invalid': 'أفلِت صورة أو مكوّن Dream هنا',
 

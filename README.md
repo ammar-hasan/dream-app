@@ -476,8 +476,9 @@ pro workspace — the mode is persisted per project.
 - **Components**: save any selection as a named component in the cross-project
   library (IndexedDB). The Components panel shows live thumbnails; double-click
   inserts at the canvas center, or drag onto the canvas to drop under the
-  cursor — the canvas previews the copy target and each instance lands selected
-  on its own layer. **Instances are copies**:
+  cursor — a compact thumbnail follows the pointer while a translucent,
+  exact-scale canvas preview names the component and shows its final position.
+  Each instance lands selected on its own layer. **Instances are copies**:
   editing the component does not update already-placed instances (the simple
   MS-Paint model; linked masters are a possible future slice).
 - Everything above is undoable through the same command history.

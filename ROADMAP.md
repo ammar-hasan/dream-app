@@ -1249,6 +1249,24 @@ work already on screen.
 - ✅ Full release gates remain green: 856 unit tests, 97.74% engine coverage,
   48 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 54 — Component drags preview the result ✅
+
+Persona need: let a fast visual creator see exactly what a reusable component
+will become and where it will land before committing the copy.
+
+- ✅ The native pointer ghost is the component's clean thumbnail rather than
+  the whole library card, centered under the pointer with familiar copy intent.
+- ✅ Inside the canvas, a translucent exact-scale rendering follows the eventual
+  centered origin, outlined without hiding the underlying composition.
+- ✅ Passive status feedback names the component; invalid/image feedback remains
+  distinct, and leaving, cancelling or dropping clears all preview state.
+- ✅ Release uses the same carried component and origin the preview showed, then
+  preserves the established new-layer, selected-instance and undo contracts.
+- ✅ A production-browser journey creates, carries, previews and drops a real
+  component while checking named feedback, rendered pixels and the new layer.
+- ✅ Full release gates remain green: 857 unit tests, 97.74% engine coverage,
+  49 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1257,8 +1275,8 @@ largest count of controls:
 1. **Direct-manipulation foundation:** cursor semantics, hover/hit feedback,
    valid/invalid targets, post-drop selection and cancellable AI progress are
    established, including provider checks, code generation and project opening;
-   continue with drag ghosts, keyboard-equivalent placement cues and richer
-   rotation affordance.
+   continue with keyboard-equivalent placement cues and richer rotation
+   affordance.
 2. **Conversational phone-first creation:** natural clarification and reference
    handling for voice now has a selected-object foundation; continue with more
    referents and corrections, a task-prioritized mobile shell, and a faithful

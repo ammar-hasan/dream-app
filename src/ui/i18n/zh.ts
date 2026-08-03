@@ -210,6 +210,7 @@ export const zh: Record<string, string> = {
   'components.delete': '删除组件',
   'components.deleteNamed': '删除 {name}',
   'drop.component': '松开以放置此组件',
+  'drop.componentNamed': '松开以放置 {name}',
   'drop.image': '松开以导入此图像',
   'drop.invalid': '请将图像或 Dream 组件拖放到这里',
 

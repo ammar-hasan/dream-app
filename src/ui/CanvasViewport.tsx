@@ -27,7 +27,7 @@ import {
 import { mirrorOperations, SYMMETRY_TOOLS } from '../engine/symmetry';
 import { clampZoom, nextZoomIn, nextZoomOut, pickColor, zoomAtPoint } from '../engine/tools';
 import type { RasterSource } from '../engine/tools';
-import type { Point, Rect } from '../engine/types';
+import type { Component, Point, Rect } from '../engine/types';
 import { useDreamStore } from '../store/dreamStore';
 import { useUiPrefs } from '../store/uiPrefs';
 import { getComponent } from '../storage/components';
@@ -37,6 +37,7 @@ import { TextOverlay } from './TextOverlay';
 import { useT } from './i18n';
 import { DreamMark } from './icons';
 import { pulseHaptic } from './haptics';
+import { activeComponentDrag, endComponentDrag, onComponentDragEnd } from './componentDrag';
 
 /** Accent used for all selection chrome, matching --accent in app.css. */
 const ACCENT = '#6d7cff';
@@ -50,6 +51,10 @@ type SelectHover =
   | { kind: 'locked' }
   | null;
 type DropFeedback = 'component' | 'image' | 'invalid' | null;
+interface ComponentDropPreview {
+  component: Component;
+  at: Point;
+}
 
 /** Paint a raw RGBA buffer onto the canvas at (x, y), honoring opacity. */
 function blitBuffer(
@@ -89,6 +94,9 @@ export function CanvasViewport() {
   const [selectHover, setSelectHover] = useState<SelectHover>(null);
   const [zoomingOut, setZoomingOut] = useState(false);
   const [dropFeedback, setDropFeedback] = useState<DropFeedback>(null);
+  const [componentDropPreview, setComponentDropPreview] = useState<ComponentDropPreview | null>(
+    null,
+  );
   const dropFeedbackRef = useRef<DropFeedback>(null);
 
   const doc = useDreamStore((s) => s.doc);
@@ -246,6 +254,26 @@ export function CanvasViewport() {
     cache.render(displayDoc, ctx, {
       layerFilter: detached.size > 0 ? (layer) => !detached.has(layer.id) : undefined,
     });
+
+    // Component drags show the exact prospective copy at its eventual origin.
+    // The native drag image stays small; this canvas preview carries scale and
+    // placement, with translucency keeping the underlying work readable.
+    if (componentDropPreview && !playing) {
+      const { component, at } = componentDropPreview;
+      const px = 1 / zoom;
+      ctx.save();
+      ctx.translate(at.x, at.y);
+      ctx.globalAlpha = 0.58;
+      for (const op of component.operations) renderOperation(op, ctx);
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = ACCENT;
+      ctx.lineWidth = 1.5 * px;
+      ctx.setLineDash([6 * px, 4 * px]);
+      ctx.shadowColor = ACCENT;
+      ctx.shadowBlur = 6 * px;
+      ctx.strokeRect(0, 0, component.width, component.height);
+      ctx.restore();
+    }
 
     if (adjustPreview) {
       const layer = doc.layers.find((l) => l.id === adjustPreview.layerId);
@@ -788,23 +816,45 @@ export function CanvasViewport() {
       setDropFeedback(kind);
       pulseHaptic(kind === 'invalid' ? 'refusal' : 'target', haptics);
     }
+    const dragged = kind === 'component' ? activeComponentDrag() : null;
+    if (dragged) {
+      const point = toDocPoint(e.clientX, e.clientY);
+      setComponentDropPreview({
+        component: dragged,
+        at: { x: point.x - dragged.width / 2, y: point.y - dragged.height / 2 },
+      });
+    } else if (componentDropPreview) setComponentDropPreview(null);
   };
 
   const clearDropFeedback = () => {
     dropFeedbackRef.current = null;
     setDropFeedback(null);
+    setComponentDropPreview(null);
   };
+
+  useEffect(
+    () =>
+      onComponentDragEnd(() => {
+        dropFeedbackRef.current = null;
+        setDropFeedback(null);
+        setComponentDropPreview(null);
+      }),
+    [],
+  );
 
   const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const kind = dropKind(e.dataTransfer);
+    const draggedComponent = activeComponentDrag();
     clearDropFeedback();
+    endComponentDrag();
     if (kind === 'invalid') return;
     const componentId = e.dataTransfer.getData('application/x-dream-component');
     if (componentId) {
       // Drop a component instance at the drop point (centered on the cursor).
       void (async () => {
-        const component = await getComponent(componentId);
+        const component =
+          draggedComponent?.id === componentId ? draggedComponent : await getComponent(componentId);
         if (!component) return;
         const point = toDocPoint(e.clientX, e.clientY);
         useDreamStore.getState().insertComponentInstance(component, {
@@ -817,7 +867,11 @@ export function CanvasViewport() {
     void importImageFiles(e.dataTransfer.files);
   };
 
-  const dropMessage = dropFeedback ? t(`drop.${dropFeedback}`) : null;
+  const dropMessage = componentDropPreview
+    ? t('drop.componentNamed', { name: componentDropPreview.component.name })
+    : dropFeedback
+      ? t(`drop.${dropFeedback}`)
+      : null;
 
   return (
     <div

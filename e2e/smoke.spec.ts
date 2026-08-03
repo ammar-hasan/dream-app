@@ -195,6 +195,48 @@ test('canvas drag targets distinguish components, images and invalid content', a
     .toEqual([8, 8, [8, 28, 8]]);
 });
 
+test('component drags preview the named copy at its exact canvas scale', async ({ page }) => {
+  await bootApp(page);
+  const canvas = page.locator('canvas.viewport-canvas');
+  const canvasBox = await canvas.boundingBox();
+  expect(canvasBox).not.toBeNull();
+  const source = {
+    x: canvasBox!.x + canvasBox!.width / 2,
+    y: canvasBox!.y + canvasBox!.height / 2,
+  };
+  await page.mouse.move(source.x - 28, source.y);
+  await page.mouse.down();
+  await page.mouse.move(source.x + 28, source.y, { steps: 8 });
+  await page.mouse.up();
+
+  await page.getByRole('tab', { name: 'Design' }).click();
+  await page.getByRole('button', { name: 'Select', exact: true }).click();
+  await page.mouse.click(source.x, source.y);
+  await page.getByRole('button', { name: 'Create component from selection' }).click();
+  const components = page.getByLabel('Components');
+  await components.getByPlaceholder('Component name').fill('Button chip');
+  await components.getByRole('button', { name: 'Save', exact: true }).click();
+
+  const card = page.locator('.component-card').filter({ hasText: 'Button chip' });
+  await expect(card).toBeVisible();
+  const cardBox = await card.boundingBox();
+  expect(cardBox).not.toBeNull();
+  const before = await nonWhitePixels(page);
+  const target = { x: canvasBox!.x + canvasBox!.width * 0.67, y: source.y + 70 };
+  await page.mouse.move(cardBox!.x + cardBox!.width / 2, cardBox!.y + cardBox!.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(target.x, target.y, { steps: 12 });
+
+  await expect(page.locator('.viewport').getByRole('status')).toHaveText(
+    'Release to place Button chip',
+  );
+  await expect.poll(() => nonWhitePixels(page)).toBeGreaterThan(before);
+  await page.mouse.up();
+
+  await expect(page.locator('.layer-list > li')).toHaveCount(2);
+  await expect(page.locator('.layer-list')).toContainText('Button chip');
+});
+
 test('tooltips escape the scrolling toolbar and tool rail', async ({ page }) => {
   await bootApp(page);
 

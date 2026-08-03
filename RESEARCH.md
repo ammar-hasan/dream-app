@@ -147,7 +147,10 @@ Modern interaction craft should make state legible rather than add spectacle:
 - **Drag in one motion, show a translucent preview, highlight only valid drop
   targets, keep the result selected and provide an alternative to every drag.**
   Failed drops need visible recovery, and known transfer work needs progress.
-  (https://developer.apple.com/design/human-interface-guidelines/drag-and-drop)
+  A compact custom pointer image can stay legible while the destination shows
+  the accurate spatial preview.
+  (https://developer.apple.com/design/human-interface-guidelines/drag-and-drop ·
+  https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/setDragImage)
 - **Pointers communicate outcome.** Select, crosshair, text, open/closed-hand
   pan, resize/rotate, copy/link and not-allowed states should follow the active
   interaction rather than remain a static cursor per tool.

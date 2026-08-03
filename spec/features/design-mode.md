@@ -78,8 +78,10 @@ group. No nesting, no containers.
 3. **Insert:** double-click places an instance at the canvas center; or
    drag a thumbnail onto the canvas to drop it under the cursor. Every
    instance lands on **its own new layer**. While dragging, the canvas names
-   the pending copy action, highlights itself as the valid target and keeps the
-   inserted instance selected for immediate refinement.
+   the component, highlights itself as the valid target and shows a translucent
+   exact-scale preview centered at the eventual drop point; a compact thumbnail
+   follows the pointer outside the canvas. The inserted instance stays selected
+   for immediate refinement. Leaving or cancelling clears every preview.
 4. **Instances are copies.** Editing the component never updates placed
    instances; editing an instance never touches the component. (The simple
    model — no linked masters.)

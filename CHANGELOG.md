@@ -7,6 +7,11 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Predictive component drags** (slice 54): dragging a library component now
+  carries a clean thumbnail ghost, names the item and paints a translucent
+  exact-scale preview at its eventual canvas position. Leaving, cancelling or
+  dropping clears the preview; the committed copy remains selected.
+
 - **Safe cancellable project opening** (slice 53): saved projects and `.dream`
   imports now show reading/restoration/patient-waiting stages and an accessible
   indeterminate loader. Cancel returns immediately, preserves current work and

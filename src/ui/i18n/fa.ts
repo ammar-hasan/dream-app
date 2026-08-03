@@ -204,6 +204,7 @@ export const fa: Record<string, string> = {
   'components.delete': 'حذف قطعه',
   'components.deleteNamed': 'حذف {name}',
   'drop.component': 'رها کنید تا این قطعه قرار بگیرد',
+  'drop.componentNamed': 'رها کنید تا {name} قرار بگیرد',
   'drop.image': 'رها کنید تا این تصویر وارد شود',
   'drop.invalid': 'یک تصویر یا قطعهٔ Dream را اینجا رها کنید',
   'adjust.title': 'تنظیم',

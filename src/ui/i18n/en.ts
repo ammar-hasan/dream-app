@@ -215,6 +215,7 @@ export const en: Record<string, string> = {
   'components.delete': 'Delete component',
   'components.deleteNamed': 'Delete {name}',
   'drop.component': 'Release to place this component',
+  'drop.componentNamed': 'Release to place {name}',
   'drop.image': 'Release to import this image',
   'drop.invalid': 'Drop an image or a Dream component here',
 
