@@ -115,6 +115,49 @@ test('switching to Design mode reveals the design panels', async ({ page }) => {
   await expect(page.locator('.components-panel')).toBeVisible();
 });
 
+test('Design blend modes visibly combine layers and undo exactly', async ({ page }) => {
+  await bootApp(page);
+  const canvas = page.locator('.viewport-canvas');
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('viewport canvas has no box');
+  const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  const sampleCenter = () =>
+    canvas.evaluate((element) => {
+      const target = element as HTMLCanvasElement;
+      const rect = target.getBoundingClientRect();
+      const context = target.getContext('2d');
+      if (!context) throw new Error('no 2d context');
+      const x = Math.floor((rect.width / 2) * (target.width / rect.width));
+      const y = Math.floor((rect.height / 2) * (target.height / rect.height));
+      return Array.from(context.getImageData(x, y, 1, 1).data);
+    });
+  const drawLine = async (fromX: number, fromY: number, toX: number, toY: number) => {
+    await page.mouse.move(fromX, fromY);
+    await page.mouse.down();
+    await page.mouse.move(toX, toY, { steps: 8 });
+    await page.mouse.up();
+  };
+
+  await page.locator('.tool-options input[type="range"]').first().fill('64');
+  await page.locator('.tool-options input[type="color"]').fill('#ff0000');
+  await drawLine(center.x - 100, center.y, center.x + 100, center.y);
+  await page.getByRole('button', { name: 'Add layer' }).click();
+  await page.locator('.tool-options input[type="color"]').fill('#0000ff');
+  await drawLine(center.x, center.y - 100, center.x, center.y + 100);
+
+  await expect.poll(sampleCenter).toEqual([0, 0, 255, 255]);
+  await expect(page.getByLabel('Blend')).toHaveCount(0);
+  await page.getByRole('tab', { name: 'Design' }).click();
+  const blend = page.getByLabel('Blend');
+  await expect(blend).toBeVisible();
+  await blend.selectOption('multiply');
+  await expect.poll(sampleCenter).toEqual([0, 0, 0, 255]);
+
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(blend).toHaveValue('normal');
+  await expect.poll(sampleCenter).toEqual([0, 0, 255, 255]);
+});
+
 test('canvas pointers preview the object and explain direct-manipulation state', async ({
   page,
 }) => {

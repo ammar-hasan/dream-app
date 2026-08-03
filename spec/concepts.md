@@ -38,19 +38,21 @@ a project saved while playing or presenting reopens in Draw.
 ## Layer
 
 A named, ordered sheet of content. Layers stack bottom-to-top; each layer's
-opacity multiplies everything on it.
+opacity multiplies everything on it, then its blend mode determines how that
+flattened layer combines with the visible artwork below it.
 
-| Attribute    | Type              | Default     | Meaning                                                           |
-| ------------ | ----------------- | ----------- | ----------------------------------------------------------------- |
-| `id`         | string            | generated   |                                                                   |
-| `name`       | string            | `"Layer N"` | user-renameable                                                   |
-| `visible`    | boolean           | `true`      | hidden layers don't paint and can't be hit                        |
-| `opacity`    | number 0–1        | `1`         | multiplies the alpha of everything on the layer                   |
-| `locked`     | boolean           | `false`     | locked layers reject all edits (adding, moving, deleting content) |
-| `operations` | list of Operation | `[]`        | the layer's content, bottom-to-top paint order                    |
+| Attribute    | Type                                                             | Default     | Meaning                                                           |
+| ------------ | ---------------------------------------------------------------- | ----------- | ----------------------------------------------------------------- |
+| `id`         | string                                                           | generated   |                                                                   |
+| `name`       | string                                                           | `"Layer N"` | user-renameable                                                   |
+| `visible`    | boolean                                                          | `true`      | hidden layers don't paint and can't be hit                        |
+| `opacity`    | number 0–1                                                       | `1`         | multiplies the alpha of everything on the layer                   |
+| `blendMode`  | `'normal'\|'multiply'\|'screen'\|'overlay'\|'darken'\|'lighten'` | `'normal'`  | combines this flattened layer with the artwork below              |
+| `locked`     | boolean                                                          | `false`     | locked layers reject all edits (adding, moving, deleting content) |
+| `operations` | list of Operation                                                | `[]`        | the layer's content, bottom-to-top paint order                    |
 
-Layer add, delete, rename, reorder, visibility, opacity and lock changes are
-all undoable.
+Layer add, delete, rename, reorder, visibility, opacity, blend-mode and lock
+changes are all undoable.
 
 ## Operation
 

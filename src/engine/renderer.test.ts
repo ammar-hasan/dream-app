@@ -51,6 +51,23 @@ describe('renderDocument', () => {
     renderDocument(doc, ctx, { layerFilter: () => false });
     expect(ctx.calls('stroke')).toHaveLength(0);
   });
+
+  it('flattens a blended layer before compositing it over the document', () => {
+    const doc = docWithStroke();
+    doc.layers[0] = { ...doc.layers[0], blendMode: 'multiply' };
+    const factories = makeMockFactories();
+    const ctx = new MockContext2D();
+
+    renderDocument(doc, ctx, factories);
+
+    expect(factories.created).toHaveLength(1);
+    expect(factories.created[0].context.calls('stroke')).toHaveLength(1);
+    expect(ctx.calls('stroke')).toHaveLength(0);
+    expect(ctx.calls('drawImage')).toEqual([
+      ['drawImage', factories.created[0], 0, 0, undefined, undefined],
+    ]);
+    expect(ctx.globalCompositeOperation).toBe('multiply');
+  });
 });
 
 describe('stroke rendering', () => {

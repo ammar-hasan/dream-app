@@ -21,7 +21,7 @@
  *   directly, capping bitmap memory (~4 bytes/pixel/bitmap).
  */
 
-import { renderLayer } from './renderer';
+import { compositeLayerBitmap, renderCompositedLayer, renderLayer } from './renderer';
 import type { CanvasLike, RenderOptions, Renderer2D } from './renderer';
 import type { DreamDocument, Layer } from './types';
 
@@ -96,11 +96,13 @@ export class LayerCache {
         if (!doc.layers.some((l) => l.id === id)) this.deleteEntry(id);
       }
       if (!cacheable || (erasing && opts.layerFilter)) {
-        this.renderDirect(layers, ctx);
+        this.renderDirect(doc, layers, ctx);
       } else if (useSnapshot) {
         this.renderSnapshot(doc, layers, ctx);
       } else {
-        for (const layer of layers) ctx.drawImage(this.entryFor(doc, layer).canvas, 0, 0);
+        for (const layer of layers) {
+          compositeLayerBitmap(layer, this.entryFor(doc, layer).canvas, ctx);
+        }
       }
     } finally {
       ctx.restore();
@@ -121,8 +123,10 @@ export class LayerCache {
     }
   }
 
-  private renderDirect(layers: Layer[], ctx: Renderer2D): void {
-    for (const layer of layers) renderLayer(layer, ctx, this.opts);
+  private renderDirect(doc: DreamDocument, layers: Layer[], ctx: Renderer2D): void {
+    for (const layer of layers) {
+      renderCompositedLayer(layer, doc.width, doc.height, ctx, this.opts);
+    }
   }
 
   private renderSnapshot(doc: DreamDocument, layers: Layer[], ctx: Renderer2D): void {
@@ -140,7 +144,9 @@ export class LayerCache {
         // The background is part of the snapshot: erasers punch through it.
         snapCtx.fillStyle = doc.background;
         snapCtx.fillRect(0, 0, doc.width, doc.height);
-        for (const layer of layers) renderLayer(layer, snapCtx, this.opts);
+        for (const layer of layers) {
+          renderCompositedLayer(layer, doc.width, doc.height, snapCtx, this.opts);
+        }
       }
       if (snap) this.releaseCanvas(snap.canvas);
       snap = { layers: doc.layers, background: doc.background, canvas };

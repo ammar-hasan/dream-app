@@ -107,6 +107,7 @@ import type {
   Hotspot,
   HotspotTransition,
   ImageOp,
+  LayerBlendMode,
   Narration,
   Operation,
   Point,
@@ -335,6 +336,7 @@ export interface DreamStore {
   renameLayer(id: string, name: string): void;
   setLayerVisibility(id: string, visible: boolean): void;
   setLayerOpacity(id: string, opacity: number): void;
+  setLayerBlendMode(id: string, blendMode: LayerBlendMode): void;
   setLayerLocked(id: string, locked: boolean): void;
   moveLayer(id: string, toIndex: number): void;
 
@@ -1298,6 +1300,9 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
           'Layer opacity',
         ),
       ),
+
+    setLayerBlendMode: (id, blendMode) =>
+      execute(updateLayerCommand(get().doc, id, { blendMode }, 'Layer blend mode')),
 
     setLayerLocked: (id, locked) =>
       execute(updateLayerCommand(get().doc, id, { locked }, 'Toggle layer lock')),

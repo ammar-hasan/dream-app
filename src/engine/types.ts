@@ -57,6 +57,21 @@ export type ToolId =
  */
 export type WorkspaceMode = 'draw' | 'design' | 'play' | 'present';
 
+export const LAYER_BLEND_MODES = [
+  'normal',
+  'multiply',
+  'screen',
+  'overlay',
+  'darken',
+  'lighten',
+] as const;
+
+export type LayerBlendMode = (typeof LAYER_BLEND_MODES)[number];
+
+export function isLayerBlendMode(value: unknown): value is LayerBlendMode {
+  return typeof value === 'string' && (LAYER_BLEND_MODES as readonly string[]).includes(value);
+}
+
 /** A rectangular RGBA pixel buffer extracted from a larger raster. */
 export interface RasterPatch {
   x: number;
@@ -157,6 +172,8 @@ export interface Layer {
   visible: boolean;
   /** 0..1 */
   opacity: number;
+  /** How this layer's flattened result combines with the artwork below. */
+  blendMode?: LayerBlendMode;
   locked: boolean;
   /** Bottom-to-top paint order. */
   operations: Operation[];

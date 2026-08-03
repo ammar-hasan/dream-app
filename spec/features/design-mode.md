@@ -22,6 +22,19 @@ cue, always alongside the visible selection. After either invitation action
 removes the temporary controls, keyboard focus lands on the active workspace
 tab.
 
+## Layer blending
+
+The active layer's detail controls add **Blend** only in Design. Normal keeps
+the layer's authored colors; Multiply, Screen, Overlay, Darken and Lighten
+combine its flattened appearance with the visible artwork beneath it. Choosing
+a mode updates the canvas immediately and is one undoable document change.
+
+Blend mode applies consistently to the working canvas, every flattened image,
+animation, presentation, prototype and scalable export. It is saved with the
+project and remains editable after reopening. Older projects and layers without
+an explicit mode open as Normal. Hidden layers do not blend; layer opacity is
+applied before the flattened layer is combined with the artwork below.
+
 ## Selection
 
 1. **Select tool (V):** click any object on the active layer to select it

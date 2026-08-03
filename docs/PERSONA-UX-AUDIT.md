@@ -11,12 +11,13 @@ not merely the presence of a named control.
   10/10 standard. The stricter bar includes the underlying job, expected quality,
   constraints, emotional need, recovery, and delivery into the person's real
   next context.
-- **Contract parity: provisional, not self-certifying.** The previous audit
-  called parity complete while deployed tooltips were clipped, AI selection was
-  discoverable only through prior mode knowledge, and the voice contract
-  contradicted the product's no-dead-ends rule. Those gaps are corrected in the
-  current release candidate and covered in a production-browser gate; parity is
-  claimed only after the full release gates and deployed proof pass.
+- **Contract parity is release evidence, not a self-certifying label.** A
+  previous audit called parity complete while deployed tooltips were clipped,
+  AI selection was discoverable only through prior mode knowledge, and the
+  voice contract contradicted the product's no-dead-ends rule. Those gaps and
+  the current professional foundation are covered by production-browser gates;
+  every release still has to pass the full gates and a deployed proof before
+  parity is claimed.
 - **Principal UX verdict: the architecture is strong; interaction quality and
   professional depth are not yet universal.** Progressive disclosure,
   local-first trust and exact undo are excellent foundations. Natural voice,
@@ -47,14 +48,14 @@ the same need.
 
 ## Persona 10/10 evaluation
 
-Scores describe today's release candidate against the latent 10/10 job, not
+Scores describe today's product against the latent 10/10 job, not
 against the much smaller question “does a related feature exist?”
 
 | Persona       | Underlying intent and 10/10 expectation                                                                                                                                                           | Current strengths                                                                                                                             | What prevents a 10/10                                                                                                                                                                                         | Score |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----: |
 | Zainab, 5     | Feel creative and powerful without reading or adult help: talk naturally, see a safe delightful story with consistent characters, change it, play it immediately, and recover every accident.     | Little Dreamer, visible voice/story review, guided movement, four games with sparse collision feedback, starters and one-step Undo.           | Voice remains mostly command-shaped and browser recognition is optional; typed/labelled fallback does not solve pre-literacy; the offline painter lacks arbitrary fidelity and no guardian controls exist.    |   5.5 |
 | Victor, 85    | Express an idea with dignity and confidence despite possible vision, tremor or memory limits; never fear losing work or wonder what mode/tool is active.                                          | Comfort mode, contrast, 44 px targets, reduced motion, autosave, exact Undo.                                                                  | Comfort is hidden behind Settings; the adult shell is dense; no tremor stabilization, guided first journey, persistent task orientation, or manual assistive-technology proof.                                |   5.5 |
-| Ali, 30       | Preserve the feel of real media while gaining digital control, speed and production trust: expressive input, deep brushes, non-destructive experimentation, calibrated color and reliable output. | Pressure, calligraphy, presets, layers, raster editing, selection, AI edits, PNG/JPEG.                                                        | No tilt/azimuth, stabilization, custom brush dynamics, blend modes, masks, adjustment layers, color profiles, soft proofing, large-canvas performance proof or professional interchange.                      |   4.0 |
+| Ali, 30       | Preserve the feel of real media while gaining digital control, speed and production trust: expressive input, deep brushes, non-destructive experimentation, calibrated color and reliable output. | Pressure, calligraphy, presets, layers with core blend modes, raster editing, selection, AI edits, PNG/JPEG.                                  | No tilt/azimuth, stabilization, custom brush dynamics, masks, adjustment layers, color profiles, soft proofing, large-canvas performance proof or professional interchange.                                   |   4.5 |
 | Fatima, 21    | Explore calligraphy authentically in her own language and direction, controlling the nib and composition precisely while keeping work suitable for high-quality sharing or print.                 | Persian RTL, regional speech, broad nib, pressure, symmetry, Persian text, scalable native marks.                                             | Fixed nib angle, no pen tilt/rotation, path refinement, calligraphic guides, OpenType/font controls, custom brush creation, print color or high-resolution publication workflow.                              |   5.0 |
 | George, 45    | Turn a feeling into an understandable moving story on a new phone with little reading, weak technical vocabulary and minimal setup; share it confidently with family.                             | Task-first phone shell/dock, first-drawing edit invitation, guided voice follow-up, story planning, narration, games and recovery.            | Natural conversation stops at bounded intents; advanced panels and export remain text-heavy; generated fidelity and sharing handoff are not resilient enough.                                                 |   4.0 |
 | Sara, 15      | Earn trust and income: create a distinctive logo quickly, revise it from client feedback, keep typography/colors precise, and deliver every professional file without embarrassment.              | Selection/layout, components, layers, honest SVG and one-click multi-size brand pack.                                                         | No vector-node editing, typography depth, transparent-background workflow, grids, brand colors/tokens, variants, PDF/print/CMYK delivery or client-review loop.                                               |   5.0 |
@@ -212,6 +213,13 @@ is a refusal to confuse breadth with completion.
     in each applicable game now aligns one short optional impact with the
     existing shake, life change and sound. Routine motion and scoring remain
     quiet, while a simultaneous game-over event cannot double the impact.
+34. **Professional effects belong in the professional workspace and in the
+    document contract.** Core layer blending now lives beside active-layer
+    opacity only in Design, updates the real canvas immediately and travels
+    through saved projects, SVG, flattened delivery and agent workflows. The
+    layer is isolated before it combines with artwork below, so rendering is
+    consistent rather than dependent on operation order; one Undo restores the
+    prior appearance. Draw gains no new control.
 
 ### What does not yet fully serve the purpose
 
@@ -278,10 +286,11 @@ is a refusal to confuse breadth with completion.
    one guide. Life-losing game collisions now follow the same causal, redundant
    contract without buzzing for routine play. Destructive refusal is not yet
    covered.
-10. **Professional outcomes need professional substrate, not isolated tools.**
-    Non-destructive masks/adjustments, vector paths, typography/color systems,
-    publication preflight and richer agent schemas unlock several personas at
-    once; adding more decorative presets does not.
+10. **Professional outcomes need the rest of the professional substrate, not
+    isolated tools.** Core blending establishes a portable compositing
+    foundation; non-destructive masks/adjustments, vector paths,
+    typography/color systems, publication preflight and richer agent schemas
+    still unlock several personas at once.
 
 ## Recommended order
 
@@ -295,9 +304,10 @@ is a refusal to confuse breadth with completion.
    drag previews and drop targets; make long tasks explain progress and support
    safe cancellation; add sparse optional haptics only after visual behavior is
    exact.
-4. **P1 — professional substrate:** non-destructive masks/adjustments, blend and
-   color foundations, vector paths, typography, grids/constraints and linked
-   reusable systems—progressively disclosed in Design, never added to Draw.
+4. **P1 — professional substrate:** build on the shipped blend foundation with
+   non-destructive masks/adjustments and color foundations, then vector paths,
+   typography, grids/constraints and linked reusable systems—progressively
+   disclosed in Design, never added to Draw.
 5. **P1 — outcome delivery:** publication-grade scientific export and integrity,
    professional brand/print delivery, and a short-video audio/caption/safe-zone
    workflow.

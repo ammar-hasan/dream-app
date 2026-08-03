@@ -697,6 +697,12 @@ holds.
       game-over event does not duplicate the impact. Disabled Touch feedback,
       unsupported hardware and reduced motion remain silent without changing
       game behavior.
+180.  GIVEN overlapping colored layers WHEN Design changes the active layer
+      from Normal to Multiply, Screen, Overlay, Darken or Lighten THEN the
+      canvas and every export combine that flattened layer with the artwork
+      below using the chosen mode; Undo restores Normal and the previous pixels
+      exactly. The mode survives `.dream` save/open and agent read/write, while
+      an older layer without it opens as Normal; Draw does not expose Blend.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

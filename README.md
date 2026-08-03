@@ -232,7 +232,8 @@ and the language picker.
   starter scenes, all procedurally generated (no assets), one undo per stamp
 - Comfort mode: a senior-friendly settings toggle — larger text/targets and
   higher-contrast tokens, composing with dark theme, kid mode and RTL
-- Layers: add, delete, rename, reorder, visibility, opacity, lock — all undoable
+- Layers: add, delete, rename, reorder, visibility, opacity, Design-only blend mode,
+  lock — all undoable
 - Image import: file picker, drag-and-drop onto the canvas, or paste from the
   clipboard — each image lands centered on its own layer (scaled down to fit);
   valid image/component drags and invalid content get distinct named targets

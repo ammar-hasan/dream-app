@@ -85,6 +85,25 @@ describe('SVG export', () => {
     expect(svg.match(/<rect /g)?.length).toBeGreaterThan(2);
   });
 
+  it('preserves a vector layer blend mode', () => {
+    const doc = withOps([
+      {
+        kind: 'shape',
+        id: 'box',
+        shape: 'rectangle',
+        from: { x: 0, y: 0 },
+        to: { x: 20, y: 20 },
+        color: '#ff0000',
+        size: 2,
+        opacity: 1,
+        fill: true,
+      },
+    ]);
+    doc.layers[0] = { ...doc.layers[0], blendMode: 'overlay' };
+
+    expect(buildSvg(doc)).toContain('style="mix-blend-mode:overlay"');
+  });
+
   it('refuses visible pixel content or erasers but ignores hidden unsupported layers', () => {
     const fill: Operation = {
       kind: 'fill',

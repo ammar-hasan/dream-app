@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { useDreamStore } from '../store/dreamStore';
-import type { Layer } from '../engine/types';
+import { LAYER_BLEND_MODES, type Layer } from '../engine/types';
 import {
   ChevronDownIcon,
   ChevronUpIcon,
@@ -22,6 +22,7 @@ export function LayersPanel() {
   const t = useT();
   const doc = useDreamStore((s) => s.doc);
   const activeLayerId = useDreamStore((s) => s.activeLayerId);
+  const mode = useDreamStore((s) => s.mode);
   const store = useDreamStore.getState;
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
@@ -137,6 +138,26 @@ export function LayersPanel() {
                     />
                     <span className="option-value">{Math.round(layer.opacity * 100)}%</span>
                   </label>
+                  {mode === 'design' && (
+                    <label className="option-row">
+                      <span className="option-label">{t('layers.blendMode')}</span>
+                      <select
+                        value={layer.blendMode ?? 'normal'}
+                        onChange={(event) =>
+                          store().setLayerBlendMode(
+                            layer.id,
+                            event.target.value as (typeof LAYER_BLEND_MODES)[number],
+                          )
+                        }
+                      >
+                        {LAYER_BLEND_MODES.map((blendMode) => (
+                          <option key={blendMode} value={blendMode}>
+                            {t(`layers.blend.${blendMode}`)}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  )}
                   <div className="layer-actions">
                     <button
                       type="button"

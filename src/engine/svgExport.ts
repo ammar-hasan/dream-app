@@ -99,10 +99,13 @@ export function buildSvg(doc: DreamDocument): string {
   if (!canExportSvg(doc)) throw new Error('SVG export requires vector-safe visible content');
   const layers = doc.layers
     .filter((layer) => layer.visible)
-    .map(
-      (layer) =>
-        `<g opacity="${n(layer.opacity)}">${layer.operations.map(operationSvg).join('')}</g>`,
-    )
+    .map((layer) => {
+      const blend =
+        layer.blendMode && layer.blendMode !== 'normal'
+          ? ` style="mix-blend-mode:${layer.blendMode}"`
+          : '';
+      return `<g opacity="${n(layer.opacity)}"${blend}>${layer.operations.map(operationSvg).join('')}</g>`;
+    })
     .join('');
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${n(doc.width)}" height="${n(doc.height)}" viewBox="0 0 ${n(doc.width)} ${n(doc.height)}">`,

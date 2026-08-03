@@ -30,7 +30,15 @@ export function genId(prefix: string): string {
 }
 
 export function createLayer(name = 'Layer', operations: Operation[] = []): Layer {
-  return { id: genId('layer'), name, visible: true, opacity: 1, locked: false, operations };
+  return {
+    id: genId('layer'),
+    name,
+    visible: true,
+    opacity: 1,
+    blendMode: 'normal',
+    locked: false,
+    operations,
+  };
 }
 
 export function createFrame(layers?: Layer[]): Frame {
@@ -275,7 +283,7 @@ export function moveLayer(doc: DreamDocument, layerId: string, toIndex: number):
 export function updateLayerProps(
   doc: DreamDocument,
   layerId: string,
-  patch: Partial<Pick<Layer, 'name' | 'visible' | 'opacity' | 'locked'>>,
+  patch: Partial<Pick<Layer, 'name' | 'visible' | 'opacity' | 'blendMode' | 'locked'>>,
 ): DreamDocument {
   return mapLayer(doc, layerId, (layer) => ({ ...layer, ...patch }));
 }

@@ -54,6 +54,7 @@ function richDocument(): DreamDocument {
         name: 'Sketch',
         visible: true,
         opacity: 0.8,
+        blendMode: 'multiply',
         locked: false,
         operations: [
           {
@@ -119,6 +120,7 @@ function richDocument(): DreamDocument {
         name: 'Pixels',
         visible: false,
         opacity: 1,
+        blendMode: 'normal',
         locked: true,
         operations: [
           {
@@ -181,6 +183,7 @@ function richDocument(): DreamDocument {
             name: 'Screen 2',
             visible: true,
             opacity: 1,
+            blendMode: 'screen',
             locked: false,
             operations: [
               {
@@ -232,6 +235,21 @@ describe('projectFile', () => {
     delete plain.activeFrameId;
     const text = await encodeProject(plain, fakeCodec);
     expect(await decodeProject(text, fakeCodec)).toEqual(plain);
+  });
+
+  it('opens older projects without blend modes as normal layers', async () => {
+    const text = await encodeProject(withMirroredLayers(richDocument()), fakeCodec);
+    const parsed = JSON.parse(text);
+    for (const layer of parsed.document.layers) delete layer.blendMode;
+    for (const frame of parsed.document.frames) {
+      for (const layer of frame.layers) delete layer.blendMode;
+    }
+
+    const decoded = await decodeProject(JSON.stringify(parsed), fakeCodec);
+    expect(decoded.layers.every((layer) => layer.blendMode === 'normal')).toBe(true);
+    expect(
+      decoded.frames?.every((frame) => frame.layers.every((layer) => layer.blendMode === 'normal')),
+    ).toBe(true);
   });
 
   it('serializes raster payloads as PNG data URLs, not byte arrays', async () => {

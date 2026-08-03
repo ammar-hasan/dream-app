@@ -34,6 +34,8 @@ rebuilds).
   envelope is transport metadata rather than document content.
 - Version bumps are additive where possible; a breaking change increments
   `version`. Readers refuse newer major versions (see errors below).
+- A layer without `blendMode` is an older/default layer and reads as
+  `"normal"`. A writer may include the explicit default.
 
 ## Reader validation
 

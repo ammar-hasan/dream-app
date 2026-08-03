@@ -1555,6 +1555,26 @@ muted, without making ordinary play distracting or tiring.
 - ✅ Full release gates remain green: 879 unit tests, 97.74% engine coverage,
   58 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 70 — Layers combine like real creative media ✅
+
+Persona need: let Ali, Fatima, Sara, Zǐxuān and Aleksandr shade, light, texture
+and compose without baking away editability or burdening Draw with pro chrome.
+
+- ✅ The active layer offers Normal, Multiply, Screen, Overlay, Darken and
+  Lighten beside opacity only in Design. Changes render immediately and remain
+  ordinary one-step undoable document edits.
+- ✅ Each affected layer is flattened before it combines with visible artwork
+  below, so canvas, cached rendering, raster delivery, animation, prototypes and
+  honest SVG use the same compositing model.
+- ✅ The mode persists through `.dream`, older or absent values recover to
+  Normal, and the agent surface lists and validates the same six values when
+  configuring a layer.
+- ✅ Engine, cache, history, portable-file, SVG and agent tests prove the
+  contract. A real browser draws overlapping primary colors, observes exact
+  Normal and Multiply pixels, and proves Undo restores both pixels and control.
+- ✅ Full release gates remain green: 883 unit tests, 97.18% engine coverage,
+  59 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1574,9 +1594,10 @@ largest count of controls:
    clarification and repair, literacy-light controls and export beyond the
    task-prioritized shell/dock, and a faithful safe creation path that does not
    require a child or low-literacy user to configure an AI provider.
-3. **Professional substrate:** non-destructive masks/adjustments and blend/color
-   foundations, then vector paths, typography, grids, constraints and linked
-   reusable systems—Design-only, preserving Draw's first-minute simplicity.
+3. **Professional substrate:** core portable layer blending is established;
+   continue with non-destructive masks/adjustments and color foundations, then
+   vector paths, typography, grids, constraints and linked reusable systems—
+   Design-only, preserving Draw's first-minute simplicity.
 4. **Outcome-grade delivery:** publication preflight for scientific figures,
    professional brand/print export, and short-video audio/caption/safe-zone
    control.

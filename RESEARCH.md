@@ -213,6 +213,16 @@ Modern interaction craft should make state legible rather than add spectacle:
   generous and tactile feedback optional and redundant.
   (https://developer.apple.com/design/human-interface-guidelines/design-principles ·
   https://developer.apple.com/design/human-interface-guidelines/feedback)
+- **Professional effects stay contextual, immediately visible and safely
+  reversible.** Figma puts blending in the selected layer's Appearance area
+  and previews choices on the canvas; Procreate keeps the active mode beside
+  the selected layer and couples it with opacity. Dream takes the portable
+  foundation from both patterns: the control appears only for the active layer
+  in Design, every choice updates the real composition, and ordinary Undo is
+  the escape hatch. A future custom picker should add hover preview only if it
+  preserves the same keyboard/touch path and never creates hidden state.
+  (https://help.figma.com/hc/en-us/articles/360040667874-Create-unique-effects-with-Blend-modes ·
+  https://help.procreate.com/procreate/handbook/5.4/layers/layers-blend)
 
 ## 3. Trend watch
 

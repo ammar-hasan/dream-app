@@ -151,7 +151,7 @@ export function moveLayerCommand(doc: DreamDocument, layerId: string, toIndex: n
   };
 }
 
-type LayerPatch = Partial<Pick<Layer, 'name' | 'visible' | 'opacity' | 'locked'>>;
+type LayerPatch = Partial<Pick<Layer, 'name' | 'visible' | 'opacity' | 'blendMode' | 'locked'>>;
 
 export function updateLayerCommand(
   doc: DreamDocument,

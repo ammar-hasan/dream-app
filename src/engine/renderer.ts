@@ -9,7 +9,15 @@
 import { cssColor } from './color';
 import { arrowheadPoints, normalizeRect } from './geometry';
 import { sprayDots } from './spray';
-import type { DreamDocument, Layer, Operation, RasterPatch, ShapeOp, StrokeOp } from './types';
+import type {
+  DreamDocument,
+  Layer,
+  LayerBlendMode,
+  Operation,
+  RasterPatch,
+  ShapeOp,
+  StrokeOp,
+} from './types';
 
 /** Structural subset of CanvasRenderingContext2D used by the renderer. */
 export interface Renderer2D {
@@ -107,7 +115,7 @@ export function renderDocument(
     for (const layer of doc.layers) {
       if (!layer.visible) continue;
       if (opts.layerFilter && !opts.layerFilter(layer)) continue;
-      renderLayer(layer, ctx, opts);
+      renderCompositedLayer(layer, doc.width, doc.height, ctx, opts);
     }
   } finally {
     ctx.restore();
@@ -118,6 +126,58 @@ export function renderLayer(layer: Layer, ctx: Renderer2D, opts: RenderOptions =
   for (const op of layer.operations) {
     renderOperation(op, ctx, { ...opts, layerOpacity: layer.opacity });
   }
+}
+
+export function layerCompositeOperation(blendMode: LayerBlendMode | undefined): string {
+  return blendMode && blendMode !== 'normal' ? blendMode : 'source-over';
+}
+
+/** Composite an already-flattened layer bitmap with its document blend mode. */
+export function compositeLayerBitmap(layer: Layer, bitmap: unknown, ctx: Renderer2D): void {
+  if (!layer.blendMode || layer.blendMode === 'normal') {
+    ctx.drawImage(bitmap, 0, 0);
+    return;
+  }
+  ctx.save();
+  try {
+    ctx.globalCompositeOperation = layerCompositeOperation(layer.blendMode);
+    ctx.drawImage(bitmap, 0, 0);
+  } finally {
+    ctx.restore();
+  }
+}
+
+/** Flatten one blended layer before combining it with the artwork below. */
+export function renderCompositedLayer(
+  layer: Layer,
+  width: number,
+  height: number,
+  ctx: Renderer2D,
+  opts: RenderOptions = {},
+): void {
+  if (!layer.blendMode || layer.blendMode === 'normal') {
+    renderLayer(layer, ctx, opts);
+    return;
+  }
+  const createCanvas =
+    opts.createCanvas ??
+    (typeof document !== 'undefined'
+      ? (canvasWidth: number, canvasHeight: number): CanvasLike => {
+          const canvas = document.createElement('canvas');
+          canvas.width = canvasWidth;
+          canvas.height = canvasHeight;
+          return canvas;
+        }
+      : undefined);
+  if (!createCanvas) {
+    throw new Error(
+      'renderDocument: blended layers need a `createCanvas` option outside a browser',
+    );
+  }
+  const bitmap = createCanvas(width, height);
+  const layerCtx = bitmap.getContext('2d');
+  if (layerCtx) renderLayer(layer, layerCtx, opts);
+  compositeLayerBitmap(layer, bitmap, ctx);
 }
 
 export interface OperationRenderOptions extends RenderOptions {

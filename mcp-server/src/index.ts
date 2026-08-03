@@ -65,7 +65,7 @@ const TOOLS: Tool[] = [
   {
     name: 'dream.list_layers',
     description:
-      'List the layers of a .dream project (id, name, visibility, opacity, lock, op count). Animated documents also get a per-frame breakdown.',
+      'List the layers of a .dream project (id, name, visibility, opacity, blend mode, lock, op count). Animated documents also get a per-frame breakdown.',
     inputSchema: {
       type: 'object',
       properties: { path: string('Path to the .dream file') },
@@ -87,7 +87,7 @@ const TOOLS: Tool[] = [
   {
     name: 'dream.update_layer',
     description:
-      'Rename, show/hide, set opacity, lock/unlock or reorder a layer in the active frame of a .dream project.',
+      'Rename, show/hide, set opacity/blend mode, lock/unlock or reorder a layer in the active frame of a .dream project.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -100,6 +100,11 @@ const TOOLS: Tool[] = [
           minimum: 0,
           maximum: 1,
           description: 'Layer opacity from 0 to 1',
+        }),
+        blendMode: optional({
+          type: 'string',
+          enum: ['normal', 'multiply', 'screen', 'overlay', 'darken', 'lighten'],
+          description: 'How the flattened layer combines with artwork below',
         }),
         locked: optional({ type: 'boolean', description: 'Whether the layer is locked' }),
         index: optional({
@@ -286,6 +291,7 @@ const argsSchema = {
     name: z.string().optional(),
     visible: z.boolean().optional(),
     opacity: z.number().optional(),
+    blendMode: z.enum(['normal', 'multiply', 'screen', 'overlay', 'darken', 'lighten']).optional(),
     locked: z.boolean().optional(),
     index: z.number().optional(),
   }),

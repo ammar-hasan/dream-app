@@ -24,6 +24,7 @@
  * codec in `mcp-server/` (@napi-rs/canvas).
  */
 
+import { isLayerBlendMode } from './types';
 import type { DreamDocument, Layer, Operation, RasterPatch } from './types';
 
 export const DREAM_PROJECT_FORMAT = 'dream-project';
@@ -173,6 +174,7 @@ async function deserializeLayers(layers: unknown, codec: RasterCodec): Promise<L
       }
       return {
         ...layer,
+        blendMode: isLayerBlendMode(layer.blendMode) ? layer.blendMode : 'normal',
         operations: await Promise.all(
           layer.operations.map((op) => deserializeOperation(op, codec)),
         ),

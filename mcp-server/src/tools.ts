@@ -25,9 +25,11 @@ import { hotspotTargetIndex } from '../../src/engine/hotspots';
 import { decodeProject, encodeProject } from '../../src/engine/projectFile';
 import { pressureWidth } from '../../src/engine/tools/stroke';
 import { DEFAULT_SETTINGS } from '../../src/engine/tools/types';
+import { isLayerBlendMode } from '../../src/engine/types';
 import type {
   DreamDocument,
   Layer,
+  LayerBlendMode,
   ShapeKind,
   ShapeOp,
   StrokeOp,
@@ -149,6 +151,7 @@ export interface LayerInfo {
   name: string;
   visible: boolean;
   opacity: number;
+  blendMode: LayerBlendMode;
   locked: boolean;
   operations: number;
 }
@@ -165,6 +168,7 @@ function layerInfo(layer: Layer): LayerInfo {
     name: layer.name,
     visible: layer.visible,
     opacity: layer.opacity,
+    blendMode: layer.blendMode ?? 'normal',
     locked: layer.locked,
     operations: layer.operations.length,
   };
@@ -221,6 +225,7 @@ export interface UpdateLayerOptions {
   name?: string;
   visible?: boolean;
   opacity?: number;
+  blendMode?: string;
   locked?: boolean;
   /** New zero-based stack index; 0 is the bottom. */
   index?: number;
@@ -246,11 +251,12 @@ export async function updateLayer(
     options.name !== undefined ||
     options.visible !== undefined ||
     options.opacity !== undefined ||
+    options.blendMode !== undefined ||
     options.locked !== undefined ||
     options.index !== undefined;
   if (!hasUpdate) throw new Error('Provide at least one layer property to update');
 
-  const patch: Partial<Pick<Layer, 'name' | 'visible' | 'opacity' | 'locked'>> = {};
+  const patch: Partial<Pick<Layer, 'name' | 'visible' | 'opacity' | 'blendMode' | 'locked'>> = {};
   if (options.name !== undefined) {
     const name = options.name.trim();
     if (!name) throw new Error('layer name must not be empty');
@@ -263,6 +269,12 @@ export async function updateLayer(
       throw new Error('opacity must be between 0 and 1');
     }
     patch.opacity = options.opacity;
+  }
+  if (options.blendMode !== undefined) {
+    if (!isLayerBlendMode(options.blendMode)) {
+      throw new Error('blendMode must be normal, multiply, screen, overlay, darken or lighten');
+    }
+    patch.blendMode = options.blendMode;
   }
   if (
     options.index !== undefined &&

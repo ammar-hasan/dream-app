@@ -167,6 +167,7 @@ describe('dream-mcp tools', () => {
       name: 'Client logo',
       visible: false,
       opacity: 0.4,
+      blendMode: 'multiply',
       locked: true,
       index: 0,
     });
@@ -175,6 +176,7 @@ describe('dream-mcp tools', () => {
       name: 'Client logo',
       visible: false,
       opacity: 0.4,
+      blendMode: 'multiply',
       locked: true,
       index: 0,
       frameId: null,
@@ -202,6 +204,9 @@ describe('dream-mcp tools', () => {
     );
     await expect(updateLayer(managedPath, { layer: 'Layer 1', opacity: 2 })).rejects.toThrow(
       'between 0 and 1',
+    );
+    await expect(updateLayer(managedPath, { layer: 'Layer 1', blendMode: 'burn' })).rejects.toThrow(
+      'blendMode must be',
     );
     await expect(updateLayer(managedPath, { layer: 'Layer 1', index: 1 })).rejects.toThrow(
       'integer from 0 to 0',

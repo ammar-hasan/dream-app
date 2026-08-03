@@ -28,14 +28,15 @@ absent as the default, and writers may omit defaults.
 
 ## Layer
 
-| Attribute    | Type        | Default                 | Rule                                    |
-| ------------ | ----------- | ----------------------- | --------------------------------------- |
-| `id`         | string      | generated               |                                         |
-| `name`       | string      | `"Layer"` / `"Layer N"` | user-renameable                         |
-| `visible`    | boolean     | `true`                  |                                         |
-| `opacity`    | number      | `1`                     | 0–1; multiplies every operation's alpha |
-| `locked`     | boolean     | `false`                 | rejects all content edits               |
-| `operations` | Operation[] | `[]`                    | bottom-to-top paint order               |
+| Attribute    | Type                                                             | Default                 | Rule                                                       |
+| ------------ | ---------------------------------------------------------------- | ----------------------- | ---------------------------------------------------------- |
+| `id`         | string                                                           | generated               |                                                            |
+| `name`       | string                                                           | `"Layer"` / `"Layer N"` | user-renameable                                            |
+| `visible`    | boolean                                                          | `true`                  |                                                            |
+| `opacity`    | number                                                           | `1`                     | 0–1; multiplies every operation's alpha                    |
+| `blendMode`  | `'normal'\|'multiply'\|'screen'\|'overlay'\|'darken'\|'lighten'` | `'normal'`              | combines the flattened layer with visible artwork below it |
+| `locked`     | boolean                                                          | `false`                 | rejects all content edits                                  |
+| `operations` | Operation[]                                                      | `[]`                    | bottom-to-top paint order                                  |
 
 ## Operation — shared base
 

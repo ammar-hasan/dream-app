@@ -87,6 +87,22 @@ describe('LayerCache', () => {
     expect(factories.created).toHaveLength(2); // same ops, new bitmap
   });
 
+  it('reuses a raw layer bitmap when only its blend mode changes', () => {
+    const doc = bigDoc(1, 5);
+    const factories = makeMockFactories();
+    const cache = new LayerCache(factories);
+    cache.render(doc, new MockContext2D());
+    expect(factories.created).toHaveLength(1);
+
+    const blended = withLayers(doc, [{ ...doc.layers[0], blendMode: 'screen' }]);
+    const ctx = new MockContext2D();
+    cache.render(blended, ctx);
+
+    expect(factories.created).toHaveLength(1);
+    expect(ctx.calls('drawImage')).toHaveLength(1);
+    expect(ctx.globalCompositeOperation).toBe('screen');
+  });
+
   it('honors visibility and the layer filter without invalidating entries', () => {
     const doc = bigDoc(2, 10);
     const factories = makeMockFactories();

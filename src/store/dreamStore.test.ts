@@ -147,14 +147,22 @@ describe('layers', () => {
     expect(store().doc.layers).toHaveLength(2);
   });
 
-  it('rename, visibility, opacity and lock are undoable', () => {
+  it('rename, visibility, opacity, blend mode and lock are undoable', () => {
     const id = store().activeLayerId;
     store().renameLayer(id, 'Sketch');
     store().setLayerVisibility(id, false);
     store().setLayerOpacity(id, 0.3);
+    store().setLayerBlendMode(id, 'multiply');
     store().setLayerLocked(id, true);
     const layer = store().doc.layers[0];
-    expect(layer).toMatchObject({ name: 'Sketch', visible: false, opacity: 0.3, locked: true });
+    expect(layer).toMatchObject({
+      name: 'Sketch',
+      visible: false,
+      opacity: 0.3,
+      blendMode: 'multiply',
+      locked: true,
+    });
+    store().undo();
     store().undo();
     store().undo();
     store().undo();
@@ -163,6 +171,7 @@ describe('layers', () => {
       name: 'Layer 1',
       visible: true,
       opacity: 1,
+      blendMode: 'normal',
       locked: false,
     });
   });

@@ -7,6 +7,12 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Portable layer blend modes** (slice 70): Design now exposes Normal,
+  Multiply, Screen, Overlay, Darken and Lighten for the active layer. Blending
+  is immediately visible, undoable, saved in `.dream`, preserved in raster and
+  honest SVG delivery, and available through the agent layer tools; Draw stays
+  unchanged and older projects open as Normal.
+
 - **Tactile game collisions** (slice 69): Catch!, Flappy Dream and Dream
   Jumper now reinforce a visible life-losing collision with one optional short
   impact on supported devices. Movement and scoring stay quiet, simultaneous
