@@ -52,7 +52,7 @@ against the much smaller question “does a related feature exist?”
 
 | Persona       | Underlying intent and 10/10 expectation                                                                                                                                                           | Current strengths                                                                                                                             | What prevents a 10/10                                                                                                                                                                                         | Score |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----: |
-| Zainab, 5     | Feel creative and powerful without reading or adult help: talk naturally, see a safe delightful story with consistent characters, change it, play it immediately, and recover every accident.     | Little Dreamer, visible listening/transcript, reviewed voice story, guided movement clarification, starters, four games, one-step Undo.       | Voice remains mostly command-shaped and browser recognition is optional; typed/labelled fallback does not solve pre-literacy; the offline painter lacks arbitrary fidelity and no guardian controls exist.    |   5.5 |
+| Zainab, 5     | Feel creative and powerful without reading or adult help: talk naturally, see a safe delightful story with consistent characters, change it, play it immediately, and recover every accident.     | Little Dreamer, visible voice/story review, guided movement, four games with sparse collision feedback, starters and one-step Undo.           | Voice remains mostly command-shaped and browser recognition is optional; typed/labelled fallback does not solve pre-literacy; the offline painter lacks arbitrary fidelity and no guardian controls exist.    |   5.5 |
 | Victor, 85    | Express an idea with dignity and confidence despite possible vision, tremor or memory limits; never fear losing work or wonder what mode/tool is active.                                          | Comfort mode, contrast, 44 px targets, reduced motion, autosave, exact Undo.                                                                  | Comfort is hidden behind Settings; the adult shell is dense; no tremor stabilization, guided first journey, persistent task orientation, or manual assistive-technology proof.                                |   5.5 |
 | Ali, 30       | Preserve the feel of real media while gaining digital control, speed and production trust: expressive input, deep brushes, non-destructive experimentation, calibrated color and reliable output. | Pressure, calligraphy, presets, layers, raster editing, selection, AI edits, PNG/JPEG.                                                        | No tilt/azimuth, stabilization, custom brush dynamics, blend modes, masks, adjustment layers, color profiles, soft proofing, large-canvas performance proof or professional interchange.                      |   4.0 |
 | Fatima, 21    | Explore calligraphy authentically in her own language and direction, controlling the nib and composition precisely while keeping work suitable for high-quality sharing or print.                 | Persian RTL, regional speech, broad nib, pressure, symmetry, Persian text, scalable native marks.                                             | Fixed nib angle, no pen tilt/rotation, path refinement, calligraphic guides, OpenType/font controls, custom brush creation, print color or high-resolution publication workflow.                              |   5.0 |
@@ -208,6 +208,10 @@ is a refusal to confuse breadth with completion.
     model, with the new marks already selected. It preserves one-step Undo,
     confirms success visually and optionally tactually, respects phone targets
     and disappears forever once learned instead of becoming permanent chrome.
+33. **Make tactile feedback causal enough to learn.** A life-losing collision
+    in each applicable game now aligns one short optional impact with the
+    existing shake, life change and sound. Routine motion and scoring remain
+    quiet, while a simultaneous game-over event cannot double the impact.
 
 ### What does not yet fully serve the purpose
 
@@ -271,8 +275,9 @@ is a refusal to confuse breadth with completion.
    optional short cues reinforce the first visible valid drop target and a
    visible refusal, rotation steps and newly entered selection guides, remain
    silent under reduced motion and never buzz while drawing or continuing along
-   one guide. Destructive refusal and game collisions are not yet covered and
-   must follow the same causal, redundant contract.
+   one guide. Life-losing game collisions now follow the same causal, redundant
+   contract without buzzing for routine play. Destructive refusal is not yet
+   covered.
 10. **Professional outcomes need professional substrate, not isolated tools.**
     Non-destructive masks/adjustments, vector paths, typography/color systems,
     publication preflight and richer agent schemas unlock several personas at

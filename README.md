@@ -613,7 +613,8 @@ All four share the same casting magic, controls, juice and sounds:
   (`game/defaults.ts` — no AI, no assets).
 - **Controls**: arrow keys, touch/mouse drag (a finger is a joystick) and —
   in kid mode — two big on-screen arrows. A run starts with a "3… 2… 1…"
-  countdown; catches pop "+1" floats, a bad catch shakes the stage, and the
+  countdown; catches pop "+1" floats, a bad catch shakes the stage and may add
+  one optional short tactile impact on supported hardware, and the
   game-over card shows score, best and a big "Play again!".
 - **Difficulty**: fall speed, spawn rate and lives are sliders in the cast
   panel (kid mode defaults to slower, sparser, 5 lives); the game also ramps

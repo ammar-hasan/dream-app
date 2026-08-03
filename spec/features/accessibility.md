@@ -240,7 +240,9 @@ on unsupported hardware; people can turn it off, and reduced-motion preference
 keeps it silent. Every tactile cue repeats an already-visible interaction state.
 Selection alignment uses the same boundary: a guide line and compact “snapped”
 confirmation remain the primary feedback, while entering a new guide may add
-one tiny cue and continuing along it never repeats the vibration.
+one tiny cue and continuing along it never repeats the vibration. A game may
+add one short impact when a collision visibly spends a life; ordinary movement,
+scoring and the game-over state do not add extra vibration.
 
 ## Edge cases
 

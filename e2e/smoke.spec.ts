@@ -1061,6 +1061,36 @@ test('a game description prepares Dream Jumper offline', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Play!' })).toBeVisible();
 });
 
+test('a life-losing game collision has one synchronized tactile impact', async ({ page }) => {
+  await page.addInitScript(() => {
+    // This seed makes Catch!'s first falling thing bad and centered over the hero.
+    Math.random = () => 35 / 2 ** 31;
+    const target = window as Window & { __dreamHaptics?: Array<number | number[]> };
+    target.__dreamHaptics = [];
+    Object.defineProperty(navigator, 'vibrate', {
+      configurable: true,
+      value: (pattern: number | number[]) => {
+        target.__dreamHaptics?.push(pattern);
+        return true;
+      },
+    });
+  });
+  await bootApp(page);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.getByRole('tab', { name: 'Play' }).click();
+  await page.getByRole('button', { name: 'Play!' }).click();
+
+  await expect
+    .poll(
+      () =>
+        page.evaluate(
+          () => (window as Window & { __dreamHaptics?: Array<number | number[]> }).__dreamHaptics,
+        ),
+      { timeout: 10_000 },
+    )
+    .toEqual([12]);
+});
+
 test('slide settings reach Presenter view with notes', async ({ page }) => {
   await bootApp(page);
   await page.getByRole('button', { name: /^Animate/ }).click();

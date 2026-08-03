@@ -13,7 +13,9 @@ Jumper**.
 2. A run flows: **ready → countdown ("3… 2… 1…", 800 ms per beat) →
    playing → over**. A big play button starts the run.
 3. Score pops float up ("+1" / "−1", 800 ms); a bad hit shakes the stage
-   (320 ms).
+   (320 ms). On supported hardware, a life-losing collision may add one short
+   optional tactile impact synchronized with that visible result. Ordinary
+   movement, scoring and a duplicate game-over event stay silent.
 4. The **game-over / win card** shows the score, the project's best, a
    "New best!" tag when beaten (Catch!/Flappy/Jumper), and a big "Play again!".
 5. The **best score persists per project** on the device (one shared best

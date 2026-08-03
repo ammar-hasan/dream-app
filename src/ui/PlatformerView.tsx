@@ -15,6 +15,7 @@ import {
 } from '../game/templates/platformer';
 import { readHighScore, useDreamStore } from '../store/dreamStore';
 import { useUiPrefs } from '../store/uiPrefs';
+import { pulseGameCollision } from './haptics';
 import { PlayIcon } from './icons';
 import { useT } from './i18n';
 import {
@@ -62,6 +63,7 @@ export function PlatformerView() {
   const doc = useDreamStore((state) => state.doc);
   const gameRunning = useDreamStore((state) => state.gameRunning);
   const kidMode = useUiPrefs((state) => state.kidMode);
+  const haptics = useUiPrefs((state) => state.haptics);
   const settings = templateSettings(doc, kidMode);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -122,6 +124,7 @@ export function PlatformerView() {
       const after = tick(before, inputRef.current, dt, gameRng(1));
       inputRef.current.jump = false;
       playEvents(after.events, SOUNDS);
+      pulseGameCollision(after.events, haptics);
       stateRef.current = after;
       if (after.phase === 'over') {
         const store = useDreamStore.getState();

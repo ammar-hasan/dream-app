@@ -1536,6 +1536,25 @@ people and Little Dreamer alone.
 - ✅ Full release gates remain green: 877 unit tests, 97.74% engine coverage,
   57 browser journeys, 24 MCP tests and four honest agent evals.
 
+## Slice 69 — Game collisions feel physical, not noisy ✅
+
+Persona need: let Zainab feel a meaningful phone-game impact even when sound is
+muted, without making ordinary play distracting or tiring.
+
+- ✅ Catch!, Flappy Dream and Dream Jumper map only their life-losing collision
+  event to one short optional impact synchronized with the existing visible
+  shake, life change and sound.
+- ✅ Movement, jumping, flapping, scoring and wins remain silent. A collision
+  that also ends the run produces one impact rather than a collision pulse plus
+  a second game-over pulse.
+- ✅ Touch feedback off, unsupported hardware and reduced motion remain silent;
+  gameplay state and timing never depend on tactile support.
+- ✅ Focused tests prove mapping, deduplication and silence boundaries. A seeded
+  production-browser journey drives a real centered bad catch and observes
+  exactly one impact.
+- ✅ Full release gates remain green: 879 unit tests, 97.74% engine coverage,
+  58 browser journeys, 24 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the

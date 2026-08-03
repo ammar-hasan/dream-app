@@ -709,7 +709,7 @@ export const pt: Record<string, string> = {
   'settings.comfortHint': 'Texto e botões maiores, contraste mais forte',
   'settings.haptics': 'Feedback tátil',
   'settings.hapticsHint':
-    'Vibrações curtas para alinhamento, alvos, encaixes de rotação e recusas em dispositivos compatíveis',
+    'Vibrações curtas para alinhamento, alvos, encaixes de rotação, recusas e colisões nos jogos em dispositivos compatíveis',
   'settings.language': 'Idioma',
   'settings.install': 'Instalar Dream',
   'settings.installHint': 'Mantenha o Dream neste dispositivo — também funciona offline',

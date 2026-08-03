@@ -135,7 +135,9 @@ Text `#0f141f` / `#ffffff`, dim text `#454d61` / `#ccd4e8`, borders
 9. On supported hardware, a short tactile cue may reinforce the first named
    valid drop target and a distinct double cue may reinforce refusal. Tactile
    feedback is optional, never runs continuously while drawing, never replaces
-   the visible state, and stays silent when reduced motion is requested.
+   the visible state, and stays silent when reduced motion is requested. A
+   life-losing game collision may use one brief impact aligned with the visible
+   shake; routine play and the following game-over state stay silent.
 10. Voice listening uses a compact five-bar waveform only while the microphone
     is active. The bars scale rather than changing layout; the accompanying
     state label and live transcript carry the meaning, so motion and sound are

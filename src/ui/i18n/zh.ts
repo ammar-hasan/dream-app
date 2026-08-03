@@ -674,7 +674,8 @@ export const zh: Record<string, string> = {
   'settings.comfort': '舒适模式',
   'settings.comfortHint': '更大的文字与按钮、更强的对比度',
   'settings.haptics': '触觉反馈',
-  'settings.hapticsHint': '在支持的设备上为对齐吸附、拖放目标、旋转卡点和拒绝操作提供短促振动',
+  'settings.hapticsHint':
+    '在支持的设备上为对齐吸附、拖放目标、旋转卡点、拒绝操作和游戏碰撞提供短促振动',
   'settings.language': '语言',
   'settings.install': '安装 Dream',
   'settings.installHint': '将 Dream 保存在此设备上 — 也能离线使用',

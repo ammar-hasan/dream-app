@@ -1,6 +1,6 @@
 /** Sparse, optional tactile cues for interactions that already have visual feedback. */
 
-export type HapticCue = 'target' | 'refusal' | 'detent';
+export type HapticCue = 'target' | 'refusal' | 'detent' | 'impact';
 
 interface HapticDeps {
   vibrate?: (pattern: number | number[]) => boolean;
@@ -11,7 +11,10 @@ const PATTERNS: Record<HapticCue, number | number[]> = {
   target: 8,
   refusal: [8, 28, 8],
   detent: 5,
+  impact: 12,
 };
+
+const GAME_COLLISIONS = new Set(['catch-bad', 'hit', 'fall']);
 
 /** Ask capable hardware for one short cue; unsupported or sensitive setups stay silent. */
 export function pulseHaptic(cue: HapticCue, enabled: boolean, deps: HapticDeps = {}): boolean {
@@ -32,4 +35,15 @@ export function pulseHaptic(cue: HapticCue, enabled: boolean, deps: HapticDeps =
   } catch {
     return false;
   }
+}
+
+/** Reinforce one life-losing game tick, even when it also ends the run. */
+export function pulseGameCollision(
+  events: readonly string[],
+  enabled: boolean,
+  deps: HapticDeps = {},
+): boolean {
+  return events.some((event) => GAME_COLLISIONS.has(event))
+    ? pulseHaptic('impact', enabled, deps)
+    : false;
 }

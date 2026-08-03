@@ -690,6 +690,13 @@ holds.
       actions are at least 44 px and reduced motion removes perceptible entrance
       timing. Select it and Close return keyboard focus to the resulting active
       workspace tab instead of losing it with the removed card.
+179.  GIVEN Touch feedback is enabled on supported hardware and reduced motion
+      is not requested WHEN Catch!, Flappy Dream or Dream Jumper visibly spends
+      a life on a collision THEN one short tactile impact accompanies that game
+      tick. Ordinary movement and scoring stay silent, and a simultaneous
+      game-over event does not duplicate the impact. Disabled Touch feedback,
+      unsupported hardware and reduced motion remain silent without changing
+      game behavior.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

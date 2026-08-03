@@ -185,8 +185,13 @@ Modern interaction craft should make state legible rather than add spectacle:
   snap, successful drop or game collision on supported hardware, but must match
   visible/audio feedback and must never buzz continuously while drawing. Shape
   alignment is specifically suited to a discrete detent; repeated motion along
-  the same guide is not a new event.
-  (https://developer.apple.com/design/human-interface-guidelines/playing-haptics)
+  the same guide is not a new event. A game collision uses one brief impact on
+  the life-losing event—not routine motion, scoring or a second pulse for the
+  resulting game-over state. Both Apple and Android emphasize causality,
+  consistency, restraint and designing tactile feedback together with visible
+  and audible feedback.
+  (https://developer.apple.com/design/human-interface-guidelines/playing-haptics ·
+  https://developer.android.com/develop/ui/views/haptics/haptics-principles)
 - **Voice needs visible, repairable feedback and another input path.** Modern
   guidance favors clear status near the action, multiple input methods and
   programmatically announced results. Browser speech recognition is still not

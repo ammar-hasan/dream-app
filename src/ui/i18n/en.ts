@@ -693,7 +693,7 @@ export const en: Record<string, string> = {
   'settings.comfortHint': 'Bigger text and buttons, stronger contrast',
   'settings.haptics': 'Touch feedback',
   'settings.hapticsHint':
-    'Tiny vibrations for alignment snaps, drop targets, rotation detents and refusals on supported devices',
+    'Tiny vibrations for alignment snaps, drop targets, rotation detents, refusals and game collisions on supported devices',
   'settings.language': 'Language',
   'settings.install': 'Install Dream',
   'settings.installHint': 'Keep Dream on this device — it works offline too',

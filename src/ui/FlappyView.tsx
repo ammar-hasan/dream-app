@@ -29,6 +29,7 @@ import {
   usePlaySounds,
 } from './playShared';
 import { useT } from './i18n';
+import { pulseGameCollision } from './haptics';
 import { PlayIcon } from './icons';
 
 const HERO_SPRITE = 120;
@@ -64,6 +65,7 @@ export function FlappyView() {
   const doc = useDreamStore((s) => s.doc);
   const gameRunning = useDreamStore((s) => s.gameRunning);
   const kidMode = useUiPrefs((s) => s.kidMode);
+  const haptics = useUiPrefs((s) => s.haptics);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef<FlappyState>(
@@ -125,6 +127,7 @@ export function FlappyView() {
       flapRef.current = false; // edge-triggered: consumed by this tick
       if (after !== before) {
         playEvents(after.events, SOUNDS);
+        pulseGameCollision(after.events, haptics);
         stateRef.current = after;
         if (after.phase === 'over') {
           const store = useDreamStore.getState();

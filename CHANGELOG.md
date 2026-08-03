@@ -7,6 +7,12 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Tactile game collisions** (slice 69): Catch!, Flappy Dream and Dream
+  Jumper now reinforce a visible life-losing collision with one optional short
+  impact on supported devices. Movement and scoring stay quiet, simultaneous
+  game-over never doubles the cue, and Touch feedback off or reduced motion
+  keeps play silent.
+
 - **First-drawing edit invitation** (slice 68): after an adult’s first new
   mark, a localized one-time card asks whether they want to move or change it.
   Select it enters the real Design/Select workspace with exactly those new
