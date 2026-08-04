@@ -1696,6 +1696,26 @@ motor consequence of a size choice before committing a mark.
 - ✅ Full release gates remain green: 905 unit tests, 97.12% engine coverage,
   63 browser journeys, 26 MCP tests and four honest agent evals.
 
+## Slice 77 — Portable named project colors ✅
+
+Persona need: let Sara keep client colors exact, let other professionals reuse
+controlled palettes and let Maria's agents understand the same color choices
+without pretending that saved swatches are linked variables.
+
+- ✅ Color-capable tools separate per-device Recent colors from up to 24 named
+  Project colors that travel with the document. Save current, select, rename,
+  replace and remove stay directly visible and localized in all six languages.
+- ✅ Every list mutation is one undoable document change. Renaming, replacing or
+  removing a saved swatch never changes existing artwork; older projects open
+  with an empty list and malformed portable entries recover safely.
+- ✅ `.dream` round-trips exact ids, names, order and normalized values. Agent
+  summaries expose the full list, while dedicated tools add/update/rename and
+  remove the same entries with the same limits.
+- ✅ Pure normalization/file/history tests, store and rendered-interaction tests
+  plus MCP real-file tests cover the complete people-and-agent contract.
+- ✅ Full release gates remain green: 913 unit tests, 97.15% engine coverage,
+  64 browser journeys, 29 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1716,8 +1736,9 @@ largest count of controls:
    task-prioritized shell/dock, and a faithful safe creation path that does not
    require a child or low-literacy user to configure an AI provider.
 3. **Professional substrate:** core portable layer blending, editable per-layer
-   adjustments, optional stroke stabilization and painted masks are established;
-   continue with effect stacks and color foundations, then vector paths,
+   adjustments, optional stroke stabilization, painted masks and named project
+   colors are established; continue with effect stacks and linked color
+   variables, then vector paths,
    typography, grids, constraints and linked reusable systems—progressively
    disclosed without crowding first-minute Draw.
 4. **Outcome-grade delivery:** publication preflight for scientific figures,

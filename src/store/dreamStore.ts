@@ -8,6 +8,7 @@
 
 import { create } from 'zustand';
 import { createDocument, createFrame, createLayer, genId } from '../engine/document';
+import { MAX_PROJECT_COLORS, MAX_PROJECT_COLOR_NAME, normalizeHex } from '../engine/color';
 import {
   activeFrameIndex,
   animationSettingsOf,
@@ -36,6 +37,7 @@ import {
   removeLayerCommand,
   replaceLayerContentCommand,
   resizeDocumentCommand,
+  setProjectColorsCommand,
   setAnimationEnabledCommand,
   setFrameCaptionsCommand,
   setFramePresentationCommand,
@@ -113,6 +115,7 @@ import type {
   Narration,
   Operation,
   Point,
+  ProjectColor,
   RasterPatch,
   Rect,
   SlidePresentation,
@@ -296,6 +299,10 @@ export interface DreamStore {
   /** Insert a coloring-book starter scene as a new layer (undoable). */
   insertStarterScene(scene: SceneId, name: string): void;
   setColor(color: Color): void;
+  /** Save a reusable color in this project; returns false when invalid or full. */
+  addProjectColor(name: string, value: Color): boolean;
+  updateProjectColor(id: string, patch: Partial<Pick<ProjectColor, 'name' | 'value'>>): void;
+  deleteProjectColor(id: string): void;
   setSize(size: number): void;
   setStabilization(stabilization: number): void;
   setBrushStyle(brushStyle: ToolSettings['brushStyle']): void;
@@ -643,6 +650,44 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         };
       }),
     setColor: (color) => set((s) => ({ settings: { ...s.settings, color } })),
+    addProjectColor: (name, value) => {
+      const { doc } = get();
+      const projectColors = doc.projectColors ?? [];
+      const normalized = normalizeHex(value);
+      const trimmed = name.trim().slice(0, MAX_PROJECT_COLOR_NAME);
+      if (!normalized || !trimmed || projectColors.length >= MAX_PROJECT_COLORS) return false;
+      execute(
+        setProjectColorsCommand(
+          doc,
+          [...projectColors, { id: genId('color'), name: trimmed, value: normalized }],
+          'Add project color',
+        ),
+      );
+      return true;
+    },
+    updateProjectColor: (id, patch) => {
+      const { doc } = get();
+      const projectColors = doc.projectColors ?? [];
+      const index = projectColors.findIndex((color) => color.id === id);
+      if (index === -1) return;
+      const current = projectColors[index];
+      const name =
+        patch.name === undefined
+          ? current.name
+          : patch.name.trim().slice(0, MAX_PROJECT_COLOR_NAME);
+      const value = patch.value === undefined ? current.value : normalizeHex(patch.value);
+      if (!name || !value || (name === current.name && value === current.value)) return;
+      const next = [...projectColors];
+      next[index] = { ...current, name, value };
+      execute(setProjectColorsCommand(doc, next, 'Update project color'));
+    },
+    deleteProjectColor: (id) => {
+      const { doc } = get();
+      const projectColors = doc.projectColors ?? [];
+      const next = projectColors.filter((color) => color.id !== id);
+      if (next.length === projectColors.length) return;
+      execute(setProjectColorsCommand(doc, next, 'Delete project color'));
+    },
     setSize: (size) => set((s) => ({ settings: { ...s.settings, size } })),
     setStabilization: (stabilization) =>
       set((s) => ({

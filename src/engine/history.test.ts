@@ -6,6 +6,7 @@ import {
   History,
   moveLayerCommand,
   removeLayerCommand,
+  setProjectColorsCommand,
   updateLayerCommand,
 } from './history';
 import type { StrokeOp } from './types';
@@ -147,5 +148,17 @@ describe('layer commands', () => {
     const renamed = history.execute(doc, updateLayerCommand(doc, id, { name: 'Sketch' }));
     expect(renamed.layers[0].name).toBe('Sketch');
     expect(history.undo(renamed).layers[0].name).toBe('Layer 1');
+  });
+});
+
+describe('project color commands', () => {
+  it('replaces named colors as one undoable change', () => {
+    const doc = createDocument({ width: 10, height: 10 });
+    const history = new History();
+    const colors = [{ id: 'color-1', name: 'Brand ink', value: '#123456' }];
+    const updated = history.execute(doc, setProjectColorsCommand(doc, colors));
+    expect(updated.projectColors).toEqual(colors);
+    expect(history.undo(updated).projectColors).toBeUndefined();
+    expect(history.redo(doc).projectColors).toEqual(colors);
   });
 });

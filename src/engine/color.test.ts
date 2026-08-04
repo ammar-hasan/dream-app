@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { cssColor, hexToRgba, isValidHex, normalizeHex, PALETTE, rgbaToHex } from './color';
+import {
+  cssColor,
+  hexToRgba,
+  isValidHex,
+  MAX_PROJECT_COLORS,
+  normalizeHex,
+  normalizeProjectColors,
+  PALETTE,
+  rgbaToHex,
+} from './color';
 
 describe('normalizeHex', () => {
   it('expands shorthand and lowercases', () => {
@@ -25,6 +34,28 @@ describe('isValidHex', () => {
   it('matches normalizeHex', () => {
     expect(isValidHex('#123abc')).toBe(true);
     expect(isValidHex('#12345')).toBe(false);
+  });
+});
+
+describe('normalizeProjectColors', () => {
+  it('normalizes values and drops malformed or duplicate entries', () => {
+    expect(
+      normalizeProjectColors([
+        { id: ' brand ', name: ' Ink ', value: '#ABC' },
+        { id: 'brand', name: 'Duplicate', value: '#ffffff' },
+        { id: 'bad', name: '', value: '#ffffff' },
+        { id: 'bad-color', name: 'Bad', value: 'red' },
+      ]),
+    ).toEqual([{ id: 'brand', name: 'Ink', value: '#aabbcc' }]);
+  });
+
+  it('caps the portable list', () => {
+    const colors = Array.from({ length: MAX_PROJECT_COLORS + 5 }, (_, index) => ({
+      id: `color-${index}`,
+      name: `Color ${index}`,
+      value: '#123456',
+    }));
+    expect(normalizeProjectColors(colors)).toHaveLength(MAX_PROJECT_COLORS);
   });
 });
 

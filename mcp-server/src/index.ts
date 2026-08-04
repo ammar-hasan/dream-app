@@ -42,11 +42,38 @@ const TOOLS: Tool[] = [
   {
     name: 'dream.read_project',
     description:
-      'Read a .dream project file and return a summary: size, background, mode, layer/frame counts, hotspots (incl. broken ones), operation counts per kind, game setup.',
+      'Read a .dream project file and return a summary: size, background, named project colors, mode, layer/frame counts, hotspots (incl. broken ones), operation counts per kind, game setup.',
     inputSchema: {
       type: 'object',
       properties: { path: string('Path to the .dream file') },
       required: ['path'],
+    },
+  },
+  {
+    name: 'dream.set_project_color',
+    description:
+      'Add a portable named color to a .dream project, or update and rename an existing one selected by id or exact name.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: string('Path to the .dream file'),
+        color: optional(string('Existing project-color id or exact name; omit to add')),
+        name: string('New non-empty name, at most 40 characters'),
+        value: string('Color value, #rgb or #rrggbb'),
+      },
+      required: ['path', 'name', 'value'],
+    },
+  },
+  {
+    name: 'dream.remove_project_color',
+    description: 'Remove a portable named color from a .dream project by id or exact name.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: string('Path to the .dream file'),
+        color: string('Project-color id or exact name'),
+      },
+      required: ['path', 'color'],
     },
   },
   {
@@ -350,6 +377,13 @@ const TOOLS: Tool[] = [
 /** Runtime arg validation (the JSON Schemas above are the wire contract). */
 const argsSchema = {
   'dream.read_project': z.object({ path: z.string() }),
+  'dream.set_project_color': z.object({
+    path: z.string(),
+    color: z.string().optional(),
+    name: z.string(),
+    value: z.string(),
+  }),
+  'dream.remove_project_color': z.object({ path: z.string(), color: z.string() }),
   'dream.create_project': z.object({
     path: z.string(),
     width: z.number(),
@@ -463,6 +497,14 @@ async function callTool(name: ToolName, args: unknown): Promise<CallToolResult> 
     case 'dream.read_project': {
       const { path } = argsSchema[name].parse(args);
       return asJson(await tools.readProject(path));
+    }
+    case 'dream.set_project_color': {
+      const { path, ...options } = argsSchema[name].parse(args);
+      return asJson(await tools.setProjectColor(path, options));
+    }
+    case 'dream.remove_project_color': {
+      const { path, color } = argsSchema[name].parse(args);
+      return asJson(await tools.removeProjectColor(path, color));
     }
     case 'dream.create_project': {
       const { path, ...options } = argsSchema[name].parse(args);

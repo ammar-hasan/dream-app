@@ -15,7 +15,11 @@ feels immediate on a 5-year-old's tablet and a pro's pen display alike.
    color `#1f2937`, size 8, opacity 1 and steady stroke 0%.
 4. All stroke tools paint with round line caps and joins.
 5. The color UI offers a 16-color palette, a custom color picker, and a
-   recent-colors row (last 8, newest first, persisted per user).
+   recent-colors row (last 8, newest first, persisted per user). A separate
+   **Project colors** group can save the current color under an editable name,
+   select it, replace its exact value or remove it. Up to 24 travel with the
+   project; every list change is undoable. Replacing or removing a swatch never
+   changes marks that already used its old value.
 6. Locked or hidden layers reject edits; the status area says why.
 7. On a hovering pointer, Brush, Pencil, Eraser and Spray replace the generic
    cursor over the document with a high-contrast ring at the exact current

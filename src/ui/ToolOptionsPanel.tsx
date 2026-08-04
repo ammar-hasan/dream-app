@@ -1,8 +1,9 @@
 /** Right panel, top half: options for the active tool. */
 
-import { useEffect } from 'react';
-import { PALETTE } from '../engine/color';
+import { useEffect, useState } from 'react';
+import { MAX_PROJECT_COLORS, MAX_PROJECT_COLOR_NAME, normalizeHex, PALETTE } from '../engine/color';
 import { SYMMETRY_TOOLS, type SymmetryMode } from '../engine/symmetry';
+import type { ProjectColor } from '../engine/types';
 import { useDreamStore } from '../store/dreamStore';
 import { useUiPrefs } from '../store/uiPrefs';
 import { useT } from './i18n';
@@ -81,6 +82,74 @@ const BRUSH_PRESETS = [
   },
 ] as const;
 
+function ProjectColorRow({ color, active }: { color: ProjectColor; active: boolean }) {
+  const t = useT();
+  const setColor = useDreamStore((s) => s.setColor);
+  const updateProjectColor = useDreamStore((s) => s.updateProjectColor);
+  const deleteProjectColor = useDreamStore((s) => s.deleteProjectColor);
+  const [name, setName] = useState(color.name);
+  const [value, setValue] = useState(color.value);
+
+  useEffect(() => setName(color.name), [color.name]);
+  useEffect(() => setValue(color.value), [color.value]);
+
+  return (
+    <div className="project-color-row">
+      <button
+        type="button"
+        className={`swatch${active ? ' active' : ''}`}
+        style={{ background: color.value }}
+        data-tooltip={t('options.projectColorUse', { name: color.name })}
+        aria-label={t('options.projectColorUse', { name: color.name })}
+        onClick={() => setColor(color.value)}
+      />
+      <input
+        className="project-color-name"
+        value={name}
+        maxLength={MAX_PROJECT_COLOR_NAME}
+        aria-label={t('options.projectColorRename', { name: color.name })}
+        onChange={(event) => setName(event.target.value)}
+        onBlur={() => {
+          if (name.trim()) updateProjectColor(color.id, { name });
+          else setName(color.name);
+        }}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') event.currentTarget.blur();
+        }}
+      />
+      <input
+        className="project-color-value"
+        value={value}
+        maxLength={7}
+        spellCheck={false}
+        aria-label={t('options.projectColorChange', { name: color.name })}
+        onChange={(event) => setValue(event.target.value)}
+        onBlur={() => {
+          const normalized = normalizeHex(value);
+          if (!normalized) {
+            setValue(color.value);
+            return;
+          }
+          updateProjectColor(color.id, { value: normalized });
+          setColor(normalized);
+        }}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') event.currentTarget.blur();
+        }}
+      />
+      <button
+        type="button"
+        className="btn project-color-delete"
+        data-tooltip={t('options.projectColorDelete', { name: color.name })}
+        aria-label={t('options.projectColorDelete', { name: color.name })}
+        onClick={() => deleteProjectColor(color.id)}
+      >
+        {t('options.projectColorRemove')}
+      </button>
+    </div>
+  );
+}
+
 export function ToolOptionsPanel() {
   const t = useT();
   const tool = useDreamStore((s) => s.tool);
@@ -97,6 +166,9 @@ export function ToolOptionsPanel() {
   const symmetry = useDreamStore((s) => s.symmetry);
   const wandDraft = useDreamStore((s) => s.wandDraft);
   const wandTolerance = useDreamStore((s) => s.wandTolerance);
+  const savedProjectColors = useDreamStore((s) => s.doc.projectColors);
+  const projectColors = savedProjectColors ?? [];
+  const addProjectColor = useDreamStore((s) => s.addProjectColor);
   const recentColors = useUiPrefs((s) => s.recentColors);
 
   // Remember the color once it settles (debounced so dragging the native
@@ -169,6 +241,37 @@ export function ToolOptionsPanel() {
               <div className="swatches">{recentColors.map(swatchButton)}</div>
             </div>
           )}
+          <div className="project-colors">
+            <div className="project-colors-header">
+              <span className="option-label">{t('options.projectColors')}</span>
+              <span className="project-colors-count">
+                {t('options.projectColorsCount', {
+                  count: projectColors.length,
+                  max: MAX_PROJECT_COLORS,
+                })}
+              </span>
+              <button
+                type="button"
+                className="btn project-color-save"
+                disabled={projectColors.length >= MAX_PROJECT_COLORS}
+                onClick={() =>
+                  addProjectColor(
+                    t('options.projectColorDefault', { count: projectColors.length + 1 }),
+                    settings.color,
+                  )
+                }
+              >
+                {t('options.projectColorSave')}
+              </button>
+            </div>
+            {projectColors.map((color) => (
+              <ProjectColorRow
+                key={color.id}
+                color={color}
+                active={settings.color === color.value}
+              />
+            ))}
+          </div>
         </>
       )}
 

@@ -172,6 +172,15 @@ Modern interaction craft should make state legible rather than add spectacle:
   readable on light or dark artwork and disappears without touching the work;
   this serves motor confidence and professional precision without animation or
   continuous haptics.
+- **Saved swatches should disclose their scope and semantics.** Modern design
+  systems distinguish reusable styles from linked variables that propagate
+  through existing work. Dream first adopts the smaller trustworthy unit: a
+  visibly named project palette beside—but separate from—personal recents,
+  with direct select/rename/value/remove actions and agent parity. Existing
+  artwork deliberately stays unchanged; linked propagation remains future work
+  rather than an implicit side effect.
+  (https://help.figma.com/hc/en-us/articles/360039238753-Create-color-text-effect-and-layout-grid-styles ·
+  https://help.figma.com/hc/en-us/articles/15339657135383-Guide-to-variables-in-Figma)
 - **Stroke assistance must be visible and optional.** Procreate exposes
   stabilization as both a professional brush property and a global
   accessibility aid, with stronger settings trading natural texture for

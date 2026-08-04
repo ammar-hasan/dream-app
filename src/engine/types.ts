@@ -27,6 +27,13 @@ export interface Rect {
 /** Color is always a normalized '#rrggbb' hex string. See color.ts helpers. */
 export type Color = string;
 
+/** A reusable named color that travels with one project. */
+export interface ProjectColor {
+  id: string;
+  name: string;
+  value: Color;
+}
+
 export type ToolId =
   | 'select'
   | 'lasso'
@@ -340,6 +347,8 @@ export interface DreamDocument {
   width: number;
   height: number;
   background: Color;
+  /** Named colors shared by this project; absent in older saves. */
+  projectColors?: ProjectColor[];
   /**
    * Bottom-to-top stacking order: layers[0] is painted first.
    *

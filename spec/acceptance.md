@@ -741,6 +741,12 @@ holds.
       current diameter and center before drawing. Changing size or zoom updates
       it immediately; leaving the document restores the ordinary pointer and
       pristine canvas, and the guide creates no history or export content.
+187.  GIVEN a current drawing color WHEN the user saves it as a project color,
+      renames or replaces it, selects it later, saves and reopens the project,
+      or asks an agent to read/update/remove it THEN the ordered named swatch
+      remains portable and exact, each in-app list change is one undoable
+      decision, the 24-color limit is enforced, device-local recents remain
+      separate, and existing artwork never changes when a swatch does.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

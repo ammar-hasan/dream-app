@@ -13,20 +13,22 @@ byte-compatible with the browser app, and vice versa.
 
 ## Tools
 
-| Tool                    | What it does                                                                                                                     |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `dream.read_project`    | Summary of a `.dream` file: size, background, mode, layer/frame counts, hotspots (incl. broken), op counts per kind, game setup. |
-| `dream.create_project`  | Create a new `.dream` file: `path`, `width`, `height`, optional `background`, `name`.                                            |
-| `dream.list_layers`     | Layer stack(s): id, name, visibility, opacity, blend mode, editable adjustments, mask summary, lock, op count — plus frames.     |
-| `dream.add_layer`       | Add a new top layer to the active frame, with an optional `name`.                                                                |
-| `dream.update_layer`    | Rename, show/hide, set opacity/blend/adjustments/mask, lock/unlock or move a layer by zero-based stack index.                    |
-| `dream.remove_layer`    | Remove a layer by id or name from the active frame; refuses to remove the final layer.                                           |
-| `dream.add_stroke`      | Append a validated brush/pencil/eraser polyline with optional pressure, style and target layer.                                  |
-| `dream.add_mask_stroke` | Append an editable pressure-aware Hide/Reveal gesture to a layer mask, creating and enabling it when needed.                     |
-| `dream.add_text`        | Append a text op: `text`, `x`, `y`, optional `size`, `color`, `fontFamily`, `layer` (id or name; default: top layer).            |
-| `dream.add_shape`       | Append a line/rectangle/ellipse with endpoints, optional size/color/opacity/fill, and an optional target `layer`.                |
-| `dream.render_png`      | Flatten the document (or one `frame` index) to a PNG file.                                                                       |
-| `dream.export_app`      | Export an animated document as ONE self-contained interactive HTML prototype (frames as screens, hotspots as tappable links).    |
+| Tool                         | What it does                                                                                                                      |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `dream.read_project`         | Summary of a `.dream` file: size, background, named project colors, mode, layer/frame counts, hotspots, op counts and game setup. |
+| `dream.set_project_color`    | Add a portable named color, or update/rename one selected by id or exact name.                                                    |
+| `dream.remove_project_color` | Remove a portable named color by id or exact name.                                                                                |
+| `dream.create_project`       | Create a new `.dream` file: `path`, `width`, `height`, optional `background`, `name`.                                             |
+| `dream.list_layers`          | Layer stack(s): id, name, visibility, opacity, blend mode, editable adjustments, mask summary, lock, op count — plus frames.      |
+| `dream.add_layer`            | Add a new top layer to the active frame, with an optional `name`.                                                                 |
+| `dream.update_layer`         | Rename, show/hide, set opacity/blend/adjustments/mask, lock/unlock or move a layer by zero-based stack index.                     |
+| `dream.remove_layer`         | Remove a layer by id or name from the active frame; refuses to remove the final layer.                                            |
+| `dream.add_stroke`           | Append a validated brush/pencil/eraser polyline with optional pressure, style and target layer.                                   |
+| `dream.add_mask_stroke`      | Append an editable pressure-aware Hide/Reveal gesture to a layer mask, creating and enabling it when needed.                      |
+| `dream.add_text`             | Append a text op: `text`, `x`, `y`, optional `size`, `color`, `fontFamily`, `layer` (id or name; default: top layer).             |
+| `dream.add_shape`            | Append a line/rectangle/ellipse with endpoints, optional size/color/opacity/fill, and an optional target `layer`.                 |
+| `dream.render_png`           | Flatten the document (or one `frame` index) to a PNG file.                                                                        |
+| `dream.export_app`           | Export an animated document as ONE self-contained interactive HTML prototype (frames as screens, hotspots as tappable links).     |
 
 ## Setup
 
@@ -118,6 +120,9 @@ The npm package must be public before the Registry will accept its metadata.
 - Layer authoring targets the active frame; update/remove preserve its mirrored
   active stack, a layer can be addressed by id or name, and the final layer is
   never removable.
+- Named project colors are capped at 24 with 40-character names. They are
+  reusable swatches, not linked variables, so replacing one never recolors
+  existing operations.
 - Freehand authoring accepts 2–10,000 finite points, optional pressure samples,
   brush/pencil/eraser tools, color, size, opacity and an id/name layer target.
   Pressure uses the same width floor as pen input; pencil and eraser remain

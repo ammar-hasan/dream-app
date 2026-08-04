@@ -43,6 +43,34 @@ test('paint tools preview their exact footprint before drawing', async ({ page }
   await expect.poll(centerPixel).toEqual([255, 255, 255, 255]);
 });
 
+test('named project colors stay exact, selectable and undoable', async ({ page }) => {
+  await bootApp(page);
+  await page.getByLabel('Custom color').fill('#123456');
+  await page.getByRole('button', { name: 'Save current' }).click();
+
+  const name = page.getByRole('textbox', { name: 'Rename Color 1' });
+  await expect(name).toHaveValue('Color 1');
+  await name.fill('Brand ink');
+  await name.press('Tab');
+
+  const value = page.getByRole('textbox', { name: 'Change Brand ink' });
+  await expect(value).toHaveValue('#123456');
+  await value.fill('#654321');
+  await value.press('Tab');
+  await expect(page.getByRole('button', { name: 'Use Brand ink' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Color #dc2626' }).click();
+  await page.getByRole('button', { name: 'Use Brand ink' }).click();
+  await expect(page.getByLabel('Custom color')).toHaveValue('#654321');
+
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(page.getByRole('textbox', { name: 'Change Brand ink' })).toHaveValue('#123456');
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(page.getByRole('textbox', { name: 'Rename Color 1' })).toBeVisible();
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(page.locator('.project-color-row')).toHaveCount(0);
+});
+
 test('the first drawing offers one direct, undo-safe path into editing', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {

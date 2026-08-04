@@ -18,6 +18,42 @@ describe('document lifecycle', () => {
   });
 });
 
+describe('project colors', () => {
+  it('adds, edits, uses and removes portable named colors through history', () => {
+    store().setColor('#123456');
+    expect(store().addProjectColor(' Brand ink ', store().settings.color)).toBe(true);
+    const saved = store().doc.projectColors?.[0];
+    expect(saved).toMatchObject({ name: 'Brand ink', value: '#123456' });
+
+    store().updateProjectColor(saved!.id, { name: 'Primary ink', value: '#ABC' });
+    expect(store().doc.projectColors?.[0]).toMatchObject({
+      name: 'Primary ink',
+      value: '#aabbcc',
+    });
+    store().undo();
+    expect(store().doc.projectColors?.[0]).toMatchObject({ name: 'Brand ink', value: '#123456' });
+
+    store().deleteProjectColor(saved!.id);
+    expect(store().doc.projectColors).toEqual([]);
+    store().undo();
+    expect(store().doc.projectColors?.[0]?.id).toBe(saved!.id);
+  });
+
+  it('rejects invalid colors and empty names', () => {
+    expect(store().addProjectColor('', '#123456')).toBe(false);
+    expect(store().addProjectColor('Ink', 'red')).toBe(false);
+    expect(store().doc.projectColors).toBeUndefined();
+  });
+
+  it('enforces the 24-color project limit', () => {
+    for (let index = 0; index < 24; index += 1) {
+      expect(store().addProjectColor(`Color ${index + 1}`, '#123456')).toBe(true);
+    }
+    expect(store().addProjectColor('One too many', '#654321')).toBe(false);
+    expect(store().doc.projectColors).toHaveLength(24);
+  });
+});
+
 describe('drawing', () => {
   it('pointer gestures commit an operation to the active layer', () => {
     store().setTool('brush');

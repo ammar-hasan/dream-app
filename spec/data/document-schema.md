@@ -17,6 +17,7 @@ absent as the default, and writers may omit defaults.
 | `name`                    | string                                | `"Untitled"`        | trimmed; empty falls back to `"Untitled"`                        |
 | `width` / `height`        | number                                | —                   | integers ≥ 1; the new-document dialog allows 1–4096              |
 | `background`              | color                                 | `#ffffff`           |                                                                  |
+| `projectColors?`          | ProjectColor[]                        | absent = `[]`       | at most 24, in display order                                     |
 | `layers`                  | Layer[]                               | one layer "Layer 1" | bottom-to-top; mirrors the active frame when `frames` is present |
 | `frames?`                 | Frame[]                               | absent              | absent = animation off                                           |
 | `activeFrameId?`          | string                                | —                   | must reference an existing frame                                 |
@@ -25,6 +26,17 @@ absent as the default, and writers may omit defaults.
 | `mode?`                   | `'draw'\|'design'\|'play'\|'present'` | `'draw'`            | `'play'`/`'present'` reopen as `'draw'`                          |
 | `game?`                   | GameSetup                             | absent = defaults   | outside undo                                                     |
 | `createdAt` / `updatedAt` | number (ms epoch)                     | creation time       | `updatedAt` bumps on every edit                                  |
+
+### ProjectColor
+
+| Attribute | Type   | Default   | Rule                                      |
+| --------- | ------ | --------- | ----------------------------------------- |
+| `id`      | string | generated | non-empty and unique within the document  |
+| `name`    | string | —         | trimmed, non-empty, at most 40 characters |
+| `value`   | color  | —         | normalized `#rrggbb`                      |
+
+Project colors are reusable swatches, not references held by operations.
+Replacing a value affects future choices only and never changes existing marks.
 
 ## Layer
 

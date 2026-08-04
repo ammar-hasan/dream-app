@@ -28,9 +28,11 @@ import {
   listLayers,
   loadProject,
   readProject,
+  removeProjectColor,
   removeLayer,
   renderPng,
   saveProject,
+  setProjectColor,
   updateLayer,
 } from './tools';
 import { nodeRasterCodec } from './nodeCodec';
@@ -79,6 +81,63 @@ describe('dream-mcp tools', () => {
     await expect(
       createProject(projectPath, { width: 10, height: 10, background: 'red' }),
     ).rejects.toThrow('Invalid background color');
+  });
+
+  it('adds, exposes, updates, and removes portable named project colors', async () => {
+    const added = await setProjectColor(projectPath, {
+      name: 'Brand ink',
+      value: '#ABC',
+    });
+    expect(added).toMatchObject({ name: 'Brand ink', value: '#aabbcc', index: 0 });
+    expect((await readProject(projectPath)).projectColors).toEqual([
+      { id: added.id, name: 'Brand ink', value: '#aabbcc' },
+    ]);
+
+    const updated = await setProjectColor(projectPath, {
+      color: added.id,
+      name: 'Primary ink',
+      value: '#123456',
+    });
+    expect(updated).toMatchObject({ id: added.id, name: 'Primary ink', value: '#123456' });
+
+    const removed = await removeProjectColor(projectPath, 'Primary ink');
+    expect(removed).toMatchObject({ id: added.id, index: 0, remaining: 0 });
+    expect((await loadProject(projectPath)).projectColors).toEqual([]);
+  });
+
+  it('validates named project-color mutations', async () => {
+    await expect(setProjectColor(projectPath, { name: '', value: '#123456' })).rejects.toThrow(
+      'must not be empty',
+    );
+    await expect(setProjectColor(projectPath, { name: 'Ink', value: 'red' })).rejects.toThrow(
+      'Invalid project color',
+    );
+    await expect(
+      setProjectColor(projectPath, {
+        color: 'missing',
+        name: 'Ink',
+        value: '#123456',
+      }),
+    ).rejects.toThrow('No project color');
+    await expect(removeProjectColor(projectPath, 'missing')).rejects.toThrow('No project color');
+  });
+
+  it('enforces the portable named-color limit for agents', async () => {
+    const fullPath = join(dir, 'full-palette.dream');
+    await createProject(fullPath, { width: 40, height: 30 });
+    const doc = await loadProject(fullPath);
+    await saveProject(fullPath, {
+      ...doc,
+      projectColors: Array.from({ length: 24 }, (_, index) => ({
+        id: `color-${index}`,
+        name: `Color ${index + 1}`,
+        value: '#123456',
+      })),
+    });
+
+    await expect(
+      setProjectColor(fullPath, { name: 'One too many', value: '#654321' }),
+    ).rejects.toThrow('at most 24');
   });
 
   it('add_text appends a text op to the top layer', async () => {

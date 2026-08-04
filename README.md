@@ -216,7 +216,8 @@ and the language picker.
 ## What works today
 
 - Brush, pencil, eraser with adjustable size, color (palette + custom + a
-  recent-colors row) and opacity — with per-point pen pressure on a stylus;
+  device-local recent-colors row + up to 24 portable named project colors)
+  and opacity — with per-point pen pressure on a stylus;
   Brush also offers a fixed-angle Calligraphy nib for directional thick/thin
   marks using mouse, touch or pen, plus Fine ink, Soft marker, Bold paint and
   Calligraphy presets that set the visible size, opacity, tip and steadiness
@@ -692,7 +693,7 @@ canvas codec (`src/ui/dreamFile.ts`), Node plugs in `@napi-rs/canvas`.
 
 `mcp-server/` is a standalone Node package (not part of the webapp build)
 exposing `.dream` files to agents over stdio MCP: `dream.read_project`,
-`dream.create_project`, `dream.list_layers`, `dream.add_layer`,
+`dream.set_project_color`, `dream.remove_project_color`, `dream.create_project`, `dream.list_layers`, `dream.add_layer`,
 `dream.update_layer`, `dream.remove_layer`, `dream.add_stroke`,
 `dream.add_mask_stroke`, `dream.add_text`, `dream.add_shape`, `dream.render_png`
 (real PNGs via `@napi-rs/canvas`) and `dream.export_app`.

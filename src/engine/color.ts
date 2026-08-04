@@ -1,6 +1,9 @@
 /** Color helpers. Colors in the engine are normalized '#rrggbb' hex strings. */
 
-import type { Color } from './types';
+import type { Color, ProjectColor } from './types';
+
+export const MAX_PROJECT_COLORS = 24;
+export const MAX_PROJECT_COLOR_NAME = 40;
 
 export interface Rgba {
   r: number;
@@ -27,6 +30,25 @@ export function normalizeHex(input: string): Color | null {
   }
   if (/^[0-9a-fA-F]{6}$/.test(s)) return '#' + s.toLowerCase();
   return null;
+}
+
+/** Sanitize portable named colors while preserving order and valid ids. */
+export function normalizeProjectColors(value: unknown): ProjectColor[] {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set<string>();
+  const colors: ProjectColor[] = [];
+  for (const item of value) {
+    if (typeof item !== 'object' || item === null) continue;
+    const record = item as Record<string, unknown>;
+    const id = typeof record.id === 'string' ? record.id.trim() : '';
+    const name = typeof record.name === 'string' ? record.name.trim() : '';
+    const color = typeof record.value === 'string' ? normalizeHex(record.value) : null;
+    if (!id || seen.has(id) || !name || !color) continue;
+    seen.add(id);
+    colors.push({ id, name: name.slice(0, MAX_PROJECT_COLOR_NAME), value: color });
+    if (colors.length === MAX_PROJECT_COLORS) break;
+  }
+  return colors;
 }
 
 export function isValidHex(input: string): boolean {

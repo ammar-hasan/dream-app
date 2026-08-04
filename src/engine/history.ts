@@ -36,6 +36,7 @@ import type {
   Hotspot,
   Layer,
   Operation,
+  ProjectColor,
   Rect,
   SlidePresentation,
 } from './types';
@@ -172,6 +173,20 @@ export function updateLayerCommand(
     label,
     apply: (d) => updateLayerProps(d, layerId, patch),
     revert: (d) => updateLayerProps(d, layerId, previous),
+  };
+}
+
+/** Replace the project's named-color list as one invertible document change. */
+export function setProjectColorsCommand(
+  doc: DreamDocument,
+  projectColors: ProjectColor[],
+  label = 'Update project colors',
+): Command {
+  const previous = doc.projectColors;
+  return {
+    label,
+    apply: (current) => ({ ...current, projectColors, updatedAt: Date.now() }),
+    revert: (current) => ({ ...current, projectColors: previous, updatedAt: Date.now() }),
   };
 }
 

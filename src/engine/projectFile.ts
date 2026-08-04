@@ -24,6 +24,7 @@
  * codec in `mcp-server/` (@napi-rs/canvas).
  */
 
+import { normalizeProjectColors } from './color';
 import { normalizeAdjustments } from './filters';
 import { normalizeLayerMask } from './masks';
 import { isLayerBlendMode } from './types';
@@ -218,10 +219,15 @@ export async function decodeProject(text: string, codec: RasterCodec): Promise<D
     const active = frames.find((f) => f.id === raw.activeFrameId);
     return {
       ...raw,
+      projectColors: normalizeProjectColors(raw.projectColors),
       frames,
       layers: active ? active.layers : await deserializeLayers(raw.layers, codec),
     } as unknown as DreamDocument;
   }
 
-  return { ...raw, layers: await deserializeLayers(raw.layers, codec) } as unknown as DreamDocument;
+  return {
+    ...raw,
+    projectColors: normalizeProjectColors(raw.projectColors),
+    layers: await deserializeLayers(raw.layers, codec),
+  } as unknown as DreamDocument;
 }

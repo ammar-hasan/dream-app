@@ -119,7 +119,9 @@ Text `#0f141f` / `#ffffff`, dim text `#454d61` / `#ccd4e8`, borders
    all animation and transition durations collapse to effectively zero —
    including presentation/app transitions, which become instant.
 4. Micro-feedback: buttons press to 97% scale, swatches lift to 112% on
-   hover, score pops float and fade (800 ms), bad hits shake (320 ms).
+   hover, score pops float and fade (800 ms), bad hits shake (320 ms). Named
+   project-color rows use the same swatch language beside an ordinary editable
+   name and compact exact-color control; they never resemble linked variables.
 5. Presentation and exported-app transitions: 220–250 ms, fade or
    horizontal slide (±4% / full-width respectively).
 6. Adult tooltips reveal after a short hover or keyboard focus, use the

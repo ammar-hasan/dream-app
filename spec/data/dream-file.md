@@ -41,6 +41,9 @@ rebuilds).
   settings outside their documented range recover to the nearest valid value.
 - A layer without `mask` is fully revealed. A saved mask retains its enabled
   state and ordered hide/reveal strokes without rasterizing the layer content.
+- A document without `projectColors` has no named project colors. Readers keep
+  at most the first 24 entries with unique non-empty ids, non-empty names of at
+  most 40 characters and valid colors; malformed entries are ignored.
 
 ## Reader validation
 

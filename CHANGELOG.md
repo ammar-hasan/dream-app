@@ -7,6 +7,12 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Portable named project colors** (slice 77): color-capable tools can save
+  the current color under an editable project name, select, replace or remove
+  up to 24 swatches with exact Undo and `.dream` persistence. Device-local
+  recents remain separate; existing marks never change. Agents read the same
+  list and can add/update/remove entries through two typed tools.
+
 - **Exact paint-tool footprint** (slice 76): Brush, Pencil, Eraser, Spray and
   layer-mask painting now replace the generic pointer over the document with a
   high-contrast exact-diameter ring and center point. It responds to size/zoom,

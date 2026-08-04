@@ -16,24 +16,33 @@ The unit of work: one drawing / design / animation / app. A document is a
 sized canvas with a background color and a stack of layers, optionally
 extended with animation frames, app-mode links, and a game setup.
 
-| Attribute                | Type                        | Default                         | Meaning                                                                                              |
-| ------------------------ | --------------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `id`                     | string                      | generated                       | unique identity                                                                                      |
-| `name`                   | string                      | `"Untitled"`                    | shown in the toolbar and dialogs                                                                     |
-| `width`, `height`        | number                      | —                               | canvas size in pixels, integers ≥ 1 (new-document dialog: 1–4096; default preset 1024×768)           |
-| `background`             | color                       | `#ffffff`                       | the canvas's base color                                                                              |
-| `layers`                 | list of Layer               | one empty layer named "Layer 1" | bottom-to-top paint order; when frames exist, this always mirrors the **active frame's** layer stack |
-| `frames`                 | list of Frame, optional     | absent                          | presence = animation is on (see below)                                                               |
-| `activeFrameId`          | string, optional            | —                               | which frame `layers` currently mirrors                                                               |
-| `animation`              | AnimationSettings, optional | absent = defaults               | playback + onion-skin preferences; outside undo                                                      |
-| `mode`                   | workspace mode, optional    | `"draw"`                        | the workspace the project was last in; outside undo                                                  |
-| `game`                   | GameSetup, optional         | absent = defaults               | Play-mode casting + settings; outside undo                                                           |
-| `narration`              | Narration, optional         | absent = none                   | one voice take over the animation/presentation; outside undo                                         |
-| `createdAt`, `updatedAt` | number                      | creation time                   | `updatedAt` is touched by every edit; drives library sorting                                         |
+| Attribute                | Type                           | Default                         | Meaning                                                                                              |
+| ------------------------ | ------------------------------ | ------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `id`                     | string                         | generated                       | unique identity                                                                                      |
+| `name`                   | string                         | `"Untitled"`                    | shown in the toolbar and dialogs                                                                     |
+| `width`, `height`        | number                         | —                               | canvas size in pixels, integers ≥ 1 (new-document dialog: 1–4096; default preset 1024×768)           |
+| `background`             | color                          | `#ffffff`                       | the canvas's base color                                                                              |
+| `projectColors`          | list of ProjectColor, optional | absent = none                   | up to 24 named reusable colors that travel with this document                                        |
+| `layers`                 | list of Layer                  | one empty layer named "Layer 1" | bottom-to-top paint order; when frames exist, this always mirrors the **active frame's** layer stack |
+| `frames`                 | list of Frame, optional        | absent                          | presence = animation is on (see below)                                                               |
+| `activeFrameId`          | string, optional               | —                               | which frame `layers` currently mirrors                                                               |
+| `animation`              | AnimationSettings, optional    | absent = defaults               | playback + onion-skin preferences; outside undo                                                      |
+| `mode`                   | workspace mode, optional       | `"draw"`                        | the workspace the project was last in; outside undo                                                  |
+| `game`                   | GameSetup, optional            | absent = defaults               | Play-mode casting + settings; outside undo                                                           |
+| `narration`              | Narration, optional            | absent = none                   | one voice take over the animation/presentation; outside undo                                         |
+| `createdAt`, `updatedAt` | number                         | creation time                   | `updatedAt` is touched by every edit; drives library sorting                                         |
 
 **Workspace modes** — `'draw' | 'design' | 'play' | 'present'`. Draw and
 Design are persisted with the project; Play and Present are **session-only**:
 a project saved while playing or presenting reopens in Draw.
+
+## Project color
+
+A reusable color saved with one document: a stable identity, a short name and
+one exact color value. Project colors are shared through portable files and
+agent workflows, unlike the per-device recent-colors row. Adding, renaming,
+replacing or removing one is undoable. A project color is a saved swatch, not a
+live variable: changing it never recolors existing artwork.
 
 ## Layer
 

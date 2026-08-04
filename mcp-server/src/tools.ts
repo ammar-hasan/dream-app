@@ -10,7 +10,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { activeFrameIndex } from '../../src/engine/animation';
 import { buildAppExportData, buildAppHtml } from '../../src/engine/appExport';
-import { normalizeHex } from '../../src/engine/color';
+import { MAX_PROJECT_COLORS, MAX_PROJECT_COLOR_NAME, normalizeHex } from '../../src/engine/color';
 import {
   appendOperation,
   createDocument,
@@ -37,6 +37,7 @@ import type {
   LayerBlendMode,
   LayerMaskMode,
   LayerMaskStroke,
+  ProjectColor,
   ShapeKind,
   ShapeOp,
   StrokeOp,
@@ -66,6 +67,7 @@ export interface ProjectSummary {
   width: number;
   height: number;
   background: string;
+  projectColors: ProjectColor[];
   mode: string;
   layers: number;
   frames: number | null;
@@ -106,6 +108,7 @@ function summarize(doc: DreamDocument): ProjectSummary {
     width: doc.width,
     height: doc.height,
     background: doc.background,
+    projectColors: doc.projectColors ?? [],
     mode: doc.mode ?? 'draw',
     layers: doc.layers.length,
     frames: doc.frames ? doc.frames.length : null,
@@ -121,6 +124,66 @@ function summarize(doc: DreamDocument): ProjectSummary {
 /** dream.read_project — a structural summary of a .dream file. */
 export async function readProject(projectPath: string): Promise<ProjectSummary> {
   return summarize(await loadProject(projectPath));
+}
+
+export interface SetProjectColorOptions {
+  /** Existing project-color id or exact name. Omit to add a color. */
+  color?: string;
+  name: string;
+  value: string;
+}
+
+/** dream.set_project_color — add, rename, or replace one portable named color. */
+export async function setProjectColor(
+  projectPath: string,
+  options: SetProjectColorOptions,
+): Promise<ProjectColor & { index: number }> {
+  const doc = await loadProject(projectPath);
+  const colors = doc.projectColors ?? [];
+  const name = options.name.trim();
+  if (!name) throw new Error('project color name must not be empty');
+  if (name.length > MAX_PROJECT_COLOR_NAME) {
+    throw new Error(`project color name must be at most ${MAX_PROJECT_COLOR_NAME} characters`);
+  }
+  const value = normalizeHex(options.value);
+  if (!value) throw new Error(`Invalid project color: ${options.value}`);
+
+  const index = options.color
+    ? colors.findIndex(
+        (candidate) => candidate.id === options.color || candidate.name === options.color,
+      )
+    : colors.length;
+  if (options.color && index === -1) {
+    throw new Error(`No project color with id or name "${options.color}"`);
+  }
+  if (!options.color && colors.length >= MAX_PROJECT_COLORS) {
+    throw new Error(`A project can contain at most ${MAX_PROJECT_COLORS} named colors`);
+  }
+
+  const projectColor: ProjectColor = options.color
+    ? { ...colors[index]!, name, value }
+    : { id: genId('color'), name, value };
+  const projectColors = [...colors];
+  projectColors[index] = projectColor;
+  await saveProject(projectPath, { ...doc, projectColors, updatedAt: Date.now() });
+  return { ...projectColor, index };
+}
+
+/** dream.remove_project_color — remove one portable named color by id or exact name. */
+export async function removeProjectColor(
+  projectPath: string,
+  selector: string,
+): Promise<ProjectColor & { index: number; remaining: number }> {
+  const doc = await loadProject(projectPath);
+  const colors = doc.projectColors ?? [];
+  const index = colors.findIndex(
+    (candidate) => candidate.id === selector || candidate.name === selector,
+  );
+  const projectColor = colors[index];
+  if (!projectColor) throw new Error(`No project color with id or name "${selector}"`);
+  const projectColors = colors.filter((_, colorIndex) => colorIndex !== index);
+  await saveProject(projectPath, { ...doc, projectColors, updatedAt: Date.now() });
+  return { ...projectColor, index, remaining: projectColors.length };
 }
 
 export interface CreateProjectOptions {

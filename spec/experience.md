@@ -45,7 +45,10 @@ together on screen.
   applicable; tapping AI opens that same sheet directly at Dream AI. Both
   sheets close on Escape and return focus to their trigger. Little Dreamer's
   larger reading-light rail is unchanged.
-- **Right panel:** tool options, plus per mode (matrix below).
+- **Right panel:** tool options, plus per mode (matrix below). Color-capable
+  tools keep device-local Recent colors visually separate from portable
+  **Project colors**; Save current creates a named row whose swatch selects it
+  and whose name, exact value and removal stay directly editable.
 - In Design, the active layer's mask controls keep **Artwork / Mask** and
   **Hide / Reveal** as explicit segmented choices. Mask editing uses a
   crosshair, and the status bar repeats the active target and action so the

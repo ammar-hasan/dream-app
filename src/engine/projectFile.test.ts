@@ -39,6 +39,10 @@ function richDocument(): DreamDocument {
     width: 320,
     height: 240,
     background: '#112233',
+    projectColors: [
+      { id: 'color-brand', name: 'Brand ink', value: '#123456' },
+      { id: 'color-accent', name: 'Accent', value: '#ff00ff' },
+    ],
     mode: 'design',
     createdAt: 1_700_000_000_000,
     updatedAt: 1_700_000_100_000,
@@ -281,6 +285,22 @@ describe('projectFile', () => {
         frame.layers.every((layer) => layer.adjustments?.contrast === 0),
       ),
     ).toBe(true);
+  });
+
+  it('opens absent or malformed project colors as a safe ordered palette', async () => {
+    const text = await encodeProject(withMirroredLayers(richDocument()), fakeCodec);
+    const parsed = JSON.parse(text);
+    parsed.document.projectColors = [
+      { id: ' ink ', name: ' Brand ink ', value: '#ABC' },
+      { id: 'ink', name: 'Duplicate', value: '#ffffff' },
+      { id: 'bad', name: '', value: '#ffffff' },
+    ];
+    expect((await decodeProject(JSON.stringify(parsed), fakeCodec)).projectColors).toEqual([
+      { id: 'ink', name: 'Brand ink', value: '#aabbcc' },
+    ]);
+
+    delete parsed.document.projectColors;
+    expect((await decodeProject(JSON.stringify(parsed), fakeCodec)).projectColors).toEqual([]);
   });
 
   it('serializes raster payloads as PNG data URLs, not byte arrays', async () => {
