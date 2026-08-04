@@ -1,6 +1,6 @@
 /** Color helpers. Colors in the engine are normalized '#rrggbb' hex strings. */
 
-import type { Color, ProjectColor } from './types';
+import type { Color, Operation, ProjectColor } from './types';
 
 export const MAX_PROJECT_COLORS = 24;
 export const MAX_PROJECT_COLOR_NAME = 40;
@@ -93,6 +93,21 @@ export function cssColor(hex: Color, opacity = 1): string {
   const rgba = hexToRgba(hex) ?? { r: 0, g: 0, b: 0, a: 255 };
   const alpha = Math.min(1, Math.max(0, opacity));
   return `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${alpha})`;
+}
+
+/**
+ * Resolve the effective color of an op: the linked project color's current
+ * value when `op.colorRef` points at a live swatch, otherwise `op.color`.
+ * Stale/missing refs and fill/image ops fall through to the literal color,
+ * so links never leave the artwork in an undefined state.
+ */
+export function resolveOpColor(op: Operation, projectColors: ProjectColor[] = []): Color {
+  const ref = op.colorRef;
+  if (ref) {
+    const swatch = projectColors.find((color) => color.id === ref);
+    if (swatch) return swatch.value;
+  }
+  return op.color;
 }
 
 /** Built-in palette shown in the tool options panel. */

@@ -41,8 +41,12 @@ a project saved while playing or presenting reopens in Draw.
 A reusable color saved with one document: a stable identity, a short name and
 one exact color value. Project colors are shared through portable files and
 agent workflows, unlike the per-device recent-colors row. Adding, renaming,
-replacing or removing one is undoable. A project color is a saved swatch, not a
-live variable: changing it never recolors existing artwork.
+replacing or removing one is undoable. In Design mode, a project color may be
+**linked** to a vector selection (stroke, shape or text). A linked operation
+follows the swatch's current value on every render and every export, so editing
+the swatch recolors all linked artwork at once. Unlinking, deleting the swatch,
+or recoloring a linked op freezes its current resolved color back into the op,
+so artwork never visually jumps when a link is severed.
 
 ## Layer
 

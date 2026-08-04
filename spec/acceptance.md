@@ -762,6 +762,15 @@ holds.
       optional tactile detent accompanies the visible change. Canvas/object
       snapping remains independently switchable; hiding the grid always removes
       its magnetism.
+190.  GIVEN Design mode with a recolorable vector selection and at least one
+      saved project color WHEN the selection is linked to a swatch THEN the
+      canvas, SVG export and MCP `render` all follow the swatch's current value
+      with no operation payload change. WHEN the swatch is edited THEN every
+      linked op recolors on the next render. WHEN the selection is unlinked, the
+      swatch is deleted, or a stale ref is imported THEN each affected op's last
+      resolved color is frozen into its `color` field and the artwork does not
+      shift. Recoloring a linked op clears the link. Links travel in `.dream`
+      files and are settable by MCP create tools.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

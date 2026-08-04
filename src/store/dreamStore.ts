@@ -8,7 +8,12 @@
 
 import { create } from 'zustand';
 import { createDocument, createFrame, createLayer, genId } from '../engine/document';
-import { MAX_PROJECT_COLORS, MAX_PROJECT_COLOR_NAME, normalizeHex } from '../engine/color';
+import {
+  MAX_PROJECT_COLORS,
+  MAX_PROJECT_COLOR_NAME,
+  normalizeHex,
+  resolveOpColor,
+} from '../engine/color';
 import {
   activeFrameIndex,
   animationSettingsOf,
@@ -37,6 +42,7 @@ import {
   removeLayerCommand,
   replaceLayerContentCommand,
   resizeDocumentCommand,
+  deleteProjectColorCommand,
   setProjectColorsCommand,
   setAnimationEnabledCommand,
   setFrameCaptionsCommand,
@@ -458,6 +464,15 @@ export interface DreamStore {
   editOperations(ids: string[]): void;
   /** Recolor vector artwork in the selection; one undoable command. */
   recolorSelection(color: Color): void;
+  /**
+   * Link the selection's color to a saved project color (Design mode only).
+   * Each recolorable op keeps its `colorRef` set so later swatch edits
+   * propagate at render time; the literal `color` is stamped to the resolved
+   * value so unlinking or deleting the swatch never shifts the artwork.
+   */
+  linkSelectionColor(colorId: string): void;
+  /** Drop the project-color link on the selection, keeping the current color. */
+  unlinkSelectionColor(): void;
   deleteSelection(): void;
   /** Duplicate with a small offset; the clones become the selection. */
   duplicateSelection(): void;
@@ -696,7 +711,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       const projectColors = doc.projectColors ?? [];
       const next = projectColors.filter((color) => color.id !== id);
       if (next.length === projectColors.length) return;
-      execute(setProjectColorsCommand(doc, next, 'Delete project color'));
+      execute(deleteProjectColorCommand(doc, id));
     },
     setSize: (size) => set((s) => ({ settings: { ...s.settings, size } })),
     setStabilization: (stabilization) =>
@@ -2008,9 +2023,64 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
           (op.kind === 'shape' ||
             op.kind === 'text' ||
             (op.kind === 'stroke' && op.tool !== 'eraser'))
-            ? { ...op, color }
+            ? { ...op, color, colorRef: undefined }
             : op,
         );
+      });
+    },
+
+    linkSelectionColor: (colorId) => {
+      const layer = activeLayer();
+      const { doc, selection } = get();
+      const swatch = (doc.projectColors ?? []).find((color) => color.id === colorId);
+      const selected = layer?.operations.filter((op) => selection.includes(op.id)) ?? [];
+      if (
+        !layer ||
+        layer.locked ||
+        !swatch ||
+        selected.length === 0 ||
+        selected.every(
+          (op) =>
+            op.kind === 'fill' ||
+            op.kind === 'image' ||
+            (op.kind === 'stroke' && op.tool === 'eraser'),
+        )
+      ) {
+        return;
+      }
+      const value = swatch.value;
+      mutateSelection(`Link color — ${swatch.name}`, (ops, ids) => {
+        const wanted = new Set(ids);
+        return ops.map((op) =>
+          wanted.has(op.id) &&
+          (op.kind === 'shape' ||
+            op.kind === 'text' ||
+            (op.kind === 'stroke' && op.tool !== 'eraser'))
+            ? { ...op, color: value, colorRef: colorId }
+            : op,
+        );
+      });
+    },
+
+    unlinkSelectionColor: () => {
+      const layer = activeLayer();
+      const { doc, selection } = get();
+      if (!layer || layer.locked || selection.length === 0) return;
+      const wanted = new Set(selection);
+      const projectColors = doc.projectColors ?? [];
+      if (!layer.operations.some((op) => wanted.has(op.id) && op.colorRef)) return;
+      mutateSelection('Unlink color', (ops, ids) => {
+        const set = new Set(ids);
+        return ops.map((op) => {
+          if (set.has(op.id) && op.colorRef) {
+            // Freeze the current resolved color into the op so unlinking never
+            // shifts the artwork, even if the swatch was edited after linking.
+            const { colorRef: _ref, ...rest } = op;
+            void _ref;
+            return { ...rest, color: resolveOpColor(op, projectColors) };
+          }
+          return op;
+        });
       });
     },
 

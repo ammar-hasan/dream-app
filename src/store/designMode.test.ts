@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { useDreamStore } from './dreamStore';
 import type { ShapeOp, StrokeOp } from '../engine/types';
+import { resolveOpColor } from '../engine/color';
 import { selectionUnionBounds } from '../engine/selection';
 
 const store = () => useDreamStore.getState();
@@ -283,6 +284,96 @@ describe('selection actions', () => {
     expect(store().doc.layers[0].operations[0].color).toBe('#ef4444');
     store().undo();
     expect(store().doc.layers[0].operations[0].color).toBe('#1f2937');
+  });
+
+  it('links a selection to a saved color and propagates edits live', () => {
+    drawRect();
+    drawStroke();
+    enterDesign();
+    expect(store().addProjectColor('Brand', '#2563eb')).toBe(true);
+    const swatch = store().doc.projectColors![0];
+    const [rectId, strokeId] = store().doc.layers[0].operations.map((op) => op.id);
+    store().setSelection([rectId, strokeId]);
+
+    store().linkSelectionColor(swatch.id);
+    const rect = store().doc.layers[0].operations[0] as ShapeOp;
+    const stroke = store().doc.layers[0].operations[1] as StrokeOp;
+    expect(rect).toMatchObject({ color: '#2563eb', colorRef: swatch.id });
+    expect(stroke).toMatchObject({ color: '#2563eb', colorRef: swatch.id });
+    expect(store().canUndo).toBe(true);
+
+    // Editing the swatch re-renders without touching the op payloads.
+    store().updateProjectColor(swatch.id, { value: '#ff8800' });
+    expect((store().doc.layers[0].operations[0] as ShapeOp).color).toBe('#2563eb');
+    expect(resolveOpColor(store().doc.layers[0].operations[0], store().doc.projectColors)).toBe(
+      '#ff8800',
+    );
+
+    // Two undo steps: the swatch edit first, then the link itself.
+    store().undo();
+    expect(store().doc.projectColors![0].value).toBe('#2563eb');
+    expect((store().doc.layers[0].operations[0] as ShapeOp).colorRef).toBe(swatch.id);
+    store().undo();
+    expect((store().doc.layers[0].operations[0] as ShapeOp).colorRef).toBeUndefined();
+  });
+
+  it('unlink keeps the current color and drops stale refs cleanly', () => {
+    drawRect();
+    enterDesign();
+    expect(store().addProjectColor('Brand', '#2563eb')).toBe(true);
+    const swatch = store().doc.projectColors![0];
+    const id = store().doc.layers[0].operations[0].id;
+    store().setSelection([id]);
+    store().linkSelectionColor(swatch.id);
+    store().updateProjectColor(swatch.id, { value: '#00ff00' });
+
+    store().unlinkSelectionColor();
+    expect((store().doc.layers[0].operations[0] as ShapeOp).colorRef).toBeUndefined();
+    // Unlink freezes the current resolved color so the artwork never shifts.
+    expect((store().doc.layers[0].operations[0] as ShapeOp).color).toBe('#00ff00');
+
+    // Unlink with no links is a no-op (no history step).
+    const undoBefore = store().canUndo;
+    store().unlinkSelectionColor();
+    expect(store().canUndo).toBe(undoBefore);
+  });
+
+  it('deleting a linked swatch bakes its last value into the artwork', () => {
+    drawRect();
+    enterDesign();
+    expect(store().addProjectColor('Brand', '#2563eb')).toBe(true);
+    const swatch = store().doc.projectColors![0];
+    const id = store().doc.layers[0].operations[0].id;
+    store().setSelection([id]);
+    store().linkSelectionColor(swatch.id);
+    store().updateProjectColor(swatch.id, { value: '#00ff00' });
+
+    store().deleteProjectColor(swatch.id);
+    const op = store().doc.layers[0].operations[0] as ShapeOp;
+    expect(op.colorRef).toBeUndefined();
+    expect(op.color).toBe('#00ff00');
+    expect(store().doc.projectColors).toEqual([]);
+    // One undo restores both the swatch and the live link.
+    store().undo();
+    expect(store().doc.projectColors?.[0]?.value).toBe('#00ff00');
+    expect(resolveOpColor(store().doc.layers[0].operations[0], store().doc.projectColors)).toBe(
+      '#00ff00',
+    );
+  });
+
+  it('recoloring a linked op clears the link', () => {
+    drawRect();
+    enterDesign();
+    expect(store().addProjectColor('Brand', '#2563eb')).toBe(true);
+    const swatch = store().doc.projectColors![0];
+    const id = store().doc.layers[0].operations[0].id;
+    store().setSelection([id]);
+    store().linkSelectionColor(swatch.id);
+
+    store().recolorSelection('#ef4444');
+    const op = store().doc.layers[0].operations[0] as ShapeOp;
+    expect(op).toMatchObject({ color: '#ef4444' });
+    expect(op.colorRef).toBeUndefined();
   });
 
   it('nudge moves by exact pixels and is undoable', () => {

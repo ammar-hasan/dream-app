@@ -530,6 +530,44 @@ describe('dream-mcp tools', () => {
     ).rejects.toThrow('No layer with id or name "missing"');
   });
 
+  it('add_shape/add_stroke/add_text link to a saved project color and reject stale refs', async () => {
+    const swatch = await setProjectColor(projectPath, { name: 'Brand', value: '#2563eb' });
+    const shape = await addShape(projectPath, {
+      shape: 'rectangle',
+      x1: 0,
+      y1: 0,
+      x2: 10,
+      y2: 10,
+      color: '#2563eb',
+      colorRef: swatch.id,
+      layer: 'Agent shapes',
+    });
+    const doc = await loadProject(projectPath);
+    const op = doc.layers
+      .find((l) => l.id === shape.layerId)!
+      .operations.find((o) => o.id === shape.opId)!;
+    expect(op.colorRef).toBe(swatch.id);
+
+    // Editing the swatch re-renders without re-stamping the op color.
+    await setProjectColor(projectPath, { color: swatch.id, name: 'Brand', value: '#ff8800' });
+    const refreshed = (await loadProject(projectPath)).layers
+      .find((l) => l.id === shape.layerId)!
+      .operations.find((o) => o.id === shape.opId)!;
+    expect(refreshed.color).toBe('#2563eb');
+    expect(refreshed.colorRef).toBe(swatch.id);
+
+    const points = [
+      { x: 0, y: 0 },
+      { x: 5, y: 5 },
+    ];
+    await expect(addStroke(projectPath, { points, colorRef: 'missing' })).rejects.toThrow(
+      'No project color with id "missing"',
+    );
+    await expect(
+      addText(projectPath, { text: 'hi', x: 0, y: 0, colorRef: 'missing' }),
+    ).rejects.toThrow('No project color with id "missing"');
+  });
+
   it('render_png flattens the document to a real PNG', async () => {
     const outPath = join(dir, 'render.png');
     const result = await renderPng(projectPath, outPath);

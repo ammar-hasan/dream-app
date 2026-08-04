@@ -7,6 +7,14 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Linked color variables** (slice 80): a saved project color can be linked to
+  a Design vector selection (strokes, shapes, text). Editing the swatch recolors
+  every linked op on the canvas, in SVG export and via MCP `render` with no op
+  payload change. Unlink, recolor or delete the swatch and each op's last
+  resolved color is frozen back in, so severing a link never shifts artwork. The
+  link rides in `.dream` files; the MCP create tools accept and validate
+  `colorRef`.
+
 - **Exact Design workspace grid** (slice 79): Design can show a session-only
   4–256 px spacing grid and independently snap selection edges/centers to it.
   Full active guides, an exact pointer-side interval label and the existing

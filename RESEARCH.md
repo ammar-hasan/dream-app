@@ -173,6 +173,15 @@ Modern interaction craft should make state legible rather than add spectacle:
   full active guide and pointer-side interval. Hidden means non-magnetic, and
   the workspace aid never leaks into delivery.
   (https://helpx.adobe.com/illustrator/using/rulers-grids-guides-crop-marks.html)
+- **A color token is a live link that must survive severing.** Design systems
+  treat a color variable as a reference, not a baked value: editing the token
+  updates every bound surface. Dream applies that to saved project colors —
+  linking a Design vector selection makes the swatch a live variable on the
+  canvas, in SVG export and through MCP `render`, with no op payload churn while
+  the link holds. The link's contract is symmetric on severing: unlink, recolor,
+  or delete the swatch and the op's last resolved value is frozen back into
+  itself, so breaking a variable never repaints the artwork by surprise.
+  (https://www.figma.com/developers/api#variables-and-variable-modes)
 - **Paint cursors disclose the footprint, not merely the tool.** Dream applies
   the predictive-pointer principle to media tools with an exact-diameter,
   two-contrast ring and center point. It updates with size and zoom, remains

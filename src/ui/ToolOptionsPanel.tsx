@@ -1,6 +1,6 @@
 /** Right panel, top half: options for the active tool. */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   contrastRatio,
   MAX_PROJECT_COLORS,
@@ -101,6 +101,30 @@ function ProjectColorRow({
   const setColor = useDreamStore((s) => s.setColor);
   const updateProjectColor = useDreamStore((s) => s.updateProjectColor);
   const deleteProjectColor = useDreamStore((s) => s.deleteProjectColor);
+  const linkSelectionColor = useDreamStore((s) => s.linkSelectionColor);
+  const unlinkSelectionColor = useDreamStore((s) => s.unlinkSelectionColor);
+  const mode = useDreamStore((s) => s.mode);
+  const selection = useDreamStore((s) => s.selection);
+  const activeLayer = useDreamStore((s) => s.doc.layers.find((l) => l.id === s.activeLayerId));
+  // Selection link state: only meaningful in Design mode with a selection.
+  // Computed from primitives so the selector never returns a fresh object.
+  const { canLink, linked } = useMemo(() => {
+    if (mode !== 'design' || selection.length === 0 || !activeLayer)
+      return { canLink: false, linked: false };
+    let recolorable = false;
+    let isLinked = false;
+    for (const id of selection) {
+      const op = activeLayer.operations.find((o) => o.id === id);
+      if (!op) continue;
+      const ok =
+        op.kind === 'shape' || op.kind === 'text' || (op.kind === 'stroke' && op.tool !== 'eraser');
+      if (ok) {
+        recolorable = true;
+        if (op.colorRef === color.id) isLinked = true;
+      }
+    }
+    return { canLink: recolorable, linked: isLinked };
+  }, [mode, selection, activeLayer, color.id]);
   const [name, setName] = useState(color.name);
   const [value, setValue] = useState(color.value);
   const ratio = contrastRatio(color.value, background) ?? 1;
@@ -174,7 +198,27 @@ function ProjectColorRow({
           status: contrastStatus,
         })}
       >
-        {t('options.projectColorContrast', { ratio: ratioText })} · {contrastStatus}
+        <span className="project-color-ratio">
+          {t('options.projectColorContrast', { ratio: ratioText })} · {contrastStatus}
+        </span>
+        {(canLink || linked) && (
+          <button
+            type="button"
+            className={`btn project-color-link${linked ? ' active' : ''}`}
+            data-tooltip={t(
+              linked ? 'options.projectColorUnlinkHint' : 'options.projectColorLinkHint',
+              { name: color.name },
+            )}
+            aria-pressed={linked}
+            aria-label={t(
+              linked ? 'options.projectColorUnlinkHint' : 'options.projectColorLinkHint',
+              { name: color.name },
+            )}
+            onClick={() => (linked ? unlinkSelectionColor() : linkSelectionColor(color.id))}
+          >
+            {t(linked ? 'options.projectColorLinked' : 'options.projectColorLink')}
+          </button>
+        )}
       </span>
     </div>
   );
@@ -183,6 +227,7 @@ function ProjectColorRow({
 export function ToolOptionsPanel() {
   const t = useT();
   const tool = useDreamStore((s) => s.tool);
+  const mode = useDreamStore((s) => s.mode);
   const settings = useDreamStore((s) => s.settings);
   const cropDraft = useDreamStore((s) => s.cropDraft);
   const setColor = useDreamStore((s) => s.setColor);
@@ -250,7 +295,7 @@ export function ToolOptionsPanel() {
         </div>
       )}
 
-      {SHOW_COLOR.has(tool) && (
+      {(SHOW_COLOR.has(tool) || mode === 'design') && (
         <>
           <div className="option-row">
             <span className="option-label">{t('options.color')}</span>

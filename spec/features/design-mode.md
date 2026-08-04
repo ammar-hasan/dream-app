@@ -149,6 +149,24 @@ With two or more objects selected, the Design panel offers: **align left /
 center / right / top / middle / bottom** (to the selection's shared bounds)
 and **distribute horizontally / vertically** (even gaps between objects).
 
+## Linked color variables
+
+A saved project color can be **linked** to a vector selection (strokes, shapes
+and text) so the artwork follows the swatch's current value. The link control
+sits on each project-color row and appears only in Design mode with a
+recolorable selection; the swatch itself still sets the active drawing color.
+
+- **Live propagation:** editing a linked swatch recolors every linked op on the
+  next render, on the canvas, in SVG export and in MCP `render`. No operation
+  payload changes while the link is live.
+- **One undoable step** to link or unlink a selection. Recoloring a linked op
+  (spoken or direct) clears its link — a literal recolor is not a variable edit.
+- **No visual jump on severing:** unlinking, deleting a linked swatch, or
+  having a stale ref after import freezes the op's last resolved color back
+  into its `color` field, so the artwork never shifts when a link is broken.
+- **Portable:** `colorRef` rides in `.dream` files and the MCP create tools can
+  set it; stale refs resolve gracefully to the baked color.
+
 ## Groups
 
 A group is a shared label on operations of one layer — grouped objects

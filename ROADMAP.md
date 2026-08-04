@@ -1763,6 +1763,29 @@ beginner in Draw to permanent layout chrome or an invisible magnetic force.
 - ✅ Full release gates remain green: 920 unit tests, 97.19% engine coverage,
   65 browser journeys, 29 MCP tests and four honest agent evals.
 
+## Slice 80 — Linked color variables ✅
+
+Persona need: let Sara rebrand a logo by editing one swatch, let Zǐxuān keep a
+figure's accent color consistent across edits, and let Aleksandr treat saved
+colors as real design tokens instead of a flat recent-colors palette.
+
+- ✅ A saved project color can be linked to a Design vector selection (strokes,
+  shapes, text). Each op carries an optional `colorRef` to the swatch id.
+- ✅ Live propagation: editing the swatch recolors every linked op on the next
+  render — on the canvas, in SVG export and through MCP `render`. No op payload
+  changes while the link is live.
+- ✅ One undoable step links or unlinks a selection. Recoloring a linked op
+  (spoken or direct) clears the link: a literal recolor is not a variable edit.
+- ✅ No visual jump on severing: unlinking, deleting a linked swatch, or
+  importing a stale ref all freeze the op's last resolved color back into its
+  `color` field.
+- ✅ Portable: `colorRef` rides in `.dream` files; the MCP create tools
+  (add_stroke / add_shape / add_text) accept and validate a `colorRef`.
+- ✅ Pure resolution, store commands, layer-cache invalidation, rendered
+  controls and a production-browser journey prove live edits, clean severing
+  and zero export drift.
+- ✅ Full release gates: pending final verification.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1783,9 +1806,9 @@ largest count of controls:
    task-prioritized shell/dock, and a faithful safe creation path that does not
    require a child or low-literacy user to configure an AI provider.
 3. **Professional substrate:** core portable layer blending, editable per-layer
-   adjustments, optional stroke stabilization, painted masks and named project
-   colors are established; continue with effect stacks and linked color
-   variables, then vector paths,
+   adjustments, optional stroke stabilization, painted masks, named project
+   colors **and linked color variables** are established; continue with effect
+   stacks, then vector paths,
    typography, grids, constraints and linked reusable systems—progressively
    disclosed without crowding first-minute Draw.
 4. **Outcome-grade delivery:** publication preflight for scientific figures,

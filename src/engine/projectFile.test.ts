@@ -303,6 +303,17 @@ describe('projectFile', () => {
     expect((await decodeProject(JSON.stringify(parsed), fakeCodec)).projectColors).toEqual([]);
   });
 
+  it('preserves op colorRef links across a round-trip', async () => {
+    const doc = withMirroredLayers(richDocument());
+    const target = doc.layers[0].operations.find(
+      (op) => op.kind === 'stroke' && op.tool !== 'eraser',
+    )!;
+    target.colorRef = 'ink';
+    const decoded = await decodeProject(await encodeProject(doc, fakeCodec), fakeCodec);
+    const restored = decoded.layers[0].operations.find((op) => op.id === target.id)!;
+    expect(restored.colorRef).toBe('ink');
+  });
+
   it('serializes raster payloads as PNG data URLs, not byte arrays', async () => {
     const doc = withMirroredLayers(richDocument());
     const text = await encodeProject(doc, fakeCodec);

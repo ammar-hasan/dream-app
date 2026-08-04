@@ -592,6 +592,46 @@ test('Design grid is visible, exact and optionally magnetic', async ({ page }) =
   await expect(page.locator('.snap-feedback')).toHaveCount(0);
 });
 
+test('linked color variables propagate edits to the canvas and stop when unlinked', async ({
+  page,
+}) => {
+  await bootApp(page);
+  await page.getByLabel('Custom color').fill('#2563eb');
+  await drawStroke(page);
+  await page.getByRole('button', { name: 'Save current' }).click();
+  const name = page.getByRole('textbox', { name: 'Rename Color 1' });
+  await name.fill('Brand');
+  await name.press('Tab');
+
+  // Design mode + select the freshly drawn stroke.
+  await page.getByRole('tab', { name: 'Design' }).click();
+  const canvas = page.locator('.viewport-canvas');
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('viewport canvas has no box');
+  const mid = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  await page.mouse.click(mid.x, mid.y);
+
+  // Link the selection to the Brand swatch, then edit the swatch: the stroke
+  // must re-render in the new color without any direct op edit.
+  await page.getByRole('button', { name: 'Link the selection to Brand' }).click();
+  const linked = await canvas.evaluate((element) => (element as HTMLCanvasElement).toDataURL());
+  const value = page.getByRole('textbox', { name: 'Change Brand' });
+  await value.fill('#dc2626');
+  await value.press('Tab');
+  await expect
+    .poll(() => canvas.evaluate((element) => (element as HTMLCanvasElement).toDataURL()))
+    .not.toBe(linked);
+
+  // Unlink: further swatch edits must NOT move the canvas.
+  const unlinked = await canvas.evaluate((element) => (element as HTMLCanvasElement).toDataURL());
+  await page.getByRole('button', { name: 'Unlink the selection from Brand' }).click();
+  await value.fill('#16a34a');
+  await value.press('Tab');
+  await expect(
+    canvas.evaluate((element) => (element as HTMLCanvasElement).toDataURL()),
+  ).resolves.toBe(unlinked);
+});
+
 test('canvas drag targets distinguish components, images and invalid content', async ({ page }) => {
   await page.addInitScript(() => {
     const target = window as Window & { __dreamHaptics?: Array<number | number[]> };

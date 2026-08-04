@@ -210,6 +210,21 @@ export interface CreateProjectOptions {
 
 const MAX_DIMENSION = 8192;
 
+/**
+ * Resolve an optional `colorRef` against the project's saved colors. Returns
+ * the `{ colorRef }` to spread onto the op when the id exists, or throws if
+ * the caller asked for a link that is not present. Passing nothing yields an
+ * empty object so call sites stay unconditional.
+ */
+function resolveColorRef(doc: DreamDocument, colorRef: string | undefined): { colorRef?: string } {
+  if (colorRef === undefined) return {};
+  const exists = (doc.projectColors ?? []).some((color) => color.id === colorRef);
+  if (!exists) {
+    throw new Error(`No project color with id "${colorRef}"`);
+  }
+  return { colorRef };
+}
+
 /** dream.create_project — write a fresh .dream file. */
 export async function createProject(
   projectPath: string,
@@ -463,6 +478,12 @@ export interface AddTextOptions {
   size?: number;
   /** Color as #rgb/#rrggbb (default #000000). */
   color?: string;
+  /**
+   * Id of a saved project color to link this op to. When set, the op follows
+   * the swatch's value on every render; `color` is still required as the
+   * fallback. Throws if no project color has this id.
+   */
+  colorRef?: string;
   fontFamily?: string;
   /** Layer id or name; default: the top layer of the active frame. */
   layer?: string;
@@ -485,6 +506,8 @@ export interface AddStrokeOptions {
   points: StrokePointInput[];
   tool?: 'brush' | 'pencil' | 'eraser';
   color?: string;
+  /** Id of a saved project color to link this op to (see AddTextOptions). */
+  colorRef?: string;
   size?: number;
   opacity?: number;
   /** Layer id or name; default: the top layer of the active frame. */
@@ -569,6 +592,7 @@ export async function addStroke(
     size,
     // Match the drawing engine: pencil and eraser are always fully opaque.
     opacity: tool === 'brush' ? opacity : 1,
+    ...resolveColorRef(doc, options.colorRef),
   };
   if (options.points.some((point) => point.pressure !== undefined)) {
     op.widths = options.points.map((point) => pressureWidth(point.pressure ?? 1));
@@ -676,6 +700,7 @@ export async function addText(
     opacity: 1,
     fontSize: options.size ?? 24,
     fontFamily: options.fontFamily ?? 'sans-serif',
+    ...resolveColorRef(doc, options.colorRef),
   };
   await saveProject(projectPath, appendOperation(doc, layer.id, op));
   return { opId: op.id, layerId: layer.id, layerName: layer.name };
@@ -691,6 +716,8 @@ export interface AddShapeOptions {
   size?: number;
   /** Color as #rgb/#rrggbb (default #000000). */
   color?: string;
+  /** Id of a saved project color to link this op to (see AddTextOptions). */
+  colorRef?: string;
   /** Operation opacity, 0..1 (default 1). */
   opacity?: number;
   /** Fill a rectangle or ellipse instead of outlining it. */
@@ -745,6 +772,7 @@ export async function addShape(
     opacity,
     size,
     ...(options.fill && options.shape !== 'line' ? { fill: true } : {}),
+    ...resolveColorRef(doc, options.colorRef),
   };
   await saveProject(projectPath, appendOperation(doc, layer.id, op));
   return { opId: op.id, layerId: layer.id, layerName: layer.name };

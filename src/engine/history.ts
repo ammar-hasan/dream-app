@@ -190,6 +190,69 @@ export function setProjectColorsCommand(
   };
 }
 
+/**
+ * Delete one project color AND bake its last value into every op that linked
+ * to it, so artwork never visually shifts when a swatch is removed. Revert is
+ * snapshot-based (delete is rare and destructive); structural sharing keeps
+ * the captured doc cheap to hold.
+ */
+export function deleteProjectColorCommand(doc: DreamDocument, id: string): Command {
+  const colors = doc.projectColors ?? [];
+  const target = colors.find((color) => color.id === id);
+  const previous = doc;
+  if (!target) return { label: 'Delete project color', apply: (d) => d, revert: (d) => d };
+  const value = target.value;
+  return {
+    label: 'Delete project color',
+    apply: (current) => detachColorFromDocument(current, id, value),
+    revert: () => previous,
+  };
+}
+
+/** Stamp `value` into every op referencing `id`, then drop the ref, doc-wide. */
+function detachColorFromDocument(doc: DreamDocument, id: string, value: string): DreamDocument {
+  const detachLayers = (layers: Layer[]): Layer[] => {
+    let changed = false;
+    const next = layers.map((layer) => {
+      let opsChanged = false;
+      const ops = layer.operations.map((op) => {
+        if (op.colorRef === id) {
+          opsChanged = true;
+          const { colorRef: _ref, ...rest } = op;
+          void _ref;
+          return { ...rest, color: value };
+        }
+        return op;
+      });
+      if (!opsChanged) return layer;
+      changed = true;
+      return { ...layer, operations: ops };
+    });
+    return changed ? next : layers;
+  };
+
+  const projectColors = (doc.projectColors ?? []).filter((color) => color.id !== id);
+  if (!doc.frames) {
+    return { ...doc, layers: detachLayers(doc.layers), projectColors, updatedAt: Date.now() };
+  }
+  let framesChanged = false;
+  const frames = doc.frames.map((frame) => {
+    const layers = detachLayers(frame.layers);
+    if (layers === frame.layers) return frame;
+    framesChanged = true;
+    return { ...frame, layers };
+  });
+  if (!framesChanged) return { ...doc, projectColors, updatedAt: Date.now() };
+  const active = frames.find((frame) => frame.id === doc.activeFrameId) ?? frames[0];
+  return {
+    ...doc,
+    frames,
+    layers: active ? active.layers : doc.layers,
+    projectColors,
+    updatedAt: Date.now(),
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Slice 2: raster editing commands (move, flip/rotate, filter bake, crop,
 // resize). Transforms are invertible by construction; crop/resize/filter

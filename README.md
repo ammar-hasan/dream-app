@@ -523,6 +523,12 @@ once per device. Little Dreamer remains invitation-free.
   pointer-side interval label make the magnetic result visible. Hiding the grid
   also disables its pull; it remains session guidance and never enters artwork,
   Undo, portable files or exports.
+- **Linked color variables**: a saved project color can be linked to a Design
+  vector selection (strokes, shapes, text). Editing the swatch recolors every
+  linked op on the canvas, in SVG export and via MCP `render` with no op
+  payload change. Unlink, recolor or delete the swatch and each op's last
+  resolved color is frozen back in, so severing a link never shifts artwork.
+  The link rides in `.dream` files; MCP create tools accept `colorRef`.
 - **Group / ungroup**: groups are a `groupId` on ops, not a scene graph —
   grouped objects select and transform as one unit.
 - **Reorder, duplicate, delete, nudge**: bring forward / send backward within

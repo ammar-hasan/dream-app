@@ -197,6 +197,11 @@ const TOOLS: Tool[] = [
           description: 'Font size in pixels (default 24)',
         }),
         color: optional(string('Text color, #rgb or #rrggbb (default #000000)')),
+        colorRef: optional(
+          string(
+            'Id of a saved project color to link this text to; the text follows the swatch on every render',
+          ),
+        ),
         fontFamily: optional(string('CSS font family (default sans-serif)')),
         layer: optional(string('Target layer id or name (default: top layer)')),
       },
@@ -237,6 +242,11 @@ const TOOLS: Tool[] = [
           description: 'Freehand tool (default brush)',
         }),
         color: optional(string('Stroke color, #rgb or #rrggbb (default #1f2937)')),
+        colorRef: optional(
+          string(
+            'Id of a saved project color to link this stroke to; the stroke follows the swatch on every render',
+          ),
+        ),
         size: optional({
           type: 'number',
           exclusiveMinimum: 0,
@@ -327,6 +337,11 @@ const TOOLS: Tool[] = [
           description: 'Outline width in pixels (default 2)',
         }),
         color: optional(string('Shape color, #rgb or #rrggbb (default #000000)')),
+        colorRef: optional(
+          string(
+            'Id of a saved project color to link this shape to; the shape follows the swatch on every render',
+          ),
+        ),
         opacity: optional({
           type: 'number',
           minimum: 0,
@@ -434,6 +449,7 @@ const argsSchema = {
       .max(10000),
     tool: z.enum(['brush', 'pencil', 'eraser']).optional(),
     color: z.string().optional(),
+    colorRef: z.string().optional(),
     size: z.number().finite().positive().max(8192).optional(),
     opacity: z.number().finite().min(0).max(1).optional(),
     layer: z.string().optional(),
@@ -462,6 +478,7 @@ const argsSchema = {
     y: z.number(),
     size: z.number().optional(),
     color: z.string().optional(),
+    colorRef: z.string().optional(),
     fontFamily: z.string().optional(),
     layer: z.string().optional(),
   }),
@@ -474,6 +491,7 @@ const argsSchema = {
     y2: z.number(),
     size: z.number().optional(),
     color: z.string().optional(),
+    colorRef: z.string().optional(),
     opacity: z.number().optional(),
     fill: z.boolean().optional(),
     layer: z.string().optional(),

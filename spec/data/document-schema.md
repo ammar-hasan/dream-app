@@ -35,8 +35,11 @@ absent as the default, and writers may omit defaults.
 | `name`    | string | —         | trimmed, non-empty, at most 40 characters |
 | `value`   | color  | —         | normalized `#rrggbb`                      |
 
-Project colors are reusable swatches, not references held by operations.
-Replacing a value affects future choices only and never changes existing marks.
+Project colors are reusable swatches. A vector operation may optionally
+**link** to one via `colorRef`; the linked op follows the swatch's current
+value at render and export time. Unlink, recolor, or delete the swatch and the
+op's last resolved color is frozen back into its `color` field, so severing a
+link never shifts the artwork.
 
 ## Layer
 
@@ -91,13 +94,14 @@ An empty mask is fully white, meaning the layer is fully revealed.
 
 ## Operation — shared base
 
-| Attribute  | Type                                         | Default      | Rule                                                                        |
-| ---------- | -------------------------------------------- | ------------ | --------------------------------------------------------------------------- |
-| `id`       | string                                       | generated    |                                                                             |
-| `kind`     | `'stroke'\|'shape'\|'fill'\|'text'\|'image'` | —            |                                                                             |
-| `color`    | color                                        | —            | erasers carry a color but ignore it                                         |
-| `opacity`  | number 0–1                                   | tool setting | multiplied with layer opacity; pencil and eraser strokes always commit at 1 |
-| `groupId?` | string                                       | absent       | Design-mode grouping; scoped to the layer                                   |
+| Attribute   | Type                                         | Default      | Rule                                                                        |
+| ----------- | -------------------------------------------- | ------------ | --------------------------------------------------------------------------- |
+| `id`        | string                                       | generated    |                                                                             |
+| `kind`      | `'stroke'\|'shape'\|'fill'\|'text'\|'image'` | —            |                                                                             |
+| `color`     | color                                        | —            | erasers carry a color but ignore it                                         |
+| `colorRef?` | string                                       | absent       | id of a linked project color; renderer & exporters follow its current value |
+| `opacity`   | number 0–1                                   | tool setting | multiplied with layer opacity; pencil and eraser strokes always commit at 1 |
+| `groupId?`  | string                                       | absent       | Design-mode grouping; scoped to the layer                                   |
 
 ### Stroke (`kind: 'stroke'`)
 

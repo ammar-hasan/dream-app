@@ -36,12 +36,15 @@ interface LayerEntry {
   opacity: number;
   adjustments: Layer['adjustments'];
   mask: Layer['mask'];
+  /** Ref of the project colors the bitmap was baked against (linked-color invalidation). */
+  projectColors: DreamDocument['projectColors'];
   canvas: CanvasLike;
 }
 
 interface Snapshot {
   layers: DreamDocument['layers'];
   background: DreamDocument['background'];
+  projectColors: DreamDocument['projectColors'];
   canvas: CanvasLike;
 }
 
@@ -86,6 +89,9 @@ export class LayerCache {
     // A snapshot is the whole stack in one bitmap — impossible for a
     // filtered (partial) render, and it already contains the background.
     const useSnapshot = erasing && !opts.layerFilter;
+    // Linked-color resolution: every bitmap render reads the current project
+    // colors, so they ride on the opts and the cache invalidates on their ref.
+    const renderOpts: RenderOptions = { ...this.opts, ...opts, projectColors: doc.projectColors };
 
     ctx.save();
     try {
@@ -98,12 +104,12 @@ export class LayerCache {
         if (!doc.layers.some((l) => l.id === id)) this.deleteEntry(id);
       }
       if (!cacheable || (erasing && opts.layerFilter)) {
-        this.renderDirect(doc, layers, ctx);
+        this.renderDirect(layers, doc.width, doc.height, ctx, renderOpts);
       } else if (useSnapshot) {
-        this.renderSnapshot(doc, layers, ctx);
+        this.renderSnapshot(doc, layers, ctx, renderOpts);
       } else {
         for (const layer of layers) {
-          compositeLayerBitmap(layer, this.entryFor(doc, layer).canvas, ctx);
+          compositeLayerBitmap(layer, this.entryFor(doc, layer, renderOpts).canvas, ctx);
         }
       }
     } finally {
@@ -125,18 +131,30 @@ export class LayerCache {
     }
   }
 
-  private renderDirect(doc: DreamDocument, layers: Layer[], ctx: Renderer2D): void {
+  private renderDirect(
+    layers: Layer[],
+    width: number,
+    height: number,
+    ctx: Renderer2D,
+    opts: RenderOptions,
+  ): void {
     for (const layer of layers) {
-      renderCompositedLayer(layer, doc.width, doc.height, ctx, this.opts);
+      renderCompositedLayer(layer, width, height, ctx, opts);
     }
   }
 
-  private renderSnapshot(doc: DreamDocument, layers: Layer[], ctx: Renderer2D): void {
+  private renderSnapshot(
+    doc: DreamDocument,
+    layers: Layer[],
+    ctx: Renderer2D,
+    opts: RenderOptions,
+  ): void {
     let snap = this.snapshot;
     if (
       !snap ||
       snap.layers !== doc.layers ||
       snap.background !== doc.background ||
+      snap.projectColors !== doc.projectColors ||
       snap.canvas.width !== doc.width ||
       snap.canvas.height !== doc.height
     ) {
@@ -147,36 +165,43 @@ export class LayerCache {
         snapCtx.fillStyle = doc.background;
         snapCtx.fillRect(0, 0, doc.width, doc.height);
         for (const layer of layers) {
-          renderCompositedLayer(layer, doc.width, doc.height, snapCtx, this.opts);
+          renderCompositedLayer(layer, doc.width, doc.height, snapCtx, opts);
         }
       }
       if (snap) this.releaseCanvas(snap.canvas);
-      snap = { layers: doc.layers, background: doc.background, canvas };
+      snap = {
+        layers: doc.layers,
+        background: doc.background,
+        projectColors: doc.projectColors,
+        canvas,
+      };
       this.snapshot = snap;
     }
     ctx.drawImage(snap.canvas, 0, 0);
   }
 
-  private entryFor(doc: DreamDocument, layer: Layer): LayerEntry {
+  private entryFor(doc: DreamDocument, layer: Layer, opts: RenderOptions): LayerEntry {
     const hit = this.entries.get(layer.id);
     if (
       hit &&
       hit.operations === layer.operations &&
       hit.opacity === layer.opacity &&
       hit.adjustments === layer.adjustments &&
-      hit.mask === layer.mask
+      hit.mask === layer.mask &&
+      hit.projectColors === doc.projectColors
     ) {
       // LRU: re-insert to mark as most recently used.
       this.entries.delete(layer.id);
       this.entries.set(layer.id, hit);
       return hit;
     }
-    const canvas = renderLayerBitmap(layer, doc.width, doc.height, this.opts);
+    const canvas = renderLayerBitmap(layer, doc.width, doc.height, opts);
     const entry: LayerEntry = {
       operations: layer.operations,
       opacity: layer.opacity,
       adjustments: layer.adjustments,
       mask: layer.mask,
+      projectColors: doc.projectColors,
       canvas,
     };
     this.deleteEntry(layer.id);

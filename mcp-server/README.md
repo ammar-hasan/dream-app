@@ -23,10 +23,10 @@ byte-compatible with the browser app, and vice versa.
 | `dream.add_layer`            | Add a new top layer to the active frame, with an optional `name`.                                                                                                    |
 | `dream.update_layer`         | Rename, show/hide, set opacity/blend/adjustments/mask, lock/unlock or move a layer by zero-based stack index.                                                        |
 | `dream.remove_layer`         | Remove a layer by id or name from the active frame; refuses to remove the final layer.                                                                               |
-| `dream.add_stroke`           | Append a validated brush/pencil/eraser polyline with optional pressure, style and target layer.                                                                      |
+| `dream.add_stroke`           | Append a validated brush/pencil/eraser polyline with optional pressure, style, target layer and `colorRef` link to a saved project color.                            |
 | `dream.add_mask_stroke`      | Append an editable pressure-aware Hide/Reveal gesture to a layer mask, creating and enabling it when needed.                                                         |
-| `dream.add_text`             | Append a text op: `text`, `x`, `y`, optional `size`, `color`, `fontFamily`, `layer` (id or name; default: top layer).                                                |
-| `dream.add_shape`            | Append a line/rectangle/ellipse with endpoints, optional size/color/opacity/fill, and an optional target `layer`.                                                    |
+| `dream.add_text`             | Append a text op: `text`, `x`, `y`, optional `size`, `color`, `colorRef`, `fontFamily`, `layer` (id or name; default: top layer).                                    |
+| `dream.add_shape`            | Append a line/rectangle/ellipse with endpoints, optional size/color/opacity/fill, optional `colorRef`, and an optional target `layer`.                               |
 | `dream.render_png`           | Flatten the document (or one `frame` index) to a PNG file.                                                                                                           |
 | `dream.export_app`           | Export an animated document as ONE self-contained interactive HTML prototype (frames as screens, hotspots as tappable links).                                        |
 
@@ -123,13 +123,14 @@ The npm package must be public before the Registry will accept its metadata.
 - Named project colors are capped at 24 with 40-character names. They are
   accompanied in project summaries by a derived two-decimal contrast ratio and
   normal-text AA boolean against the canvas background. This does not certify
-  artwork, transparency, large text, color vision or print. They are
-  reusable swatches, not linked variables, so replacing one never recolors
-  existing operations.
+  artwork, transparency, large text, color vision or print. They may be linked
+  to a vector op via `colorRef` on `dream.add_stroke` / `add_shape` / `add_text`;
+  a linked op follows the swatch's current value at render time. Unlinking or
+  deleting the swatch freezes the last resolved value back into the op.
 - Freehand authoring accepts 2–10,000 finite points, optional pressure samples,
-  brush/pencil/eraser tools, color, size, opacity and an id/name layer target.
-  Pressure uses the same width floor as pen input; pencil and eraser remain
-  fully opaque like the app.
+  brush/pencil/eraser tools, color, size, opacity, an optional `colorRef` and an
+  id/name layer target. Pressure uses the same width floor as pen input; pencil
+  and eraser remain fully opaque like the app.
 - `dream.export_app` needs an animated document (frames are the screens);
   documents without frames get a clear error.
 - Rendering uses the headless skia build — text uses the fonts bundled with

@@ -94,6 +94,14 @@ export interface RasterPatch {
 interface OperationBase {
   id: string;
   color: Color;
+  /**
+   * When set, the op's color follows the saved project color with this id:
+   * the renderer resolves it live, so editing the swatch updates every linked
+   * stroke/shape/text. Falls back to `color` when the id is missing or stale.
+   * `color` always holds the last resolved value, so unlinking (or deleting
+   * the swatch) keeps the artwork visually stable. Fill/image ops ignore it.
+   */
+  colorRef?: string;
   /** 0..1, multiplied with the owning layer's opacity at render time. */
   opacity: number;
   /**

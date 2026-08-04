@@ -8,8 +8,10 @@ import {
   normalizeHex,
   normalizeProjectColors,
   PALETTE,
+  resolveOpColor,
   rgbaToHex,
 } from './color';
+import type { Operation, ProjectColor } from './types';
 
 describe('normalizeHex', () => {
   it('expands shorthand and lowercases', () => {
@@ -111,5 +113,42 @@ describe('PALETTE', () => {
     for (const color of PALETTE) {
       expect(normalizeHex(color)).toBe(color);
     }
+  });
+});
+
+describe('resolveOpColor', () => {
+  const colors: ProjectColor[] = [
+    { id: 'ink', name: 'Ink', value: '#111111' },
+    { id: 'brand', name: 'Brand', value: '#2563eb' },
+  ];
+  const stroke = {
+    id: 's',
+    kind: 'stroke',
+    tool: 'brush',
+    color: '#000000',
+    opacity: 1,
+    points: [],
+    size: 4,
+  } as Operation;
+  const linked: Operation = { ...stroke, id: 's2', colorRef: 'brand', color: '#2563eb' };
+  const stale: Operation = { ...stroke, id: 's3', colorRef: 'gone', color: '#ff0000' };
+
+  it('returns the linked swatch value while the ref is live', () => {
+    expect(resolveOpColor(linked, colors)).toBe('#2563eb');
+  });
+
+  it('tracks a swatch edit without touching the op', () => {
+    const edited = [{ ...colors[1], value: '#ff8800' }];
+    expect(resolveOpColor(linked, edited)).toBe('#ff8800');
+    expect((linked as { color: string }).color).toBe('#2563eb');
+  });
+
+  it('falls back to the literal color when the ref is stale', () => {
+    expect(resolveOpColor(stale, colors)).toBe('#ff0000');
+  });
+
+  it('falls back to the literal color when nothing is linked', () => {
+    expect(resolveOpColor(stroke, colors)).toBe('#000000');
+    expect(resolveOpColor(stroke, [])).toBe('#000000');
   });
 });

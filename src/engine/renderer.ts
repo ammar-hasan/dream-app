@@ -6,16 +6,18 @@
  * a lightweight recording mock instead of a real canvas.
  */
 
-import { cssColor } from './color';
+import { cssColor, resolveOpColor } from './color';
 import { applyAdjustments, isIdentity, normalizeAdjustments } from './filters';
 import { arrowheadPoints, normalizeRect } from './geometry';
 import { sprayDots } from './spray';
 import type {
+  Color,
   DreamDocument,
   Layer,
   LayerBlendMode,
   LayerMaskStroke,
   Operation,
+  ProjectColor,
   RasterPatch,
   ShapeOp,
   StrokeOp,
@@ -77,6 +79,12 @@ export interface RenderOptions {
   background?: boolean;
   /** Restrict which layers are painted (default: all visible layers). */
   layerFilter?: (layer: Layer) => boolean;
+  /**
+   * Saved project colors used to resolve op `colorRef` links at paint time.
+   * `renderDocument` injects `doc.projectColors` automatically; callers that
+   * render a single layer (thumbnails, exports) pass the doc's colors through.
+   */
+  projectColors?: ProjectColor[];
   /** Factory for offscreen canvases (fill patches). Defaults to document.createElement. */
   createCanvas?: (width: number, height: number) => CanvasLike;
   /** Factory for ImageData wrappers. Defaults to the global ImageData constructor. */
@@ -118,16 +126,17 @@ export function renderDocument(
   ctx: Renderer2D,
   opts: RenderOptions = {},
 ): void {
+  const merged = doc.projectColors ? { ...opts, projectColors: doc.projectColors } : opts;
   ctx.save();
   try {
-    if (opts.background !== false) {
+    if (merged.background !== false) {
       ctx.fillStyle = doc.background;
       ctx.fillRect(0, 0, doc.width, doc.height);
     }
     for (const layer of doc.layers) {
       if (!layer.visible) continue;
-      if (opts.layerFilter && !opts.layerFilter(layer)) continue;
-      renderCompositedLayer(layer, doc.width, doc.height, ctx, opts);
+      if (merged.layerFilter && !merged.layerFilter(layer)) continue;
+      renderCompositedLayer(layer, doc.width, doc.height, ctx, merged);
     }
   } finally {
     ctx.restore();
@@ -263,15 +272,16 @@ export function renderOperation(
   ctx.save();
   try {
     ctx.globalAlpha = op.opacity * (opts.layerOpacity ?? 1);
+    const color = resolveOpColor(op, opts.projectColors);
     switch (op.kind) {
       case 'stroke':
-        renderStroke(op, ctx);
+        renderStroke(op, ctx, color);
         break;
       case 'shape':
-        renderShape(op, ctx);
+        renderShape(op, ctx, color);
         break;
       case 'text':
-        ctx.fillStyle = cssColor(op.color);
+        ctx.fillStyle = cssColor(color);
         ctx.font = `${op.fontSize}px ${op.fontFamily}`;
         ctx.textBaseline = 'top';
         ctx.fillText(op.text, op.position.x, op.position.y);
@@ -288,15 +298,15 @@ export function renderOperation(
   }
 }
 
-function renderStroke(op: StrokeOp, ctx: Renderer2D): void {
+function renderStroke(op: StrokeOp, ctx: Renderer2D, color: Color): void {
   if (op.points.length === 0) return;
   if (op.tool === 'spray') {
-    renderSpray(op, ctx);
+    renderSpray(op, ctx, color);
     return;
   }
   const erasing = op.tool === 'eraser';
   ctx.globalCompositeOperation = erasing ? 'destination-out' : 'source-over';
-  ctx.strokeStyle = erasing ? 'rgba(0, 0, 0, 1)' : cssColor(op.color);
+  ctx.strokeStyle = erasing ? 'rgba(0, 0, 0, 1)' : cssColor(color);
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
   if (op.widths && op.widths.length === op.points.length) {
@@ -318,15 +328,15 @@ function renderStroke(op: StrokeOp, ctx: Renderer2D): void {
   ctx.stroke();
 }
 
-function renderSpray(op: StrokeOp, ctx: Renderer2D): void {
+function renderSpray(op: StrokeOp, ctx: Renderer2D, color: Color): void {
   ctx.globalCompositeOperation = 'source-over';
-  ctx.fillStyle = cssColor(op.color);
+  ctx.fillStyle = cssColor(color);
   for (const dot of sprayDots(op)) {
     ctx.fillRect(dot.x - dot.size / 2, dot.y - dot.size / 2, dot.size, dot.size);
   }
 }
 
-function renderShape(op: ShapeOp, ctx: Renderer2D): void {
+function renderShape(op: ShapeOp, ctx: Renderer2D, color: Color): void {
   ctx.globalCompositeOperation = 'source-over';
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
@@ -366,11 +376,11 @@ function renderShape(op: ShapeOp, ctx: Renderer2D): void {
   }
   if (op.fill && op.shape !== 'line') {
     // Filled variant: interior in the op color, no outline.
-    ctx.fillStyle = cssColor(op.color);
+    ctx.fillStyle = cssColor(color);
     ctx.fill();
     return;
   }
-  ctx.strokeStyle = cssColor(op.color);
+  ctx.strokeStyle = cssColor(color);
   ctx.lineWidth = op.size;
   ctx.stroke();
 }

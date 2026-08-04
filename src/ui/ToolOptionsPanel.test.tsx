@@ -46,4 +46,32 @@ describe('project colors', () => {
     useDreamStore.getState().undo();
     expect(useDreamStore.getState().doc.projectColors?.[0]?.name).toBe('Brand ink');
   });
+
+  it('hides the link control in Draw mode and reveals it for a Design selection', async () => {
+    useDreamStore.getState().setColor('#2563eb');
+    useDreamStore.getState().addProjectColor('Brand', '#2563eb');
+    render(<ToolOptionsPanel />);
+    expect(screen.queryByRole('button', { name: 'Link the selection to Brand' })).toBeNull();
+
+    // Draw a shape, enter Design, select it — the link button appears.
+    useDreamStore.getState().setTool('rectangle');
+    useDreamStore.getState().setSize(2);
+    useDreamStore.getState().pointerDown({ x: 10, y: 10 });
+    useDreamStore.getState().pointerUp({ x: 30, y: 30 });
+    useDreamStore.getState().setMode('design');
+    const opId = useDreamStore.getState().doc.layers[0].operations[0].id;
+    useDreamStore.getState().setSelection([opId]);
+
+    const link = await screen.findByRole('button', { name: 'Link the selection to Brand' });
+    fireEvent.click(link);
+    expect(useDreamStore.getState().doc.layers[0].operations[0]).toMatchObject({
+      colorRef: useDreamStore.getState().doc.projectColors![0].id,
+      color: '#2563eb',
+    });
+
+    // The button flips to "Linked" and pressing again unlinks.
+    const unlink = screen.getByRole('button', { name: 'Unlink the selection from Brand' });
+    fireEvent.click(unlink);
+    expect(useDreamStore.getState().doc.layers[0].operations[0].colorRef).toBeUndefined();
+  });
 });
