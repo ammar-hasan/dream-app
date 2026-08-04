@@ -273,6 +273,18 @@ export const zh: Record<string, string> = {
   'layers.moveDownNamed': '将 {name} 下移',
   'layers.delete': '删除图层',
   'layers.deleteNamed': '删除 {name}',
+  'layers.mask.title': '图层蒙版',
+  'layers.mask.add': '添加图层蒙版',
+  'layers.mask.editTarget': '编辑画面或蒙版',
+  'layers.mask.artwork': '画面',
+  'layers.mask.mask': '蒙版',
+  'layers.mask.brushMode': '蒙版画笔模式',
+  'layers.mask.hide': '隐藏',
+  'layers.mask.reveal': '显示',
+  'layers.mask.enabled': '启用',
+  'layers.mask.delete': '删除蒙版',
+  'layers.mask.strokes': '蒙版笔画：{count}',
+  'layers.mask.hint': '用画笔隐藏；“显示”可恢复可见区域。',
 
   // --- Timeline -----------------------------------------------------------------
   'timeline.frames': '帧',

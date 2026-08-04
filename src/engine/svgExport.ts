@@ -87,6 +87,7 @@ export function canExportSvg(doc: DreamDocument): boolean {
     (layer) =>
       !layer.visible ||
       (isIdentity(normalizeAdjustments(layer.adjustments)) &&
+        (!layer.mask?.enabled || layer.mask.strokes.length === 0) &&
         layer.operations.every(
           (op) =>
             op.kind !== 'fill' &&

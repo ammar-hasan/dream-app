@@ -19,6 +19,7 @@ import {
 import type { FillOp, StrokeOp } from '../../src/engine/types';
 import {
   addLayer,
+  addMaskStroke,
   addShape,
   addStroke,
   addText,
@@ -170,6 +171,7 @@ describe('dream-mcp tools', () => {
       opacity: 0.4,
       blendMode: 'multiply',
       adjustments: { brightness: 12, blur: 2 },
+      mask: 'add',
       locked: true,
       index: 0,
     });
@@ -180,6 +182,7 @@ describe('dream-mcp tools', () => {
       opacity: 0.4,
       blendMode: 'multiply',
       adjustments: expect.objectContaining({ brightness: 12, blur: 2, contrast: 0 }),
+      mask: { enabled: true, strokes: 0 },
       locked: true,
       index: 0,
       frameId: null,
@@ -191,6 +194,57 @@ describe('dream-mcp tools', () => {
 
     await updateLayer(managedPath, { layer: 'Client logo', name: 'Approved logo' });
     expect((await listLayers(managedPath)).layers[0]?.name).toBe('Approved logo');
+  });
+
+  it('adds, reports and manages editable mask strokes', async () => {
+    const managedPath = join(dir, 'masked.dream');
+    await createProject(managedPath, { width: 40, height: 30 });
+
+    const result = await addMaskStroke(managedPath, {
+      layer: 'Layer 1',
+      mode: 'hide',
+      size: 12,
+      opacity: 0.7,
+      points: [
+        { x: 2, y: 3, pressure: 0.5 },
+        { x: 8, y: 9, pressure: 1 },
+      ],
+    });
+    expect(result).toMatchObject({ layerName: 'Layer 1', strokes: 1 });
+    expect((await listLayers(managedPath)).layers[0]?.mask).toEqual({
+      enabled: true,
+      strokes: 1,
+    });
+    expect((await loadProject(managedPath)).layers[0]?.mask?.strokes[0]).toMatchObject({
+      id: result.maskStrokeId,
+      mode: 'hide',
+      size: 12,
+      opacity: 0.7,
+      widths: [0.5, 1],
+    });
+
+    expect((await updateLayer(managedPath, { layer: 'Layer 1', mask: 'disable' })).mask).toEqual({
+      enabled: false,
+      strokes: 1,
+    });
+    expect((await updateLayer(managedPath, { layer: 'Layer 1', mask: 'enable' })).mask).toEqual({
+      enabled: true,
+      strokes: 1,
+    });
+    expect((await updateLayer(managedPath, { layer: 'Layer 1', mask: 'delete' })).mask).toBeNull();
+
+    await updateLayer(managedPath, { layer: 'Layer 1', locked: true });
+    await expect(updateLayer(managedPath, { layer: 'Layer 1', mask: 'add' })).rejects.toThrow(
+      'locked layer',
+    );
+    await expect(
+      addMaskStroke(managedPath, {
+        points: [
+          { x: 1, y: 1 },
+          { x: 2, y: 2 },
+        ],
+      }),
+    ).rejects.toThrow('locked layer');
   });
 
   it('update_layer validates its target, properties and index', async () => {

@@ -7,6 +7,12 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Non-destructive layer masks** (slice 75): Design now offers explicit
+  Artwork/Mask and Hide/Reveal targets for pressure-aware painted masks. The
+  exact live preview, one-step Undo, enable/delete recovery, transforms,
+  frames, `.dream`, raster/prototype output and agent tools share one portable
+  contract; painted masks refuse misleading SVG delivery.
+
 - **Voice-accessible steady strokes** (slice 74): spoken or typed steady and
   natural-stroke requests now set the same visible control to 60% or 0% in all
   six languages. Recognition hints, localized results, Help and the no-speech

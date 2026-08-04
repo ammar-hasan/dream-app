@@ -14,6 +14,7 @@ import type {
   DreamDocument,
   Layer,
   LayerBlendMode,
+  LayerMaskStroke,
   Operation,
   RasterPatch,
   ShapeOp,
@@ -106,7 +107,7 @@ function resolveFactories(opts: RenderOptions): ResolvedFactories {
       : undefined);
   if (!createCanvas || !createImageData) {
     throw new Error(
-      'renderDocument: raster operations and layer adjustments need `createCanvas`/`createImageData` options outside a browser environment',
+      'renderDocument: raster operations, layer adjustments and masks need `createCanvas`/`createImageData` options outside a browser environment',
     );
   }
   return { createCanvas, createImageData };
@@ -176,6 +177,23 @@ export function renderLayerBitmap(
     const adjusted = applyAdjustments(source, adjustments);
     layerCtx.putImageData(createImageData(adjusted.data, width, height), 0, 0);
   }
+  if (layer.mask?.enabled && layer.mask.strokes.length > 0) {
+    const maskBitmap = createCanvas(width, height);
+    const maskCtx = maskBitmap.getContext('2d');
+    if (maskCtx) {
+      maskCtx.fillStyle = 'rgba(255, 255, 255, 1)';
+      maskCtx.fillRect(0, 0, width, height);
+      for (const stroke of layer.mask.strokes) renderMaskStroke(stroke, maskCtx);
+      layerCtx.save();
+      try {
+        layerCtx.globalAlpha = 1;
+        layerCtx.globalCompositeOperation = 'destination-in';
+        layerCtx.drawImage(maskBitmap, 0, 0);
+      } finally {
+        layerCtx.restore();
+      }
+    }
+  }
   return bitmap;
 }
 
@@ -188,12 +206,48 @@ export function renderCompositedLayer(
   opts: RenderOptions = {},
 ): void {
   const adjustments = normalizeAdjustments(layer.adjustments);
-  if ((!layer.blendMode || layer.blendMode === 'normal') && isIdentity(adjustments)) {
+  if (
+    (!layer.blendMode || layer.blendMode === 'normal') &&
+    isIdentity(adjustments) &&
+    !(layer.mask?.enabled && layer.mask.strokes.length > 0)
+  ) {
     renderLayer(layer, ctx, opts);
     return;
   }
   const bitmap = renderLayerBitmap(layer, width, height, opts);
   compositeLayerBitmap(layer, bitmap, ctx);
+}
+
+function renderMaskStroke(stroke: LayerMaskStroke, ctx: Renderer2D): void {
+  if (stroke.points.length === 0) return;
+  ctx.save();
+  try {
+    ctx.globalAlpha = stroke.opacity;
+    ctx.globalCompositeOperation = stroke.mode === 'hide' ? 'destination-out' : 'source-over';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 1)';
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    if (stroke.widths && stroke.widths.length === stroke.points.length) {
+      for (let i = 1; i < stroke.points.length; i += 1) {
+        ctx.lineWidth = Math.max(
+          0.5,
+          ((stroke.widths[i - 1] + stroke.widths[i]) / 2) * stroke.size,
+        );
+        ctx.beginPath();
+        ctx.moveTo(stroke.points[i - 1].x, stroke.points[i - 1].y);
+        ctx.lineTo(stroke.points[i].x, stroke.points[i].y);
+        ctx.stroke();
+      }
+      return;
+    }
+    ctx.lineWidth = stroke.size;
+    ctx.beginPath();
+    ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+    for (const point of stroke.points.slice(1)) ctx.lineTo(point.x, point.y);
+    ctx.stroke();
+  } finally {
+    ctx.restore();
+  }
 }
 
 export interface OperationRenderOptions extends RenderOptions {

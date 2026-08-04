@@ -26,8 +26,9 @@ are roughly ordered by dependency, not by a fixed schedule.
   crop tool (whole document) and resize dialog (scale-to-fit, nearest sampling).
 - ✅ Export flattened PNG or JPEG (quality setting), including imported images
   and filter results.
-- Current scope is one complete revisitable settings object per layer rather
-  than a reorderable stack; masks and stacked effects remain future depth.
+- Current scope is one complete revisitable settings object and one painted
+  hide/reveal mask per layer rather than a reorderable effect stack; stacked
+  effects remain future depth.
 
 ## Slice 3 — Design mode: layers, components & selection ✅
 
@@ -1656,6 +1657,29 @@ while preserving one inspectable setting for every input method and language.
 - ✅ Full release gates remain green: 896 unit tests, 97.54% engine coverage,
   61 browser journeys, 25 MCP tests and four honest agent evals.
 
+## Slice 75 — Non-destructive layer masks ✅
+
+Persona need: let Ali and other careful creators hide and restore parts of a
+layer while keeping the original strokes, pixels and editable effects intact.
+
+- ✅ Design exposes the current **Artwork / Mask** target and **Hide / Reveal**
+  action before a crosshair touches the canvas. Adding a mask starts fully
+  revealed; count, enabled state and status text keep the editing context
+  inspectable.
+- ✅ Pressure-aware mask marks use the current size and opacity, preview the
+  exact committed visibility in the layer's real stack position and create one
+  Undo step each. Adding, enabling, disabling and deleting are independently
+  undoable; locked layers refuse changes.
+- ✅ Masks remain linked through move, flip, rotation, crop, resize and frame
+  duplication. `.dream`, cached rendering, PNG/JPEG, animation, presentation,
+  prototype export and agent read/write agree; painted masks refuse a false
+  scalable export.
+- ✅ Pure rendering/data/transform/cache tests, store-history tests, MCP
+  real-file tests and a production-browser journey cover the complete
+  hide/reveal/disable/delete/recovery path.
+- ✅ Full release gates remain green: 905 unit tests, 97.12% engine coverage,
+  62 browser journeys, 26 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1676,8 +1700,8 @@ largest count of controls:
    task-prioritized shell/dock, and a faithful safe creation path that does not
    require a child or low-literacy user to configure an AI provider.
 3. **Professional substrate:** core portable layer blending, editable per-layer
-   adjustments and optional stroke stabilization are established; continue
-   with masks, effect stacks and color foundations, then vector paths,
+   adjustments, optional stroke stabilization and painted masks are established;
+   continue with effect stacks and color foundations, then vector paths,
    typography, grids, constraints and linked reusable systems—progressively
    disclosed without crowding first-minute Draw.
 4. **Outcome-grade delivery:** publication preflight for scientific figures,

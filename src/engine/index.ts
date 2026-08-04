@@ -15,6 +15,7 @@ export * from './document';
 export * from './history';
 export * from './renderer';
 export * from './filters';
+export * from './masks';
 export * from './color';
 export * from './geometry';
 export * from './animation';

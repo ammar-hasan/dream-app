@@ -122,6 +122,39 @@ describe('LayerCache', () => {
     expect(factories.created[1].context.calls('getImageData')).toHaveLength(1);
   });
 
+  it('re-renders a layer when its mask changes', () => {
+    const doc = bigDoc(1, 5);
+    const factories = makeMockFactories();
+    const cache = new LayerCache(factories);
+    const masked = withLayers(doc, [{ ...doc.layers[0], mask: { enabled: true, strokes: [] } }]);
+    cache.render(masked, new MockContext2D());
+    expect(factories.created).toHaveLength(1); // an empty mask needs no extra bitmap
+
+    const edited = withLayers(masked, [
+      {
+        ...masked.layers[0],
+        mask: {
+          enabled: true,
+          strokes: [
+            {
+              id: 'm1',
+              mode: 'hide',
+              points: [
+                { x: 1, y: 1 },
+                { x: 2, y: 2 },
+              ],
+              size: 4,
+              opacity: 1,
+            },
+          ],
+        },
+      },
+    ]);
+    cache.render(edited, new MockContext2D());
+    expect(factories.created).toHaveLength(3); // replacement layer bitmap + painted mask bitmap
+    expect(factories.created[2].context.calls('stroke')).toHaveLength(1);
+  });
+
   it('honors visibility and the layer filter without invalidating entries', () => {
     const doc = bigDoc(2, 10);
     const factories = makeMockFactories();

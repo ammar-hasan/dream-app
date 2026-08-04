@@ -168,6 +168,30 @@ export interface ImageOp extends OperationBase {
 
 export type Operation = StrokeOp | ShapeOp | FillOp | TextOp | ImageOp;
 
+export type LayerMaskMode = 'hide' | 'reveal';
+
+/** One editable brush gesture in a layer's opacity mask. */
+export interface LayerMaskStroke {
+  id: string;
+  mode: LayerMaskMode;
+  points: Point[];
+  /** Brush diameter in document pixels. */
+  size: number;
+  /** 0..1 strength. */
+  opacity: number;
+  /** Optional per-point pressure multipliers. */
+  widths?: number[];
+}
+
+/**
+ * A white (fully revealing) layer mask with ordered hide/reveal gestures.
+ * Keeping gestures separate from artwork makes both media revisitable.
+ */
+export interface LayerMask {
+  enabled: boolean;
+  strokes: LayerMaskStroke[];
+}
+
 export interface Layer {
   id: string;
   name: string;
@@ -178,6 +202,8 @@ export interface Layer {
   blendMode?: LayerBlendMode;
   /** Editable color and pixel effects applied after this layer is flattened. */
   adjustments?: Adjustments;
+  /** Editable opacity applied after adjustments and before layer blending. */
+  mask?: LayerMask;
   locked: boolean;
   /** Bottom-to-top paint order. */
   operations: Operation[];

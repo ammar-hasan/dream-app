@@ -41,6 +41,28 @@ Their live appearance therefore includes that layer's opacity and blend mode
 before release or Apply; committing the gesture must not cause a surprise jump
 in color or stacking.
 
+## Layer masks
+
+The active layer can have one painted mask in Design. A new mask starts fully
+revealed, so adding it never changes the picture. The Layers panel then names
+the current editing target explicitly as **Artwork** or **Mask**; Mask offers
+**Hide** and **Reveal** brush modes and reports how many mask marks exist.
+
+Mask painting uses the current brush size and opacity. Its crosshair pointer,
+status-bar label and live canvas preview all identify the mask target before
+release. Hide reduces the owning layer's visibility under the stroke; Reveal
+restores it. Neither action erases or replaces the layer's operations or
+editable adjustments. Each mask mark, adding the mask, enabling or disabling
+it, and deleting it is one undoable document change. A locked layer refuses all
+of these edits.
+
+Masks follow their layer through movement, flips, quarter-turn rotation,
+cropping, resizing, frames, save/open and portable project exchange. They
+affect the working canvas, animation, presentations, prototypes and flattened
+image delivery after the layer's editable adjustments and before its opacity
+and blend mode. A visible painted mask makes scalable export unavailable rather
+than silently flattening or misrepresenting the result.
+
 ## Selection
 
 1. **Select tool (V):** click any object on the active layer to select it

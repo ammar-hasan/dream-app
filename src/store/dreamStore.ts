@@ -108,6 +108,8 @@ import type {
   HotspotTransition,
   ImageOp,
   LayerBlendMode,
+  LayerMaskMode,
+  LayerMaskStroke,
   Narration,
   Operation,
   Point,
@@ -225,6 +227,9 @@ export interface DreamStore {
   moveDraft: MoveDraft | null;
   cropDraft: CropDraft | null;
   adjustPreview: AdjustPreview | null;
+  /** Design-mode layer-mask editing is explicit and never changes the chosen artwork tool. */
+  maskEditing: boolean;
+  maskMode: LayerMaskMode;
   /** Mirror mode: strokes/shapes commit with reflected copies (one undo). */
   symmetry: SymmetryMode;
   /** Magic-wand floating region, if any. */
@@ -339,6 +344,11 @@ export interface DreamStore {
   setLayerOpacity(id: string, opacity: number): void;
   setLayerBlendMode(id: string, blendMode: LayerBlendMode): void;
   setLayerAdjustments(id: string, adjustments: Adjustments): void;
+  addLayerMask(id: string): void;
+  setLayerMaskEditing(editing: boolean): void;
+  setLayerMaskMode(mode: LayerMaskMode): void;
+  setLayerMaskEnabled(id: string, enabled: boolean): void;
+  deleteLayerMask(id: string): void;
   setLayerLocked(id: string, locked: boolean): void;
   moveLayer(id: string, toIndex: number): void;
 
@@ -536,6 +546,8 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
     moveDraft: null,
     cropDraft: null,
     adjustPreview: null,
+    maskEditing: false,
+    maskMode: 'hide',
     symmetry: 'off',
     wandDraft: null,
     wandDrag: null,
@@ -579,6 +591,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         moveDraft: null,
         cropDraft: null,
         adjustPreview: null,
+        maskEditing: false,
         wandDrag: null,
         lassoDraft: null,
         linkDraft: null,
@@ -621,6 +634,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
           moveDraft: null,
           cropDraft: null,
           adjustPreview: null,
+          maskEditing: false,
           wandDraft: null,
           wandDrag: null,
           lassoDraft: null,
@@ -665,7 +679,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       if (ops.length === 0) return;
       const layer = createLayer(name, ops);
       execute(addLayerCommand(layer));
-      set({ activeLayerId: layer.id });
+      set({ activeLayerId: layer.id, maskEditing: false });
       get().dismissHint();
     },
 
@@ -771,7 +785,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       };
       const layer = createLayer(`Region ${get().doc.layers.length + 1}`, [op]);
       execute(addLayerCommand(layer));
-      set({ wandDraft: null, wandDrag: null, activeLayerId: layer.id });
+      set({ wandDraft: null, wandDrag: null, activeLayerId: layer.id, maskEditing: false });
     },
 
     newDocument: (options) => {
@@ -788,6 +802,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         moveDraft: null,
         cropDraft: null,
         adjustPreview: null,
+        maskEditing: false,
         wandDraft: null,
         wandDrag: null,
         lassoDraft: null,
@@ -827,6 +842,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         moveDraft: null,
         cropDraft: null,
         adjustPreview: null,
+        maskEditing: false,
         wandDraft: null,
         wandDrag: null,
         lassoDraft: null,
@@ -852,6 +868,18 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
     pointerDown: (point, event = {}) => {
       const { tool, settings } = get();
       if (get().playing) return; // watching, not editing — pause first
+      if (get().maskEditing) {
+        const layer = activeLayer();
+        if (!layer?.mask?.enabled || layer.locked) return;
+        const machine = DRAWING_TOOLS.brush;
+        if (!machine) return;
+        const state = machine.begin(
+          { point, shiftKey: !!event.shiftKey, pressure: event.pressure },
+          settings,
+        );
+        set({ draft: { tool: machine, state }, previewOp: machine.preview(state, settings) });
+        return;
+      }
       if (tool === 'select') {
         const layer = activeLayer();
         if (!layer || layer.locked) {
@@ -1219,6 +1247,27 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       const op = draft.tool.commit(draft.state, settings);
       set({ draft: null, previewOp: null });
       if (op) {
+        if (get().maskEditing && op.kind === 'stroke') {
+          const layer = activeLayer();
+          if (!layer?.mask?.enabled || layer.locked) return;
+          const stroke: LayerMaskStroke = {
+            id: genId('mask'),
+            mode: get().maskMode,
+            points: op.points,
+            size: op.size,
+            opacity: op.opacity,
+            ...(op.widths ? { widths: op.widths } : {}),
+          };
+          execute(
+            updateLayerCommand(
+              get().doc,
+              layer.id,
+              { mask: { ...layer.mask, strokes: [...layer.mask.strokes, stroke] } },
+              stroke.mode === 'hide' ? 'Hide with mask' : 'Reveal with mask',
+            ),
+          );
+          return;
+        }
         // Mirror mode: the op and its reflected copies land as ONE command,
         // so a single undo removes the whole symmetric gesture.
         const { doc, symmetry } = get();
@@ -1259,6 +1308,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
           activeLayerId: id,
           selection: [],
           selectDraft: null,
+          maskEditing: id === get().activeLayerId ? get().maskEditing : false,
           wandDraft: null,
           wandDrag: null,
         });
@@ -1267,7 +1317,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
     addLayer: () => {
       const layer = createLayer(`Layer ${get().doc.layers.length + 1}`);
       execute(addLayerCommand(layer));
-      set({ activeLayerId: layer.id });
+      set({ activeLayerId: layer.id, maskEditing: false });
     },
 
     deleteLayer: (id) => {
@@ -1280,6 +1330,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
           activeLayerId,
           selection: reconcileSelection(get().doc, activeLayerId, s.selection),
           selectDraft: null,
+          maskEditing: activeLayerId === s.activeLayerId ? s.maskEditing : false,
         };
       });
     },
@@ -1318,8 +1369,58 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       set({ adjustPreview: null });
     },
 
-    setLayerLocked: (id, locked) =>
-      execute(updateLayerCommand(get().doc, id, { locked }, 'Toggle layer lock')),
+    addLayerMask: (id) => {
+      const layer = get().doc.layers.find((candidate) => candidate.id === id);
+      if (!layer || layer.locked) return;
+      if (!layer.mask) {
+        execute(
+          updateLayerCommand(
+            get().doc,
+            id,
+            { mask: { enabled: true, strokes: [] } },
+            'Add layer mask',
+          ),
+        );
+      }
+      set({ activeLayerId: id, maskEditing: true, selection: [], selectDraft: null });
+    },
+
+    setLayerMaskEditing: (maskEditing) => {
+      const layer = activeLayer();
+      set({
+        maskEditing: !!layer?.mask?.enabled && !layer.locked && maskEditing,
+        draft: null,
+        previewOp: null,
+      });
+    },
+
+    setLayerMaskMode: (maskMode) => set({ maskMode }),
+
+    setLayerMaskEnabled: (id, enabled) => {
+      const layer = get().doc.layers.find((candidate) => candidate.id === id);
+      if (!layer?.mask || layer.locked) return;
+      execute(
+        updateLayerCommand(
+          get().doc,
+          id,
+          { mask: { ...layer.mask, enabled } },
+          enabled ? 'Enable layer mask' : 'Disable layer mask',
+        ),
+      );
+      if (!enabled) set({ maskEditing: false, draft: null, previewOp: null });
+    },
+
+    deleteLayerMask: (id) => {
+      const layer = get().doc.layers.find((candidate) => candidate.id === id);
+      if (!layer?.mask || layer.locked) return;
+      execute(updateLayerCommand(get().doc, id, { mask: undefined }, 'Delete layer mask'));
+      set({ maskEditing: false, draft: null, previewOp: null });
+    },
+
+    setLayerLocked: (id, locked) => {
+      execute(updateLayerCommand(get().doc, id, { locked }, 'Toggle layer lock'));
+      if (locked && id === get().activeLayerId) set({ maskEditing: false });
+    },
 
     moveLayer: (id, toIndex) => {
       const { doc } = get();
@@ -1348,7 +1449,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       };
       const layer = createLayer(name?.trim() || `Image ${doc.layers.length + 1}`, [op]);
       execute(addLayerCommand(layer));
-      set({ activeLayerId: layer.id, adjustPreview: null });
+      set({ activeLayerId: layer.id, adjustPreview: null, maskEditing: false });
       get().dismissHint();
     },
 
@@ -1425,6 +1526,9 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
           moveDraft: null,
           cropDraft: null,
           adjustPreview: null,
+          maskEditing: next.layers.find((layer) => layer.id === activeLayerId)?.mask
+            ? s.maskEditing
+            : false,
           wandDraft: null,
           wandDrag: null,
           lassoDraft: null,
@@ -1453,6 +1557,9 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
           moveDraft: null,
           cropDraft: null,
           adjustPreview: null,
+          maskEditing: next.layers.find((layer) => layer.id === activeLayerId)?.mask
+            ? s.maskEditing
+            : false,
           wandDraft: null,
           wandDrag: null,
           lassoDraft: null,
@@ -1475,7 +1582,10 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       execute(setAnimationEnabledCommand(doc, !isAnimated(doc)));
       // Enabling wraps the current stack in frame 1 — the active layer still
       // exists; disabling may drop it if frames were edited. Reconcile either way.
-      set((s) => ({ activeLayerId: reconcileActiveLayer(get().doc, s.activeLayerId) }));
+      set((s) => ({
+        activeLayerId: reconcileActiveLayer(get().doc, s.activeLayerId),
+        maskEditing: false,
+      }));
     },
 
     selectFrame: (id) => {
@@ -1488,6 +1598,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         activeLayerId: frame.layers[frame.layers.length - 1]?.id ?? '',
         selection: [],
         selectDraft: null,
+        maskEditing: false,
         draft: null,
         previewOp: null,
         pendingText: null,
@@ -1503,7 +1614,10 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       const { doc } = get();
       if (!doc.frames) return; // timeline is only reachable when animated
       execute(addFrameCommand(doc, blankFrame()));
-      set((s) => ({ activeLayerId: reconcileActiveLayer(get().doc, s.activeLayerId) }));
+      set((s) => ({
+        activeLayerId: reconcileActiveLayer(get().doc, s.activeLayerId),
+        maskEditing: false,
+      }));
     },
 
     addStoryboardFrames: (scenes) => {
@@ -1538,6 +1652,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         activeLayerId: reconcileActiveLayer(get().doc, state.activeLayerId),
         selection: [],
         selectDraft: null,
+        maskEditing: false,
       }));
     },
 
@@ -1546,7 +1661,10 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       const active = doc.frames?.find((f) => f.id === doc.activeFrameId);
       if (!active) return;
       execute(duplicateFrameCommand(doc, cloneFrame(active), active.id));
-      set((s) => ({ activeLayerId: reconcileActiveLayer(get().doc, s.activeLayerId) }));
+      set((s) => ({
+        activeLayerId: reconcileActiveLayer(get().doc, s.activeLayerId),
+        maskEditing: false,
+      }));
     },
 
     deleteFrame: (id) => {
@@ -1557,6 +1675,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         activeLayerId: reconcileActiveLayer(get().doc, s.activeLayerId),
         selection: [],
         selectDraft: null,
+        maskEditing: false,
       }));
     },
 
@@ -1724,7 +1843,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
     createCastLayer: (name) => {
       const layer = createLayer(name);
       execute(addLayerCommand(layer));
-      set({ activeLayerId: layer.id });
+      set({ activeLayerId: layer.id, maskEditing: false });
       return layer.id;
     },
 
@@ -1873,7 +1992,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       const ops = instantiateComponent(component, origin);
       const layer = createLayer(component.name, ops);
       execute(addLayerCommand(layer));
-      set({ activeLayerId: layer.id, selection: ops.map((op) => op.id) });
+      set({ activeLayerId: layer.id, selection: ops.map((op) => op.id), maskEditing: false });
     },
 
     insertDataPlot: (name, operations) => {
@@ -1881,7 +2000,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       if (trimmed === '' || operations.length === 0) return;
       const layer = createLayer(trimmed, operations);
       execute(addLayerCommand(layer));
-      set({ activeLayerId: layer.id, selection: [] });
+      set({ activeLayerId: layer.id, selection: [], maskEditing: false });
       get().dismissHint();
     },
 

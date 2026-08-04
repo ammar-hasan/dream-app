@@ -105,6 +105,8 @@ export function CanvasViewport() {
   const moveDraft = useDreamStore((s) => s.moveDraft);
   const cropDraft = useDreamStore((s) => s.cropDraft);
   const adjustPreview = useDreamStore((s) => s.adjustPreview);
+  const maskEditing = useDreamStore((s) => s.maskEditing);
+  const maskMode = useDreamStore((s) => s.maskMode);
   const symmetry = useDreamStore((s) => s.symmetry);
   const wandDraft = useDreamStore((s) => s.wandDraft);
   const wandDrag = useDreamStore((s) => s.wandDrag);
@@ -217,11 +219,12 @@ export function CanvasViewport() {
     }
 
     const activeLayer = doc.layers.find((l) => l.id === activeLayerId);
-    const previewOps = previewOp
-      ? symmetry === 'off'
-        ? [previewOp]
-        : mirrorOperations(previewOp, symmetry, { width: doc.width, height: doc.height })
-      : [];
+    const previewOps =
+      previewOp && !maskEditing
+        ? symmetry === 'off'
+          ? [previewOp]
+          : mirrorOperations(previewOp, symmetry, { width: doc.width, height: doc.height })
+        : [];
 
     // Every live document preview stays in its owning layer. That preserves
     // stack order, layer opacity and blend mode throughout the gesture instead
@@ -256,6 +259,32 @@ export function CanvasViewport() {
         layers: displayDoc.layers.map((layer) =>
           layer.id === adjustPreview.layerId
             ? { ...layer, adjustments: adjustPreview.adjustments }
+            : layer,
+        ),
+      };
+    }
+    if (maskEditing && previewOp?.kind === 'stroke' && activeLayer?.mask?.enabled) {
+      displayDoc = {
+        ...displayDoc,
+        layers: displayDoc.layers.map((layer) =>
+          layer.id === activeLayerId && layer.mask
+            ? {
+                ...layer,
+                mask: {
+                  ...layer.mask,
+                  strokes: [
+                    ...layer.mask.strokes,
+                    {
+                      id: '__mask-preview',
+                      mode: maskMode,
+                      points: previewOp.points,
+                      size: previewOp.size,
+                      opacity: previewOp.opacity,
+                      ...(previewOp.widths ? { widths: previewOp.widths } : {}),
+                    },
+                  ],
+                },
+              }
             : layer,
         ),
       };
@@ -666,7 +695,7 @@ export function CanvasViewport() {
   }, [activeLayerId, doc.layers, editInviteIds, kidMode, mode]);
 
   const updateSelectHover = (point: Point) => {
-    if (playing || mode !== 'design' || tool !== 'select') {
+    if (playing || maskEditing || mode !== 'design' || tool !== 'select') {
       setSelectHover(null);
       return;
     }
@@ -714,7 +743,7 @@ export function CanvasViewport() {
     );
   };
 
-  useEffect(() => setSelectHover(null), [activeLayerId, mode, playing, tool]);
+  useEffect(() => setSelectHover(null), [activeLayerId, maskEditing, mode, playing, tool]);
 
   // --- Pointer routing ----------------------------------------------------
 
@@ -856,27 +885,29 @@ export function CanvasViewport() {
     ? 'default'
     : panning
       ? 'grabbing'
-      : tool === 'pan' || spacePanning
-        ? 'grab'
-        : tool === 'text'
-          ? 'text'
-          : tool === 'move'
-            ? moveDraft
-              ? 'grabbing'
-              : 'grab'
-            : tool === 'wand' && wandDrag
-              ? 'grabbing'
-              : tool === 'select'
-                ? selectCursor
-                : tool === 'zoom'
-                  ? zoomingOut
-                    ? 'zoom-out'
-                    : 'zoom-in'
-                  : tool === 'fill'
-                    ? 'cell'
-                    : tool === 'stamp'
-                      ? 'copy'
-                      : 'crosshair';
+      : maskEditing
+        ? 'crosshair'
+        : tool === 'pan' || spacePanning
+          ? 'grab'
+          : tool === 'text'
+            ? 'text'
+            : tool === 'move'
+              ? moveDraft
+                ? 'grabbing'
+                : 'grab'
+              : tool === 'wand' && wandDrag
+                ? 'grabbing'
+                : tool === 'select'
+                  ? selectCursor
+                  : tool === 'zoom'
+                    ? zoomingOut
+                      ? 'zoom-out'
+                      : 'zoom-in'
+                    : tool === 'fill'
+                      ? 'cell'
+                      : tool === 'stamp'
+                        ? 'copy'
+                        : 'crosshair';
 
   const dropKind = (transfer: DataTransfer): DropFeedback => {
     if (transfer.types.includes('application/x-dream-component')) return 'component';

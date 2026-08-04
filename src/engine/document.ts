@@ -286,7 +286,7 @@ export function updateLayerProps(
   doc: DreamDocument,
   layerId: string,
   patch: Partial<
-    Pick<Layer, 'name' | 'visible' | 'opacity' | 'blendMode' | 'adjustments' | 'locked'>
+    Pick<Layer, 'name' | 'visible' | 'opacity' | 'blendMode' | 'adjustments' | 'mask' | 'locked'>
   >,
 ): DreamDocument {
   return mapLayer(doc, layerId, (layer) => ({ ...layer, ...patch }));

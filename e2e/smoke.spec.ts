@@ -309,6 +309,73 @@ test('layer adjustments stay editable without flattening original marks', async 
   await expect.poll(sampleCenter).toEqual([255, 0, 0, 255]);
 });
 
+test('layer masks hide and reveal without erasing artwork', async ({ page }) => {
+  await bootApp(page);
+  const canvas = page.locator('.viewport-canvas');
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('viewport canvas has no box');
+  const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  const sampleAt = (dx = 0) =>
+    canvas.evaluate((element, offset) => {
+      const target = element as HTMLCanvasElement;
+      const rect = target.getBoundingClientRect();
+      const context = target.getContext('2d');
+      if (!context) throw new Error('no 2d context');
+      const x = Math.floor((rect.width / 2 + offset) * (target.width / rect.width));
+      const y = Math.floor((rect.height / 2) * (target.height / rect.height));
+      return Array.from(context.getImageData(x, y, 1, 1).data);
+    }, dx);
+  const drawLine = async (fromX: number, fromY: number, toX: number, toY: number) => {
+    await page.mouse.move(fromX, fromY);
+    await page.mouse.down();
+    await page.mouse.move(toX, toY, { steps: 8 });
+    await page.mouse.up();
+  };
+
+  await page.locator('.tool-options input[type="range"]').first().fill('64');
+  await page.locator('.tool-options input[type="color"]').fill('#ff0000');
+  await drawLine(center.x - 120, center.y, center.x + 120, center.y);
+  await expect.poll(() => sampleAt()).toEqual([255, 0, 0, 255]);
+
+  await page.getByRole('tab', { name: 'Design' }).click();
+  await page.getByRole('button', { name: 'Add layer mask' }).click();
+  await expect(page.getByRole('button', { name: 'Mask', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(page.locator('.status-tool')).toContainText('Layer mask · Hide');
+
+  // The live mask preview is already the eventual result before pointer-up.
+  await page.mouse.move(center.x, center.y - 50);
+  await page.mouse.down();
+  await page.mouse.move(center.x, center.y + 50, { steps: 8 });
+  await expect.poll(() => sampleAt()).toEqual([255, 255, 255, 255]);
+  await page.mouse.up();
+  await expect.poll(() => sampleAt()).toEqual([255, 255, 255, 255]);
+  await expect(page.locator('.layer-mask-count')).toHaveText('Mask marks: 1');
+
+  await page.getByRole('button', { name: 'Reveal', exact: true }).click();
+  await drawLine(center.x, center.y - 50, center.x, center.y + 50);
+  await expect.poll(() => sampleAt()).toEqual([255, 0, 0, 255]);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(() => sampleAt()).toEqual([255, 255, 255, 255]);
+  await page.getByRole('button', { name: 'Redo', exact: true }).click();
+  await expect.poll(() => sampleAt()).toEqual([255, 0, 0, 255]);
+
+  await page.getByRole('button', { name: 'Hide', exact: true }).click();
+  await drawLine(center.x + 60, center.y - 50, center.x + 60, center.y + 50);
+  await expect.poll(() => sampleAt(60)).toEqual([255, 255, 255, 255]);
+  await page.getByRole('checkbox', { name: 'Enabled' }).uncheck();
+  await expect.poll(() => sampleAt(60)).toEqual([255, 0, 0, 255]);
+  await page.getByRole('checkbox', { name: 'Enabled' }).check();
+  await expect.poll(() => sampleAt(60)).toEqual([255, 255, 255, 255]);
+
+  await page.getByRole('button', { name: 'Delete mask' }).click();
+  await expect.poll(() => sampleAt(60)).toEqual([255, 0, 0, 255]);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(() => sampleAt(60)).toEqual([255, 255, 255, 255]);
+});
+
 test('canvas pointers preview the object and explain direct-manipulation state', async ({
   page,
 }) => {

@@ -86,6 +86,48 @@ describe('renderDocument', () => {
     expect(layerContext.calls('putImageData')).toHaveLength(1);
     expect(ctx.calls('drawImage')).toHaveLength(1);
   });
+
+  it('applies an editable opacity mask after adjustments and before blending', () => {
+    const doc = docWithStroke();
+    doc.layers[0] = {
+      ...doc.layers[0],
+      blendMode: 'multiply',
+      adjustments: { ...doc.layers[0].adjustments!, brightness: 10 },
+      mask: {
+        enabled: true,
+        strokes: [
+          {
+            id: 'mask-1',
+            mode: 'hide',
+            points: [
+              { x: 4, y: 5 },
+              { x: 9, y: 10 },
+            ],
+            size: 12,
+            opacity: 1,
+          },
+        ],
+      },
+    };
+    const factories = makeMockFactories();
+    const ctx = new MockContext2D();
+
+    renderDocument(doc, ctx, factories);
+
+    expect(factories.created).toHaveLength(2);
+    const [layerBitmap, maskBitmap] = factories.created;
+    expect(layerBitmap.context.calls('getImageData')).toHaveLength(1);
+    expect(maskBitmap.context.calls('fillRect')).toEqual([['fillRect', 0, 0, 100, 80]]);
+    expect(maskBitmap.context.calls('stroke')).toHaveLength(1);
+    expect(maskBitmap.context.globalCompositeOperation).toBe('destination-out');
+    expect(layerBitmap.context.calls('drawImage')).toEqual([
+      ['drawImage', maskBitmap, 0, 0, undefined, undefined],
+    ]);
+    expect(ctx.calls('drawImage')).toEqual([
+      ['drawImage', layerBitmap, 0, 0, undefined, undefined],
+    ]);
+    expect(ctx.globalCompositeOperation).toBe('multiply');
+  });
 });
 
 describe('stroke rendering', () => {

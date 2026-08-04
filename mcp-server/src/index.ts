@@ -77,7 +77,7 @@ const TOOLS: Tool[] = [
   {
     name: 'dream.list_layers',
     description:
-      'List the layers of a .dream project (id, name, visibility, opacity, blend mode, editable adjustments, lock, op count). Animated documents also get a per-frame breakdown.',
+      'List the layers of a .dream project (id, name, visibility, opacity, blend mode, editable adjustments, mask summary, lock, op count). Animated documents also get a per-frame breakdown.',
     inputSchema: {
       type: 'object',
       properties: { path: string('Path to the .dream file') },
@@ -99,7 +99,7 @@ const TOOLS: Tool[] = [
   {
     name: 'dream.update_layer',
     description:
-      'Rename, show/hide, set opacity/blend mode/editable adjustments, lock/unlock or reorder a layer in the active frame of a .dream project.',
+      'Rename, show/hide, set opacity/blend mode/editable adjustments, manage its mask, lock/unlock or reorder a layer in the active frame of a .dream project.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -124,6 +124,11 @@ const TOOLS: Tool[] = [
           additionalProperties: false,
           minProperties: 1,
           description: 'Partial editable layer adjustment settings',
+        }),
+        mask: optional({
+          type: 'string',
+          enum: ['add', 'enable', 'disable', 'delete'],
+          description: 'Add, enable, disable or delete the editable opacity mask',
         }),
         locked: optional({ type: 'boolean', description: 'Whether the layer is locked' }),
         index: optional({
@@ -216,6 +221,56 @@ const TOOLS: Tool[] = [
           minimum: 0,
           maximum: 1,
           description: 'Brush opacity from 0 to 1 (default 1)',
+        }),
+        layer: optional(string('Target layer id or name (default: top layer)')),
+      },
+      required: ['path', 'points'],
+    },
+  },
+  {
+    name: 'dream.add_mask_stroke',
+    description:
+      'Add an editable hide/reveal brush gesture to a layer opacity mask (default: top layer of the active frame). Creates and enables the mask when needed.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: string('Path to the .dream file'),
+        points: {
+          type: 'array',
+          minItems: 2,
+          maxItems: 10000,
+          description: 'Ordered mask-brush samples in document pixels',
+          items: {
+            type: 'object',
+            properties: {
+              x: { type: 'number', description: 'X coordinate in document pixels' },
+              y: { type: 'number', description: 'Y coordinate in document pixels' },
+              pressure: optional({
+                type: 'number',
+                minimum: 0,
+                maximum: 1,
+                description: 'Optional stylus pressure from 0 to 1',
+              }),
+            },
+            required: ['x', 'y'],
+          },
+        },
+        mode: optional({
+          type: 'string',
+          enum: ['hide', 'reveal'],
+          description: 'Hide artwork or reveal it again (default hide)',
+        }),
+        size: optional({
+          type: 'number',
+          exclusiveMinimum: 0,
+          maximum: 8192,
+          description: 'Mask brush width in document pixels (default 8)',
+        }),
+        opacity: optional({
+          type: 'number',
+          minimum: 0,
+          maximum: 1,
+          description: 'Mask brush strength from 0 to 1 (default 1)',
         }),
         layer: optional(string('Target layer id or name (default: top layer)')),
       },
@@ -326,6 +381,7 @@ const argsSchema = {
       .strict()
       .refine((value) => Object.keys(value).length > 0, 'at least one adjustment is required')
       .optional(),
+    mask: z.enum(['add', 'enable', 'disable', 'delete']).optional(),
     locked: z.boolean().optional(),
     index: z.number().optional(),
   }),
@@ -344,6 +400,23 @@ const argsSchema = {
       .max(10000),
     tool: z.enum(['brush', 'pencil', 'eraser']).optional(),
     color: z.string().optional(),
+    size: z.number().finite().positive().max(8192).optional(),
+    opacity: z.number().finite().min(0).max(1).optional(),
+    layer: z.string().optional(),
+  }),
+  'dream.add_mask_stroke': z.object({
+    path: z.string(),
+    points: z
+      .array(
+        z.object({
+          x: z.number().finite(),
+          y: z.number().finite(),
+          pressure: z.number().finite().min(0).max(1).optional(),
+        }),
+      )
+      .min(2)
+      .max(10000),
+    mode: z.enum(['hide', 'reveal']).optional(),
     size: z.number().finite().positive().max(8192).optional(),
     opacity: z.number().finite().min(0).max(1).optional(),
     layer: z.string().optional(),
@@ -414,6 +487,10 @@ async function callTool(name: ToolName, args: unknown): Promise<CallToolResult> 
     case 'dream.add_stroke': {
       const { path, ...options } = argsSchema[name].parse(args);
       return asJson(await tools.addStroke(path, options));
+    }
+    case 'dream.add_mask_stroke': {
+      const { path, ...options } = argsSchema[name].parse(args);
+      return asJson(await tools.addMaskStroke(path, options));
     }
     case 'dream.add_text': {
       const { path, ...options } = argsSchema[name].parse(args);

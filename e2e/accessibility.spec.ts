@@ -29,6 +29,9 @@ test('core creation modes have no serious automated accessibility violations', a
   await invitation.getByRole('button', { name: 'Select it' }).click();
   expect(await seriousViolations(page)).toEqual([]);
 
+  await page.getByRole('button', { name: 'Add layer mask' }).click();
+  expect(await seriousViolations(page)).toEqual([]);
+
   await page.getByRole('tab', { name: 'Play' }).click();
   expect(await seriousViolations(page)).toEqual([]);
 });

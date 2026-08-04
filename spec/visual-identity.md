@@ -157,6 +157,10 @@ Text `#0f141f` / `#ffffff`, dim text `#454d61` / `#ccd4e8`, borders
     exact path that release will keep, its start and current endpoint do not
     drift, and drawing never vibrates continuously. Natural input at 0% has no
     smoothing effect.
+14. Layer-mask editing uses the existing segmented-control language for the
+    Artwork/Mask target and Hide/Reveal action. The canvas switches to a
+    crosshair and previews the exact visibility result at the pointer; no
+    flourish, loader or haptic may obscure the causal brush-to-result link.
 
 ## Video captions
 

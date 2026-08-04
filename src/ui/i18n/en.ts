@@ -278,6 +278,18 @@ export const en: Record<string, string> = {
   'layers.moveDownNamed': 'Move {name} down',
   'layers.delete': 'Delete layer',
   'layers.deleteNamed': 'Delete {name}',
+  'layers.mask.title': 'Layer mask',
+  'layers.mask.add': 'Add layer mask',
+  'layers.mask.editTarget': 'Edit artwork or mask',
+  'layers.mask.artwork': 'Artwork',
+  'layers.mask.mask': 'Mask',
+  'layers.mask.brushMode': 'Mask brush mode',
+  'layers.mask.hide': 'Hide',
+  'layers.mask.reveal': 'Reveal',
+  'layers.mask.enabled': 'Enabled',
+  'layers.mask.delete': 'Delete mask',
+  'layers.mask.strokes': 'Mask marks: {count}',
+  'layers.mask.hint': 'Brush to hide; Reveal paints visibility back.',
 
   // --- Timeline -----------------------------------------------------------------
   'timeline.frames': 'Frames',

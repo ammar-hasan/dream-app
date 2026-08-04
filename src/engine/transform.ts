@@ -159,6 +159,17 @@ export function translateLayer(
   return mapLayer(doc, layerId, (layer) => ({
     ...layer,
     operations: layer.operations.map((op) => translateOperation(op, dx, dy)),
+    ...(layer.mask
+      ? {
+          mask: {
+            ...layer.mask,
+            strokes: layer.mask.strokes.map((stroke) => ({
+              ...stroke,
+              points: stroke.points.map((point) => translatePoint(point, dx, dy)),
+            })),
+          },
+        }
+      : {}),
   }));
 }
 
@@ -270,6 +281,17 @@ export function transformLayer(
     return {
       ...layer,
       operations: layer.operations.map((op) => transformOperation(op, cx, cy, transform)),
+      ...(layer.mask
+        ? {
+            mask: {
+              ...layer.mask,
+              strokes: layer.mask.strokes.map((stroke) => ({
+                ...stroke,
+                points: stroke.points.map((point) => transformPoint(point, cx, cy, transform)),
+              })),
+            },
+          }
+        : {}),
     };
   });
 }
@@ -319,6 +341,17 @@ export function cropDocument(doc: DreamDocument, rect: Rect): DreamDocument {
         }
         return [translateOperation(op, -crop.x, -crop.y)];
       }),
+      ...(layer.mask
+        ? {
+            mask: {
+              ...layer.mask,
+              strokes: layer.mask.strokes.map((stroke) => ({
+                ...stroke,
+                points: stroke.points.map((point) => translatePoint(point, -crop.x, -crop.y)),
+              })),
+            },
+          }
+        : {}),
     }));
   return mapAllFrames({ ...doc, width: crop.width, height: crop.height }, cropLayers);
 }
@@ -378,6 +411,18 @@ export function resizeDocument(doc: DreamDocument, width: number, height: number
     stack.map((layer) => ({
       ...layer,
       operations: layer.operations.map((op) => scaleOperation(op, sx, sy)),
+      ...(layer.mask
+        ? {
+            mask: {
+              ...layer.mask,
+              strokes: layer.mask.strokes.map((stroke) => ({
+                ...stroke,
+                points: stroke.points.map((point) => ({ x: point.x * sx, y: point.y * sy })),
+                size: stroke.size * ((sx + sy) / 2),
+              })),
+            },
+          }
+        : {}),
     }));
   return mapAllFrames({ ...doc, width: w, height: h }, scaleLayers);
 }

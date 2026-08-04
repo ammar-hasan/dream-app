@@ -276,6 +276,18 @@ export const ar: Record<string, string> = {
   'layers.moveDownNamed': 'تحريك {name} لأسفل',
   'layers.delete': 'حذف الطبقة',
   'layers.deleteNamed': 'حذف {name}',
+  'layers.mask.title': 'قناع الطبقة',
+  'layers.mask.add': 'أضف قناع طبقة',
+  'layers.mask.editTarget': 'تحرير الرسم أو القناع',
+  'layers.mask.artwork': 'الرسم',
+  'layers.mask.mask': 'القناع',
+  'layers.mask.brushMode': 'وضع فرشاة القناع',
+  'layers.mask.hide': 'إخفاء',
+  'layers.mask.reveal': 'إظهار',
+  'layers.mask.enabled': 'مفعّل',
+  'layers.mask.delete': 'احذف القناع',
+  'layers.mask.strokes': 'علامات القناع: {count}',
+  'layers.mask.hint': 'استخدم الفرشاة للإخفاء، والإظهار لاستعادة الرؤية.',
 
   // --- Timeline -----------------------------------------------------------------
   'timeline.frames': 'الإطارات',

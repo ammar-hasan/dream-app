@@ -23,6 +23,8 @@ export function LayersPanel() {
   const doc = useDreamStore((s) => s.doc);
   const activeLayerId = useDreamStore((s) => s.activeLayerId);
   const mode = useDreamStore((s) => s.mode);
+  const maskEditing = useDreamStore((s) => s.maskEditing);
+  const maskMode = useDreamStore((s) => s.maskMode);
   const store = useDreamStore.getState;
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
@@ -158,6 +160,97 @@ export function LayersPanel() {
                       </select>
                     </label>
                   )}
+                  {mode === 'design' &&
+                    (layer.mask ? (
+                      <div className="layer-mask-controls">
+                        <div className="layer-mask-heading">
+                          <span>{t('layers.mask.title')}</span>
+                          <span className="layer-mask-count">
+                            {t('layers.mask.strokes', { count: layer.mask.strokes.length })}
+                          </span>
+                        </div>
+                        <div
+                          className="layer-mask-target"
+                          role="group"
+                          aria-label={t('layers.mask.editTarget')}
+                        >
+                          <button
+                            type="button"
+                            className="btn small"
+                            aria-pressed={!maskEditing}
+                            onClick={() => store().setLayerMaskEditing(false)}
+                          >
+                            {t('layers.mask.artwork')}
+                          </button>
+                          <button
+                            type="button"
+                            className="btn small"
+                            aria-pressed={maskEditing}
+                            disabled={!layer.mask.enabled || layer.locked}
+                            onClick={() => store().setLayerMaskEditing(true)}
+                          >
+                            {t('layers.mask.mask')}
+                          </button>
+                        </div>
+                        {maskEditing && (
+                          <>
+                            <p className="layer-mask-hint">{t('layers.mask.hint')}</p>
+                            <div
+                              className="layer-mask-target"
+                              role="group"
+                              aria-label={t('layers.mask.brushMode')}
+                            >
+                              <button
+                                type="button"
+                                className="btn small"
+                                aria-pressed={maskMode === 'hide'}
+                                onClick={() => store().setLayerMaskMode('hide')}
+                              >
+                                {t('layers.mask.hide')}
+                              </button>
+                              <button
+                                type="button"
+                                className="btn small"
+                                aria-pressed={maskMode === 'reveal'}
+                                onClick={() => store().setLayerMaskMode('reveal')}
+                              >
+                                {t('layers.mask.reveal')}
+                              </button>
+                            </div>
+                          </>
+                        )}
+                        <div className="layer-mask-footer">
+                          <label className="toggle-label">
+                            <input
+                              type="checkbox"
+                              checked={layer.mask.enabled}
+                              disabled={layer.locked}
+                              onChange={(event) =>
+                                store().setLayerMaskEnabled(layer.id, event.target.checked)
+                              }
+                            />
+                            {t('layers.mask.enabled')}
+                          </label>
+                          <button
+                            type="button"
+                            className="btn small danger"
+                            disabled={layer.locked}
+                            onClick={() => store().deleteLayerMask(layer.id)}
+                          >
+                            {t('layers.mask.delete')}
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn small layer-mask-add"
+                        disabled={layer.locked}
+                        onClick={() => store().addLayerMask(layer.id)}
+                      >
+                        {t('layers.mask.add')}
+                      </button>
+                    ))}
                   <div className="layer-actions">
                     <button
                       type="button"

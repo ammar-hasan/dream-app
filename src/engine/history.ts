@@ -152,7 +152,7 @@ export function moveLayerCommand(doc: DreamDocument, layerId: string, toIndex: n
 }
 
 type LayerPatch = Partial<
-  Pick<Layer, 'name' | 'visible' | 'opacity' | 'blendMode' | 'adjustments' | 'locked'>
+  Pick<Layer, 'name' | 'visible' | 'opacity' | 'blendMode' | 'adjustments' | 'mask' | 'locked'>
 >;
 
 export function updateLayerCommand(

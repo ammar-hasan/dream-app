@@ -123,6 +123,55 @@ describe('stroke stabilization', () => {
   });
 });
 
+describe('non-destructive layer masks', () => {
+  it('keeps hide/reveal gestures separate from artwork and undoes each decision', () => {
+    drawStroke({ x: 5, y: 5 }, { x: 30, y: 30 });
+    const layerId = store().activeLayerId;
+    const artwork = store().doc.layers[0].operations;
+
+    store().setMode('design');
+    store().addLayerMask(layerId);
+    expect(store().maskEditing).toBe(true);
+    expect(store().doc.layers[0].mask).toEqual({ enabled: true, strokes: [] });
+
+    store().pointerDown({ x: 10, y: 10 });
+    store().pointerMove({ x: 20, y: 20 });
+    store().pointerUp({ x: 20, y: 20 });
+    expect(store().doc.layers[0].operations).toBe(artwork);
+    expect(store().doc.layers[0].mask?.strokes[0]).toMatchObject({ mode: 'hide' });
+
+    store().setLayerMaskMode('reveal');
+    store().pointerDown({ x: 12, y: 12 });
+    store().pointerMove({ x: 16, y: 16 });
+    store().pointerUp({ x: 16, y: 16 });
+    expect(store().doc.layers[0].mask?.strokes).toHaveLength(2);
+    expect(store().doc.layers[0].mask?.strokes[1].mode).toBe('reveal');
+
+    store().undo();
+    expect(store().doc.layers[0].mask?.strokes).toHaveLength(1);
+    store().undo();
+    expect(store().doc.layers[0].mask?.strokes).toHaveLength(0);
+    store().undo();
+    expect(store().doc.layers[0].mask).toBeUndefined();
+    expect(store().doc.layers[0].operations).toBe(artwork);
+  });
+
+  it('can disable and delete a mask without deleting artwork', () => {
+    drawStroke();
+    const layerId = store().activeLayerId;
+    store().setMode('design');
+    store().addLayerMask(layerId);
+    store().setLayerMaskEnabled(layerId, false);
+    expect(store().doc.layers[0].mask?.enabled).toBe(false);
+    expect(store().maskEditing).toBe(false);
+    store().deleteLayerMask(layerId);
+    expect(store().doc.layers[0].mask).toBeUndefined();
+    expect(store().doc.layers[0].operations).toHaveLength(1);
+    store().undo();
+    expect(store().doc.layers[0].mask?.enabled).toBe(false);
+  });
+});
+
 describe('calligraphy brush', () => {
   it('commits directional widths as one normal undoable stroke', () => {
     store().setBrushStyle('calligraphy');

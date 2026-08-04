@@ -38,9 +38,9 @@ a project saved while playing or presenting reopens in Draw.
 ## Layer
 
 A named, ordered sheet of content. Layers stack bottom-to-top; each layer's
-content is flattened for appearance with its opacity, its editable adjustments
-are applied, then its blend mode determines how the result combines with the
-visible artwork below it.
+content is flattened for appearance, its editable adjustments and optional
+painted mask are applied, then its opacity and blend mode determine how the
+result combines with the visible artwork below it.
 
 | Attribute     | Type                                                             | Default     | Meaning                                                           |
 | ------------- | ---------------------------------------------------------------- | ----------- | ----------------------------------------------------------------- |
@@ -50,11 +50,12 @@ visible artwork below it.
 | `opacity`     | number 0–1                                                       | `1`         | multiplies the alpha of everything on the layer                   |
 | `blendMode`   | `'normal'\|'multiply'\|'screen'\|'overlay'\|'darken'\|'lighten'` | `'normal'`  | combines this flattened layer with the artwork below              |
 | `adjustments` | AdjustmentSettings                                               | all neutral | editable color and pixel effects; original operations stay intact |
+| `mask`        | LayerMask, optional                                              | absent      | editable hide/reveal marks; original operations stay intact       |
 | `locked`      | boolean                                                          | `false`     | locked layers reject all edits (adding, moving, deleting content) |
 | `operations`  | list of Operation                                                | `[]`        | the layer's content, bottom-to-top paint order                    |
 
-Layer add, delete, rename, reorder, visibility, opacity, blend-mode, adjustment
-and lock changes are all undoable.
+Layer add, delete, rename, reorder, visibility, opacity, blend-mode, adjustment,
+mask and lock changes are all undoable.
 
 ## Operation
 

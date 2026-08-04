@@ -36,6 +36,7 @@ absent as the default, and writers may omit defaults.
 | `opacity`     | number                                                           | `1`                     | 0–1; multiplies every operation's alpha                    |
 | `blendMode`   | `'normal'\|'multiply'\|'screen'\|'overlay'\|'darken'\|'lighten'` | `'normal'`              | combines the flattened layer with visible artwork below it |
 | `adjustments` | AdjustmentSettings                                               | all neutral             | editable effects applied without replacing operations      |
+| `mask?`       | LayerMask                                                        | absent = fully revealed | editable visibility without replacing operations           |
 | `locked`      | boolean                                                          | `false`                 | rejects all content edits                                  |
 | `operations`  | Operation[]                                                      | `[]`                    | bottom-to-top paint order                                  |
 
@@ -55,6 +56,26 @@ absent as the default, and writers may omit defaults.
 
 The complete settings object is saved on the layer. It affects the layer's
 flattened appearance but never replaces its operation list.
+
+### LayerMask
+
+| Attribute | Type              | Default | Rule                                           |
+| --------- | ----------------- | ------- | ---------------------------------------------- |
+| `enabled` | boolean           | `true`  | disabled masks have no visual effect           |
+| `strokes` | LayerMaskStroke[] | `[]`    | ordered paint history; later marks win locally |
+
+An empty mask is fully white, meaning the layer is fully revealed.
+
+### LayerMaskStroke
+
+| Attribute | Type               | Default   | Rule                                                                                        |
+| --------- | ------------------ | --------- | ------------------------------------------------------------------------------------------- |
+| `id`      | string             | generated | unique within the mask                                                                      |
+| `mode`    | `'hide'\|'reveal'` | —         | hide paints transparency; reveal paints visibility                                          |
+| `points`  | Point[]            | —         | ≥ 2 ordered canvas-space samples                                                            |
+| `size`    | number             | —         | stroke width in canvas px                                                                   |
+| `opacity` | number 0–1         | `1`       | strength of this mask mark                                                                  |
+| `widths?` | number[]           | absent    | per-point pressure multipliers, same length as `points`, each 0.1–1; absent = uniform width |
 
 ## Operation — shared base
 

@@ -282,6 +282,18 @@ export const pt: Record<string, string> = {
   'layers.moveDownNamed': 'Mover {name} para baixo',
   'layers.delete': 'Excluir camada',
   'layers.deleteNamed': 'Excluir {name}',
+  'layers.mask.title': 'Máscara da camada',
+  'layers.mask.add': 'Adicionar máscara',
+  'layers.mask.editTarget': 'Editar arte ou máscara',
+  'layers.mask.artwork': 'Arte',
+  'layers.mask.mask': 'Máscara',
+  'layers.mask.brushMode': 'Modo do pincel da máscara',
+  'layers.mask.hide': 'Ocultar',
+  'layers.mask.reveal': 'Revelar',
+  'layers.mask.enabled': 'Ativada',
+  'layers.mask.delete': 'Excluir máscara',
+  'layers.mask.strokes': 'Marcas da máscara: {count}',
+  'layers.mask.hint': 'Pincele para ocultar; Revelar recupera a visibilidade.',
 
   // --- Timeline -----------------------------------------------------------------
   'timeline.frames': 'Quadros',

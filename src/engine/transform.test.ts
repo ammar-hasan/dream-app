@@ -378,3 +378,70 @@ describe('resize', () => {
     expect(restored.layers).toEqual(doc.layers);
   });
 });
+
+describe('linked layer-mask transforms', () => {
+  it('moves, crops and resizes mask gestures with their artwork', () => {
+    let doc = createDocument({ width: 100, height: 80 });
+    const layer = {
+      ...createLayer('Masked', [
+        strokeOp([
+          { x: 10, y: 10 },
+          { x: 20, y: 20 },
+        ]),
+      ]),
+      mask: {
+        enabled: true,
+        strokes: [
+          {
+            id: 'm1',
+            mode: 'hide' as const,
+            points: [
+              { x: 12, y: 14 },
+              { x: 18, y: 20 },
+            ],
+            size: 10,
+            opacity: 1,
+          },
+        ],
+      },
+    };
+    doc = insertLayer(doc, layer);
+
+    const moved = translateLayer(doc, layer.id, 5, -4);
+    expect(moved.layers[1].mask?.strokes[0].points[0]).toEqual({ x: 17, y: 10 });
+
+    const cropped = cropDocument(doc, { x: 2, y: 4, width: 50, height: 40 });
+    expect(cropped.layers[1].mask?.strokes[0].points[0]).toEqual({ x: 10, y: 10 });
+
+    const resized = resizeDocument(doc, 200, 160);
+    expect(resized.layers[1].mask?.strokes[0].points[0]).toEqual({ x: 24, y: 28 });
+    expect(resized.layers[1].mask?.strokes[0].size).toBe(20);
+  });
+
+  it('flips mask gestures around the same content center', () => {
+    let doc = createDocument({ width: 100, height: 80 });
+    const layer = {
+      ...createLayer('Masked', [
+        strokeOp([
+          { x: 10, y: 10 },
+          { x: 30, y: 20 },
+        ]),
+      ]),
+      mask: {
+        enabled: true,
+        strokes: [
+          {
+            id: 'm1',
+            mode: 'hide' as const,
+            points: [{ x: 12, y: 15 }],
+            size: 6,
+            opacity: 1,
+          },
+        ],
+      },
+    };
+    doc = insertLayer(doc, layer);
+    const flipped = transformLayer(doc, layer.id, 'flip-horizontal');
+    expect(flipped.layers[1].mask?.strokes[0].points[0]).toEqual({ x: 28, y: 15 });
+  });
+});

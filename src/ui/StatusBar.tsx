@@ -9,6 +9,8 @@ export function StatusBar() {
   const zoom = useDreamStore((s) => s.zoom);
   const pointerPos = useDreamStore((s) => s.pointerPos);
   const tool = useDreamStore((s) => s.tool);
+  const maskEditing = useDreamStore((s) => s.maskEditing);
+  const maskMode = useDreamStore((s) => s.maskMode);
 
   return (
     <footer className="status-bar">
@@ -18,7 +20,11 @@ export function StatusBar() {
       <span className="status-item">
         {doc.width} × {doc.height}
       </span>
-      <span className="status-item status-tool">{t(`tools.${tool}`)}</span>
+      <span className="status-item status-tool">
+        {maskEditing
+          ? `${t('layers.mask.title')} · ${t(`layers.mask.${maskMode}`)}`
+          : t(`tools.${tool}`)}
+      </span>
       <span className="status-item status-zoom">{Math.round(zoom * 100)}%</span>
     </footer>
   );

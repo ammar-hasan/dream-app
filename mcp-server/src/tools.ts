@@ -35,6 +35,8 @@ import type {
   DreamDocument,
   Layer,
   LayerBlendMode,
+  LayerMaskMode,
+  LayerMaskStroke,
   ShapeKind,
   ShapeOp,
   StrokeOp,
@@ -158,6 +160,7 @@ export interface LayerInfo {
   opacity: number;
   blendMode: LayerBlendMode;
   adjustments: Adjustments;
+  mask: { enabled: boolean; strokes: number } | null;
   locked: boolean;
   operations: number;
 }
@@ -176,6 +179,7 @@ function layerInfo(layer: Layer): LayerInfo {
     opacity: layer.opacity,
     blendMode: layer.blendMode ?? 'normal',
     adjustments: normalizeAdjustments(layer.adjustments),
+    mask: layer.mask ? { enabled: layer.mask.enabled, strokes: layer.mask.strokes.length } : null,
     locked: layer.locked,
     operations: layer.operations.length,
   };
@@ -234,6 +238,8 @@ export interface UpdateLayerOptions {
   opacity?: number;
   blendMode?: string;
   adjustments?: Partial<Adjustments>;
+  /** Add/enable/disable/delete the layer's non-destructive opacity mask. */
+  mask?: 'add' | 'enable' | 'disable' | 'delete';
   locked?: boolean;
   /** New zero-based stack index; 0 is the bottom. */
   index?: number;
@@ -261,12 +267,13 @@ export async function updateLayer(
     options.opacity !== undefined ||
     options.blendMode !== undefined ||
     options.adjustments !== undefined ||
+    options.mask !== undefined ||
     options.locked !== undefined ||
     options.index !== undefined;
   if (!hasUpdate) throw new Error('Provide at least one layer property to update');
 
   const patch: Partial<
-    Pick<Layer, 'name' | 'visible' | 'opacity' | 'blendMode' | 'adjustments' | 'locked'>
+    Pick<Layer, 'name' | 'visible' | 'opacity' | 'blendMode' | 'adjustments' | 'mask' | 'locked'>
   > = {};
   if (options.name !== undefined) {
     const name = options.name.trim();
@@ -306,6 +313,19 @@ export async function updateLayer(
       adjustments[key] = value;
     }
     patch.adjustments = adjustments;
+  }
+  if (options.mask !== undefined) {
+    if (layer.locked) throw new Error('Cannot change the mask of a locked layer');
+    if (!['add', 'enable', 'disable', 'delete'].includes(options.mask)) {
+      throw new Error('mask must be add, enable, disable or delete');
+    }
+    if (options.mask === 'delete') patch.mask = undefined;
+    else if (options.mask === 'add' || options.mask === 'enable') {
+      patch.mask = { ...(layer.mask ?? { strokes: [] }), enabled: true };
+    } else {
+      if (!layer.mask) throw new Error('Cannot disable a layer without a mask');
+      patch.mask = { ...layer.mask, enabled: false };
+    }
   }
   if (
     options.index !== undefined &&
@@ -393,6 +413,22 @@ export interface AddStrokeOptions {
   layer?: string;
 }
 
+export interface AddMaskStrokeOptions {
+  points: StrokePointInput[];
+  mode?: LayerMaskMode;
+  size?: number;
+  opacity?: number;
+  /** Layer id or name; default: the top layer of the active frame. */
+  layer?: string;
+}
+
+export interface AddMaskStrokeResult {
+  maskStrokeId: string;
+  layerId: string;
+  layerName: string;
+  strokes: number;
+}
+
 const MAX_STROKE_POINTS = 10_000;
 
 /** dream.add_stroke — append an ordinary freehand stroke to a layer. */
@@ -461,6 +497,74 @@ export async function addStroke(
   }
   await saveProject(projectPath, appendOperation(doc, layer.id, op));
   return { opId: op.id, layerId: layer.id, layerName: layer.name };
+}
+
+/** dream.add_mask_stroke — add or extend a layer's editable opacity mask. */
+export async function addMaskStroke(
+  projectPath: string,
+  options: AddMaskStrokeOptions,
+): Promise<AddMaskStrokeResult> {
+  if (!Array.isArray(options.points) || options.points.length < 2) {
+    throw new Error('points must contain at least 2 samples');
+  }
+  if (options.points.length > MAX_STROKE_POINTS) {
+    throw new Error(`points must contain at most ${MAX_STROKE_POINTS} samples`);
+  }
+  for (const [index, point] of options.points.entries()) {
+    if (!point || !Number.isFinite(point.x) || !Number.isFinite(point.y)) {
+      throw new Error(`point ${index} coordinates must be finite`);
+    }
+    if (
+      point.pressure !== undefined &&
+      (!Number.isFinite(point.pressure) || point.pressure < 0 || point.pressure > 1)
+    ) {
+      throw new Error(`point ${index} pressure must be between 0 and 1`);
+    }
+  }
+  const mode = options.mode ?? 'hide';
+  if (mode !== 'hide' && mode !== 'reveal') throw new Error('mode must be hide or reveal');
+  const size = options.size ?? DEFAULT_SETTINGS.size;
+  if (!Number.isFinite(size) || size <= 0 || size > MAX_DIMENSION) {
+    throw new Error(`size must be greater than 0 and at most ${MAX_DIMENSION}`);
+  }
+  const opacity = options.opacity ?? 1;
+  if (!Number.isFinite(opacity) || opacity < 0 || opacity > 1) {
+    throw new Error('opacity must be between 0 and 1');
+  }
+
+  const doc = await loadProject(projectPath);
+  const layer = options.layer
+    ? doc.layers.find(
+        (candidate) => candidate.id === options.layer || candidate.name === options.layer,
+      )
+    : doc.layers[doc.layers.length - 1];
+  if (!layer) {
+    throw new Error(
+      options.layer
+        ? `No layer with id or name "${options.layer}" in the active frame`
+        : 'The document has no layers',
+    );
+  }
+  if (layer.locked) throw new Error('Cannot paint the mask of a locked layer');
+  const stroke: LayerMaskStroke = {
+    id: genId('mask'),
+    mode,
+    points: options.points.map(({ x, y }) => ({ x, y })),
+    size,
+    opacity,
+  };
+  if (options.points.some((point) => point.pressure !== undefined)) {
+    stroke.widths = options.points.map((point) => pressureWidth(point.pressure ?? 1));
+  }
+  const mask = layer.mask ?? { enabled: true, strokes: [] };
+  const updatedMask = { ...mask, enabled: true, strokes: [...mask.strokes, stroke] };
+  await saveProject(projectPath, updateLayerProps(doc, layer.id, { mask: updatedMask }));
+  return {
+    maskStrokeId: stroke.id,
+    layerId: layer.id,
+    layerName: layer.name,
+    strokes: updatedMask.strokes.length,
+  };
 }
 
 /** dream.add_text — append a text operation to a layer. Pure document edit. */

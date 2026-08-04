@@ -25,6 +25,7 @@
  */
 
 import { normalizeAdjustments } from './filters';
+import { normalizeLayerMask } from './masks';
 import { isLayerBlendMode } from './types';
 import type { DreamDocument, Layer, Operation, RasterPatch } from './types';
 
@@ -177,6 +178,7 @@ async function deserializeLayers(layers: unknown, codec: RasterCodec): Promise<L
         ...layer,
         blendMode: isLayerBlendMode(layer.blendMode) ? layer.blendMode : 'normal',
         adjustments: normalizeAdjustments(layer.adjustments),
+        mask: normalizeLayerMask(layer.mask),
         operations: await Promise.all(
           layer.operations.map((op) => deserializeOperation(op, codec)),
         ),

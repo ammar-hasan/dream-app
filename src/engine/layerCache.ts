@@ -4,7 +4,7 @@
  * Redrawing a big document on every pointermove (stroke previews, pan, zoom)
  * re-issues every operation; this cache keeps one offscreen bitmap per layer
  * and only re-renders a layer when its content actually changed — immutable
- * updates mean a new `operations`/adjustments reference or a new opacity — then
+ * updates mean a new `operations`/adjustments/mask reference or a new opacity — then
  * composites the bitmaps with one `drawImage` per layer.
  *
  * DOM-free like the rest of the engine: bitmap canvases come from the
@@ -35,6 +35,7 @@ interface LayerEntry {
   operations: Layer['operations'];
   opacity: number;
   adjustments: Layer['adjustments'];
+  mask: Layer['mask'];
   canvas: CanvasLike;
 }
 
@@ -162,7 +163,8 @@ export class LayerCache {
       hit &&
       hit.operations === layer.operations &&
       hit.opacity === layer.opacity &&
-      hit.adjustments === layer.adjustments
+      hit.adjustments === layer.adjustments &&
+      hit.mask === layer.mask
     ) {
       // LRU: re-insert to mark as most recently used.
       this.entries.delete(layer.id);
@@ -174,6 +176,7 @@ export class LayerCache {
       operations: layer.operations,
       opacity: layer.opacity,
       adjustments: layer.adjustments,
+      mask: layer.mask,
       canvas,
     };
     this.deleteEntry(layer.id);

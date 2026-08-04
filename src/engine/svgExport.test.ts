@@ -114,6 +114,31 @@ describe('SVG export', () => {
     expect(() => buildSvg(doc)).toThrow(/vector-safe/);
   });
 
+  it('refuses an active painted mask rather than omitting its visible effect', () => {
+    const doc = withOps([]);
+    doc.layers[0] = {
+      ...doc.layers[0],
+      mask: {
+        enabled: true,
+        strokes: [
+          {
+            id: 'm1',
+            mode: 'hide',
+            points: [
+              { x: 1, y: 1 },
+              { x: 4, y: 4 },
+            ],
+            size: 6,
+            opacity: 1,
+          },
+        ],
+      },
+    };
+    expect(canExportSvg(doc)).toBe(false);
+    doc.layers[0] = { ...doc.layers[0], mask: { ...doc.layers[0].mask!, enabled: false } };
+    expect(canExportSvg(doc)).toBe(true);
+  });
+
   it('refuses visible pixel content or erasers but ignores hidden unsupported layers', () => {
     const fill: Operation = {
       kind: 'fill',

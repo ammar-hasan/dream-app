@@ -1493,6 +1493,60 @@ body {
   justify-content: flex-end;
 }
 
+.layer-mask-add {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.layer-mask-controls {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.layer-mask-heading,
+.layer-mask-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.layer-mask-heading {
+  font-weight: 650;
+}
+
+.layer-mask-count,
+.layer-mask-hint {
+  color: var(--text-dim);
+  font-size: 12px;
+}
+
+.layer-mask-hint {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.layer-mask-target {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.layer-mask-target .btn[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+
+.layer-mask-footer .toggle-label {
+  margin: 0;
+}
+
 /* --- Status bar (bottom) ------------------------------------------------- */
 
 .status-bar {

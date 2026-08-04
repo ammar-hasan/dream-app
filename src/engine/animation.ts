@@ -77,6 +77,14 @@ export function cloneFrame(frame: Frame): Frame {
       ...layer,
       id: genId('layer'),
       operations: layer.operations.map(cloneOp),
+      ...(layer.mask
+        ? {
+            mask: {
+              ...layer.mask,
+              strokes: layer.mask.strokes.map((stroke) => cloneOp(stroke)),
+            },
+          }
+        : {}),
     })),
   };
 }

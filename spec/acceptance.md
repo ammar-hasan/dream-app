@@ -726,6 +726,16 @@ holds.
       THEN the same visible Steady stroke control becomes 60% or 0%, the
       announced result names the change, only future Brush, Pencil and Eraser
       marks are affected, and no document change or Undo step is created.
+185.  GIVEN an editable active layer in Design WHEN a person adds a mask THEN
+      the picture is unchanged and Artwork/Mask plus Hide/Reveal identify the
+      target before drawing. A Hide or Reveal gesture previews the exact
+      release result, changes only layer visibility, and is one undoable step;
+      disabling or deleting the mask restores the untouched artwork and is
+      independently undoable. Locked layers refuse mask changes. The mask
+      follows layer/document transforms, survives frames and `.dream`
+      save/open, is available to agent read/write, and affects every raster,
+      animation, presentation and prototype result; visible painted masks
+      refuse a misleading scalable export.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 
@@ -736,8 +746,10 @@ holds.
 2. **Victor (85):** comfort mode on → everything bigger and calmer → say
    “steady my stroke” and see the control change → draw with reduced wobble →
    undo → save → reopen tomorrow: the drawing is there.
-3. **Ali (30):** choose and tune a brush preset including Steady stroke → stylus pressure strokes → layers → import a photo →
-   Vintage preset → crop → export JPEG q92.
+3. **Ali (30):** choose and tune a brush preset including Steady stroke →
+   stylus pressure strokes → add a non-destructive layer mask → hide and reveal
+   an edge without erasing the strokes → import a photo → Vintage preset →
+   crop → export JPEG q92.
 4. **Fatima (21):** Persian UI → full RTL → choose the steady Calligraphy nib →
    tune its path and draw thick/thin lettering with mirror symmetry on → add Persian-script
    text → one undo removes the whole mirrored bloom.

@@ -57,6 +57,22 @@ function richDocument(): DreamDocument {
         opacity: 0.8,
         blendMode: 'multiply',
         adjustments: { ...DEFAULT_ADJUSTMENTS, contrast: 12 },
+        mask: {
+          enabled: true,
+          strokes: [
+            {
+              id: 'mask-stroke-1',
+              mode: 'hide',
+              points: [
+                { x: 4, y: 5 },
+                { x: 8, y: 9 },
+              ],
+              size: 14,
+              opacity: 0.8,
+              widths: [0.5, 1],
+            },
+          ],
+        },
         locked: false,
         operations: [
           {

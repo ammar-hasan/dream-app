@@ -237,7 +237,9 @@ and the language picker.
 - Comfort mode: a senior-friendly settings toggle — larger text/targets and
   higher-contrast tokens, composing with dark theme, kid mode and RTL
 - Layers: add, delete, rename, reorder, visibility, opacity, Design-only blend
-  mode, editable adjustments, lock — all undoable
+  mode, editable adjustments and painted hide/reveal masks, lock — all undoable.
+  Mask editing names Artwork/Mask and Hide/Reveal before the crosshair touches
+  the canvas; disabling or deleting a mask restores the untouched operations.
 - Image import: file picker, drag-and-drop onto the canvas, or paste from the
   clipboard — each image lands centered on its own layer (scaled down to fit);
   valid image/component drags and invalid content get distinct named targets
@@ -689,9 +691,9 @@ canvas codec (`src/ui/dreamFile.ts`), Node plugs in `@napi-rs/canvas`.
 `mcp-server/` is a standalone Node package (not part of the webapp build)
 exposing `.dream` files to agents over stdio MCP: `dream.read_project`,
 `dream.create_project`, `dream.list_layers`, `dream.add_layer`,
-`dream.update_layer`, `dream.remove_layer`, `dream.add_stroke`, `dream.add_text`,
-`dream.add_shape`, `dream.render_png` (real PNGs via `@napi-rs/canvas`) and
-`dream.export_app`.
+`dream.update_layer`, `dream.remove_layer`, `dream.add_stroke`,
+`dream.add_mask_stroke`, `dream.add_text`, `dream.add_shape`, `dream.render_png`
+(real PNGs via `@napi-rs/canvas`) and `dream.export_app`.
 Setup and client config (Claude Code, Codex) are in
 [`mcp-server/README.md`](mcp-server/README.md); `npm run check:mcp` from the
 repo root installs, builds and tests it. The repo also ships a root
@@ -783,6 +785,7 @@ src/
     symmetry.ts      Mirror mode: reflect stroke/shape ops across the center axes
     spray.ts         Seeded PRNG + deterministic spray-dot layout
     filters.ts       Pure pixel filters/adjustments over RGBA buffers (+ convolution)
+    masks.ts         Layer-mask creation and portable-data normalization
     transform.ts     Flip/rotate/translate/crop/resize for buffers, layers, documents
     selection.ts     Design mode: hit-testing, marquee, lasso, move/scale/rotate math,
                      snapping, align/distribute, groups, component factories

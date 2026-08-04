@@ -39,6 +39,8 @@ rebuilds).
 - A layer without `adjustments` is older/default content and reads with every
   adjustment at zero. Missing or non-numeric settings recover to zero; numeric
   settings outside their documented range recover to the nearest valid value.
+- A layer without `mask` is fully revealed. A saved mask retains its enabled
+  state and ordered hide/reveal strokes without rasterizing the layer content.
 
 ## Reader validation
 

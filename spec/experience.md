@@ -46,6 +46,10 @@ together on screen.
   sheets close on Escape and return focus to their trigger. Little Dreamer's
   larger reading-light rail is unchanged.
 - **Right panel:** tool options, plus per mode (matrix below).
+- In Design, the active layer's mask controls keep **Artwork / Mask** and
+  **Hide / Reveal** as explicit segmented choices. Mask editing uses a
+  crosshair, and the status bar repeats the active target and action so the
+  canvas never silently redirects a brush stroke.
 - **Bottom:** the timeline bar (when frames exist) and the status bar
   (pointer x,y · document size · active tool · zoom %).
 - **Floating zoom pill** at the bottom-end of the canvas: −, % (tap to
