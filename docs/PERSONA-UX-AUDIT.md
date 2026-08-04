@@ -286,7 +286,8 @@ is a refusal to confuse breadth with completion.
    post-component-drop selection, compact pointer ghosts and exact-scale
    component placement previews, exact in-stack previews for every live layer
    edit, a named keyboard/pointer Insert alternative and angle/constraint
-   feedback during rotation are coherent. Selection snaps
+   feedback during rotation are coherent. Paint and mask pointers now show the
+   exact current diameter with a contrast-safe center. Selection snaps
    now combine the existing exact guide with compact pointer-side and optional
    tactile confirmation. Multi-item progress remains.
 8. **Long-work control has begun, but is not yet consistent.** Create, Edit,

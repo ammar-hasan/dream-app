@@ -166,6 +166,12 @@ Modern interaction craft should make state legible rather than add spectacle:
   pan, resize/rotate, copy/link and not-allowed states should follow the active
   interaction rather than remain a static cursor per tool.
   (https://developer.apple.com/design/human-interface-guidelines/pointing-devices)
+- **Paint cursors disclose the footprint, not merely the tool.** Dream applies
+  the predictive-pointer principle to media tools with an exact-diameter,
+  two-contrast ring and center point. It updates with size and zoom, remains
+  readable on light or dark artwork and disappears without touching the work;
+  this serves motor confidence and professional precision without animation or
+  continuous haptics.
 - **Stroke assistance must be visible and optional.** Procreate exposes
   stabilization as both a professional brush property and a global
   accessibility aid, with stronger settings trading natural texture for

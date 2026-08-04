@@ -44,6 +44,7 @@ import { activeComponentDrag, endComponentDrag, onComponentDragEnd } from './com
 const ACCENT = '#6d7cff';
 const HANDLE_PX = 10;
 const ROTATE_GAP_PX = 22;
+const FOOTPRINT_TOOLS = new Set(['brush', 'pencil', 'eraser', 'spray']);
 
 type SelectHover =
   | { kind: 'object'; opId: string }
@@ -100,6 +101,8 @@ export function CanvasViewport() {
   const activeLayerId = useDreamStore((s) => s.activeLayerId);
   const mode = useDreamStore((s) => s.mode);
   const tool = useDreamStore((s) => s.tool);
+  const settings = useDreamStore((s) => s.settings);
+  const pointerPos = useDreamStore((s) => s.pointerPos);
   const previewOp = useDreamStore((s) => s.previewOp);
   const pendingText = useDreamStore((s) => s.pendingText);
   const moveDraft = useDreamStore((s) => s.moveDraft);
@@ -556,6 +559,41 @@ export function CanvasViewport() {
       for (const hotspot of activeHotspots(doc)) drawHotspot(hotspot.rect, true);
       if (linkDraft) drawHotspot(normalizeRect(linkDraft.from, linkDraft.to), false);
     }
+
+    // Modern paint tools disclose their exact footprint before the mark lands.
+    // Two contrast rings stay legible over both light and dark artwork; the
+    // tiny center dot keeps very fine brushes locatable without inflating size.
+    const showFootprint =
+      !playing &&
+      pointerPos &&
+      (maskEditing || FOOTPRINT_TOOLS.has(tool)) &&
+      !activeLayer?.locked &&
+      activeLayer?.visible !== false &&
+      pointerPos.x >= 0 &&
+      pointerPos.y >= 0 &&
+      pointerPos.x <= doc.width &&
+      pointerPos.y <= doc.height;
+    if (showFootprint) {
+      const radius = settings.size / 2;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(pointerPos.x, pointerPos.y, radius, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.92)';
+      ctx.lineWidth = 2.5 / zoom;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(pointerPos.x, pointerPos.y, radius, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(35, 40, 56, 0.9)';
+      ctx.lineWidth = 1 / zoom;
+      ctx.stroke();
+      if (!previewOp) {
+        ctx.beginPath();
+        ctx.arc(pointerPos.x, pointerPos.y, 1.25 / zoom, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(35, 40, 56, 0.9)';
+        ctx.fill();
+      }
+      ctx.restore();
+    }
     ctx.restore();
   });
 
@@ -881,33 +919,45 @@ export function CanvasViewport() {
     }
     return 'default';
   })();
+  const pointerLayer = doc.layers.find((layer) => layer.id === activeLayerId);
+  const pointerLayerEditable = !!pointerLayer && !pointerLayer.locked && pointerLayer.visible;
+  const footprintCursor =
+    pointerPos &&
+    (maskEditing || FOOTPRINT_TOOLS.has(tool)) &&
+    pointerLayerEditable &&
+    pointerPos.x >= 0 &&
+    pointerPos.y >= 0 &&
+    pointerPos.x <= doc.width &&
+    pointerPos.y <= doc.height;
   const cursor = playing
     ? 'default'
     : panning
       ? 'grabbing'
-      : maskEditing
-        ? 'crosshair'
-        : tool === 'pan' || spacePanning
-          ? 'grab'
-          : tool === 'text'
-            ? 'text'
-            : tool === 'move'
-              ? moveDraft
-                ? 'grabbing'
-                : 'grab'
-              : tool === 'wand' && wandDrag
-                ? 'grabbing'
-                : tool === 'select'
-                  ? selectCursor
-                  : tool === 'zoom'
-                    ? zoomingOut
-                      ? 'zoom-out'
-                      : 'zoom-in'
-                    : tool === 'fill'
-                      ? 'cell'
-                      : tool === 'stamp'
-                        ? 'copy'
-                        : 'crosshair';
+      : footprintCursor
+        ? 'none'
+        : maskEditing
+          ? 'crosshair'
+          : tool === 'pan' || spacePanning
+            ? 'grab'
+            : tool === 'text'
+              ? 'text'
+              : tool === 'move'
+                ? moveDraft
+                  ? 'grabbing'
+                  : 'grab'
+                : tool === 'wand' && wandDrag
+                  ? 'grabbing'
+                  : tool === 'select'
+                    ? selectCursor
+                    : tool === 'zoom'
+                      ? zoomingOut
+                        ? 'zoom-out'
+                        : 'zoom-in'
+                      : tool === 'fill'
+                        ? 'cell'
+                        : tool === 'stamp'
+                          ? 'copy'
+                          : 'crosshair';
 
   const dropKind = (transfer: DataTransfer): DropFeedback => {
     if (transfer.types.includes('application/x-dream-component')) return 'component';

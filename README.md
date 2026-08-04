@@ -225,6 +225,8 @@ and the language picker.
   “steady my stroke” and “natural stroke” reach the same visible setting by
   voice or typed command.
 - Spray (airbrush) with a density slider; deterministic per-stroke seeds
+- Brush, Pencil, Eraser, Spray and mask painting show a high-contrast exact-size
+  footprint under a hovering mouse or pen before any mark lands
 - Line, rectangle and ellipse tools with Shift-to-constrain (45° lines,
   squares, circles), plain/arrow/two-way line ends, and an optional fill-shapes
   mode (filled with the current color)

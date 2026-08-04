@@ -1680,6 +1680,22 @@ layer while keeping the original strokes, pixels and editable effects intact.
 - ✅ Full release gates remain green: 905 unit tests, 97.12% engine coverage,
   62 browser journeys, 26 MCP tests and four honest agent evals.
 
+## Slice 76 — Exact paint-tool footprint ✅
+
+Persona need: let Ali and Fatima place media precisely and let Victor see the
+motor consequence of a size choice before committing a mark.
+
+- ✅ Brush, Pencil, Eraser, Spray and layer-mask painting show the exact current
+  diameter under a hovering pointer, with concentric light/dark rings and a
+  center point that remain visible over any artwork.
+- ✅ The footprint responds immediately to size and zoom, appears only inside
+  the document on an editable layer, disappears on leave and creates no
+  document, history, haptic or export side effect.
+- ✅ A production-browser journey observes the custom pointer, visible center
+  feedback and pristine-canvas restoration after leave.
+- ✅ Full release gates remain green: 905 unit tests, 97.12% engine coverage,
+  63 browser journeys, 26 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the

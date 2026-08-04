@@ -129,6 +129,9 @@ Text `#0f141f` / `#ffffff`, dim text `#454d61` / `#ccd4e8`, borders
    content, diagonal resize at corner handles, text for type, zoom-in/out for
    zoom, and refusal where the active layer cannot change. Hover chrome is a
    lighter preview of the same accent selection box that appears after click.
+   Brush, Pencil, Eraser, Spray and layer-mask painting show the exact current
+   diameter as concentric light/dark rings with a small center point, so the
+   footprint remains legible over any artwork without pretending to be larger.
 8. A drag entering the canvas gets immediate valid/invalid target emphasis and
    a short result label. The feedback disappears on leave or drop and never
    relies on color alone.

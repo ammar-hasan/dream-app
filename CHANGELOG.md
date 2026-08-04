@@ -7,6 +7,11 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Exact paint-tool footprint** (slice 76): Brush, Pencil, Eraser, Spray and
+  layer-mask painting now replace the generic pointer over the document with a
+  high-contrast exact-diameter ring and center point. It responds to size/zoom,
+  vanishes on leave and never enters history or exports.
+
 - **Non-destructive layer masks** (slice 75): Design now offers explicit
   Artwork/Mask and Hide/Reveal targets for pressure-aware painted masks. The
   exact live preview, one-step Undo, enable/delete recovery, transforms,

@@ -736,6 +736,11 @@ holds.
       save/open, is available to agent read/write, and affects every raster,
       animation, presentation and prototype result; visible painted masks
       refuse a misleading scalable export.
+186.  GIVEN Brush, Pencil, Eraser, Spray or layer-mask painting WHEN a hovering
+      pointer enters the document THEN a high-contrast ring shows the exact
+      current diameter and center before drawing. Changing size or zoom updates
+      it immediately; leaving the document restores the ordinary pointer and
+      pristine canvas, and the guide creates no history or export content.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

@@ -20,6 +20,29 @@ test('a brush stroke paints pixels onto the canvas', async ({ page }) => {
   await expect(page.locator('.hint-card')).toHaveCount(0);
 });
 
+test('paint tools preview their exact footprint before drawing', async ({ page }) => {
+  await bootApp(page);
+  const canvas = page.locator('.viewport-canvas');
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('viewport canvas has no box');
+  const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  const centerPixel = () =>
+    canvas.evaluate((element) => {
+      const target = element as HTMLCanvasElement;
+      const context = target.getContext('2d');
+      if (!context) throw new Error('no 2d context');
+      return Array.from(context.getImageData(target.width / 2, target.height / 2, 1, 1).data);
+    });
+
+  await page.mouse.move(center.x, center.y);
+  await expect(canvas).toHaveCSS('cursor', 'none');
+  await expect.poll(centerPixel).not.toEqual([255, 255, 255, 255]);
+
+  await page.mouse.move(box.x - 10, box.y - 10);
+  await expect(canvas).toHaveCSS('cursor', 'crosshair');
+  await expect.poll(centerPixel).toEqual([255, 255, 255, 255]);
+});
+
 test('the first drawing offers one direct, undo-safe path into editing', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {
@@ -227,6 +250,8 @@ test('Design blend modes visibly combine layers and undo exactly', async ({ page
   await page.mouse.move(center.x + 50, center.y, { steps: 8 });
   await expect.poll(() => sampleAt(50, 0)).toEqual([0, 0, 0, 255]);
   await page.mouse.up();
+  // Move predictive pointer chrome away before inspecting committed pixels.
+  await page.mouse.move(center.x + 120, center.y + 120);
   await expect.poll(() => sampleAt(50, 0)).toEqual([0, 0, 0, 255]);
 
   // Undo removes the new stroke without changing the persistent blend.

@@ -17,6 +17,12 @@ feels immediate on a 5-year-old's tablet and a pro's pen display alike.
 5. The color UI offers a 16-color palette, a custom color picker, and a
    recent-colors row (last 8, newest first, persisted per user).
 6. Locked or hidden layers reject edits; the status area says why.
+7. On a hovering pointer, Brush, Pencil, Eraser and Spray replace the generic
+   cursor over the document with a high-contrast ring at the exact current
+   diameter plus a small center point. It follows the pointer without lag,
+   disappears on leave, never enters history and never becomes part of an
+   export. Once drawing begins the ring remains but the center point gets out
+   of the live mark's way. Layer-mask painting uses the same footprint.
 
 ## The tools
 
