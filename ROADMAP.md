@@ -1784,7 +1784,9 @@ colors as real design tokens instead of a flat recent-colors palette.
 - ✅ Pure resolution, store commands, layer-cache invalidation, rendered
   controls and a production-browser journey prove live edits, clean severing
   and zero export drift.
-- ✅ Full release gates: pending final verification.
+- ✅ Full release gates remain green: 930 unit tests, 97.32% engine coverage,
+  66 browser journeys, 30 MCP tests and four honest agent evals. Deployed and
+  byte-verified against the local Pages build.
 
 ## Strict 10/10 priority sequence
 
