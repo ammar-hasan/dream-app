@@ -42,7 +42,7 @@ const TOOLS: Tool[] = [
   {
     name: 'dream.read_project',
     description:
-      'Read a .dream project file and return a summary: size, background, named project colors, mode, layer/frame counts, hotspots (incl. broken ones), operation counts per kind, game setup.',
+      'Read a .dream project file and return a summary: size, background, named project colors with normal-text contrast guidance, mode, layer/frame counts, hotspots (incl. broken ones), operation counts per kind, game setup.',
     inputSchema: {
       type: 'object',
       properties: { path: string('Path to the .dream file') },

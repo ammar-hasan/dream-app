@@ -89,8 +89,10 @@ describe('dream-mcp tools', () => {
       value: '#ABC',
     });
     expect(added).toMatchObject({ name: 'Brand ink', value: '#aabbcc', index: 0 });
-    expect((await readProject(projectPath)).projectColors).toEqual([
-      { id: added.id, name: 'Brand ink', value: '#aabbcc' },
+    const summary = await readProject(projectPath);
+    expect(summary.projectColors).toEqual([{ id: added.id, name: 'Brand ink', value: '#aabbcc' }]);
+    expect(summary.projectColorTextContrast).toEqual([
+      { id: added.id, ratio: 8.41, aaNormalText: true },
     ]);
 
     const updated = await setProjectColor(projectPath, {

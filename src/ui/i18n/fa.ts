@@ -139,6 +139,11 @@ export const fa: Record<string, string> = {
   'options.projectColorChange': 'تغییر {name}',
   'options.projectColorDelete': 'حذف {name}',
   'options.projectColorRemove': 'حذف',
+  'options.projectColorContrast': 'کنتراست متن {ratio}:1',
+  'options.projectColorContrastAA': 'AA',
+  'options.projectColorContrastLow': 'کمتر از AA',
+  'options.projectColorContrastLabel':
+    '{name}: کنتراست متن عادی با پس‌زمینهٔ بوم {ratio} به ۱ است، {status}',
   'options.size': 'اندازه',
   'options.stabilization': 'تثبیت خط',
   'options.brushStyle': 'نوک قلم‌مو',

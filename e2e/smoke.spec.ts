@@ -47,6 +47,7 @@ test('named project colors stay exact, selectable and undoable', async ({ page }
   await bootApp(page);
   await page.getByLabel('Custom color').fill('#123456');
   await page.getByRole('button', { name: 'Save current' }).click();
+  await expect(page.getByText('Text 12.72:1 · AA')).toBeVisible();
 
   const name = page.getByRole('textbox', { name: 'Rename Color 1' });
   await expect(name).toHaveValue('Color 1');
@@ -57,6 +58,7 @@ test('named project colors stay exact, selectable and undoable', async ({ page }
   await expect(value).toHaveValue('#123456');
   await value.fill('#654321');
   await value.press('Tab');
+  await expect(page.getByText('Text 8.83:1 · AA')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Use Brand ink' })).toBeVisible();
 
   await page.getByRole('button', { name: 'Color #dc2626' }).click();

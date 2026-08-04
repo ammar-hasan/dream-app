@@ -181,6 +181,13 @@ Modern interaction craft should make state legible rather than add spectacle:
   rather than an implicit side effect.
   (https://help.figma.com/hc/en-us/articles/360039238753-Create-color-text-effect-and-layout-grid-styles ·
   https://help.figma.com/hc/en-us/articles/15339657135383-Guide-to-variables-in-Figma)
+- **Contrast guidance must name both its target and its limits.** A useful
+  palette row can answer “will ordinary text read on this canvas?” with the
+  exact ratio and a redundant AA/Below AA label. Dream uses the full 4.5:1
+  normal-text threshold even when the displayed two-decimal value is near the
+  boundary, and does not turn that result into a blanket accessibility badge
+  for artwork, transparency, large type, color vision or print.
+  (https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html)
 - **Stroke assistance must be visible and optional.** Procreate exposes
   stabilization as both a professional brush property and a global
   accessibility aid, with stronger settings trading natural texture for

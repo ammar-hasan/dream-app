@@ -144,6 +144,11 @@ export const ar: Record<string, string> = {
   'options.projectColorChange': 'غيّر {name}',
   'options.projectColorDelete': 'احذف {name}',
   'options.projectColorRemove': 'إزالة',
+  'options.projectColorContrast': 'تباين النص {ratio}:1',
+  'options.projectColorContrastAA': 'AA',
+  'options.projectColorContrastLow': 'أقل من AA',
+  'options.projectColorContrastLabel':
+    '{name}: تباين النص العادي مع خلفية اللوحة هو {ratio} إلى 1، {status}',
   'options.size': 'الحجم',
   'options.stabilization': 'تثبيت الخط',
   'options.brushStyle': 'رأس الفرشاة',

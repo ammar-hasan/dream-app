@@ -216,7 +216,8 @@ and the language picker.
 ## What works today
 
 - Brush, pencil, eraser with adjustable size, color (palette + custom + a
-  device-local recent-colors row + up to 24 portable named project colors)
+  device-local recent-colors row + up to 24 portable named project colors with
+  normal-text contrast guidance against the canvas background)
   and opacity — with per-point pen pressure on a stylus;
   Brush also offers a fixed-angle Calligraphy nib for directional thick/thin
   marks using mouse, touch or pen, plus Fine ink, Soft marker, Bold paint and

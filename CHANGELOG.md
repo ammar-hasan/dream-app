@@ -7,6 +7,13 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Scoped project-color contrast guidance** (slice 78): every portable named
+  color now shows its exact normal-text contrast against the current canvas
+  background with an explicit AA or Below AA label. The unrounded 4.5:1
+  threshold prevents boundary rounding errors, all six locales share the
+  visible contract, and agent summaries expose the same derived facts without
+  overstating the result as an artwork, color-vision or print certification.
+
 - **Portable named project colors** (slice 77): color-capable tools can save
   the current color under an editable project name, select, replace or remove
   up to 24 swatches with exact Undo and `.dream` persistence. Device-local

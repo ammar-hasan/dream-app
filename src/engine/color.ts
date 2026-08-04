@@ -71,6 +71,23 @@ export function rgbaToHex(r: number, g: number, b: number): Color {
   return `#${to(r)}${to(g)}${to(b)}`;
 }
 
+/** WCAG contrast ratio between two opaque sRGB colors (1..21), or null if invalid. */
+export function contrastRatio(foreground: Color, background: Color): number | null {
+  const foregroundRgba = hexToRgba(foreground);
+  const backgroundRgba = hexToRgba(background);
+  if (!foregroundRgba || !backgroundRgba) return null;
+  const luminance = ({ r, g, b }: Rgba) => {
+    const linear = (channel: number) => {
+      const value = channel / 255;
+      return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+    };
+    return 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b);
+  };
+  const lighter = Math.max(luminance(foregroundRgba), luminance(backgroundRgba));
+  const darker = Math.min(luminance(foregroundRgba), luminance(backgroundRgba));
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
 /** CSS color string for canvas styles, with an opacity multiplier (0..1). */
 export function cssColor(hex: Color, opacity = 1): string {
   const rgba = hexToRgba(hex) ?? { r: 0, g: 0, b: 0, a: 255 };

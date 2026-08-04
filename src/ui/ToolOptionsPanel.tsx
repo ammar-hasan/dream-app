@@ -1,7 +1,13 @@
 /** Right panel, top half: options for the active tool. */
 
 import { useEffect, useState } from 'react';
-import { MAX_PROJECT_COLORS, MAX_PROJECT_COLOR_NAME, normalizeHex, PALETTE } from '../engine/color';
+import {
+  contrastRatio,
+  MAX_PROJECT_COLORS,
+  MAX_PROJECT_COLOR_NAME,
+  normalizeHex,
+  PALETTE,
+} from '../engine/color';
 import { SYMMETRY_TOOLS, type SymmetryMode } from '../engine/symmetry';
 import type { ProjectColor } from '../engine/types';
 import { useDreamStore } from '../store/dreamStore';
@@ -82,13 +88,27 @@ const BRUSH_PRESETS = [
   },
 ] as const;
 
-function ProjectColorRow({ color, active }: { color: ProjectColor; active: boolean }) {
+function ProjectColorRow({
+  color,
+  background,
+  active,
+}: {
+  color: ProjectColor;
+  background: string;
+  active: boolean;
+}) {
   const t = useT();
   const setColor = useDreamStore((s) => s.setColor);
   const updateProjectColor = useDreamStore((s) => s.updateProjectColor);
   const deleteProjectColor = useDreamStore((s) => s.deleteProjectColor);
   const [name, setName] = useState(color.name);
   const [value, setValue] = useState(color.value);
+  const ratio = contrastRatio(color.value, background) ?? 1;
+  const ratioText = ratio.toFixed(2);
+  const meetsNormalTextAA = ratio >= 4.5;
+  const contrastStatus = t(
+    meetsNormalTextAA ? 'options.projectColorContrastAA' : 'options.projectColorContrastLow',
+  );
 
   useEffect(() => setName(color.name), [color.name]);
   useEffect(() => setValue(color.value), [color.value]);
@@ -146,6 +166,16 @@ function ProjectColorRow({ color, active }: { color: ProjectColor; active: boole
       >
         {t('options.projectColorRemove')}
       </button>
+      <span
+        className={`project-color-contrast ${meetsNormalTextAA ? 'pass' : 'low'}`}
+        aria-label={t('options.projectColorContrastLabel', {
+          name: color.name,
+          ratio: ratioText,
+          status: contrastStatus,
+        })}
+      >
+        {t('options.projectColorContrast', { ratio: ratioText })} · {contrastStatus}
+      </span>
     </div>
   );
 }
@@ -167,6 +197,7 @@ export function ToolOptionsPanel() {
   const wandDraft = useDreamStore((s) => s.wandDraft);
   const wandTolerance = useDreamStore((s) => s.wandTolerance);
   const savedProjectColors = useDreamStore((s) => s.doc.projectColors);
+  const background = useDreamStore((s) => s.doc.background);
   const projectColors = savedProjectColors ?? [];
   const addProjectColor = useDreamStore((s) => s.addProjectColor);
   const recentColors = useUiPrefs((s) => s.recentColors);
@@ -268,6 +299,7 @@ export function ToolOptionsPanel() {
               <ProjectColorRow
                 key={color.id}
                 color={color}
+                background={background}
                 active={settings.color === color.value}
               />
             ))}

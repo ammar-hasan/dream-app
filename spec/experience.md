@@ -48,7 +48,9 @@ together on screen.
 - **Right panel:** tool options, plus per mode (matrix below). Color-capable
   tools keep device-local Recent colors visually separate from portable
   **Project colors**; Save current creates a named row whose swatch selects it
-  and whose name, exact value and removal stay directly editable.
+  and whose name, exact value and removal stay directly editable. A compact
+  second line gives the exact normal-text contrast against the current canvas
+  background and says AA or Below AA in words, never by color alone.
 - In Design, the active layer's mask controls keep **Artwork / Mask** and
   **Hide / Reveal** as explicit segmented choices. Mask editing uses a
   crosshair, and the status bar repeats the active target and action so the

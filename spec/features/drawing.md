@@ -19,7 +19,11 @@ feels immediate on a 5-year-old's tablet and a pro's pen display alike.
    **Project colors** group can save the current color under an editable name,
    select it, replace its exact value or remove it. Up to 24 travel with the
    project; every list change is undoable. Replacing or removing a swatch never
-   changes marks that already used its old value.
+   changes marks that already used its old value. Each row reports its exact
+   normal-size text contrast against the current opaque canvas background and
+   marks AA only at an unrounded ratio of at least 4.5:1. This is guidance for
+   ordinary opaque text only—not a pass for artwork, transparency, large text,
+   color-vision accessibility or print.
 6. Locked or hidden layers reject edits; the status area says why.
 7. On a hovering pointer, Brush, Pencil, Eraser and Spray replace the generic
    cursor over the document with a high-contrast ring at the exact current

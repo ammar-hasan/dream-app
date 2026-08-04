@@ -1716,6 +1716,30 @@ without pretending that saved swatches are linked variables.
 - ✅ Full release gates remain green: 913 unit tests, 97.15% engine coverage,
   64 browser journeys, 29 MCP tests and four honest agent evals.
 
+## Slice 78 — Scoped project-color contrast guidance ✅
+
+Persona need: let Sara choose legible brand text, let Zǐxuān catch an obvious
+figure-label failure, let Victor read with confidence and let Maria's agents
+make the same decision without turning one measurement into a false universal
+accessibility badge.
+
+- ✅ Every named project color reports its exact normal-size text contrast
+  against the current opaque canvas background and says AA or Below AA in
+  words. The full unrounded 4.5:1 threshold decides the status; two visible
+  decimals avoid a rounded boundary contradiction.
+- ✅ Changing either the saved color or canvas background updates the guidance
+  without changing the document schema or history. The result is explicitly
+  scoped away from artwork, transparency, large text, color vision and print.
+- ✅ The compact second line stays subordinate to direct palette editing,
+  localizes in all six languages and never depends on green/red alone.
+- ✅ Agent summaries expose the same derived ratio and normal-text AA boolean
+  for every saved color, preserving people-and-agent parity without duplicating
+  stored state.
+- ✅ Pure color tests, rendered interaction checks, a production-browser
+  journey and MCP real-file proof cover the shared contract.
+- ✅ Full release gates remain green: 915 unit tests, 97.16% engine coverage,
+  64 browser journeys, 29 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the

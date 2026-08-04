@@ -145,6 +145,11 @@ export const en: Record<string, string> = {
   'options.projectColorChange': 'Change {name}',
   'options.projectColorDelete': 'Delete {name}',
   'options.projectColorRemove': 'Remove',
+  'options.projectColorContrast': 'Text {ratio}:1',
+  'options.projectColorContrastAA': 'AA',
+  'options.projectColorContrastLow': 'Below AA',
+  'options.projectColorContrastLabel':
+    '{name}: normal text contrast against the canvas background is {ratio} to 1, {status}',
   'options.size': 'Size',
   'options.stabilization': 'Steady stroke',
   'options.brushStyle': 'Brush tip',

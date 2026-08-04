@@ -747,6 +747,12 @@ holds.
       remains portable and exact, each in-app list change is one undoable
       decision, the 24-color limit is enforced, device-local recents remain
       separate, and existing artwork never changes when a swatch does.
+188.  GIVEN a named project color and an opaque canvas background WHEN either
+      value changes THEN the swatch row and agent summary report the same
+      two-decimal normal-text contrast ratio and AA status, using the unrounded
+      4.5:1 threshold. The visible words, not color alone, distinguish AA from
+      Below AA, and the guidance never claims to certify artwork,
+      transparency, large text, color-vision accessibility or print.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

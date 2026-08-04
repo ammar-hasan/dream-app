@@ -137,6 +137,11 @@ export const ru: Record<string, string> = {
   'options.projectColorChange': 'Изменить {name}',
   'options.projectColorDelete': 'Удалить {name}',
   'options.projectColorRemove': 'Удалить',
+  'options.projectColorContrast': 'Текст {ratio}:1',
+  'options.projectColorContrastAA': 'AA',
+  'options.projectColorContrastLow': 'Ниже AA',
+  'options.projectColorContrastLabel':
+    '{name}: контраст обычного текста с фоном холста — {ratio} к 1, {status}',
   'options.size': 'Размер',
   'options.stabilization': 'Стабилизация',
   'options.brushStyle': 'Кончик кисти',

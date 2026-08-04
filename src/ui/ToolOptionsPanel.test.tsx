@@ -22,6 +22,7 @@ describe('project colors', () => {
       name: 'Color 1',
       value: '#123456',
     });
+    expect(screen.getByText('Text 12.72:1 · AA')).toBeInTheDocument();
     const name = screen.getByRole('textbox', { name: 'Rename Color 1' });
     fireEvent.change(name, { target: { value: 'Brand ink' } });
     fireEvent.blur(name);
@@ -31,10 +32,14 @@ describe('project colors', () => {
     fireEvent.change(value, { target: { value: '#654321' } });
     fireEvent.blur(value);
     expect(useDreamStore.getState().doc.projectColors?.[0]?.value).toBe('#654321');
+    expect(screen.getByText('Text 8.83:1 · AA')).toBeInTheDocument();
+    fireEvent.change(value, { target: { value: '#777777' } });
+    fireEvent.blur(value);
+    expect(screen.getByText('Text 4.48:1 · Below AA')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Color #dc2626' }));
     fireEvent.click(screen.getByRole('button', { name: 'Use Brand ink' }));
-    expect(useDreamStore.getState().settings.color).toBe('#654321');
+    expect(useDreamStore.getState().settings.color).toBe('#777777');
 
     fireEvent.click(screen.getByRole('button', { name: 'Delete Brand ink' }));
     expect(useDreamStore.getState().doc.projectColors).toEqual([]);

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  contrastRatio,
   cssColor,
   hexToRgba,
   isValidHex,
@@ -77,6 +78,19 @@ describe('rgbaToHex', () => {
 
   it('clamps out-of-range channels', () => {
     expect(rgbaToHex(300, -5, 12.6)).toBe('#ff000d');
+  });
+});
+
+describe('contrastRatio', () => {
+  it('matches the opaque sRGB contrast extremes', () => {
+    expect(contrastRatio('#000000', '#ffffff')).toBe(21);
+    expect(contrastRatio('#123456', '#123456')).toBe(1);
+  });
+
+  it('is order-independent and rejects invalid colors', () => {
+    expect(contrastRatio('#777777', '#ffffff')).toBeCloseTo(4.478, 3);
+    expect(contrastRatio('#ffffff', '#777777')).toBeCloseTo(4.478, 3);
+    expect(contrastRatio('red', '#ffffff')).toBeNull();
   });
 });
 

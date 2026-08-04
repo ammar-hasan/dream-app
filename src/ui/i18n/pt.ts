@@ -147,6 +147,11 @@ export const pt: Record<string, string> = {
   'options.projectColorChange': 'Alterar {name}',
   'options.projectColorDelete': 'Excluir {name}',
   'options.projectColorRemove': 'Remover',
+  'options.projectColorContrast': 'Texto {ratio}:1',
+  'options.projectColorContrastAA': 'AA',
+  'options.projectColorContrastLow': 'Abaixo de AA',
+  'options.projectColorContrastLabel':
+    '{name}: o contraste de texto normal com o fundo da tela é de {ratio} para 1, {status}',
   'options.size': 'Tamanho',
   'options.stabilization': 'Traço estável',
   'options.brushStyle': 'Ponta do pincel',

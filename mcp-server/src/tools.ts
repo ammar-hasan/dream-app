@@ -10,7 +10,12 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { activeFrameIndex } from '../../src/engine/animation';
 import { buildAppExportData, buildAppHtml } from '../../src/engine/appExport';
-import { MAX_PROJECT_COLORS, MAX_PROJECT_COLOR_NAME, normalizeHex } from '../../src/engine/color';
+import {
+  contrastRatio,
+  MAX_PROJECT_COLORS,
+  MAX_PROJECT_COLOR_NAME,
+  normalizeHex,
+} from '../../src/engine/color';
 import {
   appendOperation,
   createDocument,
@@ -68,6 +73,7 @@ export interface ProjectSummary {
   height: number;
   background: string;
   projectColors: ProjectColor[];
+  projectColorTextContrast: Array<{ id: string; ratio: number; aaNormalText: boolean }>;
   mode: string;
   layers: number;
   frames: number | null;
@@ -102,13 +108,22 @@ function summarize(doc: DreamDocument): ProjectSummary {
   } else {
     countOps(doc.layers);
   }
+  const projectColors = doc.projectColors ?? [];
   return {
     id: doc.id,
     name: doc.name,
     width: doc.width,
     height: doc.height,
     background: doc.background,
-    projectColors: doc.projectColors ?? [],
+    projectColors,
+    projectColorTextContrast: projectColors.map((color) => {
+      const ratio = contrastRatio(color.value, doc.background) ?? 1;
+      return {
+        id: color.id,
+        ratio: Math.round(ratio * 100) / 100,
+        aaNormalText: ratio >= 4.5,
+      };
+    }),
     mode: doc.mode ?? 'draw',
     layers: doc.layers.length,
     frames: doc.frames ? doc.frames.length : null,
