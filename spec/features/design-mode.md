@@ -131,6 +131,18 @@ axis wins. With Touch feedback on, entering a new guide produces one tiny
 tactile detent on supported devices; repeated movement along that same guide
 stays silent.
 
+An optional **workspace grid** adds evenly spaced Design-only lines at an exact
+4–256 px interval (16 px initially). It is hidden initially and never appears
+in Draw, presentations, prototypes or exports. Showing it also makes a separate
+**Snap to grid** choice available; that choice starts on but has no effect while
+the grid is hidden, so an invisible grid can never pull artwork. Grid snapping
+uses the same screen-scaled 6 px capture distance, visible full-length guide,
+pointer-side interval label and sparse tactile detent as ordinary snapping.
+Moving edges or centers may meet the nearest grid line; an equally close canvas
+or object alignment wins. Canvas/object snapping and grid snapping remain
+independently switchable. Grid visibility, interval and snapping are workspace
+session choices: they create no document change, Undo step or portable state.
+
 ## Align & distribute
 
 With two or more objects selected, the Design panel offers: **align left /

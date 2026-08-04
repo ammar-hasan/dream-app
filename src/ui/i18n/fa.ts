@@ -169,6 +169,11 @@ export const fa: Record<string, string> = {
   'design.title': 'طراحی',
   'design.snap': 'چسباندن به بوم و اشیاء',
   'design.snapped': 'تراز شد',
+  'design.gridShow': 'نمایش شبکه',
+  'design.gridSize': 'اندازهٔ شبکه',
+  'design.gridUnit': 'پیکسل',
+  'design.gridSnap': 'چسباندن به شبکه',
+  'design.snappedGrid': 'شبکهٔ {size} پیکسلی',
   'design.selectedOne':
     '{count} شیء انتخاب شده — بکشید برای جابجایی، دستگیره‌های گوشه برای تغییر اندازه، دستگیره بالایی برای چرخش.',
   'design.selectedMany':

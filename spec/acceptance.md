@@ -753,6 +753,15 @@ holds.
       4.5:1 threshold. The visible words, not color alone, distinguish AA from
       Below AA, and the guidance never claims to certify artwork,
       transparency, large text, color-vision accessibility or print.
+189.  GIVEN Design mode WHEN Show grid is enabled and its 4–256 px interval is
+      changed THEN exact evenly spaced workspace lines update immediately over
+      the canvas but never enter the document, Undo, Draw, presentation,
+      prototype or export. WHEN Snap to grid is enabled and a selection edge or
+      center enters the screen-scaled 6 px capture range THEN it lands exactly
+      on the nearest grid line, a full guide and interval badge appear, and one
+      optional tactile detent accompanies the visible change. Canvas/object
+      snapping remains independently switchable; hiding the grid always removes
+      its magnetism.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

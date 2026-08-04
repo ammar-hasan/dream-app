@@ -176,6 +176,11 @@ export const ar: Record<string, string> = {
   'design.title': 'تصميم',
   'design.snap': 'المحاذاة التلقائية للوحة والعناصر',
   'design.snapped': 'تمت المحاذاة',
+  'design.gridShow': 'عرض الشبكة',
+  'design.gridSize': 'حجم الشبكة',
+  'design.gridUnit': 'بكسل',
+  'design.gridSnap': 'المحاذاة إلى الشبكة',
+  'design.snappedGrid': 'شبكة {size} بكسل',
   'design.selectedOne':
     '{count} عنصر محدد — اسحب للنقل، ومقابض الزوايا للتكبير، والمقبض العلوي للتدوير.',
   'design.selectedMany':

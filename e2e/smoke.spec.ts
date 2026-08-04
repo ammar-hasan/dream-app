@@ -563,6 +563,35 @@ test('selection snapping gives one visible and tactile detent per guide', async 
   await expect(page.locator('.snap-feedback')).toHaveCount(0);
 });
 
+test('Design grid is visible, exact and optionally magnetic', async ({ page }) => {
+  await bootApp(page);
+  await drawStroke(page);
+  await page.getByRole('tab', { name: 'Design' }).click();
+  await page.getByRole('button', { name: 'Select', exact: true }).click();
+
+  const canvas = page.locator('.viewport-canvas');
+  const withoutGrid = await canvas.evaluate((element) =>
+    (element as HTMLCanvasElement).toDataURL(),
+  );
+  await page.getByRole('checkbox', { name: 'Show grid' }).check();
+  await page.getByRole('spinbutton', { name: 'Grid size' }).fill('32');
+  await expect
+    .poll(() => canvas.evaluate((element) => (element as HTMLCanvasElement).toDataURL()))
+    .not.toBe(withoutGrid);
+
+  await page.getByRole('checkbox', { name: 'Snap to canvas & objects' }).uncheck();
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('viewport canvas has no box');
+  const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  await page.mouse.click(center.x, center.y);
+  await page.mouse.move(center.x, center.y);
+  await page.mouse.down();
+  await page.mouse.move(center.x + 20, center.y);
+  await expect(page.locator('.snap-feedback')).toHaveText('Grid 32 px');
+  await page.mouse.up();
+  await expect(page.locator('.snap-feedback')).toHaveCount(0);
+});
+
 test('canvas drag targets distinguish components, images and invalid content', async ({ page }) => {
   await page.addInitScript(() => {
     const target = window as Window & { __dreamHaptics?: Array<number | number[]> };

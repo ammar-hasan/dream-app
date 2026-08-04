@@ -251,6 +251,10 @@ export interface DreamStore {
   selection: string[];
   selectDraft: SelectDraft | null;
   snappingEnabled: boolean;
+  /** Session-only Design workspace grid; never part of artwork or export. */
+  gridVisible: boolean;
+  gridSize: number;
+  gridSnappingEnabled: boolean;
   zoom: number;
   /** Screen-space translation of the document origin. */
   offset: Point;
@@ -443,6 +447,9 @@ export interface DreamStore {
   setSelection(ids: string[]): void;
   clearSelection(): void;
   setSnapping(enabled: boolean): void;
+  setGridVisible(visible: boolean): void;
+  setGridSize(size: number): void;
+  setGridSnapping(enabled: boolean): void;
   /** Arrow-key nudge; one undoable command per call. */
   nudgeSelection(dx: number, dy: number): void;
   /** Uniformly scale the selection about its center; one undoable command. */
@@ -565,6 +572,9 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
     selection: [],
     selectDraft: null,
     snappingEnabled: true,
+    gridVisible: false,
+    gridSize: 16,
+    gridSnappingEnabled: true,
     zoom: 1,
     offset: { x: 0, y: 0 },
     spacePanning: false,
@@ -1105,7 +1115,15 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       if (selectDraft) {
         const layer = activeLayer();
         if (!layer) return;
-        const { doc, selection, zoom, snappingEnabled } = get();
+        const {
+          doc,
+          selection,
+          zoom,
+          snappingEnabled,
+          gridVisible,
+          gridSize,
+          gridSnappingEnabled,
+        } = get();
         const shift = !!event.shiftKey;
         const changed = selectDraft.changed || distance(point, selectDraft.from) * zoom > 2;
         const next: SelectDraft = { ...selectDraft, to: point, changed };
@@ -1114,7 +1132,8 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
           let dx = point.x - selectDraft.from.x;
           let dy = point.y - selectDraft.from.y;
           let guides: SnapGuide[] = [];
-          if (snappingEnabled) {
+          const gridActive = gridVisible && gridSnappingEnabled;
+          if (snappingEnabled || gridActive) {
             const moved = {
               ...selectDraft.bounds,
               x: selectDraft.bounds.x + dx,
@@ -1122,9 +1141,13 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
             };
             const snap = computeSnap(
               moved,
-              snapTargets(layer.operations, selection),
+              snappingEnabled ? snapTargets(layer.operations, selection) : [],
               { width: doc.width, height: doc.height },
               6 / zoom,
+              {
+                canvas: snappingEnabled,
+                ...(gridActive ? { gridSize } : {}),
+              },
             );
             dx += snap.dx;
             dy += snap.dy;
@@ -1914,6 +1937,15 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
     clearSelection: () => set({ selection: [], selectDraft: null }),
 
     setSnapping: (enabled) => set({ snappingEnabled: enabled }),
+
+    setGridVisible: (visible) => set({ gridVisible: visible }),
+
+    setGridSize: (size) => {
+      if (!Number.isFinite(size)) return;
+      set({ gridSize: Math.max(4, Math.min(256, Math.round(size))) });
+    },
+
+    setGridSnapping: (enabled) => set({ gridSnappingEnabled: enabled }),
 
     nudgeSelection: (dx, dy) => {
       mutateSelection('Move selection', (ops, ids) => {

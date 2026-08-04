@@ -177,6 +177,11 @@ export const en: Record<string, string> = {
   'design.title': 'Design',
   'design.snap': 'Snap to canvas & objects',
   'design.snapped': 'Snapped',
+  'design.gridShow': 'Show grid',
+  'design.gridSize': 'Grid size',
+  'design.gridUnit': 'px',
+  'design.gridSnap': 'Snap to grid',
+  'design.snappedGrid': 'Grid {size} px',
   'design.selectedOne':
     '{count} object selected — drag to move, corner handles to scale, top handle to rotate.',
   'design.selectedMany':

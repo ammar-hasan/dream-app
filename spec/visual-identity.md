@@ -136,6 +136,9 @@ Text `#0f141f` / `#ffffff`, dim text `#454d61` / `#ccd4e8`, borders
    Brush, Pencil, Eraser, Spray and layer-mask painting show the exact current
    diameter as concentric light/dark rings with a small center point, so the
    footprint remains legible over any artwork without pretending to be larger.
+   A shown Design grid uses quiet one-screen-pixel accent lines over the
+   artwork. The active snapped line becomes fully legible and the pointer badge
+   names its interval; hiding the grid removes both lines and magnetism.
 8. A drag entering the canvas gets immediate valid/invalid target emphasis and
    a short result label. The feedback disappears on leave or drop and never
    relies on color alone.

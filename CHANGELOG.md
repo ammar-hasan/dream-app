@@ -7,6 +7,12 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Exact Design workspace grid** (slice 79): Design can show a session-only
+  4–256 px spacing grid and independently snap selection edges/centers to it.
+  Full active guides, an exact pointer-side interval label and the existing
+  sparse tactile detent make every magnetic move visible; hiding the grid also
+  disables its pull, and no line enters artwork, Undo, files or exports.
+
 - **Scoped project-color contrast guidance** (slice 78): every portable named
   color now shows its exact normal-text contrast against the current canvas
   background with an explicit AA or Below AA label. The unrounded 4.5:1

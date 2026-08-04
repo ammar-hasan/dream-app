@@ -1371,6 +1371,31 @@ body {
   gap: 8px;
 }
 
+.design-grid-controls {
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel-hover);
+}
+
+.design-grid-controls .option-row:last-child {
+  margin-bottom: 0;
+}
+
+.grid-size-input {
+  min-width: 0;
+  width: 72px;
+  min-height: 34px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
 .font-select {
   flex: 1;
   min-width: 0;

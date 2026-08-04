@@ -518,6 +518,11 @@ once per device. Little Dreamer remains invitation-free.
   compact pointer-side confirmation. Entering a new guide adds one optional
   tactile detent on supported devices; moving along it stays quiet. Toggle
   snapping in the Design panel (on by default).
+- **Workspace grid**: Design can show an exact 4–256 px grid (16 px initially)
+  and independently snap moving edges/centers to it. A full guide and
+  pointer-side interval label make the magnetic result visible. Hiding the grid
+  also disables its pull; it remains session guidance and never enters artwork,
+  Undo, portable files or exports.
 - **Group / ungroup**: groups are a `groupId` on ops, not a scene graph —
   grouped objects select and transform as one unit.
 - **Reorder, duplicate, delete, nudge**: bring forward / send backward within

@@ -167,6 +167,11 @@ export const ru: Record<string, string> = {
   'design.title': 'Дизайн',
   'design.snap': 'Привязка к холсту и объектам',
   'design.snapped': 'Привязано',
+  'design.gridShow': 'Показать сетку',
+  'design.gridSize': 'Шаг сетки',
+  'design.gridUnit': 'пкс',
+  'design.gridSnap': 'Привязка к сетке',
+  'design.snappedGrid': 'Сетка {size} пкс',
   'design.selectedOne':
     'Выбран объект ({count}) — тяните для перемещения, угловые ручки — масштабировать, верхняя — повернуть.',
   'design.selectedMany':

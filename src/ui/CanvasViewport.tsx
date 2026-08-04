@@ -117,6 +117,8 @@ export function CanvasViewport() {
   const linkDraft = useDreamStore((s) => s.linkDraft);
   const selection = useDreamStore((s) => s.selection);
   const selectDraft = useDreamStore((s) => s.selectDraft);
+  const gridVisible = useDreamStore((s) => s.gridVisible);
+  const gridSize = useDreamStore((s) => s.gridSize);
   const zoom = useDreamStore((s) => s.zoom);
   const offset = useDreamStore((s) => s.offset);
   const spacePanning = useDreamStore((s) => s.spacePanning);
@@ -323,6 +325,26 @@ export function CanvasViewport() {
       cachedDocIdRef.current = doc.id;
     }
     cache.render(displayDoc, ctx);
+
+    // Design's workspace grid is guidance only: it sits above artwork while
+    // editing, but never enters the document renderer or any export.
+    if (!playing && mode === 'design' && gridVisible) {
+      ctx.save();
+      ctx.strokeStyle = ACCENT;
+      ctx.globalAlpha = 0.2;
+      ctx.lineWidth = 1 / zoom;
+      ctx.beginPath();
+      for (let x = gridSize; x < doc.width; x += gridSize) {
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, doc.height);
+      }
+      for (let y = gridSize; y < doc.height; y += gridSize) {
+        ctx.moveTo(0, y);
+        ctx.lineTo(doc.width, y);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
 
     // Component drags show the exact prospective copy at its eventual origin.
     // The native drag image stays small; this canvas preview carries scale and
@@ -1045,6 +1067,9 @@ export function CanvasViewport() {
   const snapFeedback =
     selectDraft?.kind === 'move' && selectDraft.guides.length > 0
       ? {
+          text: selectDraft.guides.some((guide) => guide.source === 'grid')
+            ? t('design.snappedGrid', { size: gridSize })
+            : t('design.snapped'),
           left: offset.x + selectDraft.to.x * zoom + 14,
           top: offset.y + selectDraft.to.y * zoom + 14,
         }
@@ -1136,7 +1161,7 @@ export function CanvasViewport() {
           aria-live="off"
           style={{ left: snapFeedback.left, top: snapFeedback.top }}
         >
-          {t('design.snapped')}
+          {snapFeedback.text}
         </div>
       )}
       {!kidMode && (

@@ -166,6 +166,13 @@ Modern interaction craft should make state legible rather than add spectacle:
   pan, resize/rotate, copy/link and not-allowed states should follow the active
   interaction rather than remain a static cursor per tool.
   (https://developer.apple.com/design/human-interface-guidelines/pointing-devices)
+- **Grids are useful only when their spacing and magnetism are inspectable.**
+  Professional design tools separate visible grids, grid interval and snapping
+  rather than making alignment an invisible force. Dream follows that smaller
+  contract in Design: exact quiet lines, an independently switchable magnet,
+  full active guide and pointer-side interval. Hidden means non-magnetic, and
+  the workspace aid never leaks into delivery.
+  (https://helpx.adobe.com/illustrator/using/rulers-grids-guides-crop-marks.html)
 - **Paint cursors disclose the footprint, not merely the tool.** Dream applies
   the predictive-pointer principle to media tools with an exact-diameter,
   two-contrast ring and center point. It updates with size and zoom, remains

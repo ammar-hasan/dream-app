@@ -55,6 +55,10 @@ together on screen.
   **Hide / Reveal** as explicit segmented choices. Mask editing uses a
   crosshair, and the status bar repeats the active target and action so the
   canvas never silently redirects a brush stroke.
+- The Design panel keeps canvas/object snapping separate from a contained
+  **Show grid / Grid size / Snap to grid** group. Grid size and magnetism stay
+  disabled until the grid is visible; dragging to it names the exact interval
+  beside the pointer.
 - **Bottom:** the timeline bar (when frames exist) and the status bar
   (pointer x,y · document size · active tool · zoom %).
 - **Floating zoom pill** at the bottom-end of the canvas: −, % (tap to

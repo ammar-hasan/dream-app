@@ -1740,6 +1740,29 @@ accessibility badge.
 - ✅ Full release gates remain green: 915 unit tests, 97.16% engine coverage,
   64 browser journeys, 29 MCP tests and four honest agent evals.
 
+## Slice 79 — Exact Design workspace grid ✅
+
+Persona need: let Sara establish logo spacing, let Zǐxuān align a scientific
+figure and let Aleksandr move at professional thought speed without exposing a
+beginner in Draw to permanent layout chrome or an invisible magnetic force.
+
+- ✅ Design can show an exact 4–256 px grid, initially 16 px. Quiet lines update
+  immediately over the artwork but never enter the document renderer, history,
+  portable files, Draw, presentations, prototypes or delivery.
+- ✅ Snap to grid is separate from canvas/object snapping. Moving selection
+  edges and centers use the same zoom-aware capture distance; equally close
+  object/canvas alignment wins.
+- ✅ A full active grid line, exact pointer-side interval label and the existing
+  optional one-shot tactile detent all describe the same result. Repeated motion
+  on that line stays silent.
+- ✅ Grid size and snapping stay disabled until Show grid is on. Hiding the grid
+  always removes its magnetism while remembering the session choices for a
+  quick return.
+- ✅ Pure snap math, store movement, rendered controls and a production-browser
+  journey prove visible pixels, exact placement and zero document/Undo effect.
+- ✅ Full release gates remain green: 920 unit tests, 97.19% engine coverage,
+  65 browser journeys, 29 MCP tests and four honest agent evals.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the

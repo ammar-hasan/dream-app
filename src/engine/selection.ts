@@ -338,12 +338,21 @@ export interface SnapGuide {
   /** Segment extent along the line. */
   from: number;
   to: number;
+  /** What produced this guide; absent means ordinary alignment for old callers. */
+  source?: 'alignment' | 'grid';
 }
 
 export interface SnapResult {
   dx: number;
   dy: number;
   guides: SnapGuide[];
+}
+
+export interface SnapOptions {
+  /** Include canvas edges/centers. Defaults to true. */
+  canvas?: boolean;
+  /** Also snap moving edges/centers to this grid interval. */
+  gridSize?: number;
 }
 
 /**
@@ -356,9 +365,10 @@ export function computeSnap(
   targets: Rect[],
   docSize: Size,
   threshold: number,
+  options: SnapOptions = {},
 ): SnapResult {
-  const xLines = [0, docSize.width / 2, docSize.width];
-  const yLines = [0, docSize.height / 2, docSize.height];
+  const xLines = options.canvas === false ? [] : [0, docSize.width / 2, docSize.width];
+  const yLines = options.canvas === false ? [] : [0, docSize.height / 2, docSize.height];
   for (const t of targets) {
     xLines.push(t.x, t.x + t.width / 2, t.x + t.width);
     yLines.push(t.y, t.y + t.height / 2, t.y + t.height);
@@ -370,6 +380,8 @@ export function computeSnap(
   let dy = 0;
   let guideX: number | null = null;
   let guideY: number | null = null;
+  let guideXIsGrid = false;
+  let guideYIsGrid = false;
   let bestX = threshold;
   let bestY = threshold;
   for (const line of xLines) {
@@ -379,6 +391,7 @@ export function computeSnap(
         bestX = Math.abs(delta);
         dx = delta;
         guideX = line;
+        guideXIsGrid = false;
       }
     }
   }
@@ -389,6 +402,31 @@ export function computeSnap(
         bestY = Math.abs(delta);
         dy = delta;
         guideY = line;
+        guideYIsGrid = false;
+      }
+    }
+  }
+
+  const gridSize = options.gridSize;
+  if (gridSize && Number.isFinite(gridSize) && gridSize > 0) {
+    for (const edge of xEdges) {
+      const line = Math.max(0, Math.min(docSize.width, Math.round(edge / gridSize) * gridSize));
+      const delta = line - edge;
+      if (Math.abs(delta) < bestX) {
+        bestX = Math.abs(delta);
+        dx = delta;
+        guideX = line;
+        guideXIsGrid = true;
+      }
+    }
+    for (const edge of yEdges) {
+      const line = Math.max(0, Math.min(docSize.height, Math.round(edge / gridSize) * gridSize));
+      const delta = line - edge;
+      if (Math.abs(delta) < bestY) {
+        bestY = Math.abs(delta);
+        dy = delta;
+        guideY = line;
+        guideYIsGrid = true;
       }
     }
   }
@@ -400,11 +438,23 @@ export function computeSnap(
       moving.y + moving.height,
       ...targets.flatMap((t) => [t.y, t.y + t.height]),
     ];
-    guides.push({ axis: 'x', position: guideX, from: Math.min(...ys), to: Math.max(...ys) });
+    guides.push({
+      axis: 'x',
+      position: guideX,
+      from: guideXIsGrid ? 0 : Math.min(...ys),
+      to: guideXIsGrid ? docSize.height : Math.max(...ys),
+      source: guideXIsGrid ? 'grid' : 'alignment',
+    });
   }
   if (guideY !== null) {
     const xs = [moving.x, moving.x + moving.width, ...targets.flatMap((t) => [t.x, t.x + t.width])];
-    guides.push({ axis: 'y', position: guideY, from: Math.min(...xs), to: Math.max(...xs) });
+    guides.push({
+      axis: 'y',
+      position: guideY,
+      from: guideYIsGrid ? 0 : Math.min(...xs),
+      to: guideYIsGrid ? docSize.width : Math.max(...xs),
+      source: guideYIsGrid ? 'grid' : 'alignment',
+    });
   }
   return { dx, dy, guides };
 }

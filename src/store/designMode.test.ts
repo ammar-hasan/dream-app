@@ -35,6 +35,9 @@ beforeEach(() => {
   store().newDocument({ width: 100, height: 80, name: 'Test' });
   // Tests assert exact pixel math; snapping gets its own dedicated test.
   store().setSnapping(false);
+  store().setGridVisible(false);
+  store().setGridSize(16);
+  store().setGridSnapping(true);
 });
 
 describe('workspace mode', () => {
@@ -153,6 +156,37 @@ describe('select tool: click, marquee, drag', () => {
     store().pointerUp({ x: 49, y: 40 });
     const op = store().doc.layers[0].operations[0] as ShapeOp;
     expect(op.from).toEqual({ x: 40, y: 30 }); // snapped delta (30, 20)
+  });
+
+  it('grid snapping is exact, optional, and independent of object snapping', () => {
+    drawRect(); // rendered bounds 9..31
+    enterDesign();
+    store().setGridVisible(true);
+    store().setGridSize(16);
+    store().pointerDown({ x: 20, y: 20 });
+    store().pointerMove({ x: 25, y: 25 });
+    expect(store().selectDraft?.guides.every((guide) => guide.source === 'grid')).toBe(true);
+    store().pointerUp({ x: 25, y: 25 });
+    const snapped = store().doc.layers[0].operations[0] as ShapeOp;
+    expect(snapped.from).toEqual({ x: 17, y: 17 });
+
+    store().undo();
+    store().setGridVisible(false);
+    store().pointerDown({ x: 20, y: 20 });
+    store().pointerMove({ x: 25, y: 25 });
+    expect(store().selectDraft?.guides).toEqual([]);
+    store().pointerUp({ x: 25, y: 25 });
+    const unsnapped = store().doc.layers[0].operations[0] as ShapeOp;
+    expect(unsnapped.from).toEqual({ x: 15, y: 15 });
+  });
+
+  it('keeps the session grid interval within its visible control range', () => {
+    store().setGridSize(2);
+    expect(store().gridSize).toBe(4);
+    store().setGridSize(999);
+    expect(store().gridSize).toBe(256);
+    store().setGridSize(Number.NaN);
+    expect(store().gridSize).toBe(256);
   });
 
   it('a click on an already-selected multi-selection keeps it intact', () => {

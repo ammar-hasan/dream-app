@@ -27,6 +27,9 @@ export function DesignPanel() {
   const t = useT();
   const selection = useDreamStore((s) => s.selection);
   const snapping = useDreamStore((s) => s.snappingEnabled);
+  const gridVisible = useDreamStore((s) => s.gridVisible);
+  const gridSize = useDreamStore((s) => s.gridSize);
+  const gridSnapping = useDreamStore((s) => s.gridSnappingEnabled);
   const store = useDreamStore.getState;
   const count = selection.length;
   const [plotOpen, setPlotOpen] = useState(false);
@@ -43,6 +46,41 @@ export function DesignPanel() {
         />
         <span>{t('design.snap')}</span>
       </label>
+
+      <div className="design-grid-controls">
+        <label className="option-row checkbox-field">
+          <input
+            type="checkbox"
+            checked={gridVisible}
+            onChange={(e) => store().setGridVisible(e.target.checked)}
+          />
+          <span>{t('design.gridShow')}</span>
+        </label>
+        <label className="option-row">
+          <span className="option-label">{t('design.gridSize')}</span>
+          <input
+            className="grid-size-input"
+            type="number"
+            min="4"
+            max="256"
+            step="1"
+            value={gridSize}
+            disabled={!gridVisible}
+            aria-label={t('design.gridSize')}
+            onChange={(e) => store().setGridSize(Number(e.target.value))}
+          />
+          <span className="option-value">{t('design.gridUnit')}</span>
+        </label>
+        <label className="option-row checkbox-field">
+          <input
+            type="checkbox"
+            checked={gridSnapping}
+            disabled={!gridVisible}
+            onChange={(e) => store().setGridSnapping(e.target.checked)}
+          />
+          <span>{t('design.gridSnap')}</span>
+        </label>
+      </div>
 
       <button type="button" className="btn" onClick={() => setPlotOpen(true)}>
         {t('plot.open')}

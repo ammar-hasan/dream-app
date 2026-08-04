@@ -351,6 +351,26 @@ describe('computeSnap', () => {
     const far = computeSnap({ x: 20, y: 20, width: 5, height: 5 }, [], doc, 2);
     expect(far.guides).toHaveLength(0);
   });
+
+  it('snaps to a visible grid without implicitly enabling canvas snapping', () => {
+    const result = computeSnap({ x: 18, y: 18, width: 10, height: 10 }, [], doc, 3, {
+      canvas: false,
+      gridSize: 16,
+    });
+    expect(result).toMatchObject({ dx: -2, dy: -2 });
+    expect(result.guides).toEqual([
+      { axis: 'x', position: 16, from: 0, to: 100, source: 'grid' },
+      { axis: 'y', position: 16, from: 0, to: 100, source: 'grid' },
+    ]);
+  });
+
+  it('keeps ordinary alignment when grid and object corrections tie', () => {
+    const target = { x: 16, y: 16, width: 8, height: 8 };
+    const result = computeSnap({ x: 18, y: 18, width: 10, height: 10 }, [target], doc, 3, {
+      gridSize: 16,
+    });
+    expect(result.guides.every((guide) => guide.source === 'alignment')).toBe(true);
+  });
 });
 
 describe('reorder / delete / duplicate', () => {

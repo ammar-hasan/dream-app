@@ -179,6 +179,11 @@ export const pt: Record<string, string> = {
   'design.title': 'Design',
   'design.snap': 'Encaixar na tela e objetos',
   'design.snapped': 'Alinhado',
+  'design.gridShow': 'Mostrar grade',
+  'design.gridSize': 'Tamanho da grade',
+  'design.gridUnit': 'px',
+  'design.gridSnap': 'Encaixar na grade',
+  'design.snappedGrid': 'Grade de {size} px',
   'design.selectedOne':
     '{count} objeto selecionado — arraste para mover, alças de canto para escalar, alça superior para girar.',
   'design.selectedMany':
