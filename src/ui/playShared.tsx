@@ -26,7 +26,7 @@ export function spriteCanvas(
 ): HTMLCanvasElement {
   const layer = doc.layers.find((l) => l.id === layerId && l.visible);
   if (layer) {
-    const raster = rasterizeLayer(layer, doc.width, doc.height);
+    const raster = rasterizeLayer(layer, doc.width, doc.height, doc.projectColors);
     const bounds = raster && contentBounds(raster);
     if (raster && bounds) {
       const cropped = cropBuffer(raster, bounds);

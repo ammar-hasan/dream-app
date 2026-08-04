@@ -644,7 +644,7 @@ export function CanvasViewport() {
     off.height = state.doc.height;
     const offCtx = off.getContext('2d');
     if (!offCtx) return;
-    renderLayer(layer, offCtx);
+    renderLayer(layer, offCtx, { projectColors: state.doc.projectColors });
     const image = offCtx.getImageData(0, 0, off.width, off.height);
     state.applyFillAt(point, { data: image.data, width: off.width, height: off.height });
   };
@@ -673,7 +673,7 @@ export function CanvasViewport() {
     off.height = state.doc.height;
     const offCtx = off.getContext('2d');
     if (!offCtx) return;
-    renderLayer(layer, offCtx);
+    renderLayer(layer, offCtx, { projectColors: state.doc.projectColors });
     const image = offCtx.getImageData(0, 0, off.width, off.height);
     state.applyWandAt(point, { data: image.data, width: off.width, height: off.height });
   };

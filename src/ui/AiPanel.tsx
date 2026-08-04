@@ -198,7 +198,7 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
       const prompt = editPrompt.trim();
       const store = useDreamStore.getState();
       if (!prompt || !layer || layer.operations.length === 0) return;
-      const base = rasterizeLayer(layer, doc.width, doc.height);
+      const base = rasterizeLayer(layer, doc.width, doc.height, doc.projectColors);
       if (!base) throw new Error(t('ai.rasterError'));
       const region = selectedOnly ? editRegionForSelection(doc, layer, selection) : null;
       const result = await p.editImage({
@@ -217,7 +217,7 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
     runAI('edit', async (p, signal) => {
       const store = useDreamStore.getState();
       if (!layer || layer.operations.length === 0) return;
-      const base = rasterizeLayer(layer, doc.width, doc.height);
+      const base = rasterizeLayer(layer, doc.width, doc.height, doc.projectColors);
       if (!base) throw new Error(t('ai.rasterError'));
       const region = editRegionForSelection(doc, layer, selection);
       const result = await p.editImage({
@@ -254,7 +254,7 @@ export function AiPanel({ kid = false }: { kid?: boolean }) {
       });
       return;
     }
-    const base = rasterizeLayer(layer, doc.width, doc.height);
+    const base = rasterizeLayer(layer, doc.width, doc.height, doc.projectColors);
     if (!base) return;
     const merged = { ...DEFAULT_ADJUSTMENTS, ...action.adjustments };
     store.applyLayerRaster(applyAdjustments(base, merged), 'AI touch-up');

@@ -376,6 +376,35 @@ describe('selection actions', () => {
     expect(op.colorRef).toBeUndefined();
   });
 
+  it('deleting a linked swatch preserves out-of-history state on undo', () => {
+    drawRect();
+    enterDesign();
+    expect(store().addProjectColor('Brand', '#2563eb')).toBe(true);
+    const swatch = store().doc.projectColors![0];
+    const id = store().doc.layers[0].operations[0].id;
+    store().setSelection([id]);
+    store().linkSelectionColor(swatch.id);
+
+    store().deleteProjectColor(swatch.id);
+    const activeFrameBefore = store().doc.activeFrameId;
+    const modeBefore = store().doc.mode;
+    // Simulate navigation/workspace changes that happen outside history after
+    // the delete — undo must NOT revert them (AGENTS.md rule 3).
+    store().setMode('draw');
+    expect(store().doc.mode).toBe('draw');
+
+    store().undo();
+    // The swatch and the live link are restored…
+    expect(store().doc.projectColors?.[0]?.id).toBe(swatch.id);
+    expect(resolveOpColor(store().doc.layers[0].operations[0], store().doc.projectColors)).toBe(
+      '#2563eb',
+    );
+    // …but the workspace we switched to after the delete is preserved.
+    expect(store().doc.mode).toBe('draw');
+    expect(store().doc.activeFrameId).toBe(activeFrameBefore);
+    void modeBefore;
+  });
+
   it('nudge moves by exact pixels and is undoable', () => {
     drawRect();
     enterDesign();

@@ -193,19 +193,37 @@ export function setProjectColorsCommand(
 /**
  * Delete one project color AND bake its last value into every op that linked
  * to it, so artwork never visually shifts when a swatch is removed. Revert is
- * snapshot-based (delete is rare and destructive); structural sharing keeps
- * the captured doc cheap to hold.
+ * scoped to the fields detach touches (projectColors/frames/layers) and
+ * re-derives `layers` from the *current* active frame, so undo never teleports
+ * the user or reverts out-of-history state (mode, animation, game, narration).
  */
 export function deleteProjectColorCommand(doc: DreamDocument, id: string): Command {
   const colors = doc.projectColors ?? [];
   const target = colors.find((color) => color.id === id);
-  const previous = doc;
   if (!target) return { label: 'Delete project color', apply: (d) => d, revert: (d) => d };
   const value = target.value;
+  // Capture only what detach touches, so revert can spread `current` and keep
+  // every out-of-history field (activeFrameId, mode, animation, game, narration).
+  const prevColors = doc.projectColors;
+  const prevFrames = doc.frames;
+  const prevLayers = doc.layers;
   return {
     label: 'Delete project color',
     apply: (current) => detachColorFromDocument(current, id, value),
-    revert: () => previous,
+    revert: (current) => {
+      // Restore the touched fields; mirror the active frame's layers so the
+      // user stays on whatever frame they navigated to after the delete.
+      const frames = prevFrames;
+      const activeId = current.activeFrameId;
+      const mirror = frames?.find((frame) => frame.id === activeId)?.layers ?? prevLayers;
+      return {
+        ...current,
+        projectColors: prevColors,
+        ...(frames ? { frames } : {}),
+        layers: mirror,
+        updatedAt: Date.now(),
+      };
+    },
   };
 }
 

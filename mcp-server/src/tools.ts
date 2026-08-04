@@ -212,17 +212,21 @@ const MAX_DIMENSION = 8192;
 
 /**
  * Resolve an optional `colorRef` against the project's saved colors. Returns
- * the `{ colorRef }` to spread onto the op when the id exists, or throws if
- * the caller asked for a link that is not present. Passing nothing yields an
- * empty object so call sites stay unconditional.
+ * `{ color, colorRef }` to spread onto the op when the id exists (stamping the
+ * swatch's current value into `color` so the link's fallback invariant holds),
+ * or throws if the caller asked for a link that is not present. Passing nothing
+ * yields an empty object so call sites stay unconditional.
  */
-function resolveColorRef(doc: DreamDocument, colorRef: string | undefined): { colorRef?: string } {
+function resolveColorRef(
+  doc: DreamDocument,
+  colorRef: string | undefined,
+): { color?: string; colorRef?: string } {
   if (colorRef === undefined) return {};
-  const exists = (doc.projectColors ?? []).some((color) => color.id === colorRef);
-  if (!exists) {
+  const swatch = (doc.projectColors ?? []).find((color) => color.id === colorRef);
+  if (!swatch) {
     throw new Error(`No project color with id "${colorRef}"`);
   }
-  return { colorRef };
+  return { color: swatch.value, colorRef };
 }
 
 /** dream.create_project — write a fresh .dream file. */
@@ -592,7 +596,8 @@ export async function addStroke(
     size,
     // Match the drawing engine: pencil and eraser are always fully opaque.
     opacity: tool === 'brush' ? opacity : 1,
-    ...resolveColorRef(doc, options.colorRef),
+    // Erasers render with destination-out and ignore color, so don't attach a link.
+    ...(tool !== 'eraser' ? resolveColorRef(doc, options.colorRef) : {}),
   };
   if (options.points.some((point) => point.pressure !== undefined)) {
     op.widths = options.points.map((point) => pressureWidth(point.pressure ?? 1));

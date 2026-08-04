@@ -532,13 +532,14 @@ describe('dream-mcp tools', () => {
 
   it('add_shape/add_stroke/add_text link to a saved project color and reject stale refs', async () => {
     const swatch = await setProjectColor(projectPath, { name: 'Brand', value: '#2563eb' });
+    // Omit `color`: linking must stamp the swatch value into the op so the
+    // stale-ref fallback never shifts artwork from its link-time appearance.
     const shape = await addShape(projectPath, {
       shape: 'rectangle',
       x1: 0,
       y1: 0,
       x2: 10,
       y2: 10,
-      color: '#2563eb',
       colorRef: swatch.id,
       layer: 'Agent shapes',
     });
@@ -546,7 +547,7 @@ describe('dream-mcp tools', () => {
     const op = doc.layers
       .find((l) => l.id === shape.layerId)!
       .operations.find((o) => o.id === shape.opId)!;
-    expect(op.colorRef).toBe(swatch.id);
+    expect(op).toMatchObject({ color: '#2563eb', colorRef: swatch.id });
 
     // Editing the swatch re-renders without re-stamping the op color.
     await setProjectColor(projectPath, { color: swatch.id, name: 'Brand', value: '#ff8800' });
@@ -556,10 +557,17 @@ describe('dream-mcp tools', () => {
     expect(refreshed.color).toBe('#2563eb');
     expect(refreshed.colorRef).toBe(swatch.id);
 
+    // Eraser strokes ignore color: a colorRef is rejected, not silently inert.
     const points = [
       { x: 0, y: 0 },
       { x: 5, y: 5 },
     ];
+    const eraser = await addStroke(projectPath, { points, tool: 'eraser', colorRef: swatch.id });
+    const eraserOp = (await loadProject(projectPath)).layers
+      .find((l) => l.id === eraser.layerId)!
+      .operations.find((o) => o.id === eraser.opId)!;
+    expect(eraserOp.colorRef).toBeUndefined();
+
     await expect(addStroke(projectPath, { points, colorRef: 'missing' })).rejects.toThrow(
       'No project color with id "missing"',
     );
