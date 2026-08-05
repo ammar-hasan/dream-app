@@ -26,6 +26,7 @@
 
 import { normalizeProjectColors } from './color';
 import { normalizeAdjustments } from './filters';
+import { normalizeEffects } from './effects';
 import { normalizeLayerMask } from './masks';
 import { isLayerBlendMode } from './types';
 import type { DreamDocument, Layer, Operation, RasterPatch } from './types';
@@ -179,6 +180,7 @@ async function deserializeLayers(layers: unknown, codec: RasterCodec): Promise<L
         ...layer,
         blendMode: isLayerBlendMode(layer.blendMode) ? layer.blendMode : 'normal',
         adjustments: normalizeAdjustments(layer.adjustments),
+        ...(layer.effects !== undefined ? { effects: normalizeEffects(layer.effects) } : {}),
         mask: normalizeLayerMask(layer.mask),
         operations: await Promise.all(
           layer.operations.map((op) => deserializeOperation(op, codec)),

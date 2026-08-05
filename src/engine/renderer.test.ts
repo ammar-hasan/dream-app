@@ -87,6 +87,55 @@ describe('renderDocument', () => {
     expect(ctx.calls('drawImage')).toHaveLength(1);
   });
 
+  it('casts a drop shadow behind the layer from an enabled effect', () => {
+    const doc = docWithStroke();
+    doc.layers[0] = {
+      ...doc.layers[0],
+      effects: [
+        {
+          id: 'shadow-1',
+          type: 'shadow',
+          enabled: true,
+          params: { color: '#000000', opacity: 0.5, radius: 6, offsetX: 2, offsetY: 3 },
+        },
+      ],
+    };
+    const factories = makeMockFactories();
+    const ctx = new MockContext2D();
+
+    renderDocument(doc, ctx, factories);
+
+    // One scratch canvas holds the shadow silhouette; the bitmap then draws on top.
+    expect(factories.created.length).toBeGreaterThanOrEqual(2);
+    const layerBitmap = factories.created[0];
+    const shadowScratch = factories.created[1];
+    const sctx = shadowScratch.context;
+    // Shadow props were set on the scratch before drawing the bitmap.
+    expect(sctx.shadowColor).toBe('rgba(0, 0, 0, 0.5)');
+    expect(sctx.shadowBlur).toBe(6);
+    expect(sctx.shadowOffsetX).toBe(2);
+    expect(sctx.shadowOffsetY).toBe(3);
+    // The destination receives the shadow halo, then the layer bitmap.
+    const draws = ctx.calls('drawImage');
+    expect(draws).toContainEqual(['drawImage', shadowScratch, 0, 0, undefined, undefined]);
+    expect(draws).toContainEqual(['drawImage', layerBitmap, 0, 0, undefined, undefined]);
+  });
+
+  it('skips the shadow scratch entirely when every effect is disabled', () => {
+    const doc = docWithStroke();
+    doc.layers[0] = {
+      ...doc.layers[0],
+      effects: [
+        { id: 'shadow-1', type: 'shadow', enabled: false, params: { opacity: 0.5 } as never },
+      ],
+    };
+    const factories = makeMockFactories();
+    const ctx = new MockContext2D();
+    renderDocument(doc, ctx, factories);
+    expect(factories.created).toHaveLength(0);
+    expect(ctx.calls('drawImage')).toHaveLength(0);
+  });
+
   it('applies an editable opacity mask after adjustments and before blending', () => {
     const doc = docWithStroke();
     doc.layers[0] = {

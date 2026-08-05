@@ -771,6 +771,14 @@ holds.
       resolved color is frozen into its `color` field and the artwork does not
       shift. Recoloring a linked op clears the link. Links travel in `.dream`
       files and are settable by MCP create tools.
+191.  GIVEN a layer with visible content WHEN a drop shadow effect is added to
+      its effect stack THEN a blurred, offset silhouette of the layer's alpha
+      casts behind it on the canvas, in SVG-irrelevant raster compositing only.
+      Adjusting color/opacity/blur/offset previews live and commits one undo
+      step per drag. Toggle, reorder, remove and add are each one undoable
+      step. WHEN every effect is disabled or removed THEN the layer renders
+      exactly as if the stack were absent. Effects travel in `.dream` files
+      and are sanitized (unknown types dropped, params clamped) on load.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

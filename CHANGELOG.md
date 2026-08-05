@@ -7,6 +7,13 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Per-layer effect stack + drop shadow** (slice 81): each layer carries an
+  ordered, toggleable effect stack beyond its color adjustments. The first
+  effect is a drop shadow that casts the layer's alpha behind it (color,
+  opacity, 0–40 px blur, −40–40 px X/Y offset). Add/remove/toggle/reorder are
+  one undoable step each; slider edits preview live and commit on release. The
+  stack rides in `.dream` files and is sanitized on load.
+
 - **Linked color variables** (slice 80): a saved project color can be linked to
   a Design vector selection (strokes, shapes, text). Editing the swatch recolors
   every linked op on the canvas, in SVG export and via MCP `render` with no op

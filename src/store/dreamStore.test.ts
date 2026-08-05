@@ -226,6 +226,41 @@ describe('layers', () => {
     store().setLayerOpacity(id, 5);
     expect(store().doc.layers[0].opacity).toBe(1);
   });
+
+  it('manages a per-layer effect stack through history', () => {
+    const id = store().activeLayerId;
+    expect(store().doc.layers[0].effects).toBeUndefined();
+
+    store().addLayerEffect(id, 'shadow');
+    const layer = store().doc.layers[0];
+    expect(layer.effects).toHaveLength(1);
+    expect(layer.effects![0]).toMatchObject({ type: 'shadow', enabled: true });
+
+    const fxId = layer.effects![0].id;
+    store().updateLayerEffect(id, fxId, { radius: 12, opacity: 0.8, color: '#111111' });
+    expect(store().doc.layers[0].effects![0].params).toMatchObject({
+      radius: 12,
+      opacity: 0.8,
+      color: '#111111',
+    });
+
+    store().toggleLayerEffect(id, fxId);
+    expect(store().doc.layers[0].effects![0].enabled).toBe(false);
+
+    store().addLayerEffect(id, 'shadow');
+    store().reorderLayerEffect(id, store().doc.layers[0].effects![1].id, 'up');
+    expect(store().doc.layers[0].effects!.map((e) => e.id)).toEqual([
+      store().doc.layers[0].effects![0].id,
+      fxId,
+    ]);
+
+    store().undo(); // undo reorder
+    store().removeLayerEffect(id, fxId);
+    expect(store().doc.layers[0].effects).toHaveLength(1);
+
+    store().undo();
+    expect(store().doc.layers[0].effects).toHaveLength(2);
+  });
 });
 
 describe('raster baking', () => {

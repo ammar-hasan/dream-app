@@ -51,6 +51,7 @@ link never shifts the artwork.
 | `opacity`     | number                                                           | `1`                     | 0–1; multiplies every operation's alpha                    |
 | `blendMode`   | `'normal'\|'multiply'\|'screen'\|'overlay'\|'darken'\|'lighten'` | `'normal'`              | combines the flattened layer with visible artwork below it |
 | `adjustments` | AdjustmentSettings                                               | all neutral             | editable effects applied without replacing operations      |
+| `effects?`    | LayerEffect[]                                                    | absent = none           | ordered, toggleable per-layer effects; drop shadow first   |
 | `mask?`       | LayerMask                                                        | absent = fully revealed | editable visibility without replacing operations           |
 | `locked`      | boolean                                                          | `false`                 | rejects all content edits                                  |
 | `operations`  | Operation[]                                                      | `[]`                    | bottom-to-top paint order                                  |
@@ -71,6 +72,28 @@ link never shifts the artwork.
 
 The complete settings object is saved on the layer. It affects the layer's
 flattened appearance but never replaces its operation list.
+
+### LayerEffect
+
+An ordered, toggleable entry in a layer's effect stack. Applied after
+adjustments/mask and before layer blending; each casts behind the layer.
+
+| Attribute | Type             | Default   | Rule                                            |
+| --------- | ---------------- | --------- | ----------------------------------------------- |
+| `id`      | string           | generated | non-empty, unique within the layer              |
+| `type`    | `'shadow'`       | —         | the only effect type today; a union as it grows |
+| `enabled` | boolean          | `true`    | disabled effects paint nothing                  |
+| `params`  | DropShadowParams | —         | type-specific; for `shadow`: the cast controls  |
+
+#### DropShadowParams
+
+| Attribute | Type   | Default   | Rule                                   |
+| --------- | ------ | --------- | -------------------------------------- |
+| `color`   | color  | `#000000` | normalized `#rrggbb`                   |
+| `opacity` | number | `0.45`    | 0–1                                    |
+| `radius`  | number | `8`       | blur radius in document pixels, 0–40   |
+| `offsetX` | number | `0`       | cast offset in document pixels, −40–40 |
+| `offsetY` | number | `4`       | cast offset in document pixels, −40–40 |
 
 ### LayerMask
 

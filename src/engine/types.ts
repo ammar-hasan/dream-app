@@ -217,11 +217,38 @@ export interface Layer {
   blendMode?: LayerBlendMode;
   /** Editable color and pixel effects applied after this layer is flattened. */
   adjustments?: Adjustments;
+  /**
+   * Ordered, toggleable per-layer effects (drop shadow first). Applied after
+   * adjustments/mask and before layer blending; each casts behind the layer.
+   * Absent = no effects; backward compatible.
+   */
+  effects?: LayerEffect[];
   /** Editable opacity applied after adjustments and before layer blending. */
   mask?: LayerMask;
   locked: boolean;
   /** Bottom-to-top paint order. */
   operations: Operation[];
+}
+
+/** Params for a drop-shadow effect (the first layer effect). */
+export interface DropShadowParams {
+  /** Normalized '#rrggbb'. */
+  color: Color;
+  /** 0..1. */
+  opacity: number;
+  /** Blur radius in document pixels, 0..40. */
+  radius: number;
+  /** Offset in document pixels, -40..40. */
+  offsetX: number;
+  offsetY: number;
+}
+
+/** One entry in a layer's effect stack. `type` will grow into a union. */
+export interface LayerEffect {
+  id: string;
+  type: 'shadow';
+  enabled: boolean;
+  params: DropShadowParams;
 }
 
 /** How an app-mode hotspot animates the move to its target frame. */

@@ -57,6 +57,26 @@ Presets choose the same editable settings rather than replacing content.
 | Cool    | hue −15, saturation 10, brightness 5  |
 | Warm    | sepia 25, saturation 10, brightness 5 |
 
+## The Effects stack
+
+Each layer carries an optional ordered **effect stack** beyond its color
+adjustments. Today the single effect is a **drop shadow**; the stack is
+reorderable and toggleable so further effects can be added without a rewrite.
+
+- A drop shadow casts the layer's own alpha silhouette behind it, blurred and
+  offset by the effect's params (color, opacity 0–1, blur radius 0–40 px,
+  offset X/Y −40–40 px). It paints below the layer content and never replaces
+  the operations.
+- Effects are applied after adjustments and the layer mask, and before the
+  layer's blend mode — so a shadow on a multiply layer still casts normally
+  beneath it.
+- Add / remove / toggle / reorder are each one undoable step. Editing a
+  shadow's sliders previews live through the same compositor and commits one
+  step on release (one drag = one undo).
+- Effects travel in `.dream` files and are sanitized on load (unknown types
+  and out-of-range params are dropped or clamped). An empty or all-disabled
+  stack costs nothing at render time.
+
 ## Move, flip, rotate (per layer)
 
 - The **Move tool (M in Draw mode, V in Draw mode)** drags the active

@@ -268,6 +268,17 @@ export const zh: Record<string, string> = {
   'adjust.invert': '反相',
   'adjust.blur': '模糊',
   'adjust.sharpen': '锐化',
+  'adjust.effects': '效果',
+  'adjust.effectShadow': '投影',
+  'adjust.effectAddShadow': '添加阴影',
+  'adjust.effectUp': '上移效果',
+  'adjust.effectDown': '下移效果',
+  'adjust.effectRemove': '移除效果',
+  'adjust.effectColor': '颜色',
+  'adjust.effect.opacity': '不透明度',
+  'adjust.effect.radius': '模糊',
+  'adjust.effect.offsetX': 'X 偏移',
+  'adjust.effect.offsetY': 'Y 偏移',
 
   // --- Layers panel ------------------------------------------------------------
   'layers.title': '图层',

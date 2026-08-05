@@ -53,6 +53,7 @@ import {
   updateLayerCommand,
 } from '../engine/history';
 import { createHotspot, MIN_HOTSPOT_SIZE } from '../engine/hotspots';
+import { DEFAULT_SHADOW, normalizeShadow } from '../engine/effects';
 import type { Adjustments, PixelBuffer } from '../engine/filters';
 import { distance, normalizeRect, pointInRect } from '../engine/geometry';
 import {
@@ -115,7 +116,9 @@ import type {
   Hotspot,
   HotspotTransition,
   ImageOp,
+  DropShadowParams,
   LayerBlendMode,
+  LayerEffect,
   LayerMaskMode,
   LayerMaskStroke,
   Narration,
@@ -188,6 +191,12 @@ export interface AdjustPreview {
   adjustments: Adjustments;
 }
 
+/** Live preview of an in-progress effect-stack edit (not yet committed). */
+export interface EffectsPreview {
+  layerId: string;
+  effects: LayerEffect[];
+}
+
 export type CornerHandle = 'nw' | 'ne' | 'sw' | 'se';
 
 /** In-progress Select-tool gesture (Design mode). */
@@ -236,6 +245,7 @@ export interface DreamStore {
   moveDraft: MoveDraft | null;
   cropDraft: CropDraft | null;
   adjustPreview: AdjustPreview | null;
+  effectsPreview: EffectsPreview | null;
   /** Design-mode layer-mask editing is explicit and never changes the chosen artwork tool. */
   maskEditing: boolean;
   maskMode: LayerMaskMode;
@@ -361,6 +371,18 @@ export interface DreamStore {
   setLayerOpacity(id: string, opacity: number): void;
   setLayerBlendMode(id: string, blendMode: LayerBlendMode): void;
   setLayerAdjustments(id: string, adjustments: Adjustments): void;
+  /** Append a new drop-shadow effect to the layer's effect stack; undoable. */
+  addLayerEffect(id: string, type: 'shadow'): void;
+  /** Remove one effect from the stack; undoable. */
+  removeLayerEffect(id: string, effectId: string): void;
+  /** Toggle an effect's enabled flag without removing it; undoable. */
+  toggleLayerEffect(id: string, effectId: string): void;
+  /** Move an effect up or down in the stack (paint order); undoable. */
+  reorderLayerEffect(id: string, effectId: string, direction: 'up' | 'down'): void;
+  /** Update one shadow effect's params (merged); undoable. */
+  updateLayerEffect(id: string, effectId: string, patch: Partial<DropShadowParams>): void;
+  /** Replace the whole effect stack (used by the slider-release commit); undoable. */
+  setLayerEffects(id: string, effects: LayerEffect[]): void;
   addLayerMask(id: string): void;
   setLayerMaskEditing(editing: boolean): void;
   setLayerMaskMode(mode: LayerMaskMode): void;
@@ -373,6 +395,7 @@ export interface DreamStore {
   importImage(buffer: PixelBuffer, name?: string): void;
   /** Show (or clear) session-only non-destructive settings before Apply. */
   setAdjustPreview(preview: AdjustPreview | null): void;
+  setEffectsPreview(preview: EffectsPreview | null): void;
   /** Bake the previewed raster into the layer as an undoable command. */
   applyLayerRaster(buffer: PixelBuffer, label?: string): void;
   flipLayer(direction: FlipDirection): void;
@@ -575,6 +598,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
     moveDraft: null,
     cropDraft: null,
     adjustPreview: null,
+    effectsPreview: null,
     maskEditing: false,
     maskMode: 'hide',
     symmetry: 'off',
@@ -623,6 +647,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         moveDraft: null,
         cropDraft: null,
         adjustPreview: null,
+        effectsPreview: null,
         maskEditing: false,
         wandDrag: null,
         lassoDraft: null,
@@ -666,6 +691,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
           moveDraft: null,
           cropDraft: null,
           adjustPreview: null,
+          effectsPreview: null,
           maskEditing: false,
           wandDraft: null,
           wandDrag: null,
@@ -872,6 +898,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         moveDraft: null,
         cropDraft: null,
         adjustPreview: null,
+        effectsPreview: null,
         maskEditing: false,
         wandDraft: null,
         wandDrag: null,
@@ -912,6 +939,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         moveDraft: null,
         cropDraft: null,
         adjustPreview: null,
+        effectsPreview: null,
         maskEditing: false,
         wandDraft: null,
         wandDrag: null,
@@ -1449,7 +1477,71 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
 
     setLayerAdjustments: (id, adjustments) => {
       execute(updateLayerCommand(get().doc, id, { adjustments }, 'Layer adjustments'));
-      set({ adjustPreview: null });
+      set({ adjustPreview: null, effectsPreview: null });
+    },
+
+    addLayerEffect: (id, type) => {
+      const layer = get().doc.layers.find((candidate) => candidate.id === id);
+      if (!layer || layer.locked) return;
+      if (type !== 'shadow') return;
+      const effect: LayerEffect = {
+        id: genId('fx'),
+        type,
+        enabled: true,
+        params: { ...DEFAULT_SHADOW },
+      };
+      execute(
+        updateLayerCommand(
+          get().doc,
+          id,
+          { effects: [...(layer.effects ?? []), effect] },
+          'Add shadow',
+        ),
+      );
+    },
+
+    removeLayerEffect: (id, effectId) => {
+      const layer = get().doc.layers.find((candidate) => candidate.id === id);
+      if (!layer?.effects) return;
+      const next = layer.effects.filter((effect) => effect.id !== effectId);
+      if (next.length === layer.effects.length) return;
+      execute(updateLayerCommand(get().doc, id, { effects: next }, 'Remove effect'));
+    },
+
+    toggleLayerEffect: (id, effectId) => {
+      const layer = get().doc.layers.find((candidate) => candidate.id === id);
+      if (!layer?.effects) return;
+      const next = layer.effects.map((effect) =>
+        effect.id === effectId ? { ...effect, enabled: !effect.enabled } : effect,
+      );
+      execute(updateLayerCommand(get().doc, id, { effects: next }, 'Toggle effect'));
+    },
+
+    reorderLayerEffect: (id, effectId, direction) => {
+      const layer = get().doc.layers.find((candidate) => candidate.id === id);
+      if (!layer?.effects) return;
+      const index = layer.effects.findIndex((effect) => effect.id === effectId);
+      if (index === -1) return;
+      const target = direction === 'up' ? index - 1 : index + 1;
+      if (target < 0 || target >= layer.effects.length) return;
+      const next = [...layer.effects];
+      [next[index], next[target]] = [next[target]!, next[index]!];
+      execute(updateLayerCommand(get().doc, id, { effects: next }, 'Reorder effects'));
+    },
+
+    updateLayerEffect: (id, effectId, patch) => {
+      const layer = get().doc.layers.find((candidate) => candidate.id === id);
+      if (!layer?.effects) return;
+      const next = layer.effects.map((effect) =>
+        effect.id === effectId
+          ? { ...effect, params: normalizeShadow({ ...effect.params, ...patch }) }
+          : effect,
+      );
+      execute(updateLayerCommand(get().doc, id, { effects: next }, 'Edit effect'));
+    },
+
+    setLayerEffects: (id, effects) => {
+      execute(updateLayerCommand(get().doc, id, { effects }, 'Edit effect'));
     },
 
     addLayerMask: (id) => {
@@ -1532,11 +1624,18 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       };
       const layer = createLayer(name?.trim() || `Image ${doc.layers.length + 1}`, [op]);
       execute(addLayerCommand(layer));
-      set({ activeLayerId: layer.id, adjustPreview: null, maskEditing: false });
+      set({
+        activeLayerId: layer.id,
+        adjustPreview: null,
+        effectsPreview: null,
+        maskEditing: false,
+      });
       get().dismissHint();
     },
 
     setAdjustPreview: (preview) => set({ adjustPreview: preview }),
+
+    setEffectsPreview: (preview) => set({ effectsPreview: preview }),
 
     applyLayerRaster: (buffer, label = 'Apply filter') => {
       const layer = activeLayer();
@@ -1550,7 +1649,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         patch: { x: 0, y: 0, width: buffer.width, height: buffer.height, data: buffer.data },
       };
       execute(replaceLayerContentCommand(get().doc, layer.id, [op], label));
-      set({ adjustPreview: null });
+      set({ adjustPreview: null, effectsPreview: null });
     },
 
     flipLayer: (direction) => {
@@ -1609,6 +1708,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
           moveDraft: null,
           cropDraft: null,
           adjustPreview: null,
+          effectsPreview: null,
           maskEditing: next.layers.find((layer) => layer.id === activeLayerId)?.mask
             ? s.maskEditing
             : false,
@@ -1640,6 +1740,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
           moveDraft: null,
           cropDraft: null,
           adjustPreview: null,
+          effectsPreview: null,
           maskEditing: next.layers.find((layer) => layer.id === activeLayerId)?.mask
             ? s.maskEditing
             : false,
@@ -1688,6 +1789,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         moveDraft: null,
         cropDraft: null,
         adjustPreview: null,
+        effectsPreview: null,
         playing: false,
         playbackFrame: null,
       });

@@ -13,6 +13,10 @@ export class MockContext2D implements Renderer2D {
   font = '10px sans-serif';
   textBaseline = 'alphabetic';
   textAlign = 'start';
+  shadowColor = 'rgba(0, 0, 0, 0)';
+  shadowBlur = 0;
+  shadowOffsetX = 0;
+  shadowOffsetY = 0;
 
   /** Every method call, recorded as [name, ...args]. */
   readonly log: unknown[][] = [];

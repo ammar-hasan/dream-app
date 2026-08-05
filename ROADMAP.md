@@ -1788,6 +1788,27 @@ colors as real design tokens instead of a flat recent-colors palette.
   66 browser journeys, 30 MCP tests and four honest agent evals. Deployed and
   byte-verified against the local Pages build.
 
+## Slice 81 — Per-layer effect stack + drop shadow ✅
+
+Persona need: give Sara one-tap logo depth, let Zǐxuān separate a figure from
+its background, and let Aleksandr treat layer effects as a real ordered stack
+instead of a flat preset bundle.
+
+- ✅ Each layer carries an optional ordered, toggleable `effects` stack beyond
+  its color adjustments. The first effect is a drop shadow.
+- ✅ A shadow casts the layer's alpha silhouette behind it (native blur), with
+  color, opacity 0–1, blur radius 0–40 px and offset X/Y −40–40 px. It paints
+  after adjustments/mask and before the layer blend mode.
+- ✅ Add / remove / toggle / reorder are each one undoable step. Slider edits
+  preview live through the same compositor and commit one step on release.
+- ✅ An empty or all-disabled stack costs nothing at render time (the simple
+  paint path is taken when nothing is active).
+- ✅ Portable: `effects` rides in `.dream` files, sanitized on load (unknown
+  types dropped, params clamped to range, duplicate ids removed).
+- ✅ Pure effect math + cache-aware compositing, store actions, rendered
+  controls, engine/store/portability tests and a production-browser journey.
+- ✅ Full release gates: pending final verification.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1809,8 +1830,9 @@ largest count of controls:
    require a child or low-literacy user to configure an AI provider.
 3. **Professional substrate:** core portable layer blending, editable per-layer
    adjustments, optional stroke stabilization, painted masks, named project
-   colors **and linked color variables** are established; continue with effect
-   stacks, then vector paths,
+   colors, linked color variables **and a per-layer effect stack** are
+   established; continue with effect stacks (more effect
+   types), then vector paths,
    typography, grids, constraints and linked reusable systems—progressively
    disclosed without crowding first-minute Draw.
 4. **Outcome-grade delivery:** publication preflight for scientific figures,

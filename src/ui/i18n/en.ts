@@ -274,6 +274,17 @@ export const en: Record<string, string> = {
   'adjust.invert': 'Invert',
   'adjust.blur': 'Blur',
   'adjust.sharpen': 'Sharpen',
+  'adjust.effects': 'Effects',
+  'adjust.effectShadow': 'Drop shadow',
+  'adjust.effectAddShadow': 'Add shadow',
+  'adjust.effectUp': 'Move effect up',
+  'adjust.effectDown': 'Move effect down',
+  'adjust.effectRemove': 'Remove effect',
+  'adjust.effectColor': 'Color',
+  'adjust.effect.opacity': 'Opacity',
+  'adjust.effect.radius': 'Blur',
+  'adjust.effect.offsetX': 'Offset X',
+  'adjust.effect.offsetY': 'Offset Y',
 
   // --- Layers panel ------------------------------------------------------------
   'layers.title': 'Layers',

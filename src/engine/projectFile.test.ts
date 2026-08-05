@@ -314,6 +314,51 @@ describe('projectFile', () => {
     expect(restored.colorRef).toBe('ink');
   });
 
+  it('preserves a per-layer effect stack across a round-trip', async () => {
+    const doc = withMirroredLayers(richDocument());
+    doc.layers[0] = {
+      ...doc.layers[0],
+      effects: [
+        {
+          id: 'fx-1',
+          type: 'shadow',
+          enabled: true,
+          params: { color: '#000000', opacity: 0.5, radius: 6, offsetX: 0, offsetY: 4 },
+        },
+      ],
+    };
+    const decoded = await decodeProject(await encodeProject(doc, fakeCodec), fakeCodec);
+    expect(decoded.layers[0].effects).toEqual([
+      {
+        id: 'fx-1',
+        type: 'shadow',
+        enabled: true,
+        params: { color: '#000000', opacity: 0.5, radius: 6, offsetX: 0, offsetY: 4 },
+      },
+    ]);
+  });
+
+  it('sanitizes a malformed effect stack on load', async () => {
+    const doc = withMirroredLayers(richDocument());
+    const plain = { ...doc };
+    delete plain.frames;
+    delete plain.activeFrameId;
+    const parsed = JSON.parse(await encodeProject(plain, fakeCodec));
+    parsed.document.layers[0].effects = [
+      { id: 'bad', type: 'glow', enabled: true, params: {} },
+      { id: 'ok', type: 'shadow', enabled: true, params: { opacity: 9, radius: -3 } },
+    ];
+    const cleaned = await decodeProject(JSON.stringify(parsed), fakeCodec);
+    expect(cleaned.layers[0].effects).toEqual([
+      {
+        id: 'ok',
+        type: 'shadow',
+        enabled: true,
+        params: { color: '#000000', opacity: 1, radius: 0, offsetX: 0, offsetY: 4 },
+      },
+    ]);
+  });
+
   it('serializes raster payloads as PNG data URLs, not byte arrays', async () => {
     const doc = withMirroredLayers(richDocument());
     const text = await encodeProject(doc, fakeCodec);

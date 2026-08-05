@@ -278,6 +278,17 @@ export const pt: Record<string, string> = {
   'adjust.invert': 'Inverter',
   'adjust.blur': 'Desfocar',
   'adjust.sharpen': 'Nitidez',
+  'adjust.effects': 'Efeitos',
+  'adjust.effectShadow': 'Sombra',
+  'adjust.effectAddShadow': 'Adicionar sombra',
+  'adjust.effectUp': 'Mover efeito para cima',
+  'adjust.effectDown': 'Mover efeito para baixo',
+  'adjust.effectRemove': 'Remover efeito',
+  'adjust.effectColor': 'Cor',
+  'adjust.effect.opacity': 'Opacidade',
+  'adjust.effect.radius': 'Desfoque',
+  'adjust.effect.offsetX': 'Desloc. X',
+  'adjust.effect.offsetY': 'Desloc. Y',
 
   // --- Layers panel ------------------------------------------------------------
   'layers.title': 'Camadas',

@@ -109,7 +109,12 @@ export class LayerCache {
         this.renderSnapshot(doc, layers, ctx, renderOpts);
       } else {
         for (const layer of layers) {
-          compositeLayerBitmap(layer, this.entryFor(doc, layer, renderOpts).canvas, ctx);
+          compositeLayerBitmap(
+            layer,
+            this.entryFor(doc, layer, renderOpts).canvas,
+            ctx,
+            renderOpts,
+          );
         }
       }
     } finally {

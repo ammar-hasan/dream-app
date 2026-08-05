@@ -272,6 +272,17 @@ export const ar: Record<string, string> = {
   'adjust.invert': 'عكس',
   'adjust.blur': 'تمويه',
   'adjust.sharpen': 'حدة',
+  'adjust.effects': 'تأثيرات',
+  'adjust.effectShadow': 'ظل مسقط',
+  'adjust.effectAddShadow': 'إضافة ظل',
+  'adjust.effectUp': 'تحريك التأثير لأعلى',
+  'adjust.effectDown': 'تحريك التأثير لأسفل',
+  'adjust.effectRemove': 'إزالة التأثير',
+  'adjust.effectColor': 'اللون',
+  'adjust.effect.opacity': 'الشفافية',
+  'adjust.effect.radius': 'الضبابية',
+  'adjust.effect.offsetX': 'إزاحة س',
+  'adjust.effect.offsetY': 'إزاحة ص',
 
   // --- Layers panel ------------------------------------------------------------
   'layers.title': 'الطبقات',

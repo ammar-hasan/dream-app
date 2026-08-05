@@ -632,6 +632,28 @@ test('linked color variables propagate edits to the canvas and stop when unlinke
   ).resolves.toBe(unlinked);
 });
 
+test('a per-layer drop shadow casts behind the artwork and is undoable', async ({ page }) => {
+  await bootApp(page);
+  await drawStroke(page);
+  const baseline = await nonWhitePixels(page);
+
+  // The Adjust panel appears once the layer has content; adding a shadow casts
+  // extra non-white pixels around the stroke.
+  await page.getByRole('button', { name: 'Add shadow' }).click();
+  await expect.poll(() => nonWhitePixels(page)).toBeGreaterThan(baseline);
+
+  // Disabling the effect removes the cast pixels.
+  const shadowLabel = page.getByRole('checkbox', { name: 'Drop shadow' });
+  await shadowLabel.uncheck();
+  await expect.poll(() => nonWhitePixels(page)).toBe(baseline);
+
+  // Re-enable, then undo removes the effect entirely.
+  await shadowLabel.check();
+  await expect.poll(() => nonWhitePixels(page)).toBeGreaterThan(baseline);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(() => nonWhitePixels(page)).toBe(baseline);
+});
+
 test('canvas drag targets distinguish components, images and invalid content', async ({ page }) => {
   await page.addInitScript(() => {
     const target = window as Window & { __dreamHaptics?: Array<number | number[]> };

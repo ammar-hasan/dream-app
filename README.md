@@ -253,6 +253,12 @@ and the language picker.
   blur (box) and sharpen (3x3 kernel) with live preview and B&W / Vintage / Cool /
   Warm presets — Apply saves one undoable editable effect without flattening
   original marks; Cancel restores the last saved settings
+- **Effect stack**: each layer carries an ordered, toggleable stack beyond its
+  color adjustments. The first effect is a **drop shadow** (color, opacity,
+  0–40 px blur, −40–40 px X/Y offset) that casts the layer's alpha behind it.
+  Add/remove/toggle/reorder are one undoable step each; slider edits preview
+  live and commit on release. Disabled effects cost nothing; the stack rides
+  in `.dream` files and is sanitized on load.
 - Crop tool (drag a rectangle, Apply or Enter) and a Resize dialog that scales
   the document and its content to fit (nearest-neighbor for raster pixels)
 - Undo/redo across every operation (200-step command history)

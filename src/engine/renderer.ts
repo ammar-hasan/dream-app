@@ -8,6 +8,7 @@
 
 import { cssColor, resolveOpColor } from './color';
 import { applyAdjustments, isIdentity, normalizeAdjustments } from './filters';
+import { hasActiveEffect, normalizeEffects } from './effects';
 import { arrowheadPoints, normalizeRect } from './geometry';
 import { sprayDots } from './spray';
 import type {
@@ -15,6 +16,7 @@ import type {
   DreamDocument,
   Layer,
   LayerBlendMode,
+  LayerEffect,
   LayerMaskStroke,
   Operation,
   ProjectColor,
@@ -34,6 +36,11 @@ export interface Renderer2D {
   lineJoin: string;
   font: string;
   textBaseline: string;
+  /** Native drop-shadow controls (used by the layer-effect stack). */
+  shadowColor: string;
+  shadowBlur: number;
+  shadowOffsetX: number;
+  shadowOffsetY: number;
   save(): void;
   restore(): void;
   beginPath(): void;
@@ -154,7 +161,17 @@ export function layerCompositeOperation(blendMode: LayerBlendMode | undefined): 
 }
 
 /** Composite an already-flattened layer bitmap with its document blend mode. */
-export function compositeLayerBitmap(layer: Layer, bitmap: unknown, ctx: Renderer2D): void {
+export function compositeLayerBitmap(
+  layer: Layer,
+  bitmap: unknown,
+  ctx: Renderer2D,
+  opts: RenderOptions = {},
+): void {
+  const effects = normalizeEffects(layer.effects);
+  if (hasActiveEffect(effects)) {
+    const canvas = bitmap as CanvasLike;
+    drawLayerShadow(ctx, bitmap, canvas.width, canvas.height, effects, opts);
+  }
   if (!layer.blendMode || layer.blendMode === 'normal') {
     ctx.drawImage(bitmap, 0, 0);
     return;
@@ -165,6 +182,41 @@ export function compositeLayerBitmap(layer: Layer, bitmap: unknown, ctx: Rendere
     ctx.drawImage(bitmap, 0, 0);
   } finally {
     ctx.restore();
+  }
+}
+
+/**
+ * Cast each enabled shadow effect behind the layer. Uses the native
+ * `shadow*` properties on a scratch canvas to blur/offset the bitmap's alpha
+ * silhouette, then strips the bitmap itself so only the halo lands behind.
+ */
+function drawLayerShadow(
+  ctx: Renderer2D,
+  bitmap: unknown,
+  width: number,
+  height: number,
+  effects: LayerEffect[],
+  opts: RenderOptions,
+): void {
+  const { createCanvas } = resolveFactories(opts);
+  for (const effect of effects) {
+    if (effect.type !== 'shadow' || !effect.enabled) continue;
+    const { color, opacity, radius, offsetX, offsetY } = effect.params;
+    if (opacity <= 0) continue;
+    const scratch = createCanvas(width, height);
+    const sctx = scratch.getContext('2d');
+    if (!sctx) continue;
+    sctx.save();
+    sctx.shadowColor = cssColor(color, opacity);
+    sctx.shadowBlur = radius;
+    sctx.shadowOffsetX = offsetX;
+    sctx.shadowOffsetY = offsetY;
+    sctx.drawImage(bitmap, 0, 0);
+    sctx.restore();
+    // Erase the bitmap itself, leaving only the offset/blur halo behind.
+    sctx.globalCompositeOperation = 'destination-out';
+    sctx.drawImage(bitmap, 0, 0);
+    ctx.drawImage(scratch, 0, 0);
   }
 }
 
@@ -215,16 +267,18 @@ export function renderCompositedLayer(
   opts: RenderOptions = {},
 ): void {
   const adjustments = normalizeAdjustments(layer.adjustments);
+  const effects = normalizeEffects(layer.effects);
   if (
     (!layer.blendMode || layer.blendMode === 'normal') &&
     isIdentity(adjustments) &&
+    !hasActiveEffect(effects) &&
     !(layer.mask?.enabled && layer.mask.strokes.length > 0)
   ) {
     renderLayer(layer, ctx, opts);
     return;
   }
   const bitmap = renderLayerBitmap(layer, width, height, opts);
-  compositeLayerBitmap(layer, bitmap, ctx);
+  compositeLayerBitmap(layer, bitmap, ctx, opts);
 }
 
 function renderMaskStroke(stroke: LayerMaskStroke, ctx: Renderer2D): void {

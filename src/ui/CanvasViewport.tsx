@@ -108,6 +108,7 @@ export function CanvasViewport() {
   const moveDraft = useDreamStore((s) => s.moveDraft);
   const cropDraft = useDreamStore((s) => s.cropDraft);
   const adjustPreview = useDreamStore((s) => s.adjustPreview);
+  const effectsPreview = useDreamStore((s) => s.effectsPreview);
   const maskEditing = useDreamStore((s) => s.maskEditing);
   const maskMode = useDreamStore((s) => s.maskMode);
   const symmetry = useDreamStore((s) => s.symmetry);
@@ -264,6 +265,16 @@ export function CanvasViewport() {
         layers: displayDoc.layers.map((layer) =>
           layer.id === adjustPreview.layerId
             ? { ...layer, adjustments: adjustPreview.adjustments }
+            : layer,
+        ),
+      };
+    }
+    if (effectsPreview) {
+      displayDoc = {
+        ...displayDoc,
+        layers: displayDoc.layers.map((layer) =>
+          layer.id === effectsPreview.layerId
+            ? { ...layer, effects: effectsPreview.effects }
             : layer,
         ),
       };
