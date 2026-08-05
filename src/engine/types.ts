@@ -50,6 +50,7 @@ export type ToolId =
   | 'stamp'
   | 'eyedropper'
   | 'text'
+  | 'pen'
   | 'move'
   | 'crop'
   | 'pan'
@@ -169,6 +170,35 @@ export interface TextOp extends OperationBase {
 }
 
 /**
+ * One node on an editable Bezier path. The anchor is always on the curve;
+ * the optional handles control the incoming/outgoing tangent. Absent handles
+ * make a corner (straight segment through the anchor); equal opposing handles
+ * make a smooth point.
+ */
+export interface PathAnchor {
+  point: Point;
+  /** Tangent into this anchor from the previous segment (document px). */
+  handleIn?: Point;
+  /** Tangent out of this anchor toward the next segment (document px). */
+  handleOut?: Point;
+}
+
+/**
+ * An editable vector path: a chain of cubic Bezier segments between anchors.
+ * `closed` joins the last anchor back to the first. Stroked only (no fill in
+ * the first cut); like other vector ops it transforms as one unit in Design.
+ */
+export interface PathOp extends OperationBase {
+  kind: 'path';
+  anchors: PathAnchor[];
+  closed: boolean;
+  /** Outline width in document pixels. */
+  size: number;
+  /** Line only: optional connector arrowheads; absent behaves as plain. */
+  lineStyle?: 'arrow' | 'double-arrow';
+}
+
+/**
  * A raster image placed on the canvas (import, or a baked filter result).
  * Like flood fill, pixels are baked into a RasterPatch so undo/redo and
  * IndexedDB serialization stay trivial (structured clone handles the bytes).
@@ -181,7 +211,7 @@ export interface ImageOp extends OperationBase {
   patch: RasterPatch;
 }
 
-export type Operation = StrokeOp | ShapeOp | FillOp | TextOp | ImageOp;
+export type Operation = StrokeOp | ShapeOp | FillOp | TextOp | PathOp | ImageOp;
 
 export type LayerMaskMode = 'hide' | 'reveal';
 

@@ -14,11 +14,13 @@
 
 import { genId } from './document';
 import { distance, normalizeRect, pointInPolygon, pointInRect } from './geometry';
+import { mapAnchors, pathBounds, samplePath } from './paths';
 import { resizeBufferNearest, transformOperation, translateOperation } from './transform';
 import type {
   Component,
   Layer,
   Operation,
+  PathOp,
   Point,
   Rect,
   ShapeOp,
@@ -80,6 +82,8 @@ export function selectionBounds(op: Operation): Rect {
         width: op.patch.width * op.scale,
         height: op.patch.height * op.scale,
       };
+    case 'path':
+      return pathBounds(op, op.size);
   }
 }
 
@@ -126,6 +130,15 @@ function hitStroke(op: StrokeOp, point: Point, tolerance: number): boolean {
   return op.points.some((p, i) => i > 0 && distanceToSegment(point, op.points[i - 1], p) <= reach);
 }
 
+/** Hit-test a Bezier path by sampling it to a polyline and testing segments. */
+function hitPath(op: PathOp, point: Point, tolerance: number): boolean {
+  if (op.anchors.length === 0) return false;
+  const reach = op.size / 2 + tolerance;
+  const pts = samplePath(op.anchors, op.closed);
+  if (pts.length === 1) return distance(point, pts[0]) <= reach;
+  return pts.some((p, i) => i > 0 && distanceToSegment(point, pts[i - 1], p) <= reach);
+}
+
 function hitShape(op: ShapeOp, point: Point, tolerance: number): boolean {
   if (op.shape === 'line') {
     return distanceToSegment(point, op.from, op.to) <= op.size / 2 + tolerance;
@@ -153,6 +166,8 @@ export function hitTestOperation(op: Operation, point: Point, tolerance = 0): bo
       return hitShape(op, point, tolerance);
     case 'text':
       return pointInRect(point, inflate(estimateTextBounds(op), tolerance));
+    case 'path':
+      return hitPath(op, point, tolerance);
     case 'fill':
     case 'image':
       return pointInRect(point, inflate(selectionBounds(op), tolerance));
@@ -253,6 +268,12 @@ export function scaleOperationAbout(op: Operation, anchor: Point, factor: number
         position: scalePoint(op.position, anchor, f),
         fontSize: Math.max(4, op.fontSize * f),
       };
+    case 'path':
+      return {
+        ...op,
+        anchors: mapAnchors(op.anchors, (p) => scalePoint(p, anchor, f)),
+        size: Math.max(0.5, op.size * f),
+      };
     case 'image': {
       const topLeft = scalePoint({ x: op.patch.x, y: op.patch.y }, anchor, f);
       return {
@@ -304,6 +325,11 @@ export function rotateOperation(op: Operation, center: Point, angle: number): Op
     case 'text':
       // The anchor rotates with the content; glyphs stay upright.
       return { ...op, position: rotatePoint(op.position, center, angle) };
+    case 'path':
+      return {
+        ...op,
+        anchors: mapAnchors(op.anchors, (p) => rotatePoint(p, center, angle)),
+      };
     default:
       return op;
   }

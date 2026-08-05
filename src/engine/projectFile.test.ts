@@ -314,6 +314,36 @@ describe('projectFile', () => {
     expect(restored.colorRef).toBe('ink');
   });
 
+  it('preserves an editable Bezier path across a round-trip', async () => {
+    const doc = withMirroredLayers(richDocument());
+    doc.layers[0].operations.push({
+      id: 'pen-1',
+      kind: 'path',
+      color: '#1f2937',
+      opacity: 1,
+      size: 3,
+      closed: true,
+      anchors: [
+        { point: { x: 1, y: 2 }, handleOut: { x: 3, y: 2 } },
+        { point: { x: 5, y: 6 }, handleIn: { x: 4, y: 6 } },
+      ],
+    });
+    const decoded = await decodeProject(await encodeProject(doc, fakeCodec), fakeCodec);
+    const restored = decoded.layers[0].operations.find((op) => op.id === 'pen-1')!;
+    expect(restored).toEqual({
+      id: 'pen-1',
+      kind: 'path',
+      color: '#1f2937',
+      opacity: 1,
+      size: 3,
+      closed: true,
+      anchors: [
+        { point: { x: 1, y: 2 }, handleOut: { x: 3, y: 2 } },
+        { point: { x: 5, y: 6 }, handleIn: { x: 4, y: 6 } },
+      ],
+    });
+  });
+
   it('preserves a per-layer effect stack across a round-trip', async () => {
     const doc = withMirroredLayers(richDocument());
     doc.layers[0] = {

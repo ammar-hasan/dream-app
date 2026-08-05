@@ -19,6 +19,7 @@ import type {
   LayerEffect,
   LayerMaskStroke,
   Operation,
+  PathOp,
   ProjectColor,
   RasterPatch,
   ShapeOp,
@@ -44,8 +45,10 @@ export interface Renderer2D {
   save(): void;
   restore(): void;
   beginPath(): void;
+  closePath(): void;
   moveTo(x: number, y: number): void;
   lineTo(x: number, y: number): void;
+  bezierCurveTo(c1x: number, c1y: number, c2x: number, c2y: number, x: number, y: number): void;
   stroke(): void;
   fill(): void;
   rect(x: number, y: number, w: number, h: number): void;
@@ -340,6 +343,9 @@ export function renderOperation(
         ctx.textBaseline = 'top';
         ctx.fillText(op.text, op.position.x, op.position.y);
         break;
+      case 'path':
+        renderPath(op, ctx, color);
+        break;
       case 'fill':
         renderPatch(op.patch, 1, ctx, opts);
         break;
@@ -436,6 +442,38 @@ function renderShape(op: ShapeOp, ctx: Renderer2D, color: Color): void {
   }
   ctx.strokeStyle = cssColor(color);
   ctx.lineWidth = op.size;
+  ctx.stroke();
+}
+
+/** Stroke an editable Bezier path through its anchors. */
+function renderPath(op: PathOp, ctx: Renderer2D, color: Color): void {
+  if (op.anchors.length === 0) return;
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = cssColor(color);
+  ctx.lineWidth = op.size;
+  ctx.beginPath();
+  const first = op.anchors[0]!.point;
+  ctx.moveTo(first.x, first.y);
+  const segments = op.closed ? op.anchors.length : op.anchors.length - 1;
+  for (let i = 0; i < segments; i += 1) {
+    const a = op.anchors[i]!;
+    const b = op.anchors[(i + 1) % op.anchors.length]!;
+    const c1 = a.handleOut ?? a.point;
+    const c2 = b.handleIn ?? b.point;
+    ctx.bezierCurveTo(c1.x, c1.y, c2.x, c2.y, b.point.x, b.point.y);
+  }
+  if (op.closed) ctx.closePath();
+  if (op.lineStyle === 'arrow' || op.lineStyle === 'double-arrow') {
+    const a = op.anchors[op.anchors.length - 1]!.point;
+    const b = op.anchors[0]!.point;
+    const [h1, h2] = arrowheadPoints(a, b, op.size);
+    ctx.moveTo(b.x, b.y);
+    ctx.lineTo(h1.x, h1.y);
+    ctx.moveTo(b.x, b.y);
+    ctx.lineTo(h2.x, h2.y);
+  }
   ctx.stroke();
 }
 

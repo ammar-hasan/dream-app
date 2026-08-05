@@ -123,6 +123,8 @@ import type {
   LayerMaskStroke,
   Narration,
   Operation,
+  PathAnchor,
+  PathOp,
   Point,
   ProjectColor,
   RasterPatch,
@@ -261,6 +263,8 @@ export interface DreamStore {
   lassoDraft: Point[] | null;
   /** In-progress Link-tool drag (app mode), doc-space corners. */
   linkDraft: { from: Point; to: Point } | null;
+  /** Pen-tool draft: anchors placed so far (a PathOp in construction). */
+  penDraft: { anchors: PathAnchor[]; dragging: boolean } | null;
   /** Link rect awaiting the "go to frame…" dialog, if any. */
   pendingHotspot: Rect | null;
   /** Design mode: ids of the selected ops on the active layer. */
@@ -355,6 +359,16 @@ export interface DreamStore {
   pointerDown(point: Point, event?: { shiftKey?: boolean; pressure?: number }): void;
   pointerMove(point: Point, event?: { shiftKey?: boolean; pressure?: number }): void;
   pointerUp(point: Point, event?: { shiftKey?: boolean }): void;
+  /** Pen tool: place or close an anchor (close when clicking the first anchor). */
+  penDown(point: Point): void;
+  /** Pen tool: drag the just-placed anchor's handles (smooth point). */
+  penMove(point: Point): void;
+  /** Pen tool: release the active anchor. */
+  penUp(): void;
+  /** Pen tool: commit the in-progress path (≥2 anchors) and clear the draft. */
+  finishPen(close: boolean): void;
+  /** Pen tool: discard the in-progress path. */
+  cancelPen(): void;
   /** Commit a flood fill; the viewport supplies the active layer's raster. */
   applyFillAt(point: Point, raster: RasterSource): void;
   /** Commit the text typed at `pendingText`. */
@@ -539,6 +553,20 @@ function readHintDismissed(): boolean {
   }
 }
 
+/** Build a PathOp from the pen draft's anchors (for both preview and commit). */
+function penPathOp(anchors: PathAnchor[], closed: boolean, settings: ToolSettings): PathOp {
+  return {
+    id: genId('op'),
+    kind: 'path',
+    color: settings.color,
+    opacity: settings.opacity,
+    size: settings.size,
+    closed,
+    anchors: anchors.map((anchor) => ({ ...anchor })),
+    ...(settings.lineStyle !== 'plain' ? { lineStyle: settings.lineStyle } : {}),
+  };
+}
+
 const initialDoc = createDocument({ width: 1024, height: 768 });
 
 export const useDreamStore = create<DreamStore>()((set, get) => {
@@ -597,6 +625,7 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
     pendingText: null,
     moveDraft: null,
     cropDraft: null,
+    penDraft: null,
     adjustPreview: null,
     effectsPreview: null,
     maskEditing: false,
@@ -768,6 +797,69 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
       execute(addOperationsCommand(layer.id, ops));
       get().dismissHint();
     },
+
+    penDown: (point) => {
+      const layer = activeLayer();
+      if (!layer || layer.locked) return;
+      const draft = get().penDraft;
+      // Clicking the first anchor of a ≥2-anchor draft closes the path.
+      const PEN_CLOSE_PX = 8 / get().zoom;
+      if (draft && draft.anchors.length >= 2) {
+        const first = draft.anchors[0]!.point;
+        if (Math.hypot(point.x - first.x, point.y - first.y) <= PEN_CLOSE_PX) {
+          get().finishPen(true);
+          return;
+        }
+      }
+      const anchors = draft ? [...draft.anchors] : [];
+      anchors.push({ point });
+      set({
+        penDraft: { anchors, dragging: true },
+        previewOp: penPathOp(anchors, false, get().settings),
+      });
+    },
+
+    penMove: (point) => {
+      const draft = get().penDraft;
+      if (!draft?.dragging) return;
+      const anchors = [...draft.anchors];
+      const last = anchors[anchors.length - 1]!;
+      // Dragging pulls a symmetric handle pair through the anchor: a smooth
+      // point. The outgoing handle points at the cursor; the incoming mirrors.
+      anchors[anchors.length - 1] = {
+        point: last.point,
+        handleOut: { ...point },
+        handleIn: { x: 2 * last.point.x - point.x, y: 2 * last.point.y - point.y },
+      };
+      set({
+        penDraft: { anchors, dragging: true },
+        previewOp: penPathOp(anchors, false, get().settings),
+      });
+    },
+
+    penUp: () => {
+      const draft = get().penDraft;
+      if (!draft) return;
+      set({ penDraft: { ...draft, dragging: false } });
+    },
+
+    finishPen: (close) => {
+      const draft = get().penDraft;
+      const layer = activeLayer();
+      if (!draft || draft.anchors.length < 2 || !layer) {
+        get().cancelPen();
+        return;
+      }
+      const op = penPathOp(draft.anchors, close, get().settings);
+      if (op) {
+        execute(
+          replaceLayerContentCommand(get().doc, layer.id, [...layer.operations, op], 'Pen path'),
+        );
+      }
+      set({ penDraft: null, previewOp: null });
+    },
+
+    cancelPen: () => set({ penDraft: null, previewOp: null }),
 
     insertStarterScene: (scene, name) => {
       const { doc } = get();
@@ -1111,6 +1203,10 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         set({ cropDraft: { from: point, to: point, dragging: true } });
         return;
       }
+      if (tool === 'pen') {
+        get().penDown(point);
+        return;
+      }
       const machine = DRAWING_TOOLS[tool];
       if (!machine) return;
       const layer = activeLayer();
@@ -1134,7 +1230,12 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         linkDraft,
         wandDrag,
         wandDraft,
+        penDraft,
       } = get();
+      if (penDraft?.dragging) {
+        get().penMove(point);
+        return;
+      }
       if (lassoDraft) {
         set({ lassoDraft: [...lassoDraft, point] });
         return;
@@ -1269,7 +1370,13 @@ export const useDreamStore = create<DreamStore>()((set, get) => {
         lassoDraft,
         linkDraft,
         wandDrag,
+        penDraft,
+        tool,
       } = get();
+      if (tool === 'pen' && penDraft?.dragging) {
+        get().penUp();
+        return;
+      }
       if (linkDraft) {
         set({ linkDraft: null });
         const rect = normalizeRect(linkDraft.from, point);

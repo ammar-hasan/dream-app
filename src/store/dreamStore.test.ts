@@ -263,6 +263,57 @@ describe('layers', () => {
   });
 });
 
+describe('pen tool', () => {
+  it('draws a smooth Bezier path by click-dragging anchors, then finishes', () => {
+    store().setTool('pen');
+    // First anchor: a plain click (corner).
+    store().pointerDown({ x: 10, y: 10 });
+    store().pointerUp({ x: 10, y: 10 });
+    expect(store().penDraft?.anchors).toHaveLength(1);
+    expect(store().penDraft?.anchors[0]).toEqual({ point: { x: 10, y: 10 } });
+
+    // Second anchor: click-drag to set a symmetric handle pair (smooth point).
+    store().pointerDown({ x: 40, y: 10 });
+    store().pointerMove({ x: 50, y: 0 });
+    store().pointerUp({ x: 50, y: 0 });
+    const second = store().penDraft!.anchors[1];
+    expect(second.point).toEqual({ x: 40, y: 10 });
+    expect(second.handleOut).toEqual({ x: 50, y: 0 });
+    expect(second.handleIn).toEqual({ x: 30, y: 20 });
+
+    // Enter finishes the open path; it commits one undoable PathOp.
+    store().finishPen(false);
+    const op = store().doc.layers[0].operations[0];
+    expect(op.kind).toBe('path');
+    expect(store().penDraft).toBeNull();
+    expect(store().canUndo).toBe(true);
+    store().undo();
+    expect(store().doc.layers[0].operations).toHaveLength(0);
+  });
+
+  it('closes the path when the pen clicks the first anchor', () => {
+    store().setTool('pen');
+    store().pointerDown({ x: 20, y: 20 });
+    store().pointerUp({ x: 20, y: 20 });
+    store().pointerDown({ x: 60, y: 20 });
+    store().pointerUp({ x: 60, y: 20 });
+    // A click near the first anchor (within zoom-scaled 8px) closes & commits.
+    store().pointerDown({ x: 20, y: 24 });
+    expect(store().doc.layers[0].operations[0]).toMatchObject({ kind: 'path', closed: true });
+    expect(store().penDraft).toBeNull();
+  });
+
+  it('cancelPen discards the in-progress draft without history', () => {
+    store().setTool('pen');
+    store().pointerDown({ x: 5, y: 5 });
+    store().pointerUp({ x: 5, y: 5 });
+    const undoBefore = store().canUndo;
+    store().cancelPen();
+    expect(store().penDraft).toBeNull();
+    expect(store().canUndo).toBe(undoBefore);
+  });
+});
+
 describe('raster baking', () => {
   it('replaces the active layer as one undoable AI-style bake', () => {
     store().setTool('brush');

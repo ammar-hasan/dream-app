@@ -779,6 +779,14 @@ holds.
       step. WHEN every effect is disabled or removed THEN the layer renders
       exactly as if the stack were absent. Effects travel in `.dream` files
       and are sanitized (unknown types dropped, params clamped) on load.
+192.  GIVEN the Pen tool WHEN the user clicks to place anchors and click-drags
+      to pull symmetric handles THEN an editable cubic Bezier path is drawn live
+      and committed as one undoable operation on Enter or double-click (≥2
+      anchors). WHEN the user clicks the first anchor of a ≥2-anchor draft THEN
+      the path closes; WHEN Esc is pressed THEN the draft is discarded with no
+      history. The committed path renders on the canvas, exports truthfully to
+      SVG, round-trips in `.dream`, and in Design mode selects and transforms as
+      one unit with its Bezier handles riding along.
 
 ## K. The ten end-to-end scenarios (persona proofs)
 

@@ -57,6 +57,7 @@ export const pt: Record<string, string> = {
   'tools.spray': 'Spray',
   'tools.eyedropper': 'Conta-gotas',
   'tools.text': 'Texto',
+  'tools.pen': 'Caneta',
   'tools.crop': 'Cortar',
   'tools.pan': 'Deslocar',
   'tools.zoom': 'Zoom',
@@ -99,6 +100,8 @@ export const pt: Record<string, string> = {
   'options.hint.zoom': 'Clique para ampliar. Alt+clique para reduzir.',
   'options.hint.fill': 'Clique numa região para preenchê-la com a cor atual.',
   'options.hint.text': 'Clique na tela, digite e pressione Enter para colocar o texto.',
+  'options.hint.pen':
+    'Clique para um ponto de canto, arraste para uma curva suave. Duplo clique ou Enter finaliza; clique no primeiro ponto para fechar.',
   'options.hint.wand':
     'Clique numa região colorida para recortá‑la. Arraste para mover, pressione Delete para remover ou copie para uma nova camada. Esc devolve ao lugar.',
   'options.hint.lasso':

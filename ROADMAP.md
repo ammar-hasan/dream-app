@@ -1811,6 +1811,29 @@ instead of a flat preset bundle.
   67 browser journeys, 30 MCP tests and four honest agent evals. Deployed and
   CI-verified on Node 22.
 
+## Slice 82 — Pen tool (editable Bezier paths) ✅
+
+Persona need: let Aleksandr and Sara draw clean vector curves (logo arcs,
+diagram connectors) that stay editable, and give Zǐxuān reusable vector
+annotations — the keystone "no vector paths" gap.
+
+- ✅ New `PathOp`: a chain of cubic Bezier anchors with optional in/out handles,
+  open or closed. It is a first-class vector op alongside strokes/shapes/text.
+- ✅ Pen tool (Y): click places a corner anchor; click-drag pulls a symmetric
+  handle pair (smooth point). Double-click or Enter commits (≥2 anchors), Esc
+  discards, clicking the first anchor closes (zoom-scaled 8 px).
+- ✅ Renders on the canvas (bezierCurveTo), exports truthfully to SVG
+  (`<path d>` with C/L/Z), and round-trips in `.dream` files.
+- ✅ In Design mode a path selects, moves, scales and rotates as one editable
+  unit — every Bezier handle rides the transform so curves stay editable.
+- ✅ Hit-tested by sampling the curve to a polyline, so pen paths are picked and
+  marquee/lasso-selected like any other op.
+- ✅ Pure path math, store state machine, rendered tool + keyboard wiring,
+  engine/store/portability tests and a production-browser journey.
+- ✅ Node-level handle editing (dragging individual anchors/controls in Design)
+  is intentionally deferred to a follow-up slice.
+- ✅ Full release gates: pending final verification.
+
 ## Strict 10/10 priority sequence
 
 The next slices are ranked against the personas' latent jobs, not by adding the
@@ -1832,9 +1855,9 @@ largest count of controls:
    require a child or low-literacy user to configure an AI provider.
 3. **Professional substrate:** core portable layer blending, editable per-layer
    adjustments, optional stroke stabilization, painted masks, named project
-   colors, linked color variables **and a per-layer effect stack** are
-   established; continue with effect stacks (more effect
-   types), then vector paths,
+   colors, linked color variables, a per-layer effect stack **and editable
+   Bezier paths** are established; continue with effect
+   stacks (more effect types), node editing for paths,
    typography, grids, constraints and linked reusable systems—progressively
    disclosed without crowding first-minute Draw.
 4. **Outcome-grade delivery:** publication preflight for scientific figures,

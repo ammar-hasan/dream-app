@@ -1105,6 +1105,9 @@ export function CanvasViewport() {
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
+        onDoubleClick={() => {
+          if (useDreamStore.getState().penDraft) useDreamStore.getState().finishPen(false);
+        }}
         onPointerLeave={clearPointerFeedback}
         onPointerCancel={() => {
           panRef.current = null;

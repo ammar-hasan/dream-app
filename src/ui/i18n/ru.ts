@@ -53,6 +53,7 @@ export const ru: Record<string, string> = {
   'tools.spray': 'Спрей',
   'tools.eyedropper': 'Пипетка',
   'tools.text': 'Текст',
+  'tools.pen': 'Перо',
   'tools.crop': 'Обрезка',
   'tools.pan': 'Рука',
   'tools.zoom': 'Масштаб',
@@ -91,6 +92,8 @@ export const ru: Record<string, string> = {
   'options.hint.zoom': 'Клик — увеличить. Alt+клик — уменьшить.',
   'options.hint.fill': 'Кликните область, чтобы залить выбранным цветом.',
   'options.hint.text': 'Кликните по холсту, введите текст, нажмите Enter для размещения.',
+  'options.hint.pen':
+    'Клик — угловая точка, перетаскивание — плавная кривая. Двойной клик или Enter завершает; клик по первой точке замыкает.',
   'options.hint.wand':
     'Кликните по цветной области, чтобы выделить её. Тяните — переместить, Delete — удалить или скопируйте на новый слой. Esc — вернуть обратно.',
   'options.hint.lasso': 'Обведите объект, чтобы выделить. Shift — добавить к выбору.',

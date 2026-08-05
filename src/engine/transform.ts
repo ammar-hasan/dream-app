@@ -9,6 +9,7 @@
 
 import { mapLayer, withLayers } from './document';
 import { boundingRect, normalizeRect } from './geometry';
+import { mapAnchors, samplePath } from './paths';
 import type { PixelBuffer } from './filters';
 import type { DreamDocument, Layer, Operation, Point, RasterPatch, Rect } from './types';
 
@@ -97,6 +98,8 @@ export function operationBounds(op: Operation): Rect | null {
       return normalizeRect(op.from, op.to);
     case 'text':
       return { x: op.position.x, y: op.position.y, width: 0, height: 0 };
+    case 'path':
+      return boundingRect(samplePath(op.anchors, op.closed));
     case 'fill':
       return { x: op.patch.x, y: op.patch.y, width: op.patch.width, height: op.patch.height };
     case 'image':
@@ -143,6 +146,8 @@ export function translateOperation(op: Operation, dx: number, dy: number): Opera
       return { ...op, from: translatePoint(op.from, dx, dy), to: translatePoint(op.to, dx, dy) };
     case 'text':
       return { ...op, position: translatePoint(op.position, dx, dy) };
+    case 'path':
+      return { ...op, anchors: mapAnchors(op.anchors, (p) => translatePoint(p, dx, dy)) };
     case 'fill':
     case 'image':
       return { ...op, patch: { ...op.patch, x: op.patch.x + dx, y: op.patch.y + dy } };
@@ -257,6 +262,11 @@ export function transformOperation(
     case 'text':
       // The anchor moves with the content; glyphs themselves stay upright.
       return { ...op, position: transformPoint(op.position, cx, cy, transform) };
+    case 'path':
+      return {
+        ...op,
+        anchors: mapAnchors(op.anchors, (p) => transformPoint(p, cx, cy, transform)),
+      };
     case 'fill':
       return { ...op, patch: transformPatch(op.patch, 1, cx, cy, transform).patch };
     case 'image':
@@ -377,6 +387,12 @@ function scaleOperation(op: Operation, sx: number, sy: number): Operation {
         ...op,
         position: { x: op.position.x * sx, y: op.position.y * sy },
         fontSize: op.fontSize * mid,
+      };
+    case 'path':
+      return {
+        ...op,
+        anchors: mapAnchors(op.anchors, (p) => ({ x: p.x * sx, y: p.y * sy })),
+        size: op.size * mid,
       };
     case 'fill': {
       const resized = resizeBufferNearest(op.patch, op.patch.width * sx, op.patch.height * sy);

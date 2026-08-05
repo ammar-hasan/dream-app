@@ -56,6 +56,7 @@ export const zh: Record<string, string> = {
   'tools.spray': '喷枪',
   'tools.eyedropper': '吸管',
   'tools.text': '文字',
+  'tools.pen': '钢笔',
   'tools.crop': '裁剪',
   'tools.pan': '移动画布',
   'tools.zoom': '缩放',
@@ -97,6 +98,7 @@ export const zh: Record<string, string> = {
   'options.hint.zoom': '点击放大。Alt+点击缩小。',
   'options.hint.fill': '点击区域以用当前颜色填充。',
   'options.hint.text': '点击画布，输入文字，然后按回车放置文字。',
+  'options.hint.pen': '点击添加角点，拖动生成平滑曲线。双击或按回车结束；点击第一个点可闭合路径。',
   'options.hint.wand':
     '点击有颜色的区域将其抬出。拖动移动，按 Delete 删除，或复制到新图层。Esc 放回原位。',
   'options.hint.lasso': '画一圈包围对象以选中它们。Shift 可添加到选择。',

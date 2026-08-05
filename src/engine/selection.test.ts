@@ -139,6 +139,25 @@ describe('hitTestOperation', () => {
     expect(hitTestOperation(stroke(), { x: 30, y: 30 }, 4)).toBe(false);
   });
 
+  it('hits a Bezier path along the sampled curve and misses far from it', () => {
+    const path = {
+      id: 'p',
+      kind: 'path' as const,
+      color: '#000000',
+      opacity: 1,
+      size: 4,
+      closed: false,
+      anchors: [
+        { point: { x: 10, y: 10 } },
+        { point: { x: 50, y: 10 } },
+        { point: { x: 50, y: 50 } },
+      ],
+    };
+    expect(hitTestOperation(path, { x: 30, y: 10 })).toBe(true); // on a segment
+    expect(hitTestOperation(path, { x: 50, y: 30 })).toBe(true); // on another
+    expect(hitTestOperation(path, { x: 30, y: 30 })).toBe(false); // off the curve
+  });
+
   it('hits a single-point stroke as a dot', () => {
     const dot = stroke({ points: [{ x: 10, y: 10 }] });
     expect(hitTestOperation(dot, { x: 11, y: 11 })).toBe(true);

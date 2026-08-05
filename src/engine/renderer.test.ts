@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createDocument, createLayer, insertLayer } from './document';
 import { renderDocument, renderLayer, renderOperation } from './renderer';
 import { MockContext2D, makeMockFactories } from '../test/mockContext';
-import type { FillOp, ImageOp, ShapeOp, StrokeOp, TextOp } from './types';
+import type { FillOp, ImageOp, Operation, ShapeOp, StrokeOp, TextOp } from './types';
 
 const stroke: StrokeOp = {
   kind: 'stroke',
@@ -134,6 +134,32 @@ describe('renderDocument', () => {
     renderDocument(doc, ctx, factories);
     expect(factories.created).toHaveLength(0);
     expect(ctx.calls('drawImage')).toHaveLength(0);
+  });
+
+  it('strokes a Bezier path through its anchors via bezierCurveTo', () => {
+    const base = createDocument({ width: 100, height: 80 });
+    const pathOp: Operation = {
+      id: 'p',
+      kind: 'path',
+      color: '#000000',
+      opacity: 1,
+      size: 4,
+      closed: false,
+      anchors: [
+        { point: { x: 10, y: 10 } },
+        { point: { x: 50, y: 10 }, handleIn: { x: 30, y: 10 } },
+        { point: { x: 50, y: 50 }, handleIn: { x: 50, y: 30 } },
+      ],
+    };
+    const doc = { ...base, layers: [{ ...base.layers[0], operations: [pathOp] }] };
+    const ctx = new MockContext2D();
+    renderDocument(doc, ctx);
+    const beziers = ctx.calls('bezierCurveTo');
+    expect(beziers).toHaveLength(2);
+    // First segment: corner→smooth, c1 is the first anchor (no handleOut).
+    expect(beziers[0]).toEqual(['bezierCurveTo', 10, 10, 30, 10, 50, 10]);
+    expect(beziers[1]).toEqual(['bezierCurveTo', 50, 10, 50, 30, 50, 50]);
+    expect(ctx.calls('stroke')).toHaveLength(1);
   });
 
   it('applies an editable opacity mask after adjustments and before blending', () => {

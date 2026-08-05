@@ -98,6 +98,26 @@ commits nothing.
 - **Fill shapes toggle** (options panel): rectangles and ellipses commit
   filled with the current color and **no outline**. Lines are unaffected.
 
+### Pen (Y)
+
+The Pen tool draws editable cubic Bezier paths one anchor at a time.
+
+- **Click** places a corner anchor (no handles → straight segments through
+  it). **Click-drag** places a smooth anchor: dragging pulls a symmetric handle
+  pair, so the outgoing handle points at the cursor and the incoming handle
+  mirrors it, curving both segments that meet at the anchor.
+- **Double-click** or **Enter** finishes the open path (commits one undoable
+  op). **Esc** discards the in-progress draft with no history step. A path
+  needs at least two anchors to commit.
+- **Click the first anchor** of a ≥2-anchor draft to **close** the path back to
+  its start (the close threshold is the same zoom-scaled 8 px as snapping).
+- Outline width is the current size; line-end styles (Arrow / Arrows both ways)
+  attach to the closing segment like the Line tool.
+- A finished path is a first-class vector op: it renders on the canvas, exports
+  truthfully to SVG (as a `<path d>`), survives `.dream` round-trips, and in
+  Design mode selects, moves, scales and rotates as one editable unit with its
+  handles riding along. Node-level handle editing arrives in a later slice.
+
 ### Flood fill (G)
 
 Click to fill the contiguous region of matching color on the active layer

@@ -656,6 +656,30 @@ test('a per-layer drop shadow casts behind the artwork and is undoable', async (
   expect(Math.abs(afterUndo - baseline)).toBeLessThan(50);
 });
 
+test('the pen tool draws an editable Bezier path that commits on Enter', async ({ page }) => {
+  await bootApp(page);
+  await page.getByRole('button', { name: 'Pen', exact: true }).click();
+  const canvas = page.locator('.viewport-canvas');
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('viewport canvas has no box');
+  const baseline = await nonWhitePixels(page);
+  // Three corner anchors: click (down+up) at distinct points. The draft
+  // previews live, so pixels rise during construction.
+  for (const dx of [0, 60, 30]) {
+    await page.mouse.move(box.x + box.width / 2 + dx, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.up();
+  }
+  await expect.poll(() => nonWhitePixels(page)).toBeGreaterThan(baseline);
+  const drafted = await nonWhitePixels(page);
+  // Enter commits the open path; the committed render matches the draft.
+  await page.keyboard.press('Enter');
+  await expect.poll(() => nonWhitePixels(page)).toBe(drafted);
+  // Undo removes the committed path entirely.
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(() => nonWhitePixels(page)).toBe(baseline);
+});
+
 test('canvas drag targets distinguish components, images and invalid content', async ({ page }) => {
   await page.addInitScript(() => {
     const target = window as Window & { __dreamHaptics?: Array<number | number[]> };
@@ -1684,7 +1708,7 @@ test('phone editing dock keeps selection, every tool and every panel one task aw
   await allToolsButton.click();
   const allTools = dock.getByRole('group', { name: 'All tools' });
   await expect(allTools).toBeVisible();
-  await expect(allTools.getByRole('button')).toHaveCount(16);
+  await expect(allTools.getByRole('button')).toHaveCount(17);
   await allTools.getByRole('button', { name: 'Spray' }).click();
   await expect(allTools).toHaveCount(0);
   await expect(dock.getByRole('button', { name: 'Spray' })).toHaveAttribute('aria-pressed', 'true');

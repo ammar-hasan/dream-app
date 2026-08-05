@@ -49,6 +49,13 @@ export const LineIcon = (p: IconProps) => (
   </svg>
 );
 
+export const PenIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M4 20 6 14 15 5l3 3-9 9-5 3z" />
+    <path d="M14 6l3 3" />
+  </svg>
+);
+
 export const RectangleIcon = (p: IconProps) => (
   <svg {...base(p)}>
     <rect x="3" y="5" width="18" height="14" rx="1" />

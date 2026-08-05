@@ -112,10 +112,15 @@ export function useKeyboardShortcuts(): void {
       if (mod || e.altKey) return;
 
       if (e.key === 'Escape') {
-        if (store.wandDraft) store.cancelWand();
+        if (store.penDraft) store.cancelPen();
+        else if (store.wandDraft) store.cancelWand();
         else if (designing && store.selection.length > 0) store.clearSelection();
         else if (store.cropDraft) store.cancelCrop();
         else store.cancelText();
+        return;
+      }
+      if (e.key === 'Enter' && store.penDraft) {
+        store.finishPen(false);
         return;
       }
       if (e.key === 'Enter' && store.cropDraft) {

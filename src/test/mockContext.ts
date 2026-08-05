@@ -38,11 +38,17 @@ export class MockContext2D implements Renderer2D {
   beginPath(): void {
     this.record('beginPath');
   }
+  closePath(): void {
+    this.record('closePath');
+  }
   moveTo(x: number, y: number): void {
     this.record('moveTo', x, y);
   }
   lineTo(x: number, y: number): void {
     this.record('lineTo', x, y);
+  }
+  bezierCurveTo(c1x: number, c1y: number, c2x: number, c2y: number, x: number, y: number): void {
+    this.record('bezierCurveTo', c1x, c1y, c2x, c2y, x, y);
   }
   stroke(): void {
     this.record('stroke');

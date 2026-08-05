@@ -117,14 +117,14 @@ An empty mask is fully white, meaning the layer is fully revealed.
 
 ## Operation — shared base
 
-| Attribute   | Type                                         | Default      | Rule                                                                        |
-| ----------- | -------------------------------------------- | ------------ | --------------------------------------------------------------------------- |
-| `id`        | string                                       | generated    |                                                                             |
-| `kind`      | `'stroke'\|'shape'\|'fill'\|'text'\|'image'` | —            |                                                                             |
-| `color`     | color                                        | —            | erasers carry a color but ignore it                                         |
-| `colorRef?` | string                                       | absent       | id of a linked project color; renderer & exporters follow its current value |
-| `opacity`   | number 0–1                                   | tool setting | multiplied with layer opacity; pencil and eraser strokes always commit at 1 |
-| `groupId?`  | string                                       | absent       | Design-mode grouping; scoped to the layer                                   |
+| Attribute   | Type                                                 | Default      | Rule                                                                        |
+| ----------- | ---------------------------------------------------- | ------------ | --------------------------------------------------------------------------- |
+| `id`        | string                                               | generated    |                                                                             |
+| `kind`      | `'stroke'\|'shape'\|'fill'\|'text'\|'path'\|'image'` | —            |                                                                             |
+| `color`     | color                                                | —            | erasers carry a color but ignore it                                         |
+| `colorRef?` | string                                               | absent       | id of a linked project color; renderer & exporters follow its current value |
+| `opacity`   | number 0–1                                           | tool setting | multiplied with layer opacity; pencil and eraser strokes always commit at 1 |
+| `groupId?`  | string                                               | absent       | Design-mode grouping; scoped to the layer                                   |
 
 ### Stroke (`kind: 'stroke'`)
 
@@ -164,6 +164,30 @@ A flood fill baked to pixels when committed.
 | `text`       | string | —           | trimmed on commit; empty commits nothing                                 |
 | `fontSize`   | number | 24          | canvas px                                                                |
 | `fontFamily` | string | system sans | one of the named choices: Sans, Serif, Mono, Handwritten, Persian script |
+
+### Path (`kind: 'path'`)
+
+An editable vector path: a chain of cubic Bezier segments between anchors,
+drawn with the Pen tool. Stroked only (no fill in the first cut).
+
+| Attribute   | Type         | Default | Rule                                                            |
+| ----------- | ------------ | ------- | --------------------------------------------------------------- |
+| `anchors`   | PathAnchor[] | —       | ≥2 for a committable path; each carries optional Bezier handles |
+| `closed`    | boolean      | `false` | joins the last anchor back to the first                         |
+| `size`      | number       | tool    | outline width in document px                                    |
+| `lineStyle` | enum         | plain   | optional `arrow` / `double-arrow` head on the closing segment   |
+
+#### PathAnchor
+
+| Attribute   | Type  | Default | Rule                                                          |
+| ----------- | ----- | ------- | ------------------------------------------------------------- |
+| `point`     | Point | —       | always on the curve                                           |
+| `handleIn`  | Point | absent  | incoming tangent (absent = straight from the previous anchor) |
+| `handleOut` | Point | absent  | outgoing tangent (absent = straight to the next anchor)       |
+
+Absent handles make a corner; symmetric `handleIn`/`handleOut` make a smooth
+point. Move/scale/rotate a path and every handle rides along so curves stay
+editable after the transform.
 
 ### Image (`kind: 'image'`)
 

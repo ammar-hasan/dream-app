@@ -80,6 +80,25 @@ function operationSvg(op: Operation, projectColors: ProjectColor[]): string {
   if (op.kind === 'text') {
     return `<text x="${n(op.position.x)}" y="${n(op.position.y)}" fill="${escapeXml(color)}" font-family="${escapeXml(op.fontFamily)}" font-size="${n(op.fontSize)}" dominant-baseline="text-before-edge"${opacity}>${escapeXml(op.text)}</text>`;
   }
+  if (op.kind === 'path') {
+    if (op.anchors.length === 0) return '';
+    const first = op.anchors[0]!.point;
+    let d = `M ${n(first.x)} ${n(first.y)}`;
+    const segments = op.closed ? op.anchors.length : op.anchors.length - 1;
+    for (let i = 0; i < segments; i += 1) {
+      const a = op.anchors[i]!;
+      const b = op.anchors[(i + 1) % op.anchors.length]!;
+      const c1 = a.handleOut ?? a.point;
+      const c2 = b.handleIn ?? b.point;
+      if (c1 === a.point && c2 === b.point) {
+        d += ` L ${n(b.point.x)} ${n(b.point.y)}`;
+      } else {
+        d += ` C ${n(c1.x)} ${n(c1.y)} ${n(c2.x)} ${n(c2.y)} ${n(b.point.x)} ${n(b.point.y)}`;
+      }
+    }
+    if (op.closed) d += ' Z';
+    return `<path d="${d}" fill="none" stroke="${escapeXml(color)}" stroke-width="${n(op.size)}" stroke-linecap="round" stroke-linejoin="round"${opacity}/>`;
+  }
   throw new Error('SVG export received pixel content');
 }
 

@@ -55,6 +55,7 @@ export const fa: Record<string, string> = {
   'tools.spray': 'اسپری',
   'tools.eyedropper': 'قطره‌چکان رنگ',
   'tools.text': 'متن',
+  'tools.pen': 'قلم مسیری',
   'tools.crop': 'برش',
   'tools.pan': 'حرکت بوم',
   'tools.zoom': 'بزرگ‌نمایی',
@@ -93,6 +94,8 @@ export const fa: Record<string, string> = {
   'options.hint.zoom': 'برای بزرگ‌نمایی کلیک کن. Alt+کلیک برای کوچک‌نمایی.',
   'options.hint.fill': 'روی یک ناحیه کلیک کن تا با رنگ فعلی پر شود.',
   'options.hint.text': 'روی بوم کلیک کن، تایپ کن، سپس Enter بزن تا متن قرار بگیرد.',
+  'options.hint.pen':
+    'برای رأس کلیک کن، برای منحنی نرم بکش. برای پایان دو بار کلیک کن یا Enter بزن؛ برای بستن روی نقطهٔ اول کلیک کن.',
   'options.hint.wand':
     'روی یک ناحیه رنگی کلیک کن تا جدا شود. بکش برای جابجایی، Delete برای حذف، یا کپی کن به لایه جدید. Esc برای بازگرداندن.',
   'options.hint.lasso': 'دور اشیا حلقه بکش تا انتخاب شوند. Shift برای اضافه کردن به انتخاب.',

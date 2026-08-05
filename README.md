@@ -232,6 +232,11 @@ and the language picker.
 - Line, rectangle and ellipse tools with Shift-to-constrain (45° lines,
   squares, circles), plain/arrow/two-way line ends, and an optional fill-shapes
   mode (filled with the current color)
+- **Pen tool (Y)** for editable cubic Bezier paths: click to add corner
+  anchors, click-drag to pull symmetric smooth handles; double-click or Enter
+  finishes, Esc discards, clicking the first anchor closes. Paths render, export
+  to SVG (`<path d>`), round-trip in `.dream`, and transform as one editable
+  unit in Design mode (handles ride along)
 - Mirror symmetry (vertical / horizontal / quad) with live mirrored preview
 - Flood fill (bucket), magic wand (move / delete / copy-to-layer a region),
   eyedropper color picker, and a click-to-type text tool with a Persian-script

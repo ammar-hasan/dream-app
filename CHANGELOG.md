@@ -7,6 +7,14 @@ All notable changes to Dream are documented here. The format is based on
 
 ### Added
 
+- **Pen tool — editable Bezier paths** (slice 82): a new vector path operation
+  (`PathOp`) drawn with the Pen tool (Y). Click to add corner anchors,
+  click-drag to pull symmetric smooth handles; double-click or Enter commits
+  (≥2 anchors), Esc discards, clicking the first anchor closes. Paths render
+  on the canvas, export to SVG as `<path d>`, round-trip in `.dream`, and in
+  Design mode select and transform as one editable unit (Bezier handles ride
+  along). Node-level handle editing is deferred to a follow-up.
+
 - **Per-layer effect stack + drop shadow** (slice 81): each layer carries an
   ordered, toggleable effect stack beyond its color adjustments. The first
   effect is a drop shadow that casts the layer's alpha behind it (color,

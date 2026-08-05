@@ -58,6 +58,7 @@ export const en: Record<string, string> = {
   'tools.spray': 'Spray',
   'tools.eyedropper': 'Color picker',
   'tools.text': 'Text',
+  'tools.pen': 'Pen',
   'tools.crop': 'Crop',
   'tools.pan': 'Pan',
   'tools.zoom': 'Zoom',
@@ -99,6 +100,8 @@ export const en: Record<string, string> = {
   'options.hint.zoom': 'Click to zoom in. Alt+click to zoom out.',
   'options.hint.fill': 'Click a region to fill it with the current color.',
   'options.hint.text': 'Click on the canvas, type, then press Enter to place the text.',
+  'options.hint.pen':
+    'Click to add a corner point, drag for a smooth curve. Double-click or press Enter to finish; click the first point to close.',
   'options.hint.wand':
     'Click a colored region to lift it out. Drag it to move it, press Delete to remove it, or copy it to a new layer. Esc puts it back.',
   'options.hint.lasso': 'Draw a loop around objects to select them. Shift adds to the selection.',

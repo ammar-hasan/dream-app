@@ -57,6 +57,7 @@ export const ar: Record<string, string> = {
   'tools.spray': 'رش',
   'tools.eyedropper': 'أداة اختيار اللون',
   'tools.text': 'نص',
+  'tools.pen': 'قلم',
   'tools.crop': 'قص',
   'tools.pan': 'تحريك اللوحة',
   'tools.zoom': 'تكبير',
@@ -98,6 +99,8 @@ export const ar: Record<string, string> = {
   'options.hint.zoom': 'انقر للتكبير. Alt+نقرة للتصغير.',
   'options.hint.fill': 'انقر على منطقة لتعبئتها باللون الحالي.',
   'options.hint.text': 'انقر على اللوحة واكتب ثم اضغط Enter لوضع النص.',
+  'options.hint.pen':
+    'انقر لإضافة ركن، أو اسحب لمنحنى ناعم. انقر مرتين أو اضغط Enter للإنهاء؛ وانقر النقطة الأولى للإغلاق.',
   'options.hint.wand':
     'انقر على منطقة ملوّنة لرفعها. اسحبها لنقلها، اضغط Delete لحذفها، أو انسخها إلى طبقة جديدة. زر Esc يعيدها.',
   'options.hint.lasso': 'ارسم حلقة حول العناصر لتحديدها. زر Shift يضيف إلى التحديد.',
