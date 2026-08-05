@@ -1807,7 +1807,9 @@ instead of a flat preset bundle.
   types dropped, params clamped to range, duplicate ids removed).
 - ✅ Pure effect math + cache-aware compositing, store actions, rendered
   controls, engine/store/portability tests and a production-browser journey.
-- ✅ Full release gates: pending final verification.
+- ✅ Full release gates remain green: 944 unit tests, 97.39% engine coverage,
+  67 browser journeys, 30 MCP tests and four honest agent evals. Deployed and
+  CI-verified on Node 22.
 
 ## Strict 10/10 priority sequence
 
