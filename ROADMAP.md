@@ -1832,7 +1832,9 @@ annotations — the keystone "no vector paths" gap.
   engine/store/portability tests and a production-browser journey.
 - ✅ Node-level handle editing (dragging individual anchors/controls in Design)
   is intentionally deferred to a follow-up slice.
-- ✅ Full release gates: pending final verification.
+- ✅ Full release gates remain green: 957 unit tests, 96.47% engine coverage,
+  68 browser journeys, 30 MCP tests and four honest agent evals. Deployed and
+  CI-verified on Node 22.
 
 ## Strict 10/10 priority sequence
 
